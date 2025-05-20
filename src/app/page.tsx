@@ -3,13 +3,9 @@ import { redirect } from 'next/navigation'
 
 export default function Home() {
   const cookieStore = cookies()
-  const token = cookieStore.get('kin-access-token')?.value
+  //const token = cookieStore.get('kin-access-token')?.value
 
-  if (token) {
-    redirect('/dashboard')
-  } else {
-    redirect('/login')
-  }
+  redirect('/login');
 
   return null
 }
