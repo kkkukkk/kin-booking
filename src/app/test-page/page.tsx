@@ -11,7 +11,7 @@ type User = {
 	register_date: Date;
 }
 
-export default function TestPage() {
+const TestPage = () => {
 	const [users, setUsers] = useState<User[]>([])
 
 	useEffect(() => {
@@ -38,3 +38,5 @@ export default function TestPage() {
 		</div>
 	)
 }
+
+export default TestPage;
