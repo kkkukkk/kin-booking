@@ -8,3 +8,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export function getStorageImageUrl(bucket, filePath) {
+	//테스트
+	bucket = 'kin';
+	filePath = 'images/background.jpg';
+
+	const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+	return data.publicUrl;
+}
+
