@@ -5,7 +5,7 @@ export default function Home() {
   const cookieStore = cookies()
   //const token = cookieStore.get('kin-access-token')?.value
 
-  redirect('/login');
+  redirect('/not-found');
 
   return null
 }
