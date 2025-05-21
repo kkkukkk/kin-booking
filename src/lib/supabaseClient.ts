@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export function getStorageImageUrl(bucket, filePath) {
+export function getStorageImageUrl(bucket: string, filePath: string) {
 	//테스트
 	bucket = 'kin';
 	filePath = 'images/background.jpg';
