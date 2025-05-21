@@ -1,6 +1,6 @@
 import React from "react";
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
 	fullWidth?: boolean;
 	size?: 'sm' | 'md' | 'lg';
 	placeholder?: string;
