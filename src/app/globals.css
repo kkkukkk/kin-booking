@@ -4,6 +4,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --neon-green: rgb(119, 255, 153);
+  --neon-green-strong: rgba(119, 255, 153, .7);  /* 진한빛 */
+  --neon-green-medium: rgba(119, 255, 153, .5);  /* 중간빛 */
+  --neon-green-light: rgba(119, 255, 153, .3);   /* 연한빛 */
+  --neon-green-faint: rgba(119, 255, 153, .2);   /* 아주 연한빛 */
+  --black_10: rgba(0, 0, 0, .1);
+  --black_30: rgba(0, 0, 0, .3);
+  --black_50: rgba(0, 0, 0, .5);
+  --black_70: rgba(0, 0, 0, .7);
+  --white_10: rgba(255, 255, 255, .1);
+  --white_30: rgba(255, 255, 255, .3);
+  --white_50: rgba(255, 255, 255, .5);
+  --white_70: rgba(255, 255, 255, .7);
 }
 
 @media (prefers-color-scheme: dark) {

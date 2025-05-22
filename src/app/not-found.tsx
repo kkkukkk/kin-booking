@@ -1,8 +1,12 @@
+import Card from "@/components/Card";
+
 const NotFound = () => {
 	return (
-		<div className={'text-lg'}>
-			준비중입니다.
-		</div>
+		<Card>
+			<div className={'text-lg'}>
+				준비중입니다.
+			</div>
+		</Card>
 	);
 }
 
