@@ -1,0 +1,98 @@
+.layout-grid {
+    display: grid;
+    grid-template-rows: 5vh 90vh 5vh;
+    grid-template-columns: 5% 90% 5%;
+    grid-template-areas:
+    "header-left header-center header-right"
+    "main-left main-center main-right"
+    "footer-left footer-center footer-right";
+    height: 100vh;
+}
+
+/*
+.layout-grid.enter {
+    grid-template-rows: 20vh 60vh 20vh;
+    grid-template-columns: 10% 80% 10%;
+}
+*/
+
+.bg-image {
+    background-image: url('https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/images/background_2.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+
+
+/* grid-area 지정 클래스들 */
+.header-left {
+    grid-area: header-left;
+}
+.header-center {
+    grid-area: header-center;
+}
+.header-right {
+    grid-area: header-right;
+}
+
+.main-left {
+    grid-area: main-left;
+}
+.main-center {
+    grid-area: main-center;
+}
+.main-center.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.main-right {
+    grid-area: main-right;
+}
+
+.footer-left {
+    grid-area: footer-left;
+}
+.footer-center {
+    grid-area: footer-center;
+}
+.footer-right {
+    grid-area: footer-right;
+}
+
+/* PC/태블릿 (769px 이상) */
+@media (min-width: 769px) {
+    /* PC/태블릿용 스타일 */
+
+}
+
+/* 모바일 세로 (<=768px, portrait) */
+@media (max-width: 768px) and (orientation: portrait) {
+    /* 모바일 세로용 스타일 */
+    .layout-grid {
+        grid-template-rows: 5vh 90vh 5vh;
+        grid-template-columns: 100%;
+        grid-template-areas:
+            "header-center"
+            "main-center"
+            "footer-center";
+    }
+    .layout-grid > .card {
+        border-radius: unset;
+    }
+}
+
+/* 모바일 가로 (<=768px, landscape) */
+@media (max-width: 1024px) and (orientation: landscape) {
+    /* 모바일 가로용 스타일 */
+    .layout-grid {
+        grid-template-rows: 100vh;
+        grid-template-columns: 5% 90% 5%;
+        grid-template-areas:
+            "main-left main-center main-right"
+    }
+
+    .layout-grid > .card {
+        border-radius: unset;
+    }
+}

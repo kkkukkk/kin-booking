@@ -1,0 +1,54 @@
+/* button.module.css */
+.btn-base {
+    border-radius: 5px;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-base.round {
+    border-radius: 9999px;
+}
+
+/* 테마별 배경색 + 텍스트 */
+.theme-normal {
+    color: #000;
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.theme-dark {
+    color: #eee;
+    backdrop-filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255,255,255,.3);
+}
+.theme-neon {
+    color: var(--neon-green);
+    backdrop-filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+/* hover 효과 */
+.theme-normal:hover {
+    box-shadow:
+        0 0 4px var(--black_70),
+        0 0 8px var(--black_50),
+        0 0 12px var(--black_30),
+        0 0 20px var(--black_10);
+}
+.theme-dark:hover {
+    box-shadow:
+        0 0 4px var(--black_70),
+        0 0 8px var(--black_50),
+        0 0 12px var(--black_30),
+        0 0 20px var(--black_10);
+}
+.theme-neon:hover {
+    box-shadow:
+        0 0 4px var(--neon-green-strong),
+        0 0 8px var(--neon-green-medium),
+        0 0 12px var(--neon-green-light),
+        0 0 20px var(--neon-green-faint);
+}

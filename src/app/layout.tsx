@@ -1,22 +1,24 @@
-import React from "react";
-import './globals.css'
-import QueryProvider from '@/providers/QueryProvider'
+'use client';
 
+import React from 'react';
+import { usePathname } from 'next/navigation';
+import './globals.css';
+import '@/css/layout.css';
+import AppProviders from '@/providers/AppProviders';
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
+    const pathname = usePathname();
+    const isEnterPage = pathname === '/enter';
 
     return (
         <html lang="ko">
-            <body
-                className="min-h-screen bg-gray-100 flex items-center justify-center"
-                style={{ backgroundImage: `url(https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/images/background.jpg?v=${Date.now()})` }}
-            >
-                <div className="w-full max-w-sm bg-white bg-opacity-30 backdrop-blur-md rounded-xl p-6 shadow-lg">
-                    <QueryProvider>{children}</QueryProvider>
-                </div>
+            <body className={`layout-grid ${isEnterPage ? 'enter' : ''} bg-image`}>
+                <AppProviders>
+                    {children}
+                </AppProviders>
             </body>
         </html>
-    )
-}
+    );
+};
 
 export default RootLayout;
