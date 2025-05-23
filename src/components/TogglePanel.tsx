@@ -38,7 +38,7 @@ const TogglePanel = () => {
 				onClick={() => setOpen(!open)}
 				on={open}
 				theme="neon"
-				fontSizePx={"14px"}
+				fontSizePx={14}
 				style={{
 					opacity: open ? "1" : "0.6",
 					border: "1px solid rgba(255,255,255,.3)",
