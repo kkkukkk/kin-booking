@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 type Theme = "normal" | "dark" | "neon";
 
 interface ThemeState {
-	current: Theme | null
+	current: Theme
 }
 
 const initialState: ThemeState = {
