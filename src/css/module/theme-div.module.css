@@ -1,0 +1,21 @@
+.theme-div.normal {
+    color: #000;
+    backdrop-filter: blur(8px);
+    background-color: var(--normal-back);
+    border: 1px solid rgba(0,0,0,.1);
+}
+
+.theme-div.dark
+{
+    color: #eee;
+    backdrop-filter: blur(2px);
+    background-color: var(--dark-back);;
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+.theme-div.neon {
+    color: #eee;
+    backdrop-filter: blur(2px);
+    background-color: var(--dark-back);;
+    border: 1px solid rgba(255,255,255,.1);
+}

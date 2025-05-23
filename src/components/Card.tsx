@@ -1,27 +1,32 @@
 'use client'
 
 import React from "react";
-import ThemeButtonSet from "./ThemeButtonSet";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import '@/css/card.css';
+import clsx from "clsx";
+import styles from '@/css/module/card.module.css';
+import ThemeDiv from "@/components/base/ThemeDiv";
 
 const Card = ({
 	children,
-	className = "",
+	className,
 }: {
 	children: React.ReactNode;
 	className?: string;
 }) => {
 	const currentTheme = useSelector((state: RootState) => state.theme.current);
 
-	const themeClass = currentTheme === "neon" ? "dark neon" : currentTheme;
-
 	return (
-		<div className={`relative card ${themeClass} ${className}`}>
-			<ThemeButtonSet />
+		<ThemeDiv
+			className={clsx(
+				"relative",
+				styles.card,
+				currentTheme && styles[currentTheme],
+				className
+			)}
+		>
 			{children}
-		</div>
+		</ThemeDiv>
 	);
 };
 

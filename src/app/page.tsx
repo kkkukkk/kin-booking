@@ -1,11 +1,15 @@
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+'use client';
 
-export default function Home() {
-  const cookieStore = cookies()
-  //const token = cookieStore.get('kin-access-token')?.value
+import Card from "@/components/Card";
 
-  redirect('/not-found');
-
-  return null
+const Home = ()=> {
+  return (
+      <Card className={"main-center center"}>
+        <div className={'text-lg'}>
+          준비중입니다
+        </div>
+      </Card>
+  );
 }
+
+export default Home;
