@@ -1,11 +1,17 @@
 "use client";
 import React from "react";
-import { Button } from "@/components/ui/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setTheme } from "@/redux/slices/themeSlice";
+import clsx from "clsx";
+import Button from "@/components/base/Button";
+import ThemeDiv from "@/components/base/ThemeDiv";
 
-const ThemeButtonSet = () => {
+type ThemeButtonSetProps = {
+	isOpen: boolean;
+};
+
+const ThemeButtonSet = ({ isOpen }: ThemeButtonSetProps) => {
 	const dispatch = useDispatch();
 	const currentTheme = useSelector((state: RootState) => state.theme.current);
 
@@ -14,9 +20,18 @@ const ThemeButtonSet = () => {
 	};
 
 	return (
-		<div 
-			style={{ backdropFilter: "blur(5px)", backgroundColor: "rgba(243,243,243,0.8)" }}
-			className="absolute bottom-4 right-4 flex gap-4 bg-opacity-90 shadow-md p-3 rounded-lg"
+		<ThemeDiv
+			className={clsx(
+				"flex flex-col gap-2 p-2 rounded-full shadow-md",
+				"absolute bottom-full mb-2 left-1/2 -translate-x-1/2",
+				"transition-all duration-300 ease-out",
+				isOpen
+					? "opacity-100 scale-100 pointer-events-auto"
+					: "opacity-0 scale-95 pointer-events-none"
+			)}
+			style={{
+				width: "fit-content",
+			}}
 		>
 			{(["normal", "dark", "neon"] as const).map((theme) => (
 				<Button
@@ -24,13 +39,14 @@ const ThemeButtonSet = () => {
 					type="button"
 					theme={theme}
 					onClick={() => handleClick(theme)}
-					className={currentTheme === theme ? "" : ""}
+					className={currentTheme === theme ? "on" : ""}
 					round
+					on={currentTheme === theme}
 				>
 					{theme.charAt(0).toUpperCase() + theme.slice(1)}
 				</Button>
 			))}
-		</div>
+		</ThemeDiv>
 	);
 };
 

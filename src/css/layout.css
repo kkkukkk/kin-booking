@@ -1,12 +1,11 @@
 .layout-grid {
     display: grid;
-    grid-template-rows: 5vh 90vh 5vh;
+    grid-template-rows: 5% 90% 5%;
     grid-template-columns: 5% 90% 5%;
     grid-template-areas:
     "header-left header-center header-right"
     "main-left main-center main-right"
     "footer-left footer-center footer-right";
-    height: 100vh;
 }
 
 /*
@@ -17,7 +16,7 @@
 */
 
 .bg-image {
-    background-image: url('https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/images/background_1.jpg');
+    background-image: var(--background-image-url);
     background-size: cover;
     background-position: center;
 }
