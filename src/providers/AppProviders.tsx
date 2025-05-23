@@ -13,9 +13,6 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
 			<PersistGate
 				loading={<SpinnerOverlay />}
 				persistor={persistor}
-				onBeforeLift={() => {
-					(window as any).__PERSISTOR__ = persistor;
-				}}
 			>
 				<QueryProvider>{children}</QueryProvider>
 			</PersistGate>

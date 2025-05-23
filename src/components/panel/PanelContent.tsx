@@ -1,6 +1,6 @@
 'use client'
 
-import React, from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
