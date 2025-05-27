@@ -12,7 +12,7 @@ export const useAlertActions = () => {
 	const dispatch = useDispatch<AppDispatch>();
 
 	const showAlert = useCallback(
-		(payload: { type: AlertType; message: string; inputValue?: string }) => {
+		(payload: { type: AlertType; message: string; inputValue?: string, autoCloseTime?: number }) => {
 			dispatch(openAlert(payload));
 		},
 		[dispatch]
