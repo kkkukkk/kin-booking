@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import clsx from "clsx";
 import styles from '@/css/module/card.module.css';
@@ -14,7 +14,7 @@ const Card = ({
 	children: React.ReactNode;
 	className?: string;
 }) => {
-	const currentTheme = useSelector((state: RootState) => state.theme.current);
+	const currentTheme = useAppSelector((state: RootState) => state.theme.current);
 
 	return (
 		<ThemeDiv

@@ -6,7 +6,7 @@ import clsx from "clsx";
 import Button from "@/components/base/Button";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import ThemeButtonSet from "@/components/panel/ThemeButtonSet";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 
 type PanelContentProps = {
@@ -17,7 +17,7 @@ type PanelContentProps = {
 
 const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentProps) => {
 	const router = useRouter();
-	const currentTheme = useSelector((state: RootState) => state.theme.current);
+	const currentTheme = useAppSelector((state: RootState) => state.theme.current);
 
 	const toggleButton = (key: string) => {
 		if (key === "Home") return;

@@ -21,15 +21,11 @@ const rootReducer = combineReducers({
 
 const persistConfig = {
 	key: "root",
-	storage,  // 무조건 넣기 (클라이언트에서만 사용하니까)
+	storage,
 	whitelist: ["theme"],
 };
 
-const isClient = typeof window !== "undefined";
-
-const persistedReducer = isClient
-	? persistReducer(persistConfig, rootReducer)
-	: rootReducer;
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
 	reducer: persistedReducer,
@@ -41,7 +37,7 @@ export const store = configureStore({
 		}),
 });
 
-export const persistor = isClient ? persistStore(store) : null;
+export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof persistedReducer>;
 export type AppDispatch = typeof store.dispatch;

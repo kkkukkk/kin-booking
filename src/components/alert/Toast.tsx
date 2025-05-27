@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import useAlert from '@/hooks/useAlert';
 import clsx from 'clsx';
 import styles from "@/css/module/alert.module.css";
@@ -23,8 +23,7 @@ const Toast = () => {
 	const animationFrameRef = useRef<number | null>(null);
 	const progressBarRef = useRef<HTMLDivElement>(null);
 
-	// 진행률 애니메이션 업데이트 (ref로 직접 스타일 조작)
-	const updateProgress = () => {
+	const updateProgress = useCallback(() => {
 		if (!startTimeRef.current || !autoCloseTime) return;
 
 		const now = Date.now();
@@ -43,28 +42,18 @@ const Toast = () => {
 			if (progressBarRef.current) {
 				progressBarRef.current.style.width = '100%';
 			}
-			return; // 애니메이션 종료
+			return;
 		}
 
 		animationFrameRef.current = requestAnimationFrame(updateProgress);
-	};
+	}, [autoCloseTime, hideAlert]);
 
-	useEffect(() => {
-		if (isOpen) {
-			setShowAnimation(true);
-		} else {
-			setShowAnimation(false);
-		}
-	}, [isOpen]);
-
-	// isOpen 또는 isHovered 변경 시 애니메이션 시작/중지 제어
 	useEffect(() => {
 		if (isOpen && autoCloseTime) {
 			if (!isHovered) {
 				startTimeRef.current = Date.now();
 				animationFrameRef.current = requestAnimationFrame(updateProgress);
 
-				// 남은 시간 계산 후 타이머 설정 (마우스 오버 시 clear)
 				const remainingTime = autoCloseTime - elapsedTimeRef.current;
 				if (timeoutRef.current) clearTimeout(timeoutRef.current);
 				timeoutRef.current = setTimeout(() => {
@@ -76,7 +65,6 @@ const Toast = () => {
 					}
 				}, remainingTime);
 			} else {
-				// 마우스 올렸을 때 경과 시간 저장 후 애니메이션/타이머 정지
 				if (startTimeRef.current) {
 					elapsedTimeRef.current += Date.now() - startTimeRef.current;
 					startTimeRef.current = null;
@@ -90,7 +78,7 @@ const Toast = () => {
 			if (timeoutRef.current) clearTimeout(timeoutRef.current);
 			if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
 		};
-	}, [isOpen, isHovered, autoCloseTime, hideAlert]);
+	}, [isOpen, isHovered, autoCloseTime, hideAlert, updateProgress]);
 
 	if (!isOpen) return null;
 
