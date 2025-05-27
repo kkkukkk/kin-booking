@@ -39,8 +39,9 @@ body {
   color: var(--foreground);
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI",
   Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  height: calc(var(--vh, 1vh) * 100);
   margin: 0;
-  height: calc(var(--vh) * 100);
+  padding: 0;
 }
 
 

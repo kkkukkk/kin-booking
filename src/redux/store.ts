@@ -1,5 +1,6 @@
 import { combineReducers } from "redux";
 import themeReducer from "./slices/themeSlice";
+import alertReducer from "./slices/alertSlice";
 import {
 	persistStore,
 	persistReducer,
@@ -11,20 +12,24 @@ import {
 	REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import {configureStore} from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 
 const rootReducer = combineReducers({
 	theme: themeReducer,
-	// 다른 slice가 있으면 여기에 추가
+	alert: alertReducer,
 });
 
 const persistConfig = {
 	key: "root",
-	storage,
-	whitelist: ["theme"], // 유지할 slice 명
+	storage,  // 무조건 넣기 (클라이언트에서만 사용하니까)
+	whitelist: ["theme"],
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const isClient = typeof window !== "undefined";
+
+const persistedReducer = isClient
+	? persistReducer(persistConfig, rootReducer)
+	: rootReducer;
 
 export const store = configureStore({
 	reducer: persistedReducer,
@@ -36,7 +41,7 @@ export const store = configureStore({
 		}),
 });
 
-export const persistor = persistStore(store);
+export const persistor = isClient ? persistStore(store) : null;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

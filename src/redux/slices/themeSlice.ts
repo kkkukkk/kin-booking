@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-type Theme = "normal" | "dark" | "neon";
+import { Theme } from "@/types/theme";
 
 interface ThemeState {
 	current: Theme

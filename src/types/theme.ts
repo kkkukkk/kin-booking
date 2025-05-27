@@ -1,0 +1,1 @@
+export type Theme = "normal" | "dark" | "neon";

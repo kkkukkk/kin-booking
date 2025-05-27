@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
@@ -11,8 +13,6 @@ const ThemeDiv: React.FC<ThemeDivProps> = ({ children, className, ...rest }) => 
 	const theme = useSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
 
-	console.log(rehydrated);
-
 	if (!rehydrated) return null;
 
 	return (
@@ -24,5 +24,7 @@ const ThemeDiv: React.FC<ThemeDivProps> = ({ children, className, ...rest }) => 
 		</div>
 	);
 };
+
+ThemeDiv.displayName = "ThemeDiv";
 
 export default ThemeDiv;

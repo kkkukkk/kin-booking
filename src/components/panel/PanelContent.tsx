@@ -6,8 +6,8 @@ import clsx from "clsx";
 import Button from "@/components/base/Button";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import ThemeButtonSet from "@/components/panel/ThemeButtonSet";
-import {useSelector} from "react-redux";
-import {RootState} from "@/redux/store";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 type PanelContentProps = {
 	isOpen: boolean;
@@ -63,7 +63,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 			{panelButtons.map(({ key, onClick, name }) => (
 				<Button
 					key={key}
-					theme={currentTheme !== "normal" ? currentTheme : "dark"} // normal이면 적용 안 함
+					theme={currentTheme !== "normal" ? currentTheme : "dark"} // normal 이면 적용 안 함
 					onClick={() => {
 						toggleButton(key);
 						onClick();
@@ -71,6 +71,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 					className="btn-base w-12 h-12 text-sm"
 					round
 					on={!!activeButtons[key]}
+					reverse={!!activeButtons[key] && currentTheme === "normal"} // normal 일 때 on 이면 dark shadow
 				>
 					{name}
 				</Button>

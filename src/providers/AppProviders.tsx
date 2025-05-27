@@ -5,7 +5,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import { store, persistor } from "@/redux/store";
 import QueryProvider from "./QueryProvider";
 import { PersistGate } from "redux-persist/integration/react";
-import SpinnerOverlay from "@/components/SpinnerOverlay";
+import SpinnerOverlay from "@/components/spinner/SpinnerOverlay";
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
 	return (

@@ -1,27 +1,27 @@
 import React from "react";
+import clsx from "clsx";
+import styles from "@/css/module/input.module.css";
+import { InputProps } from "@/types/input";
 
-type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
-	fullWidth?: boolean;
-	size?: 'sm' | 'md' | 'lg';
-	placeholder?: string;
-};
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+	({ theme = "normal", variant = "box", error = false, className, ...rest }, ref) => {
+		return (
+			<input
+				{...rest}
+				ref={ref}
+				className={clsx(
+					styles["input-base"],
+					styles[`theme-${theme}`],
+					styles[`${variant}`],
+					error && styles["error"], // 에러 스타일
+					"pl-2 py-1 text-sm",
+					className
+				)}
+			/>
+		);
+	}
+);
 
-export const Input = ({ fullWidth = true, size = 'md', className, ...props }: InputProps) => {
-	const sizeClasses = {
-		sm: 'px-2 py-1.5 text-sm',
-		md: 'px-2 py-2 text-base',
-		lg: 'px-2 py-2.5 text-lg',
-	};
+Input.displayName = "Input";
 
-	return (
-		<input
-			{...props}
-			className={`
-				border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
-		        ${fullWidth ? 'w-full' : ''}
-		        ${sizeClasses[size]}
-		        ${className ?? ''}
-            `}
-		/>
-	);
-};
+export default Input;
