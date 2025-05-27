@@ -1,17 +1,35 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "@/css/module/button.module.css";
+import {ButtonProps} from "@/types/button";
 
-type ThemeType = "normal" | "dark" | "neon";
-
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-	widthPx?: number;
-	heightPx?: number;
-	fontSizePx?: number;
-	theme?: ThemeType;
-	round?: boolean;
-	variant?: "default" | "hamburger";
-	on?: boolean; // 활성화 / 열림 상태 모두 표현
+// 햄버거 버튼 바
+const HamburgerLines = ({ on }: { on: boolean }) => {
+	return (
+		<>
+			<span
+			  className={clsx(
+			      "absolute w-5 bg-current transition-all duration-300 h-[2px]",
+			      on ? "rotate-45 top-1/2" : "top-1/2 -translate-y-2"
+			  )}
+			  style={{ transformOrigin: "center" }}
+			/>
+			<span
+				className={clsx(
+					"absolute w-5 bg-current transition-all duration-300 h-[2px]",
+					on ? "opacity-0" : "opacity-100",
+					"top-1/2 -translate-y-1/2"
+				)}
+			/>
+			<span
+				className={clsx(
+					"absolute w-5 bg-current transition-all duration-300 h-[2px]",
+					on ? "-rotate-45 top-1/2" : "top-1/2 translate-y-2"
+				)}
+				style={{ transformOrigin: "center" }}
+			/>
+		</>
+	);
 };
 
 const Button = ({
@@ -22,76 +40,41 @@ const Button = ({
 	round = false,
 	variant = "default",
 	on = false,
+	reverse = false,
 	className,
 	style,
 	...rest
 }: ButtonProps) => {
+	const baseClass = clsx(
+		styles["btn-base"],
+		styles[`theme-${theme}`],
+		round && styles["round"],
+		on && styles["on"],
+		reverse && styles["reverse"],
+		"relative flex items-center justify-center",
+		className
+	);
+
+	const baseStyle = {
+		width: widthPx,
+		height: heightPx,
+		fontSize: fontSizePx,
+		...style,
+	};
+
+	// 햄버거 버튼
 	if (variant === "hamburger") {
 		return (
-			<button
-				{...rest}
-				className={clsx(
-					styles["btn-base"],
-					styles[`theme-${theme}`],
-					round && styles["round"],
-					className,
-					"relative flex items-center justify-center"
-				)}
-				style={{
-					width: widthPx,
-					height: heightPx,
-					fontSize: fontSizePx,
-					...style,
-				}}
-				aria-pressed={on}
-			>
-				<span
-					className={clsx(
-						"absolute w-5 bg-current transition-all duration-300",
-						"h-[2px]",          // 두께 4px로 변경
-						on ? "rotate-45 top-1/2" : "top-1/2 -translate-y-2"  // 간격 조절 (위쪽 바)
-					)}
-					style={{transformOrigin: "center"}}
-				/>
-				<span
-					className={clsx(
-						"absolute w-5 bg-current transition-all duration-300",
-						"h-[2px]",          // 두께 4px
-						on ? "opacity-0" : "opacity-100",
-						"top-1/2 -translate-y-1/2"  // 가운데 바 위치 유지
-					)}
-				/>
-				<span
-					className={clsx(
-						"absolute w-5 bg-current transition-all duration-300",
-						"h-[2px]",          // 두께 4px
-						on ? "-rotate-45 top-1/2" : "top-1/2 translate-y-2"  // 간격 조절 (아래쪽 바)
-					)}
-					style={{transformOrigin: "center"}}
-				/>
+			<button {...rest} className={baseClass} style={baseStyle} aria-pressed={on}>
+				<HamburgerLines on={on} />
 			</button>
 		);
 	}
 
-	return (
-		<button
-			{...rest}
-			className={clsx(
-				styles["btn-base"],
-				styles[`theme-${theme}`],
-				round && styles["round"],
-				on && styles["on"],
-				"relative flex items-center justify-center",
-				className
-			)}
-			style={{
-				width : widthPx,
-				height: heightPx,
-				fontSize: fontSizePx,
-				...style,
-			}}
-		/>
-	);
+	// 기본 버튼
+	return <button {...rest} className={baseClass} style={baseStyle} aria-pressed={on} />;
 };
+
+Button.displayName = "Button";
 
 export default Button;

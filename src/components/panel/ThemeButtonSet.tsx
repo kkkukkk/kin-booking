@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { setTheme } from "@/redux/slices/themeSlice";
 import clsx from "clsx";
@@ -12,8 +12,8 @@ type ThemeButtonSetProps = {
 };
 
 const ThemeButtonSet = ({ isOpen }: ThemeButtonSetProps) => {
-	const dispatch = useDispatch();
-	const currentTheme = useSelector((state: RootState) => state.theme.current);
+	const dispatch = useAppDispatch();
+	const currentTheme = useAppSelector((state: RootState) => state.theme.current);
 
 	const handleClick = (theme: "normal" | "dark" | "neon") => {
 		dispatch(setTheme(theme));

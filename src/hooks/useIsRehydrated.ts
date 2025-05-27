@@ -7,7 +7,7 @@ const useRehydrated = () => {
 	useEffect(() => {
 		if (persistor) {
 			const unsubscribe = persistor.subscribe(() => {
-				const { bootstrapped } = persistor.getState();
+				const bootstrapped = persistor?.getState().bootstrapped;
 				if (bootstrapped) {
 					setRehydrated(true);
 					unsubscribe();
@@ -15,7 +15,7 @@ const useRehydrated = () => {
 			});
 
 			// 초기 상태가 이미 부트스트랩 완료면 바로 처리
-			if (persistor.getState().bootstrapped) {
+			if (persistor?.getState().bootstrapped) {
 				setRehydrated(true);
 				unsubscribe();
 			}
