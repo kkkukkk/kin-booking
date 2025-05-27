@@ -49,6 +49,14 @@ const Toast = () => {
 	}, [autoCloseTime, hideAlert]);
 
 	useEffect(() => {
+		if (isOpen) {
+			setShowAnimation(true);
+		} else {
+			setShowAnimation(false);
+		}
+	}, [isOpen]);
+
+	useEffect(() => {
 		if (isOpen && autoCloseTime) {
 			if (!isHovered) {
 				startTimeRef.current = Date.now();
