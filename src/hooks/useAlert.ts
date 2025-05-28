@@ -1,15 +1,14 @@
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/redux/store";  // store 설정에 따라 경로 조정
-import { openAlert, closeAlert } from "@/redux/slices/alertSlice";
+import { openAlert, closeAlert, setInputValue } from "@/redux/slices/alertSlice";
 import type { AlertType } from "@/types/alert"
 import { useCallback } from "react";
+import {useAppDispatch, useAppSelector} from "@/redux/hooks"
 
 export const useAlertState = () => {
-	return useSelector((state: RootState) => state.alert);
+	return useAppSelector((state) => state.alert);
 };
 
 export const useAlertActions = () => {
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useAppDispatch();
 
 	const showAlert = useCallback(
 		(payload: { type: AlertType; message: string; inputValue?: string, autoCloseTime?: number }) => {
@@ -22,17 +21,16 @@ export const useAlertActions = () => {
 		dispatch(closeAlert());
 	}, [dispatch]);
 
-	const setInputValue = useCallback(
+	const setInputValueAction = useCallback(
 		(value: string) => {
 			dispatch(setInputValue(value));
 		},
 		[dispatch]
 	);
 
-	return { showAlert, hideAlert, setInputValue };
+	return { showAlert, hideAlert, setInputValue: setInputValueAction };
 };
 
-// 상태 + action
 const useAlert = () => {
 	const state = useAlertState();
 	const actions = useAlertActions();
