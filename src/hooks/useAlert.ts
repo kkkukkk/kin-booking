@@ -1,5 +1,5 @@
 import { openAlert, closeAlert, setInputValue } from "@/redux/slices/alertSlice";
-import type { AlertType } from "@/types/alert"
+import type { AlertType } from "@/types/ui/alert"
 import { useCallback } from "react";
 import {useAppDispatch, useAppSelector} from "@/redux/hooks"
 

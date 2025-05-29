@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "@/css/module/button.module.css";
-import {ButtonProps} from "@/types/button";
+import {ButtonProps} from "@/types/ui/button";
 
 // 햄버거 버튼 바
 const HamburgerLines = ({ on }: { on: boolean }) => {

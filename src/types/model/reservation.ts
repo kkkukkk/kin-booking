@@ -1,0 +1,22 @@
+export enum ReservationStatus {
+	Pending = 'pending',       // 대기
+	Confirmed = 'confirmed',   // 확정
+	Cancelled = 'cancelled',   // 취소
+	Completed = 'completed',   // 완료
+}
+
+export const ReservationStatusKo: Record<ReservationStatus, string> = {
+	[ReservationStatus.Pending]: '대기',
+	[ReservationStatus.Confirmed]: '확정',
+	[ReservationStatus.Cancelled]: '취소',
+	[ReservationStatus.Completed]: '완료',
+};
+
+export interface Reservation {
+	id: number;
+	userId: string;
+	eventId: number;
+	reservedAt: string;
+	quantity: number;
+	status: ReservationStatus;
+}
