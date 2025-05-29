@@ -1,5 +1,5 @@
 import React from "react";
-import { Theme } from "@/types/theme";
+import { Theme } from "@/types/ui/theme";
 
 export type VariantType = "box" | "underline";
 

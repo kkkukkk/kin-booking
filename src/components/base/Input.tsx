@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "@/css/module/input.module.css";
-import { InputProps } from "@/types/input";
+import { InputProps } from "@/types/ui/input";
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
 	({ theme = "normal", variant = "box", error = false, className, ...rest }, ref) => {
