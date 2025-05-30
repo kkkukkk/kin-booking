@@ -2,6 +2,7 @@
 
 import { useUsers } from "@/hooks/api/useUsers";
 import Card from "@/components/Card";
+import {UserWithRoles} from "@/types/dto/user";
 
 const TestPage = () => {
 	const { data, error, isLoading } = useUsers({ page: 1, size: 10 })
@@ -10,11 +11,11 @@ const TestPage = () => {
 	if (error) return <p>Error: {error.message}</p>;
 
 	console.log(data);
-	const users = data?.data ?? [];
+	const users: UserWithRoles[] = data?.data ?? [];
 
 
 	return (
-		<Card children={'center'}>
+		<Card className={'center'}>
 			<h1>Users</h1>
 			<ul>
 				{users.length === 0 && <li>No users found</li>}

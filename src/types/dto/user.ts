@@ -1,5 +1,4 @@
-import { User } from "@supabase/auth-js";
-import {UserStatus} from "@/types/model/user";
+import { User, UserStatus } from "@/types/model/user";
 
 export interface CreateUserDto {
 	name: string;
