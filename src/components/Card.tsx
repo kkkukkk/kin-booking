@@ -19,7 +19,7 @@ const Card = ({
 	return (
 		<ThemeDiv
 			className={clsx(
-				"relative",
+				"relative main-center",
 				styles.card,
 				currentTheme && styles[currentTheme],
 				className

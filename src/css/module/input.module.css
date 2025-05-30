@@ -35,7 +35,7 @@
 .theme-dark {
     color: #eee;
     background-color: var(--dark-back);
-    border: 1px solid rgba(255,255,255,.3);
+    border: 1px solid rgba(255,255,255,.5);
 }
 .theme-dark::placeholder {
     color: var(--white_50);
@@ -43,7 +43,7 @@
 .theme-neon {
     color: #eee;
     background-color: var(--dark-back);
-    border: 1px solid rgba(255,255,255,.3);
+    border: 1px solid rgba(255,255,255,.5);
 }
 .theme-neon::placeholder {
     color: var(--white_50);

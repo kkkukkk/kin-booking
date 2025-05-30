@@ -4,7 +4,7 @@ import Card from "@/components/Card";
 
 const Home = ()=> {
   return (
-      <Card className={"main-center center"}>
+      <Card className={"center"}>
         <div className={'text-lg'}>
           준비중입니다
         </div>

@@ -30,8 +30,8 @@ export interface UserWithRoles extends User {
 		roles: {
 			roleCode: string;
 			roleName: string;
-		}[];
-	}[];
+		};
+	};
 }
 
 export interface FetchUserWithRolesResponseDto {

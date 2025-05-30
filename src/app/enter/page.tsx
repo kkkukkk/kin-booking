@@ -5,7 +5,7 @@ import Card from "@/components/Card";
 
 const EnterPage = () => {
 	return (
-		<Card className={"main-center center"}>
+		<Card className={"center"}>
 			<Letter />
 		</Card>
 	)
