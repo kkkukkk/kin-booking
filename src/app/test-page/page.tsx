@@ -1,41 +1,31 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-
-type User = {
-	id: string;
-	name: string;
-	email: string;
-	phone_number: string;
-	register_date: Date;
-}
+import { useUsers } from "@/hooks/api/useUsers";
+import Card from "@/components/Card";
+import {UserWithRoles} from "@/types/dto/user";
 
 const TestPage = () => {
-	const [users, setUsers] = useState<User[]>([])
+	const { data, error, isLoading } = useUsers({ page: 1, size: 10 })
 
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const { data, error } = await supabase.from('users').select('*');
-			if (error) {
-				console.error(error);
-				setUsers([]);
-			} else {
-				setUsers(data as User[] ?? [])
-			}
-		}
-		fetchUsers();
-	}, []);
+	if (isLoading) return <p>Loading...</p>;
+	if (error) return <p>Error: {error.message}</p>;
+
+	console.log(data);
+	const users: UserWithRoles[] = data?.data ?? [];
+
 
 	return (
-		<div>
+		<Card className={'center'}>
 			<h1>Users</h1>
 			<ul>
+				{users.length === 0 && <li>No users found</li>}
 				{users.map((user) => (
-					<li key={user.id}>{user.email}</li>
+					<li key={user.id}>
+						{user.name} - {user.email} - {user.phoneNumber} - {user.registerDate?.toString()} - {user.status} - {user.userRoles.roles.roleName}
+					</li>
 				))}
 			</ul>
-		</div>
+		</Card>
 	)
 }
 
