@@ -35,10 +35,12 @@ const TogglePanel = () => {
 			/>
 			<Button
 				round
-				onClick={() => setOpen(!open)}
+				onClick={() => {
+					if (open) setActiveButtons({});
+					setOpen(!open);
+				}}
 				on={open}
 				theme="neon"
-				fontSizePx={14}
 				style={{
 					opacity: open ? "1" : "0.6",
 					border: "1px solid rgba(255,255,255,.3)",

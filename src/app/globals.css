@@ -21,6 +21,7 @@
   --white_70: rgba(255, 255, 255, .7);
   --normal-back: rgba(255, 255, 255, .9);
   --dark-back: rgba(0, 0, 0, .8);
+  --check-box: rgb(55, 176, 83);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,6 +43,10 @@ body {
   height: calc(var(--vh, 1vh) * 100);
   margin: 0;
   padding: 0;
+}
+
+#__next {
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 

@@ -101,16 +101,30 @@ const Toast = () => {
 				showAnimation ? styles["toast-enter-active"] : styles["toast-enter"]
 			)}
 		>
-			<p className="text-sm text-gray-800 mb-2">{message}</p>
-			<div className="w-full h-2 bg-gray-200 rounded overflow-hidden">
-				<div
-					ref={progressBarRef}
-					className={clsx(
-						styles["toast-progress-bar"], "rounded h-full bg-blue-500"
-					)}
-					style={{ width: '100%' }} // 기본 100%
-				/>
+			<div className="text-sm flex justify-between items-center">
+				{message}
+				{!autoCloseTime && <div
+					className={
+						"flex items-center cursor-pointer font-bold"
+					}
+					onClick={hideAlert}
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+					     className="bi bi-x-lg" viewBox="0 0 16 16">
+						<path
+							d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+					</svg>
+				</div>}
 			</div>
+			{autoCloseTime && <div className="w-full h-2 bg-gray-200 rounded overflow-hidden mt-2">
+							<div
+								ref={progressBarRef}
+								className={clsx(
+					styles["toast-progress-bar"], "rounded h-full"
+				)}
+								style={{width: '100%'}} // 기본 100%
+							/>
+						</div>}
 		</ThemeDiv>
 	);
 };

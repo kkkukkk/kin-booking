@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "@/css/module/button.module.css";
-import {ButtonProps} from "@/types/ui/button";
+import { ButtonProps } from "@/types/ui/button";
 
 // 햄버거 버튼 바
 const HamburgerLines = ({ on }: { on: boolean }) => {
@@ -33,14 +33,16 @@ const HamburgerLines = ({ on }: { on: boolean }) => {
 };
 
 const Button = ({
-	widthPx = 42,
-	heightPx = 42,
-	fontSizePx = 10,
+	widthPx = "auto",
+	heightPx = "auto",
 	theme = "normal",
 	round = false,
 	variant = "default",
 	on = false,
 	reverse = false,
+	fontSize = "text-sm",
+	fontWeight = "font-medium",
+	padding = "px-2 py-0",
 	className,
 	style,
 	...rest
@@ -50,15 +52,17 @@ const Button = ({
 		styles[`theme-${theme}`],
 		round && styles["round"],
 		on && styles["on"],
+		fontSize,
+		fontWeight,
+		padding,
 		reverse && styles["reverse"],
 		"relative flex items-center justify-center",
 		className
 	);
 
 	const baseStyle = {
-		width: widthPx,
-		height: heightPx,
-		fontSize: fontSizePx,
+		width: round ? "42px" : widthPx,
+		height: round? "42px" : heightPx,
 		...style,
 	};
 

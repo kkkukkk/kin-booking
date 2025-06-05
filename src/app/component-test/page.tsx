@@ -4,11 +4,13 @@ import Input from "@/components/base/Input";
 import Card from "@/components/Card";
 import Button from "@/components/base/Button";
 import useAlert from "@/hooks/useAlert";
+import {useEffect} from "react";
 
 const LoginPage = () => {
+
 	const { showAlert, hideAlert } = useAlert();
 	const handleClick = () => {
-		showAlert({ type: "toast", message: "저장되었습니다!", autoCloseTime: 3000, });
+		showAlert({ type: "toast", message: "저장되었습니다!", autoCloseTime: 3000});
 	}
 	return (
 		<Card className={"flex flex-col gap-2"}>

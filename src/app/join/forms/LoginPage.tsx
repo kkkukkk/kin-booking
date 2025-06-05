@@ -4,16 +4,20 @@ import Input from "@/components/base/Input";
 import Card from "@/components/Card";
 import Button from "@/components/base/Button";
 import useAlert from "@/hooks/useAlert";
-import {useState} from "react";
-import {supabase} from "@/lib/supabaseClient";
-import {useAppSelector} from "@/redux/hooks";
-import {RootState} from "@/redux/store";
+import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
-const LoginPage = () => {
+interface LoginPageProps {
+	onSwitch: () => void;
+}
+
+const LoginPage = ({ onSwitch }: LoginPageProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const { showAlert, hideAlert } = useAlert();
+	const { showAlert } = useAlert();
 
 	const handleLogin = async () => {
 		const {data, error} = await supabase.auth.signInWithPassword({
@@ -39,7 +43,9 @@ const LoginPage = () => {
 
 
 	return (
-		<Card className={"flex flex-col gap-2"}>
+		<Card
+			className={"flex flex-col gap-2"}
+		>
 			<Input placeholder="이메일" theme={theme} className={"input-base"} value={email} onChange={(e) => setEmail(e.target.value)}/>
 			<Input placeholder="비밀번호" theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)}/>
 			<Button
@@ -55,6 +61,13 @@ const LoginPage = () => {
 				onClick={() => handleLogOut()}
 			>
 				{"로그아웃"}
+			</Button>
+			<Button
+				type="button"
+				theme={"dark"}
+				onClick={onSwitch}
+			>
+				{"회원가입"}
 			</Button>
 		</Card>
 	)

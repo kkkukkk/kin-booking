@@ -33,7 +33,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                     <Alert />
                 </PathnameWrapper>
             </AppProviders>
-            </body>
+        </body>
         </html>
     );
 };

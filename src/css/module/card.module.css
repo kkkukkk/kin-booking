@@ -1,5 +1,6 @@
 .card {
     width: 100%;
+    height: 100%;
     border-radius: 10px;
     padding: 1.5rem;
     box-shadow:
@@ -7,9 +8,18 @@
         0 0 12px var(--black_50),
         0 0 24px var(--black_30),
         0 0 36px var(--black_10);
-    opacity: 0;
-    transform: translateY(10px);
-    animation: fadeInUp 0.4s ease forwards;
+    background-color: var(--white_70) !important;
+}
+
+.card.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card.dark,
+.card.neon {
+    background-color: var(--black_70) !important;
 }
 
 .card.neon {
@@ -21,10 +31,24 @@
     transition: box-shadow 0.5s ease-in-out;
 }
 
+/* PC/태블릿 (769px 이상) */
+@media (min-width: 769px) {
+    /* PC/태블릿용 스타일 */
 
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
+}
+
+/* 모바일 세로 (<=768px, portrait) */
+@media (max-width: 768px) and (orientation: portrait) {
+    /* 모바일 세로용 스타일 */
+    .card {
+        border-radius: 0;
+    }
+}
+
+/* 모바일 가로 (<=768px, landscape) */
+@media (max-width: 1024px) and (orientation: landscape) {
+    /* 모바일 가로용 스타일 */
+    .card {
+        border-radius: 0;
     }
 }

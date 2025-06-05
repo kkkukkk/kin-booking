@@ -1,15 +1,17 @@
-'use client'
+'use client';
 
 import React from 'react';
-import { useAppSelector } from "@/redux/hooks";
+import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import clsx from 'clsx';
 import styles from '@/css/module/theme-div.module.css';
-import useRehydrated from "@/hooks/useIsRehydrated";
+import useRehydrated from '@/hooks/useIsRehydrated';
 
-type ThemeDivProps = React.HTMLAttributes<HTMLDivElement>;
+type ThemeDivProps = React.HTMLAttributes<HTMLDivElement> & {
+	children?: React.ReactNode;
+};
 
-const ThemeDiv: React.FC<ThemeDivProps> = ({ children, className, ...rest }) => {
+const ThemeDiv = ({ children, className, ...rest }: ThemeDivProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
 
@@ -17,7 +19,7 @@ const ThemeDiv: React.FC<ThemeDivProps> = ({ children, className, ...rest }) => 
 
 	return (
 		<div
-			className={clsx(styles["theme-div"], styles[theme], className)}
+			className={clsx(styles['theme-div'], styles[theme], className)}
 			{...rest}
 		>
 			{children}
@@ -25,6 +27,6 @@ const ThemeDiv: React.FC<ThemeDivProps> = ({ children, className, ...rest }) => 
 	);
 };
 
-ThemeDiv.displayName = "ThemeDiv";
+ThemeDiv.displayName = 'ThemeDiv';
 
 export default ThemeDiv;
