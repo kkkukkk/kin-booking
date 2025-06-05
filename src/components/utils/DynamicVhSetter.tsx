@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import useDynamicVh from '@/hooks/useDynamicVh';
 
 const DynamicVhSetter = () => {

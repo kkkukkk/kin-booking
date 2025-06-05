@@ -39,6 +39,7 @@ const ThemeButtonSet = ({ isOpen }: ThemeButtonSetProps) => {
 					type="button"
 					theme={theme}
 					onClick={() => handleClick(theme)}
+					style={{fontSize: "10px"}}
 					className={currentTheme === theme ? "on" : ""}
 					round
 					on={currentTheme === theme}

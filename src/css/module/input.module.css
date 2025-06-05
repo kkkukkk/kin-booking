@@ -49,12 +49,18 @@
     color: var(--white_50);
 }
 
+.input-base.underline {
+    border-radius: 0;
+}
+
 .input-base.underline.theme-normal {
-    border-bottom: 1px solid black;
+    border-radius: 5px 5px 0 0;
+    background-color: var(--white_50);
+    border-bottom: 2px solid var(--black_70);
 }
 .input-base.underline.theme-dark {
-    border-bottom: 2px solid var(--white_70);
+    border-bottom: 1px solid var(--white_70);
 }
 .input-base.underline.theme-neon {
-    border-bottom: 2px solid var(--neon-green-medium);
+    border-bottom: 1px solid var(--neon-green-medium);
 }

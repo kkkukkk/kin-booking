@@ -68,6 +68,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 						toggleButton(key);
 						onClick();
 					}}
+					style={{fontSize: "10px"}}
 					className="btn-base w-12 h-12 text-sm"
 					round
 					on={!!activeButtons[key]}
