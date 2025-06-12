@@ -1,15 +1,34 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import styles from "@/css/module/spinner-overlay.module.css";
 import Spinner from "@/components/spinner/Spinner";
 
-const SpinnerOverlay = () => {
-	return (
-		<div className={styles.overlay}>
+interface SpinnerOverlayProps {
+	withBackgroundImage?: boolean;
+}
+
+const SpinnerOverlay = ({ withBackgroundImage = false }: SpinnerOverlayProps) => {
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) return null;
+
+	return ReactDOM.createPortal(
+		<div
+			className={styles.overlay}
+			data-background={withBackgroundImage ? "image" : "none"}
+		>
 			<div className={styles.backdrop} />
 			<div className={styles.spinnerWrapper}>
 				<Spinner />
 			</div>
-		</div>
+		</div>,
+		document.body
 	);
 };
 

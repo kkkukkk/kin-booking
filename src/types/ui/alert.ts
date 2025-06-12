@@ -1,12 +1,21 @@
-export type AlertType = "toast" | "confirm" | "alert" | "prompt"
+export type AlertType = "confirm" | "prompt";
 
-export type AlertProps = {
-	isOpen: boolean;
-	type: AlertType;
+export type IconType = "success" | "warning" | "error" | "info";
+
+export interface AlertProps {
+	type: AlertType,
+	title: string,
 	message: string,
 	inputValue?: string,
-	autoCloseTime?: number;
-	onInputChange?: (value: string) => void;
-	onConfirm?: (inputValue?: string) => void;
-	onCancel?: () => void;
+	onChangeInput?: (value: string) => void,
+	onConfirm: () => void,
+	onCancel?: () => void,
 }
+
+export interface ToastState {
+	isOpen: boolean,
+	message: string,
+	autoCloseTime?: number,
+	iconType?: IconType,
+}
+

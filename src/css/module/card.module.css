@@ -34,7 +34,9 @@
 /* PC/태블릿 (769px 이상) */
 @media (min-width: 769px) {
     /* PC/태블릿용 스타일 */
-
+    .card {
+        padding: 1.5rem 3rem;
+    }
 }
 
 /* 모바일 세로 (<=768px, portrait) */

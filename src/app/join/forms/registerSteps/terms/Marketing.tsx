@@ -5,7 +5,7 @@ interface MarketingProps {
 	onConfirm: () => void;
 }
 
-const Marketing = ({onClose, onConfirm}: MarketingProps) => {
+const Marketing = ({ onClose, onConfirm }: MarketingProps) => {
 	return (
 		<section>
 			<h2 className="text-lg md:text-2xl font-bold mb-4">[공연 관련 소식 수신 동의 (선택)]</h2>
@@ -22,13 +22,15 @@ const Marketing = ({onClose, onConfirm}: MarketingProps) => {
 
 			<div className="flex items-center justify-center mt-4 gap-2">
 				<Button
-					widthPx={"50%"}
+					width={"50%"}
 					padding={"p-1"}
+					className={"text-sm md:text-lg"}
 					onClick={onClose}
 				>취소</Button>
 				<Button
-					widthPx={"50%"}
+					width={"50%"}
 					padding={"p-1"}
+					className={"text-sm md:text-lg"}
 					onClick={onConfirm}
 					theme={"dark"}
 				>동의</Button>

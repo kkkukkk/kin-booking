@@ -1,21 +1,24 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import useAlert from '@/hooks/useAlert';
+import { useEffect, useRef, useState, useCallback, JSX } from 'react';
+import useToast from '@/hooks/useToast';
 import clsx from 'clsx';
-import styles from "@/css/module/alert.module.css";
+import styles from "@/css/module/toast.module.css";
 import ThemeDiv from "@/components/base/ThemeDiv";
+import { CloseIcon } from "@/components/icon/CloseIcon";
+import { ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from "@/components/icon/AlertIcons";
+import { IconType } from "@/types/ui/alert";
 
 const Toast = () => {
 	const [isHovered, setIsHovered] = useState(false);
-	const [showAnimation, setShowAnimation] = useState(false);
 
 	const {
 		isOpen,
 		message,
-		hideAlert,
+		hideToast,
+		iconType,
 		autoCloseTime,
-	} = useAlert();
+	} = useToast();
 
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const startTimeRef = useRef<number | null>(null);
@@ -29,49 +32,50 @@ const Toast = () => {
 		const now = Date.now();
 		const elapsed = elapsedTimeRef.current + (now - startTimeRef.current);
 		const remaining = Math.max(autoCloseTime - elapsed, 0);
-		const newProgress = remaining / autoCloseTime;
+		const progress  = remaining / autoCloseTime;
 
 		if (progressBarRef.current) {
-			progressBarRef.current.style.width = `${newProgress * 100}%`;
+			progressBarRef.current.style.width = `${progress * 100}%`;
 		}
 
-		if (newProgress <= 0) {
-			hideAlert();
+		if (progress  <= 0) {
+			hideToast();
 			startTimeRef.current = null;
 			elapsedTimeRef.current = 0;
-			if (progressBarRef.current) {
-				progressBarRef.current.style.width = '100%';
-			}
+			if (progressBarRef.current) progressBarRef.current.style.width = '100%';
 			return;
 		}
 
 		animationFrameRef.current = requestAnimationFrame(updateProgress);
-	}, [autoCloseTime, hideAlert]);
+	}, [autoCloseTime, hideToast]);
 
-	useEffect(() => {
-		if (isOpen) {
-			setShowAnimation(true);
-		} else {
-			setShowAnimation(false);
+	const getIcon = (iconType: IconType): JSX.Element | null => {
+		switch (iconType) {
+			case 'success': return <SuccessIcon />
+			case 'warning': return <WarningIcon />
+			case 'error': return <ErrorIcon />
+			case 'info': return <InfoIcon />
+			default: return null;
 		}
-	}, [isOpen]);
+	}
 
 	useEffect(() => {
+		if (!isOpen || !autoCloseTime) return;
+
 		if (isOpen && autoCloseTime) {
 			if (!isHovered) {
 				startTimeRef.current = Date.now();
 				animationFrameRef.current = requestAnimationFrame(updateProgress);
 
-				const remainingTime = autoCloseTime - elapsedTimeRef.current;
 				if (timeoutRef.current) clearTimeout(timeoutRef.current);
 				timeoutRef.current = setTimeout(() => {
-					hideAlert();
+					hideToast();
 					startTimeRef.current = null;
 					elapsedTimeRef.current = 0;
 					if (progressBarRef.current) {
 						progressBarRef.current.style.width = '100%';
 					}
-				}, remainingTime);
+				}, autoCloseTime - elapsedTimeRef.current);
 			} else {
 				if (startTimeRef.current) {
 					elapsedTimeRef.current += Date.now() - startTimeRef.current;
@@ -86,7 +90,7 @@ const Toast = () => {
 			if (timeoutRef.current) clearTimeout(timeoutRef.current);
 			if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
 		};
-	}, [isOpen, isHovered, autoCloseTime, hideAlert, updateProgress]);
+	}, [isOpen, isHovered, autoCloseTime, hideToast, updateProgress]);
 
 	if (!isOpen) return null;
 
@@ -97,34 +101,38 @@ const Toast = () => {
 			onTouchStart={() => setIsHovered(true)}
 			onTouchEnd={() => setIsHovered(false)}
 			className={clsx(
-				"fixed bottom-8 left-1/2 -translate-x-1/2 bg-white px-4 py-3 rounded shadow-lg w-[300px] z-50",
-				showAnimation ? styles["toast-enter-active"] : styles["toast-enter"]
+				"fixed bottom-12 left-1/2 -translate-x-1/2 bg-white px-4 py-3 rounded shadow-lg w-[300px] z-50 md:w-[400px]",
+				isOpen  ? styles["toast-enter-active"] : styles["toast-enter"]
 			)}
+			tabIndex={-1}
 		>
-			<div className="text-sm flex justify-between items-center">
-				{message}
+			<div className="text-sm flex items-center md:text-base relative">
+				<div className="w-6 h-6 flex-shrink-0 flex justify-center items-center m-1">
+					{getIcon(iconType)}
+				</div>
+
+				<div className="break-words whitespace-normal break-normal pl-1">
+					{message}
+				</div>
+
 				{!autoCloseTime && <div
 					className={
-						"flex items-center cursor-pointer font-bold"
+						"absolute top-[50%] right-0 translate-y-[-50%] flex items-center cursor-pointer font-bold cursor-pointer shrink-0"
 					}
-					onClick={hideAlert}
+					onClick={hideToast}
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
-					     className="bi bi-x-lg" viewBox="0 0 16 16">
-						<path
-							d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-					</svg>
+					<CloseIcon />
 				</div>}
 			</div>
-			{autoCloseTime && <div className="w-full h-2 bg-gray-200 rounded overflow-hidden mt-2">
-							<div
-								ref={progressBarRef}
-								className={clsx(
-					styles["toast-progress-bar"], "rounded h-full"
-				)}
-								style={{width: '100%'}} // 기본 100%
-							/>
-						</div>}
+			{autoCloseTime &&
+				<div className="w-full h-2 bg-gray-200 rounded overflow-hidden mt-2">
+					<div
+						ref={progressBarRef}
+						className={clsx(styles["toast-progress-bar"], "rounded h-full")}
+						style={{width: '100%'}} // 기본 100%
+					/>
+				</div>
+			}
 		</ThemeDiv>
 	);
 };

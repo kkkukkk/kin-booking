@@ -5,7 +5,7 @@ import AppProviders from '@/providers/AppProviders';
 import TogglePanel from "@/components/panel/TogglePanel";
 import DynamicVhSetter from "@/components/utils/DynamicVhSetter";
 import PathnameWrapper from "@/components/wrapper/PathnameWrapper";
-import Alert from "@/components/alert/Alert";
+import Toast from "@/components/alert/Toast";
 
 export const metadata = {
     title: 'KIN',
@@ -30,7 +30,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 <PathnameWrapper>
                     {children}
                     <TogglePanel/>
-                    <Alert />
+                    <Toast />
                 </PathnameWrapper>
             </AppProviders>
         </body>

@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import themeReducer from "./slices/themeSlice";
-import alertReducer from "./slices/alertSlice";
+import toastReducer from "./slices/toastSlice";
 import {
 	persistStore,
 	persistReducer,
@@ -16,7 +16,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 const rootReducer = combineReducers({
 	theme: themeReducer,
-	alert: alertReducer,
+	toast: toastReducer,
 });
 
 const persistConfig = {
@@ -39,5 +39,5 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof persistedReducer>;
+export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

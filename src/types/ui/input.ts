@@ -3,7 +3,8 @@ import { Theme } from "@/types/ui/theme";
 
 export type VariantType = "box" | "underline";
 
-export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+	type?: string;
 	theme?: Theme;
 	variant?: VariantType;
 	fontSize?: string;
@@ -11,5 +12,4 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	padding?: string;
 	className?: string;
 	error?: boolean;
-	placeholder?: string;
-};
+}

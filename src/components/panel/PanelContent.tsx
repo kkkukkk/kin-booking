@@ -8,6 +8,9 @@ import ThemeDiv from "@/components/base/ThemeDiv";
 import ThemeButtonSet from "@/components/panel/ThemeButtonSet";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import { HomeIcon } from "@/components/icon/HomeIcon";
+import { useLogout } from "@/hooks/api/useAuth";
+import { useSession } from "@/hooks/useSession";
 
 type PanelContentProps = {
 	isOpen: boolean;
@@ -18,6 +21,8 @@ type PanelContentProps = {
 const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentProps) => {
 	const router = useRouter();
 	const currentTheme = useAppSelector((state: RootState) => state.theme.current);
+	const { mutate: logout } = useLogout();
+	const { session } = useSession();
 
 	const toggleButton = (key: string) => {
 		if (key === "Home") return;
@@ -37,13 +42,23 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 			key: 'Home',
 			onClick: () => router.push('/'),
 			name:
-				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-				     className="bi bi-house-fill" viewBox="0 0 16 16">
-					<path
-						d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
-					<path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z"/>
-				</svg>
-		}
+				<HomeIcon />
+		},
+		...(session
+			? [
+				{
+					key: 'Logout',
+					onClick: () => logout(),
+					name: 'Logout',
+				},
+			]
+			: [
+				{
+					key: 'Login',
+					onClick: () => router.push('/join'),
+					name: 'Login',
+				},
+			]),
 	]
 
 	return (

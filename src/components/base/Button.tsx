@@ -33,8 +33,8 @@ const HamburgerLines = ({ on }: { on: boolean }) => {
 };
 
 const Button = ({
-	widthPx = "auto",
-	heightPx = "auto",
+	width = "auto",
+	height = "auto",
 	theme = "normal",
 	round = false,
 	variant = "default",
@@ -61,8 +61,8 @@ const Button = ({
 	);
 
 	const baseStyle = {
-		width: round ? "42px" : widthPx,
-		height: round? "42px" : heightPx,
+		width: round ? "42px" : width,
+		height: round? "42px" : height,
 		...style,
 	};
 
