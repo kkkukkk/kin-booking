@@ -15,7 +15,10 @@ const JoinPage = () => {
 
 	useEffect(() => {
 		if (!loading && session) {
-			router.replace("/");
+			const isEmailVerified = !!session.user.email_confirmed_at;
+			if (isEmailVerified) {
+				router.replace("/");
+			}
 		}
 	}, [loading, session, router]);
 

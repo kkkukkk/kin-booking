@@ -14,6 +14,7 @@ const Alert = ({
 	title,
 	message,
 	inputValue,
+	noCancel = false,
 	onChangeInput,
 	onConfirm,
 	onCancel,
@@ -65,9 +66,9 @@ const Alert = ({
 					<Button onClick={onConfirm} theme={"dark"} width={"30%"} padding={"px-2 py-1"}>
 						확인
 					</Button>
-					<Button onClick={onCancel} theme={"normal"} width={"30%"} padding={"px-2 py-1"}>
+					{!noCancel && <Button onClick={onCancel} theme={"normal"} width={"30%"} padding={"px-2 py-1"}>
 						취소
-					</Button>
+					</Button>}
 				</div>
 			</ThemeDiv>
 		</div>,

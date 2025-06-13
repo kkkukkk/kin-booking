@@ -9,7 +9,7 @@ interface LogoProps {
 }
 
 const Logo = ({ width = 450, className }: LogoProps) => {
-	useAppSelector((state: RootState) => state.theme.current);
+	const theme = useAppSelector((state: RootState) => state.theme.current);
 
 	return (
 		<div
@@ -19,7 +19,8 @@ const Logo = ({ width = 450, className }: LogoProps) => {
 			)}
 		>
 			<Image
-				src="/images/logo_normal.png"
+				key={theme}
+				src={`/images/logo_${theme}.png`}
 				alt="logo"
 				fill
 				style={{ objectFit: "contain" }}

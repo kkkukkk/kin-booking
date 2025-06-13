@@ -8,6 +8,7 @@ export interface AlertProps {
 	message: string,
 	inputValue?: string,
 	onChangeInput?: (value: string) => void,
+	noCancel?: boolean,
 	onConfirm: () => void,
 	onCancel?: () => void,
 }

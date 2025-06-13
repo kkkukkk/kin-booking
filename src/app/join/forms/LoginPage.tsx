@@ -1,15 +1,19 @@
 'use client'
 
+import React, { useEffect, useState } from "react";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { useLogin } from "@/hooks/api/useAuth";
+import { useLoginImages } from "@/hooks/api/useImages";
+import { useSpinner } from "@/providers/SpinnerProvider";
 import Input from "@/components/base/Input";
 import Card from "@/components/Card";
 import Button from "@/components/base/Button";
 import useToast from "@/hooks/useToast";
-import {useEffect, useState} from "react";
-import { useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
-import { useLogin } from "@/hooks/api/useAuth";
 import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
-import {useSpinner} from "@/providers/SpinnerProvider";
+import Logo from "@/components/Logo";
+import ImageSlider from "@/components/slider/ImageSlider";
+import Skeleton from "@/components/base/Skeleton";
 
 interface LoginPageProps {
 	onSwitch: () => void;
@@ -19,9 +23,10 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const { mutate: login, isPending, error } = useLogin();
+	const { mutate: login, isPending: loginPending, error: loginError } = useLogin();
 	const { showToast } = useToast();
 	const { showSpinner, hideSpinner } = useSpinner();
+	const { data: images = [], isPending: imagePending, error: imagesError } = useLoginImages();
 
 	const handleLogin = async () => {
 		if (!email) {
@@ -33,12 +38,25 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 		}
 	}
 
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleLogin();
+		}
+	};
+
+
 	useEffect(() => {
-		if (error) {
-			if ((error as Error).message === "Invalid login credentials") {
+		if (loginError) {
+			if ((loginError as Error).message === "Invalid login credentials") {
 				showToast({
 					message: "이메일과 비밀번호를 확인해주세요.",
 					iconType: "error",
+					autoCloseTime: 3000,
+				});
+			} else if ((loginError as Error).message === "Email not confirmed") {
+				showToast({
+					message: "이메일 인증 후 로그인할 수 있어요.",
+					iconType: "warning",
 					autoCloseTime: 3000,
 				});
 			} else {
@@ -49,33 +67,62 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 				});
 			}
 		}
-	}, [error, showToast]);
+	}, [loginError, showToast]);
 
 	useEffect(() => {
-		if (isPending) showSpinner();
+		if (loginPending) showSpinner();
 		else hideSpinner();
-	}, [isPending, showSpinner, hideSpinner]);
+	}, [loginPending, showSpinner, hideSpinner]);
 
 	return (
 		<Card
-			className={"flex flex-col gap-2"}
+			className={"flex flex-col md:flex-row gap-8 md:gap-16"}
 		>
-			<Input placeholder="이메일" name={"email"} theme={theme} className={"input-base"} value={email} onChange={(e) => setEmail(e.target.value)}/>
-			<InputWithPasswordToggle placeholder="비밀번호" name={"password"} theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)}/>
-			<Button
-				type="button"
-				theme={"dark"}
-				onClick={() => handleLogin()}
+			<div
+				className={"hidden md:flex justify-center item-center md:w-2/3"}
 			>
-				{"로그인"}
-			</Button>
-			<Button
-				type="button"
-				theme={"dark"}
-				onClick={onSwitch}
+				{
+					imagePending
+						? <Skeleton />
+						: <ImageSlider
+							images={images}
+							width="w-full"
+							height="h-full"
+							interval={5000}
+						/>
+				}
+			</div>
+			<div
+				className={"flex flex-col md:w-1/3 h-full gap-8 mt-2 md:gap-16 md:mt-8"}
 			>
-				{"회원가입"}
-			</Button>
+				<div
+					className={"flex justify-center items-center flex-grow-[2]"}
+				>
+					<Logo />
+				</div>
+				<div
+					className={"flex flex-col gap-2 flex-grow-[3.5]"}
+				>
+					<Input placeholder="이메일" name={"email"} theme={theme} className={"input-base"} value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={handleKeyPress} />
+					<InputWithPasswordToggle placeholder="비밀번호" name={"password"} theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={handleKeyPress} />
+					<Button
+						type="button"
+						theme={"dark"}
+						padding={"py-1"}
+						onClick={() => handleLogin()}
+					>
+						{"로그인"}
+					</Button>
+					<Button
+						type="button"
+						theme={"dark"}
+						padding={"py-1"}
+						onClick={onSwitch}
+					>
+						{"회원가입"}
+					</Button>
+				</div>
+			</div>
 		</Card>
 	)
 }

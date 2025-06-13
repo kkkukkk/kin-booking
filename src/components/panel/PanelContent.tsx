@@ -38,12 +38,6 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 			onClick: () => console.log('Theme'),
 			name: 'Theme',
 		},
-		{
-			key: 'Home',
-			onClick: () => router.push('/'),
-			name:
-				<HomeIcon />
-		},
 		...(session
 			? [
 				{
@@ -59,6 +53,12 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 					name: 'Login',
 				},
 			]),
+		{
+			key: 'Home',
+			onClick: () => router.push('/'),
+			name:
+				<HomeIcon />
+		},
 	]
 
 	return (

@@ -139,9 +139,11 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			const confirmed = await showAlert({
 				type: 'confirm',
 				title: '가입 완료!',
-				message: '환영합니다! 바로 로그인할까요?',
+				message: '인증 이메일이 발송되었습니다. 메일을 확인해 주세요.',
+				noCancel: true,
 			});
 
+			/* 자동 로그인
 			if (confirmed) {
 				try {
 					await login({
@@ -152,12 +154,14 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 					return;
 				} catch {
 					showToast({
-						message      : '자동 로그인 실패했습니다. 직접 로그인해주세요.',
-						iconType     : 'error',
+						message: '오류가 발생했습니다.',
+						iconType: 'error',
 						autoCloseTime: 3000,
 					});
 				}
 			}
+			*/
+
 			onSwitch();
 		} catch (error) {
 			const message = getErrorMessage(error);

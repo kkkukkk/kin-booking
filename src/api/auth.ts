@@ -8,6 +8,12 @@ export const login = async (email: string, password: string) => {
 	});
 
 	if (error) throw error;
+
+	if (!data.user.email_confirmed_at) {
+		await supabase.auth.signOut(); // 자동 로그인 방지
+		throw new Error("Email not confirmed");
+	}
+
 	return data;
 }
 
@@ -26,7 +32,9 @@ export const register = async ({
 				display_name: name,
 				phone_number: phoneNumber,
 				marketing_consent: marketingConsent,
-			}
+			},
+			// 배포 시 수정
+			emailRedirectTo: 'http://localhost:3000/join',
 		}
 	});
 
