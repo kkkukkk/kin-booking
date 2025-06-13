@@ -22,7 +22,7 @@ export const useLogout = () => {
 		onSuccess: () => {
 			router.push('/join');
 		},
-		onError: (error: any) => {
+		onError: (error) => {
 			console.error(error.message);
 		},
 	});

@@ -7,7 +7,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { bottomUp, bottomUpDelay } from "@/types/ui/motionVariants";
 import { RegisterStep } from "@/types/ui/registerStep";
 import { useAlert } from "@/providers/AlertProvider";
-import {useLogin, useRegister} from "@/hooks/api/useAuth";
+import { useLogin, useRegister } from "@/hooks/api/useAuth";
+import { useSpinner } from "@/providers/SpinnerProvider";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
+import { getErrorMessage } from "@/components/utils/error";
 import Card from "@/components/Card";
 import Name from "@/app/join/forms/registerSteps/Name";
 import Email from "@/app/join/forms/registerSteps/Email";
@@ -18,9 +22,6 @@ import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
-import { useSpinner } from "@/providers/SpinnerProvider";
-import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
 
 interface RegisterPageProps {
 	onSwitch: () => void;
@@ -50,10 +51,11 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 
 	const [isValidName, setIsValidName] = useState(false);
 	const [isValidEmail, setIsValidEmail] = useState(false);
-	const [isDuplicateEmail, setIsDuplicateEmail] = useState<boolean | null>(null);
 	const [isValidPassword, setIsValidPassword] = useState(false);
 	const [isValidPhone, setIsValidPhone] = useState(false);
-	const [isDuplicatePhone, setIsDuplicatePhone] = useState(false);
+
+	const [isDuplicateEmail, setIsDuplicateEmail] = useState<boolean | null>(null);
+	const [isDuplicatePhone, setIsDuplicatePhone] = useState<boolean | null>(null);
 
 	const toastConfigs = {
 		consent: {
@@ -146,31 +148,23 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 						email,
 						password,
 					});
-					router.push('/');
+					router.push('/')
+					return;
 				} catch {
 					showToast({
-						message: '자동 로그인 실패했습니다. 직접 로그인해주세요.',
-						iconType: 'error',
+						message      : '자동 로그인 실패했습니다. 직접 로그인해주세요.',
+						iconType     : 'error',
 						autoCloseTime: 3000,
 					});
-					router.push('/join');
 				}
-			} else {
-				router.push('/join');
 			}
-		} catch (error: any) {
-			if (error.message.includes('already registered')) {
-				showToast({
-					message: '이미 등록된 이메일이에요.',
-					iconType: 'error',
-					autoCloseTime: 3000,
-				});
+			onSwitch();
+		} catch (error) {
+			const message = getErrorMessage(error);
+			if (message.includes('already registered')) {
+				showToast({ message: '이미 등록된 이메일이에요.', iconType: 'error', autoCloseTime: 3000 });
 			} else {
-				showToast({
-					message: `회원가입 중 오류가 발생했어요. (${error.message})`,
-					iconType: 'error',
-					autoCloseTime: 3000,
-				});
+				showToast({ message: `회원가입 중 오류가 발생했어요. (${message})`, iconType: 'error', autoCloseTime: 3000 });
 			}
 		}
 	};
@@ -202,7 +196,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 		}
 	}
 
-	const onNext = () => {
+	const onNext = async () => {
 		hideToast();
 		if (!canProceed()) {
 			showToastAlert(getToastKey());
@@ -210,13 +204,15 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 		}
 
 		if (step === 'phoneNumber') {
-			showAlert({
+			const confirmed = await showAlert({
 				type: 'confirm',
 				title: '확인',
 				message: `이름: ${name}\n이메일: ${email}\n휴대폰번호: ${phoneNumber.replace(/[^0-9]/g, '')}\n\n해당 정보로 가입할까요?`,
-				onConfirm: handleRegister,
-				onCancel: () => hideAlert(),
 			});
+			if (confirmed) {
+				await handleRegister();
+			}
+
 		} else {
 			const currentIndex = steps.indexOf(step);
 			setStep(steps[currentIndex + 1]);
@@ -272,7 +268,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 					isValid={isValidPassword}
 					onValidChange={(valid, reason) => {
 						setIsValidPassword(valid);
-						setPasswordValidationReason(reason);
+						setPasswordValidationReason(reason ?? '');
 					}}
 					theme={theme}
 				/>;
@@ -293,7 +289,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 	useEffect(() => {
 		if (isPending) showSpinner();
 		else hideSpinner();
-	}, [isPending]);
+	}, [isPending, showSpinner, hideSpinner]);
 
 	return (
 		<Card>

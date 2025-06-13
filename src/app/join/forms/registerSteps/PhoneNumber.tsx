@@ -18,7 +18,7 @@ interface PhoneNumberProps {
 	isValid: boolean,
 	onValidChange: (isValid: boolean) => void,
 	isDuplicatePhone: boolean | null;
-	onDuplicateCheck: (isDuplicatePhone: boolean) => void;
+	onDuplicateCheck: (isDuplicatePhone: boolean | null) => void;
 	theme?: Theme,
 }
 

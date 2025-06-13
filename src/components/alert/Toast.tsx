@@ -108,7 +108,7 @@ const Toast = () => {
 		>
 			<div className="text-sm flex items-center md:text-base relative">
 				<div className="w-6 h-6 flex-shrink-0 flex justify-center items-center m-1">
-					{getIcon(iconType)}
+					{iconType && getIcon(iconType)}
 				</div>
 
 				<div className="break-words whitespace-normal break-normal pl-1">

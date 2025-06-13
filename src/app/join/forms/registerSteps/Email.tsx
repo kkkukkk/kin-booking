@@ -18,7 +18,7 @@ interface EmailProps {
 	isValid: boolean;
 	onValidChange: (isValid: boolean) => void;
 	isDuplicateEmail: boolean | null;
-	onDuplicateCheck: (isDuplicateEmail: boolean) => void;
+	onDuplicateCheck: (isDuplicateEmail: boolean | null) => void;
 	theme?: Theme,
 }
 

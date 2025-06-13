@@ -3,7 +3,7 @@
 import Logo from './Logo';
 
 interface ProgressLogoProps {
-	steps: any[];
+	steps: string[];
 	currentStep: number;
 }
 

@@ -54,7 +54,7 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 	useEffect(() => {
 		if (isPending) showSpinner();
 		else hideSpinner();
-	}, [isPending]);
+	}, [isPending, showSpinner, hideSpinner]);
 
 	return (
 		<Card

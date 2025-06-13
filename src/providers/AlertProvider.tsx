@@ -15,7 +15,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
 		resolve: (value: boolean) => void;
 	} | null>(null);
 
-	const showAlert = (props: Omit<AlertProps, 'onCancel' | 'onConfirm'>) => {
+	const showAlert = (props: Omit<AlertProps, 'onConfirm' | 'onCancel'>): Promise<boolean> => {
 		setAlertProps(props);
 		return new Promise<boolean>((resolve) => {
 			setPromiseHandlers({ resolve });
