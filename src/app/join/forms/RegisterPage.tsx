@@ -345,7 +345,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			>
 				<Button
 					theme={"dark"}
-					width={"100%"}
+					width={"w-full"}
 					fontSize={"text-md md:text-xl"}
 					padding={"px-2 py-1.5"}
 					onClick={onNext}

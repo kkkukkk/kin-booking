@@ -129,7 +129,7 @@ const Email = ({
 				/>
 				<Button
 					theme={"dark"}
-					width={"20%"}
+					width={"w-1/5"}
 					fontSize={"text-sm md:text-base"}
 					padding={"px-2 py-1.5"}
 					onClick={checkDuplicateEmail}

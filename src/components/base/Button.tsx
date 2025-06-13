@@ -40,7 +40,7 @@ const Button = ({
 	variant = "default",
 	on = false,
 	reverse = false,
-	fontSize = "text-[10px] md:text-sm",
+	fontSize = "text-sm md:text-base",
 	fontWeight = "font-medium",
 	padding = "px-2 py-0",
 	className,
