@@ -143,6 +143,10 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 				noCancel: true,
 			});
 
+			if (confirmed) {
+				onSwitch();
+			}
+
 			/* 자동 로그인
 			if (confirmed) {
 				try {
@@ -160,9 +164,9 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 					});
 				}
 			}
-			*/
 
 			onSwitch();
+			*/
 		} catch (error) {
 			const message = getErrorMessage(error);
 			if (message.includes('already registered')) {

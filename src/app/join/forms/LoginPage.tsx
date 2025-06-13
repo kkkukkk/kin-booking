@@ -103,12 +103,13 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 				<div
 					className={"flex flex-col gap-2 flex-grow-[3.5]"}
 				>
-					<Input placeholder="이메일" name={"email"} theme={theme} className={"input-base"} value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={handleKeyPress} />
-					<InputWithPasswordToggle placeholder="비밀번호" name={"password"} theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={handleKeyPress} />
+					<Input placeholder="이메일" name={"email"} fontSize={"text-sm md:text-xl"} theme={theme} className={"input-base"} value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={handleKeyPress} />
+					<InputWithPasswordToggle placeholder="비밀번호" name={"password"} fontSize={"text-sm md:text-xl"} theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={handleKeyPress} />
 					<Button
 						type="button"
 						theme={"dark"}
 						padding={"py-1"}
+						fontSize={"text-sm md:text-lg"}
 						onClick={() => handleLogin()}
 					>
 						{"로그인"}
@@ -117,6 +118,7 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 						type="button"
 						theme={"dark"}
 						padding={"py-1"}
+						fontSize={"text-sm md:text-lg"}
 						onClick={onSwitch}
 					>
 						{"회원가입"}

@@ -34,7 +34,7 @@ export const register = async ({
 				marketing_consent: marketingConsent,
 			},
 			// 배포 시 수정
-			emailRedirectTo: 'http://localhost:3000/join',
+			emailRedirectTo: 'http://localhost:3000/auth/callback',
 		}
 	});
 

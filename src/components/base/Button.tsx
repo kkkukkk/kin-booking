@@ -33,50 +33,41 @@ const HamburgerLines = ({ on }: { on: boolean }) => {
 };
 
 const Button = ({
-	width = "auto",
-	height = "auto",
+	width = "w-auto",
+	height = "h-auto",
 	theme = "normal",
 	round = false,
 	variant = "default",
 	on = false,
 	reverse = false,
-	fontSize = "text-sm",
+	fontSize = "text-[10px] md:text-sm",
 	fontWeight = "font-medium",
 	padding = "px-2 py-0",
 	className,
-	style,
 	...rest
 }: ButtonProps) => {
 	const baseClass = clsx(
-		styles["btn-base"],
 		styles[`theme-${theme}`],
-		round && styles["round"],
-		on && styles["on"],
+		"transition-all duration-300 cursor-pointer",
+		"relative flex items-center justify-center",
+		round ? "rounded-full w-[42px] h-[42px] md:w-[64px] md:h-[64px]" : ["rounded-[5px]", width, height],
 		fontSize,
 		fontWeight,
 		padding,
-		reverse && styles["reverse"],
-		"relative flex items-center justify-center",
+		on && styles["on"], // 필요 시 유지
+		reverse && styles["reverse"], // 필요 시 유지
 		className
 	);
 
-	const baseStyle = {
-		width: round ? "42px" : width,
-		height: round? "42px" : height,
-		...style,
-	};
-
-	// 햄버거 버튼
 	if (variant === "hamburger") {
 		return (
-			<button {...rest} className={baseClass} style={baseStyle} aria-pressed={on}>
+			<button {...rest} className={baseClass} aria-pressed={on}>
 				<HamburgerLines on={on} />
 			</button>
 		);
 	}
 
-	// 기본 버튼
-	return <button {...rest} className={baseClass} style={baseStyle} aria-pressed={on} />;
+	return <button {...rest} className={baseClass} aria-pressed={on} />;
 };
 
 Button.displayName = "Button";

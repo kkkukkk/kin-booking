@@ -20,7 +20,7 @@ const AuthCallbackPage = () => {
 				iconType: 'success',
 				autoCloseTime: 3000,
 			})
-			router.replace('/join'); // 로그인 페이지 혹은 원하는 곳으로
+			router.replace('/join'); // 로그인 페이지
 		};
 
 		logoutAfterEmailVerification();

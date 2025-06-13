@@ -83,11 +83,9 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 						toggleButton(key);
 						onClick();
 					}}
-					style={{fontSize: "10px"}}
-					className="btn-base w-12 h-12 text-sm"
-					round
 					on={!!activeButtons[key]}
 					reverse={!!activeButtons[key] && currentTheme === "normal"} // normal 일 때 on 이면 dark shadow
+					round
 				>
 					{name}
 				</Button>
