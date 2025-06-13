@@ -2,8 +2,10 @@ import { User, UserStatus } from "@/types/model/user";
 
 export interface CreateUserDto {
 	name: string;
+	password: string;
 	email: string;
-	phoneNumber?: string;
+	phoneNumber: string;
+	marketingConsent: boolean;
 }
 
 export interface UpdateUserDto {
@@ -16,6 +18,7 @@ export interface FetchUserDto {
 	email?: string;
 	phoneNumber?: string;
 	status?: string;
+	marketingConsent?: boolean;
 }
 
 export interface FetchUserResponseDto {

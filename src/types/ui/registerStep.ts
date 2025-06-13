@@ -1,0 +1,1 @@
+export type RegisterStep = 'consent' | 'name' | 'email' | 'password' | 'phoneNumber';

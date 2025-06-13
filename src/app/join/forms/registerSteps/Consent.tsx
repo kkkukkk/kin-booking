@@ -2,16 +2,21 @@
 
 import { JSX, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {bottomUpDelay, consent, textContainer, textContainerItem} from "@/types/ui/motionVariants";
+import { consent, textContainer, textContainerItem } from "@/types/ui/motionVariants";
 import Modal from "@/components/Modal";
 import PersonalInfo from "@/app/join/forms/registerSteps/terms/PersonalInfo";
 import TermsOfService from "@/app/join/forms/registerSteps/terms/TermsOfService";
 import Marketing from "@/app/join/forms/registerSteps/terms/Marketing";
 import ConsentItem from "@/app/join/forms/registerSteps/ConsentItem"
-import Button from "@/components/base/Button";
 
 interface ConsentProps {
-	onNext: () => void;
+	key: string;
+	personalChecked: boolean;
+	onChangePersonal: (checked: boolean) => void;
+	termsChecked: boolean;
+	onChangeTerms: (checked: boolean) => void;
+	marketingChecked: boolean;
+	onChangeMarketing: (checked: boolean) => void;
 }
 
 type DetailType = 'personal' | 'terms' | 'marketing';
@@ -19,30 +24,32 @@ type DetailType = 'personal' | 'terms' | 'marketing';
 const messages = [
 	"안녕하세요!",
 	"저희는 공연팀 KIN 입니다.",
-	"함께하시기 전 확인할 내용이 있어요.",
+	"함께하시기 전 확인할 내용이 있어요! ✅",
 ];
 
-const Consent = ({ onNext }: ConsentProps) => {
+const Consent = ({
+	personalChecked,
+	onChangePersonal,
+	termsChecked,
+	onChangeTerms,
+	marketingChecked,
+	onChangeMarketing
+}: ConsentProps) => {
 	const [showDetail, setShowDetail] = useState<DetailType | null>(null);
-	const [personalChecked, setPersonalChecked] = useState(false);
-	const [termsChecked, setTermsChecked] = useState(false);
-	const [marketingChecked, setMarketingChecked] = useState(false);
 
 	const handleClose = () => setShowDetail(null);
 
 	const handleCancel = (detail: DetailType) => {
-		console.log('handleCancel called:', detail);
-		if (detail === 'personal') setPersonalChecked(false);
-		if (detail === 'terms') setTermsChecked(false);
-		if (detail === 'marketing') setMarketingChecked(false);
+		if (detail === 'personal') onChangePersonal(false);
+		if (detail === 'terms') onChangeTerms(false);
+		if (detail === 'marketing') onChangeMarketing(false);
 		handleClose();
 	}
 
 	const handleConfirm = (detail: DetailType) => {
-		console.log('handleConfirm called:', detail);
-		if (detail === 'personal') setPersonalChecked(true);
-		if (detail === 'terms') setTermsChecked(true);
-		if (detail === 'marketing') setMarketingChecked(true);
+		if (detail === 'personal') onChangePersonal(true);
+		if (detail === 'terms') onChangeTerms(true);
+		if (detail === 'marketing') onChangeMarketing(true);
 		handleClose();
 	};
 
@@ -63,12 +70,12 @@ const Consent = ({ onNext }: ConsentProps) => {
 	};
 
 	return (
-		<div>
+		<div className={"relative overflow-hidden"}>
 			<motion.div
 				variants={textContainer}
 				initial="hidden"
 				animate="visible"
-				className="flex flex-col space-y-2 mb-5 text-base md:text-xl"
+				className="flex flex-col space-y-2 text-base md:text-xl"
 			>
 				{messages.map((msg, idx) => (
 					<motion.p key={idx} variants={textContainerItem}>
@@ -81,7 +88,7 @@ const Consent = ({ onNext }: ConsentProps) => {
 				variants={consent}
 				initial="initial"
 				animate="animate"
-				className="flex flex-col gap-4"
+				className="flex flex-col gap-4 my-8 md:my-10"
 			>
 				<ConsentItem
 					checked={personalChecked}

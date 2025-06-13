@@ -21,7 +21,7 @@
   --white_70: rgba(255, 255, 255, .7);
   --normal-back: rgba(255, 255, 255, .9);
   --dark-back: rgba(0, 0, 0, .8);
-  --check-box: rgb(55, 176, 83);
+  --check: rgb(55, 176, 83);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,12 +41,14 @@ body {
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI",
   Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   height: calc(var(--vh, 1vh) * 100);
+  width: 100%;
   margin: 0;
   padding: 0;
 }
 
-#__next {
-  height: calc(var(--vh, 1vh) * 100);
+html, #__next {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
-
 

@@ -1,14 +1,14 @@
 'use client'
 
 import React from "react";
-import {useAppSelector} from "@/redux/hooks";
-import {RootState} from "@/redux/store";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 import clsx from "clsx";
 import styles from '@/css/module/card.module.css';
 import ThemeDiv from "@/components/base/ThemeDiv";
 import Logo from "@/components/Logo";
-import {fadeSlideY} from "@/types/ui/motionVariants";
-import {motion, AnimatePresence} from "framer-motion";
+import { fadeSlideY } from "@/types/ui/motionVariants";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CardProps {
 	children: React.ReactNode;

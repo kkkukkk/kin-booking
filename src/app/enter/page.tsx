@@ -5,8 +5,8 @@ import Card from "@/components/Card";
 
 const EnterPage = () => {
 	return (
-		<Card center>
-			<Letter />
+		<Card>
+			<div></div>
 		</Card>
 	)
 }

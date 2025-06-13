@@ -27,7 +27,7 @@ const TogglePanel = () => {
 	}, [open]);
 
 	return (
-		<div className="fixed bottom-3.5 right-3.5 flex flex-col items-end gap-2" ref={panelRef}>
+		<div className="fixed bottom-3.5 right-3.5 flex flex-col items-end gap-2 md:bottom-5 md:right-5" ref={panelRef}>
 			<PanelContent
 				isOpen={open}
 				activeButtons={activeButtons}
@@ -39,6 +39,7 @@ const TogglePanel = () => {
 					if (open) setActiveButtons({});
 					setOpen(!open);
 				}}
+				fontSize={"text-[10px] md:text-base"}
 				on={open}
 				theme="neon"
 				style={{

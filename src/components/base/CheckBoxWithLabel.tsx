@@ -19,7 +19,7 @@ const CheckBoxWithLabel = ({
 			<span
 				className={
 					`w-5 h-5 mr-2 flex items-center justify-center border-2 rounded-md
-	                ${checked ? 'bg-[var(--check-box)] border-[var(--check-box)]' : 'border-gray-400'}
+	                ${checked ? 'bg-[var(--check)] border-[var(--check)]' : 'border-gray-400'}
 	                transition-colors`
 				}
 			>

@@ -1,13 +1,19 @@
 'use client'
 
+import React, { useEffect, useState } from "react";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { useLogin } from "@/hooks/api/useAuth";
+import { useLoginImages } from "@/hooks/api/useImages";
+import { useSpinner } from "@/providers/SpinnerProvider";
 import Input from "@/components/base/Input";
 import Card from "@/components/Card";
 import Button from "@/components/base/Button";
-import useAlert from "@/hooks/useAlert";
-import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
+import useToast from "@/hooks/useToast";
+import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
+import Logo from "@/components/Logo";
+import ImageSlider from "@/components/slider/ImageSlider";
+import Skeleton from "@/components/base/Skeleton";
 
 interface LoginPageProps {
 	onSwitch: () => void;
@@ -17,58 +23,108 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const { showAlert } = useAlert();
+	const { mutate: login, isPending: loginPending, error: loginError } = useLogin();
+	const { showToast } = useToast();
+	const { showSpinner, hideSpinner } = useSpinner();
+	const { data: images = [], isPending: imagePending, error: imagesError } = useLoginImages();
 
 	const handleLogin = async () => {
-		const {data, error} = await supabase.auth.signInWithPassword({
-			email: email,
-			password: password
-		});
-
-		if (error) {
-			showAlert({ type: "toast", message: "로그인 실패", autoCloseTime: 3000, });
+		if (!email) {
+			showToast({ iconType: "warning", message: "이메일을 입력해주세요", autoCloseTime: 3000, });
+		} else if (!password) {
+			showToast({ iconType: "warning", message: "비밀번호를 입력해주세요", autoCloseTime: 3000, });
 		} else {
-			showAlert({ type: "toast", message: "로그인 성공", autoCloseTime: 3000, });
+			await login({ email, password });
 		}
 	}
 
-	const handleLogOut = async () => {
-		const { error } = await supabase.auth.signOut();
-		if (error) {
-			showAlert({ type: "toast", message: "로그아웃 실패", autoCloseTime: 3000, });
-		} else {
-			showAlert({ type: "toast", message: "로그아웃 성공", autoCloseTime: 3000, });
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleLogin();
 		}
-	}
+	};
 
+
+	useEffect(() => {
+		if (loginError) {
+			if ((loginError as Error).message === "Invalid login credentials") {
+				showToast({
+					message: "이메일과 비밀번호를 확인해주세요.",
+					iconType: "error",
+					autoCloseTime: 3000,
+				});
+			} else if ((loginError as Error).message === "Email not confirmed") {
+				showToast({
+					message: "이메일 인증 후 로그인할 수 있어요.",
+					iconType: "warning",
+					autoCloseTime: 3000,
+				});
+			} else {
+				showToast({
+					message: "로그인 중 오류가 발생했습니다.",
+					iconType: "error",
+					autoCloseTime: 3000,
+				});
+			}
+		}
+	}, [loginError, showToast]);
+
+	useEffect(() => {
+		if (loginPending) showSpinner();
+		else hideSpinner();
+	}, [loginPending, showSpinner, hideSpinner]);
 
 	return (
 		<Card
-			className={"flex flex-col gap-2"}
+			className={"flex flex-col md:flex-row gap-8 md:gap-16"}
 		>
-			<Input placeholder="이메일" theme={theme} className={"input-base"} value={email} onChange={(e) => setEmail(e.target.value)}/>
-			<Input placeholder="비밀번호" theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)}/>
-			<Button
-				type="button"
-				theme={"dark"}
-				onClick={() => handleLogin()}
+			<div
+				className={"hidden md:flex justify-center item-center md:w-2/3"}
 			>
-				{"로그인"}
-			</Button>
-			<Button
-				type="button"
-				theme={"dark"}
-				onClick={() => handleLogOut()}
+				{
+					imagePending
+						? <Skeleton />
+						: <ImageSlider
+							images={images}
+							width="w-full"
+							height="h-full"
+							interval={5000}
+						/>
+				}
+			</div>
+			<div
+				className={"flex flex-col md:w-1/3 h-full gap-8 mt-2 md:gap-16 md:mt-8"}
 			>
-				{"로그아웃"}
-			</Button>
-			<Button
-				type="button"
-				theme={"dark"}
-				onClick={onSwitch}
-			>
-				{"회원가입"}
-			</Button>
+				<div
+					className={"flex justify-center items-center flex-grow-[2]"}
+				>
+					<Logo />
+				</div>
+				<div
+					className={"flex flex-col gap-2 flex-grow-[3.5]"}
+				>
+					<Input placeholder="이메일" name={"email"} fontSize={"text-sm md:text-xl"} theme={theme} className={"input-base"} value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={handleKeyPress} />
+					<InputWithPasswordToggle placeholder="비밀번호" name={"password"} fontSize={"text-sm md:text-xl"} theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={handleKeyPress} />
+					<Button
+						type="button"
+						theme={"dark"}
+						padding={"py-1"}
+						fontSize={"text-sm md:text-lg"}
+						onClick={() => handleLogin()}
+					>
+						{"로그인"}
+					</Button>
+					<Button
+						type="button"
+						theme={"dark"}
+						padding={"py-1"}
+						fontSize={"text-sm md:text-lg"}
+						onClick={onSwitch}
+					>
+						{"회원가입"}
+					</Button>
+				</div>
+			</div>
 		</Card>
 	)
 }

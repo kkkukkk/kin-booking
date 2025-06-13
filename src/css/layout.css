@@ -1,6 +1,6 @@
 .layout-grid {
     display: grid;
-    height: 100%;
+    height: calc(var(--vh, 1vh) * 100);
     grid-template-rows: 5% 90% 5%;
     grid-template-columns: 5% 90% 5%;
     grid-template-areas:
@@ -70,7 +70,7 @@
 @media (max-width: 768px) and (orientation: portrait) {
     /* 모바일 세로용 스타일 */
     .layout-grid {
-        grid-template-rows: 5vh 90vh 5vh;
+        grid-template-rows: minmax(5vh, 5%) minmax(80vh, 90%) minmax(5vh, 5%);
         grid-template-columns: 100%;
         grid-template-areas:
             "header-center"
@@ -78,7 +78,7 @@
             "footer-center";
     }
     .layout-grid > .card {
-        border-radius: unset;
+        border-radius: 0;
     }
 }
 
@@ -86,7 +86,7 @@
 @media (max-width: 1024px) and (orientation: landscape) {
     /* 모바일 가로용 스타일 */
     .layout-grid {
-        grid-template-rows: 100vh;
+        grid-template-rows: 1fr;
         grid-template-columns: 5% 90% 5%;
         grid-template-areas:
             "main-left main-center main-right"

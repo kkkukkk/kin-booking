@@ -3,9 +3,9 @@ import {Theme} from "@/types/ui/theme";
 
 export type ButtonType = "default" | "hamburger";
 
-export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-	widthPx?: string;
-	heightPx?: string;
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+	width?: string;
+	height?: string;
 	theme?: Theme;
 	round?: boolean;
 	variant?: ButtonType;

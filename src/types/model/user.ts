@@ -16,5 +16,6 @@ export interface User {
 	email: string;
 	phoneNumber?: string | null;
 	registerDate: string;
+	marketingConsent: boolean;
 	status: UserStatus;
 }

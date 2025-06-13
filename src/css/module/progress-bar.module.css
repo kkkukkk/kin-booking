@@ -1,0 +1,57 @@
+.progressWrapper {
+    width: 100%;
+    height: 0.5rem;
+    background-color: #e5e7eb; /* gray-200 */
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progressWrapper.dark {
+    background-color: #b9b3b3;
+}
+
+.progressInner {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.3s ease-in-out;
+}
+
+.progressInner.normal {
+    background: linear-gradient(
+        to right,
+        #222,
+        #444
+    );
+}
+.progressInner.dark {
+    background: linear-gradient(
+        to right,
+        #262626,
+        #5d5d5d
+    );
+}
+.progressInner.neon {
+    transition: width 0.1s linear;
+    background: linear-gradient(
+        270deg,
+        #10b9ab,
+        #22c581,
+        #3dafec,
+        #70ffb8,
+        #50ea7c
+    );
+    background-size: 800% 800%;
+    animation: gradientShift 5s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}

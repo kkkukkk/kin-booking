@@ -5,7 +5,7 @@ interface TermsOfServiceProps {
 	onConfirm: () => void;
 }
 
-const TermsOfService = ({onClose, onConfirm}: TermsOfServiceProps) => {
+const TermsOfService = ({ onClose, onConfirm }: TermsOfServiceProps) => {
 	return (
 		<section>
 			<h2 className="text-lg md:text-2xl font-bold mb-4">[서비스 이용 약관]</h2>
@@ -32,13 +32,15 @@ const TermsOfService = ({onClose, onConfirm}: TermsOfServiceProps) => {
 
 			<div className="flex items-center justify-center mt-4 gap-2">
 				<Button
-					widthPx={"50%"}
+					width={"50%"}
 					padding={"p-1"}
+					className={"text-sm md:text-lg"}
 					onClick={onClose}
 				>취소</Button>
 				<Button
-					widthPx={"50%"}
+					width={"50%"}
 					padding={"p-1"}
+					className={"text-sm md:text-lg"}
 					onClick={onConfirm}
 					theme={"dark"}
 				>동의</Button>

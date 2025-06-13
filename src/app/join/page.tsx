@@ -3,16 +3,26 @@
 import { useEffect, useState } from "react";
 import LoginPage from "@/app/join/forms/LoginPage";
 import RegisterPage from "@/app/join/forms/RegisterPage";
-import { notFound } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/hooks/useSession";
 
 type Pages = "LoginPage" | "RegisterPage"
 
 const JoinPage = () => {
-	useEffect(() => {
-		notFound();
-	}, [])
+	const { session, loading } = useSession();
+	const [currentPage, setCurrentPage] = useState<Pages>("LoginPage");
+	const router = useRouter();
 
-	const [currentPage, setCurrentPage] = useState<Pages>("LoginPage")
+	useEffect(() => {
+		if (!loading && session) {
+			const isEmailVerified = !!session.user.email_confirmed_at;
+			if (isEmailVerified) {
+				router.replace("/");
+			}
+		}
+	}, [loading, session, router]);
+
+	if (loading) return null;
 
 	const handlePageChange = (page: Pages) => {
 		setCurrentPage(page);
@@ -21,9 +31,9 @@ const JoinPage = () => {
 	return (
 		<>
 			{currentPage === "LoginPage" ? (
-				<LoginPage onSwitch={() => handlePageChange("RegisterPage")}/>
+				<LoginPage onSwitch={() => handlePageChange("RegisterPage")} />
 			) : (
-				<RegisterPage onSwitch={() => handlePageChange("LoginPage")}/>
+				<RegisterPage onSwitch={() => handlePageChange("LoginPage")} />
 			)}
 		</>
 	)
