@@ -22,13 +22,13 @@ const Marketing = ({ onClose, onConfirm }: MarketingProps) => {
 
 			<div className="flex items-center justify-center mt-4 gap-2">
 				<Button
-					width={"50%"}
+					width={"w-1/2"}
 					padding={"p-1"}
 					className={"text-sm md:text-lg"}
 					onClick={onClose}
 				>취소</Button>
 				<Button
-					width={"50%"}
+					width={"w-1/2"}
 					padding={"p-1"}
 					className={"text-sm md:text-lg"}
 					onClick={onConfirm}

@@ -3,7 +3,6 @@
 import Card from "@/components/Card";
 import { useSession } from "@/hooks/useSession";
 import AnimatedText from "@/components/base/AnimatedText";
-import Skeleton from "@/components/base/Skeleton";
 
 const Home = ()=> {
     const { session} = useSession();

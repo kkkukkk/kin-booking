@@ -63,10 +63,10 @@ const Alert = ({
 				)}
 
 				<div className={"flex justify-center gap-2"}>
-					<Button onClick={onConfirm} theme={"dark"} width={"30%"} padding={"px-2 py-1"}>
+					<Button onClick={onConfirm} theme={"dark"} width={"w-1/3"} padding={"px-2 py-1"}>
 						확인
 					</Button>
-					{!noCancel && <Button onClick={onCancel} theme={"normal"} width={"30%"} padding={"px-2 py-1"}>
+					{!noCancel && <Button onClick={onCancel} theme={"normal"} width={"w-1/3"} padding={"px-2 py-1"}>
 						취소
 					</Button>}
 				</div>
