@@ -184,11 +184,11 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			case 'name':
 				return isValidName;
 			case 'email':
-				return isValidEmail && !isDuplicateEmail;
+				return isValidEmail && isDuplicateEmail === false;
 			case 'password':
 				return isValidPassword;
 			case 'phoneNumber':
-				return isValidPhone && !isDuplicatePhone;
+				return isValidPhone && isDuplicatePhone === false;
 			default:
 				return false;
 		}
@@ -198,9 +198,15 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 		switch (step) {
 			case 'consent': return 'consent';
 			case 'name': return 'name';
-			case 'email': return isDuplicateEmail ? 'emailDuplicate' : 'emailInvalid';
+			case 'email':
+				if (!isValidEmail) return 'emailInvalid';
+				if (isDuplicateEmail || isDuplicateEmail === null) return 'emailDuplicate';
+				break;
 			case 'password': return passwordValidationReason === 'invalidFormat' ? 'passwordInvalidFormat' : 'passwordNotMatch';
-			case 'phoneNumber': return isDuplicatePhone ? 'phoneDuplicate' : 'phone';
+			case 'phoneNumber':
+				if (!isValidPassword) return 'phone';
+				if (isDuplicatePhone || isDuplicatePhone === null) return 'phoneDuplicate';
+				break;
 		}
 	}
 
@@ -314,7 +320,6 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 				currentStep={steps.indexOf(step)}
 			    theme={theme}
 			/>
-
 
 			<AnimatePresence mode="wait">
 				<motion.div

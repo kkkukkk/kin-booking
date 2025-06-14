@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
@@ -35,6 +35,8 @@ const PhoneNumber = ({
 	const [touched, setTouched] = useState(false);
 	const [checking, setChecking] = useState(false);
 
+	const prevValueRef = useRef<string>(value);
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const input = e.target.value;
 		// 숫자, -, 공백만 허용하고 나머지는 제거
@@ -55,7 +57,10 @@ const PhoneNumber = ({
 	useEffect(() => {
 		const valid = isValidPhoneNumber(value);
 		onValidChange?.(valid);
-		onDuplicateCheck?.(null);
+		if (prevValueRef.current !== value) {
+			onDuplicateCheck?.(null);
+			prevValueRef.current = value;
+		}
 	}, [value, onValidChange, onDuplicateCheck]);
 
 	const checkDuplicatePhone = async () => {
