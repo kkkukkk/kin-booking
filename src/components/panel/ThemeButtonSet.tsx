@@ -39,10 +39,10 @@ const ThemeButtonSet = ({ isOpen }: ThemeButtonSetProps) => {
 					type="button"
 					theme={theme}
 					onClick={() => handleClick(theme)}
-					style={{fontSize: "10px"}}
-					className={currentTheme === theme ? "on" : ""}
+					fontSize={"text-[10px] md:text-xs"}
 					round
 					on={currentTheme === theme}
+					reverse={currentTheme !== theme}
 				>
 					{theme.charAt(0).toUpperCase() + theme.slice(1)}
 				</Button>

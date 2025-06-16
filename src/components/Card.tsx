@@ -16,7 +16,8 @@ interface CardProps {
 	hasLogo?: boolean;
 	width?: string;
 	height?: string;
-	center?: boolean
+	center?: boolean;
+	innerScroll?: boolean;
 }
 
 const Card = ({
@@ -26,8 +27,13 @@ const Card = ({
 	width = "w-full",
 	height = "h-full",
 	center = false,
+	innerScroll = false,
 }: CardProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
+	const conditionStyle = {
+		...(innerScroll && { overflowY: "auto" }),
+		...(hasLogo && { paddingTop: 0 }),
+	};
 
 	return (
 		<AnimatePresence mode="wait">
@@ -37,17 +43,31 @@ const Card = ({
 				animate="center"
 				exit="exit"
 				transition={{duration: 0.3}}
-				className={clsx("relative main-center", width, height)}
+				className={clsx(
+					"relative main-center",
+					width,
+					height
+				)}
+				style={
+					innerScroll
+						? { maxHeight: "100%", overflow: "hidden" }
+						: undefined
+				}
 			>
 				<ThemeDiv
 					className={clsx(
 						styles.card,
 						theme && styles[theme],
 						className,
-						center && "flex justify-center items-center"
+						center && "flex justify-center items-center",
 					)}
+					style={conditionStyle}
 				>
-					{hasLogo && <Logo className={"relative top-0 left-[50%] w-[120px] h-auto translate-x-[-50%]"}/>}
+					{hasLogo &&
+					    <div className={"sticky top-0 z-10 flex w-full justify-center pt-[1.5rem]"}>
+						    <Logo width={120}/>
+					    </div>
+					}
 					{children}
 				</ThemeDiv>
 			</motion.div>

@@ -8,25 +8,40 @@ interface LogoProps {
 	className?: string;
 }
 
-const Logo = ({ width = 450, className }: LogoProps) => {
+const Logo = ({ width, className }: LogoProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
+
+	// 기본 크기와 비율
+	const defaultWidth = 450;
+	const defaultHeight = 330;
+
+	// width가 없으면 기본값, height는 비율 맞춰서 계산
+	const computedWidth = width ?? defaultWidth;
+	const computedHeight = (computedWidth / defaultWidth) * defaultHeight;
 
 	return (
 		<div
 			className={clsx(
-				"w-full max-w-[450px] aspect-[450/330] relative",
-				className
+				className,
+				"w-full h-full flex justify-center items-center"
 			)}
 		>
-			<Image
-				key={theme}
-				src={`/images/logo_${theme}.png`}
-				alt="logo"
-				fill
-				style={{ objectFit: "contain" }}
-				sizes={`${width}px`}
-				priority
-			/>
+			<div
+				className={"relative"}
+				style={{
+					width: computedWidth,
+					height: computedHeight,
+				}}
+			>
+				<Image
+					key={theme}
+					src={`/images/logo_${theme}.png`}
+					alt="logo"
+					fill
+					style={{ objectFit: "contain" }}
+					priority
+				/>
+			</div>
 		</div>
 	);
 };

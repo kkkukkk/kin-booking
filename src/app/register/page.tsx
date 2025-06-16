@@ -13,11 +13,11 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { getErrorMessage } from "@/components/utils/error";
 import Card from "@/components/Card";
-import Name from "@/app/join/forms/registerSteps/Name";
-import Email from "@/app/join/forms/registerSteps/Email";
-import Password from "@/app/join/forms/registerSteps/Password";
-import PhoneNumber from "@/app/join/forms/registerSteps/PhoneNumber";
-import Consent from "@/app/join/forms/registerSteps/Consent";
+import Name from "@/app/register/registerSteps/Name";
+import Email from "@/app/register/registerSteps/Email";
+import Password from "@/app/register/registerSteps/Password";
+import PhoneNumber from "@/app/register/registerSteps/PhoneNumber";
+import Consent from "@/app/register/registerSteps/Consent";
 import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
@@ -89,12 +89,12 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			autoCloseTime: 3000,
 		},
 		phone: {
-			message: "유효한 핸드폰 번호를 입력해주세요.",
+			message: "유효한 휴대폰 번호를 입력해주세요.",
 			iconType: "warning",
 			autoCloseTime: 3000,
 		},
 		phoneDuplicate: {
-			message: "핸드폰 번호 중복검사를 해주세요.",
+			message: "휴대폰 번호 중복검사를 해주세요.",
 			iconType: "warning",
 			autoCloseTime: 3000,
 		},
@@ -144,7 +144,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			});
 
 			if (confirmed) {
-				onSwitch();
+				router.push('/login');
 			}
 
 			/* 자동 로그인
@@ -235,7 +235,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 
 	const onBack = () => {
 		hideToast();
-		if (step === 'consent') onSwitch();
+		if (step === 'consent') router.push('/login');
 		else if (step === 'name') setStep('consent');
 		else if (step === 'phoneNumber') setStep('password');
 		else if (step === 'password') setStep('email');
@@ -318,7 +318,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			<ProgressBar
 				steps={steps}
 				currentStep={steps.indexOf(step)}
-			    theme={theme}
+				theme={theme}
 			/>
 
 			<AnimatePresence mode="wait">

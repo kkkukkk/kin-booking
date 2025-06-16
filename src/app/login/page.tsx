@@ -6,6 +6,7 @@ import { RootState } from "@/redux/store";
 import { useLogin } from "@/hooks/api/useAuth";
 import { useLoginImages } from "@/hooks/api/useImages";
 import { useSpinner } from "@/providers/SpinnerProvider";
+import { useRouter } from "next/navigation";
 import Input from "@/components/base/Input";
 import Card from "@/components/Card";
 import Button from "@/components/base/Button";
@@ -14,12 +15,11 @@ import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
 import Logo from "@/components/Logo";
 import ImageSlider from "@/components/slider/ImageSlider";
 import Skeleton from "@/components/base/Skeleton";
+import Link from "next/link";
 
-interface LoginPageProps {
-	onSwitch: () => void;
-}
 
-const LoginPage = ({ onSwitch }: LoginPageProps) => {
+const LoginPage = () => {
+	const router = useRouter();
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
@@ -98,7 +98,7 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 				<div
 					className={"flex justify-center items-center flex-grow-[2]"}
 				>
-					<Logo />
+					<Logo width={400}/>
 				</div>
 				<div
 					className={"flex flex-col gap-2 flex-grow-[3.5]"}
@@ -111,6 +111,7 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 						padding={"py-1"}
 						fontSize={"text-sm md:text-lg"}
 						onClick={() => handleLogin()}
+						reverse={theme === "normal"}
 					>
 						{"로그인"}
 					</Button>
@@ -119,10 +120,18 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 						theme={"dark"}
 						padding={"py-1"}
 						fontSize={"text-sm md:text-lg"}
-						onClick={onSwitch}
+						onClick={() => router.push('/register')}
+						reverse={theme === "normal"}
 					>
 						{"회원가입"}
 					</Button>
+					<div
+						className={"cursor-pointer text-sm text-right md:text-sm hover:underline"}
+					>
+						<Link href={"/auth/find"}>
+							{"로그인에 어려움이 있나요?"}
+						</Link>
+					</div>
 				</div>
 			</div>
 		</Card>
