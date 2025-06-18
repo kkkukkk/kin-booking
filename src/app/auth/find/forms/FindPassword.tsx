@@ -41,7 +41,7 @@ const FindPassword = () => {
 
 		const { data, error } = await supabase.rpc('check_user_exists', {
 			input_email: email,
-			input_phone: phoneNumber,
+			input_phone: digits,
 		});
 
 		setChecking(false);

@@ -23,18 +23,13 @@ import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
 
-interface RegisterPageProps {
-	onSwitch: () => void;
-}
-
-const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
+const RegisterPage = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const router = useRouter();
 	const { mutate: register, isPending } = useRegister();
-	const { mutate: login } = useLogin();
 	const { showToast, hideToast } = useToast();
-	const { showAlert, hideAlert } = useAlert();
+	const { showAlert } = useAlert();
 	const { showSpinner, hideSpinner } = useSpinner();
 
 	const [step, setStep] = useState<RegisterStep>('consent');
