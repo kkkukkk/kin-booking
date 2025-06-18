@@ -82,6 +82,7 @@ const PhoneNumber = ({
 		}
 
 		setChecking(true);
+
 		const digits = value.replace(/[^0-9]/g, '');
 		const { data, error } = await supabase.rpc('check_phone_duplicate', { input_phone_number: digits });
 
@@ -135,6 +136,7 @@ const PhoneNumber = ({
 					className={"font text-md md:text-xl"}
 					value={value}
 					onChange={handleChange}
+					maxLength={13}
 				/>
 				<Button
 					theme={"dark"}

@@ -204,7 +204,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 				break;
 			case 'password': return passwordValidationReason === 'invalidFormat' ? 'passwordInvalidFormat' : 'passwordNotMatch';
 			case 'phoneNumber':
-				if (!isValidPassword) return 'phone';
+				if (!isValidPhone) return 'phone';
 				if (isDuplicatePhone || isDuplicatePhone === null) return 'phoneDuplicate';
 				break;
 		}
@@ -306,15 +306,17 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 	}, [isPending, showSpinner, hideSpinner]);
 
 	return (
-		<Card>
-			<Button
-				theme={"dark"}
-				padding={"px-2 py-1.5"}
-				onClick={onBack}
-			>
-				{"뒤로가기"}
-			</Button>
-
+		<Card
+			backButton={
+				<Button
+					theme={"dark"}
+					padding={"px-3 py-1.5"}
+					onClick={onBack}
+				>
+					{"뒤로가기"}
+				</Button>
+			}
+		>
 			<ProgressBar
 				steps={steps}
 				currentStep={steps.indexOf(step)}

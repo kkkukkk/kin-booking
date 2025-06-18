@@ -105,6 +105,7 @@ const Toast = () => {
 				isOpen  ? styles["toast-enter-active"] : styles["toast-enter"]
 			)}
 			tabIndex={-1}
+			isChildren
 		>
 			<div className="text-sm flex items-center md:text-base relative">
 				<div className="w-6 h-6 flex-shrink-0 flex justify-center items-center m-1">

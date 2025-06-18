@@ -8,7 +8,6 @@ import PersonalInfo from "@/app/register/registerSteps/terms/PersonalInfo";
 import TermsOfService from "@/app/register/registerSteps/terms/TermsOfService";
 import Marketing from "@/app/register/registerSteps/terms/Marketing";
 import ConsentItem from "@/app/register/registerSteps/ConsentItem"
-import { SquareCheckIcon } from "@/components/icon/SquareCheckIcon";
 
 interface ConsentProps {
 	key: string;

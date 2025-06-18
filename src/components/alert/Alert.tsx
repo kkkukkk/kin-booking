@@ -33,6 +33,7 @@ const Alert = ({
 		<div className={"fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 z-50"}>
 			<ThemeDiv
 				className={"bg-white p-6 rounded-md shadow-lg min-w-[300px] max-w-[90%] md:min-w-[500px]"}
+				isChildren
 			>
 				<div
 					className={"flex items-center cursor-pointer absolute top-4 right-4 font-bold"}

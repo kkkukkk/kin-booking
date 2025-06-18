@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
 import ThemeDiv from "@/components/base/ThemeDiv";
@@ -11,6 +11,7 @@ import { RootState } from "@/redux/store";
 import { HomeIcon } from "@/components/icon/HomeIcon";
 import { useLogout } from "@/hooks/api/useAuth";
 import { useSession } from "@/hooks/useSession";
+import useToast from "@/hooks/useToast";
 
 type PanelContentProps = {
 	isOpen: boolean;
@@ -20,10 +21,10 @@ type PanelContentProps = {
 
 const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentProps) => {
 	const router = useRouter();
-	const pathname = usePathname();
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { mutate: logout } = useLogout();
 	const { session } = useSession();
+	const { showToast } = useToast();
 
 	const skipKeys = ["Home", "Login", "Logout"];
 
@@ -38,14 +39,25 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 	const panelButtons = [
 		{
 			key: 'Theme',
-			onClick: () => console.log('Theme'),
+			onClick: () => {},
 			name: 'Theme',
 		},
 		...(session
 			? [
 				{
 					key: 'Logout',
-					onClick: () => logout(),
+					onClick: () => {
+						logout(undefined, {
+							onSuccess: () => {
+								showToast({
+									iconType: 'success',
+									message: '로그아웃 되었습니다.',
+									autoCloseTime: 3000
+								})
+								router.push("/login")
+							},
+						});
+					},
 					name: 'Logout',
 				},
 			]

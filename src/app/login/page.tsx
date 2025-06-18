@@ -16,7 +16,8 @@ import Logo from "@/components/Logo";
 import ImageSlider from "@/components/slider/ImageSlider";
 import Skeleton from "@/components/base/Skeleton";
 import Link from "next/link";
-
+import { useSession } from "@/hooks/useSession";
+import clsx from "clsx";
 
 const LoginPage = () => {
 	const router = useRouter();
@@ -27,6 +28,13 @@ const LoginPage = () => {
 	const { showToast } = useToast();
 	const { showSpinner, hideSpinner } = useSpinner();
 	const { data: images = [], isPending: imagePending, error: imagesError } = useLoginImages();
+	const { session, loading } = useSession();
+
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleLogin();
+		}
+	};
 
 	const handleLogin = async () => {
 		if (!email) {
@@ -37,13 +45,6 @@ const LoginPage = () => {
 			await login({ email, password });
 		}
 	}
-
-	const handleKeyPress = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			handleLogin();
-		}
-	};
-
 
 	useEffect(() => {
 		if (loginError) {
@@ -73,6 +74,19 @@ const LoginPage = () => {
 		if (loginPending) showSpinner();
 		else hideSpinner();
 	}, [loginPending, showSpinner, hideSpinner]);
+
+	useEffect(() => {
+		if (!loading && session) {
+			const isEmailVerified = !!session.user.email_confirmed_at;
+			if (isEmailVerified) {
+				router.replace("/");
+			}
+		}
+	}, [loading, session, router]);
+
+	if (loading || (session && session.user.email_confirmed_at)) {
+		return null;
+	}
 
 	return (
 		<Card
@@ -126,10 +140,17 @@ const LoginPage = () => {
 						{"회원가입"}
 					</Button>
 					<div
-						className={"cursor-pointer text-sm text-right md:text-sm hover:underline"}
+						className={"text-sm text-right mt-2 md:text-base"}
 					>
-						<Link href={"/auth/find"}>
-							{"로그인에 어려움이 있나요?"}
+						<Link
+							href={"/auth/find"}
+							className={clsx(
+								theme === "normal" ? "bg-green-100/90" : "bg-green-700/70",
+								"cursor-pointer px-2.5 py-1 rounded-full shadow-md"
+							)}
+							tabIndex={0}
+						>
+							{"로그인 정보를 잊으셨나요?"}
 						</Link>
 					</div>
 				</div>

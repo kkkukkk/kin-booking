@@ -3,14 +3,25 @@
     height: 100%;
     border-radius: 10px;
     padding: 1.5rem;
-    box-shadow:
-        0 0 6px var(--black_70),
-        0 0 12px var(--black_50),
-        0 0 24px var(--black_30),
-        0 0 36px var(--black_10);
     background-color: var(--white_70) !important;
 }
 
+.card-wrap {
+    box-shadow:
+            0 0 6px var(--black_70),
+            0 0 12px var(--black_50),
+            0 0 24px var(--black_30),
+            0 0 36px var(--black_10);
+}
+
+.card-wrap.neon {
+    box-shadow:
+            0 0 6px var(--neon-green-strong),
+            0 0 12px var(--neon-green-medium),
+            0 0 24px var(--neon-green-light),
+            0 0 36px var(--neon-green-faint);
+    transition: box-shadow 0.5s ease-in-out;
+}
 .card.center {
     display: flex;
     justify-content: center;
@@ -20,15 +31,6 @@
 .card.dark,
 .card.neon {
     background-color: var(--black_70) !important;
-}
-
-.card.neon {
-    box-shadow:
-        0 0 6px var(--neon-green-strong),
-        0 0 12px var(--neon-green-medium),
-        0 0 24px var(--neon-green-light),
-        0 0 36px var(--neon-green-faint);
-    transition: box-shadow 0.5s ease-in-out;
 }
 
 /* PC/태블릿 (769px 이상) */

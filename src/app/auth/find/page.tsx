@@ -26,15 +26,16 @@ const FindPage = () => {
 		<Card
 			hasLogo
 			innerScroll
+			backButton={
+				<Button
+					theme="dark"
+					padding="px-3 py-1.5"
+					onClick={() => router.push('/login')}
+				>
+					뒤로가기
+				</Button>
+			}
 		>
-			<Button
-				theme={"dark"}
-				padding={"px-2 py-1.5"}
-				onClick={() => router.push('/login')}
-				className={"absolute top-0 left-0"}
-			>
-				{"뒤로가기"}
-			</Button>
 			<div
 				className={"my-4"}
 			>
@@ -49,6 +50,7 @@ const FindPage = () => {
 					onClick={() => handlePageChange("FindEmail")}
 					theme={"dark"}
 					on={currentPage === "FindEmail"}
+					className={"z-1"}
 				>이메일 찾기</Button>
 				<Button
 					width={"w-[50%]"}
@@ -56,6 +58,7 @@ const FindPage = () => {
 					onClick={() => handlePageChange("FindPassword")}
 					theme={"dark"}
 					on={currentPage === "FindPassword"}
+					className={"z-1"}
 				>비밀번호 찾기</Button>
 			</div>
 			<div
