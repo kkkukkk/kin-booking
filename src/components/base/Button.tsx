@@ -33,6 +33,7 @@ const HamburgerLines = ({ on }: { on: boolean }) => {
 };
 
 const Button = ({
+	key,
 	width = "w-auto",
 	height = "h-auto",
 	theme = "normal",
@@ -44,8 +45,7 @@ const Button = ({
 	fontWeight = "font-medium",
 	padding = "px-2 py-0",
 	className,
-	...rest,
-	key
+	...rest
 }: ButtonProps) => {
 	const baseClass = clsx(
 		styles[`theme-${theme}`],
