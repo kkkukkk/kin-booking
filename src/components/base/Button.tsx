@@ -44,7 +44,8 @@ const Button = ({
 	fontWeight = "font-medium",
 	padding = "px-2 py-0",
 	className,
-	...rest
+	...rest,
+	key
 }: ButtonProps) => {
 	const baseClass = clsx(
 		styles[`theme-${theme}`],
