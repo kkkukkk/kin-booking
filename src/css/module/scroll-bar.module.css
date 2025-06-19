@@ -1,0 +1,66 @@
+.scrollbarTrack {
+    background: var(--black_30);
+    border-radius: 9999px;
+}
+
+.scrollbarThumb {
+    background: linear-gradient(45deg, #8ec5fc, #e0c3fc);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: margin-top 0.1s;
+    animation: pulse 2s infinite alternate;
+}
+
+.scrollbarThumb {
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: margin-top 0.1s;
+}
+
+.scrollbarThumb.normal {
+    background: var(--black_70);
+}
+
+.scrollbarThumb.dark {
+    background: var(--white_70);
+}
+
+.scrollbarThumb.neon {
+    transition: width 0.1s linear;
+    background: linear-gradient(
+            270deg,
+            #10b9ab,
+            #22c581,
+            #3dafec,
+            #70ffb8,
+            #50ea7c
+    );
+    background-size: 800% 800%;
+    animation: gradientShift 10s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+.dragging {
+    box-shadow: 0 0 10px #8ec5fc;
+    animation: none;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 6px #8ec5fc;
+    }
+    100% {
+        box-shadow: 0 0 14px #8ec5fc;
+    }
+}

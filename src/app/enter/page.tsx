@@ -1,6 +1,5 @@
 'use client'
 
-import Letter from "@/components/Letter";
 import Card from "@/components/Card";
 
 const EnterPage = () => {

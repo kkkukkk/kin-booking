@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+'use client'
+
+import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
@@ -35,6 +37,8 @@ const PhoneNumber = ({
 	const [touched, setTouched] = useState(false);
 	const [checking, setChecking] = useState(false);
 
+	const prevValueRef = useRef<string>(value);
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const input = e.target.value;
 		// 숫자, -, 공백만 허용하고 나머지는 제거
@@ -55,13 +59,16 @@ const PhoneNumber = ({
 	useEffect(() => {
 		const valid = isValidPhoneNumber(value);
 		onValidChange?.(valid);
-		onDuplicateCheck?.(null);
+		if (prevValueRef.current !== value) {
+			onDuplicateCheck?.(null);
+			prevValueRef.current = value;
+		}
 	}, [value, onValidChange, onDuplicateCheck]);
 
 	const checkDuplicatePhone = async () => {
 		if (value === "") {
 			showToast({
-				message: "핸드폰 번호를 입력해주세요.",
+				message: "휴대폰 번호를 입력해주세요.",
 				autoCloseTime: 3000,
 				iconType: "warning",
 			});
@@ -69,7 +76,7 @@ const PhoneNumber = ({
 		}
 		if (!isValid) {
 			showToast({
-				message: "올바른 핸드폰 번호을 입력해주세요.",
+				message: "올바른 휴대폰 번호을 입력해주세요.",
 				autoCloseTime: 3000,
 				iconType: "warning",
 			});
@@ -77,17 +84,16 @@ const PhoneNumber = ({
 		}
 
 		setChecking(true);
+
 		const digits = value.replace(/[^0-9]/g, '');
-		console.log(digits);
 		const { data, error } = await supabase.rpc('check_phone_duplicate', { input_phone_number: digits });
-		console.log(data);
 
 		setChecking(false);
 
 		if (error) {
-			console.error("핸드폰 번호 중복 체크 실패:", error.message);
+			console.error("휴대폰 번호 중복 체크 실패:", error.message);
 			showToast({
-				message: "핸드폰 번호 중복 확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
+				message: "휴대폰 번호 중복 확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
 				autoCloseTime: 3000,
 				iconType: "error",
 			});
@@ -101,8 +107,8 @@ const PhoneNumber = ({
 
 		showToast({
 			message: isUsed
-				? "이미 사용 중인 핸드폰 번호에요."
-				: "사용 가능한 핸드폰 번호에요!",
+				? "이미 사용 중인 휴대폰 번호에요."
+				: "사용 가능한 휴대폰 번호에요!",
 			autoCloseTime: 3000,
 			iconType: isUsed ? "warning" : "success",
 		});
@@ -111,7 +117,7 @@ const PhoneNumber = ({
 	return (
 		<div className="flex flex-col relative overflow-hidden">
 			<div className={"mb-2"}>
-				<AnimatedText fontSize={"text-base md:text-xl"} text={"핸드폰 번호를 입력해주세요! 📱"}/>
+				<AnimatedText fontSize={"text-base md:text-xl"} text={"휴대폰 번호를 입력해주세요! 📱"}/>
 			</div>
 			<div className={"mb-4"}>
 				<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 숫자만 입력해도 괜찮아요!"} delay={0.8}/>
@@ -127,11 +133,12 @@ const PhoneNumber = ({
 				<Input
 					type={"tel"}
 					name={"phoneNumber"}
-					placeholder={"핸드폰 번호를 입력해주세요."}
+					placeholder={"휴대폰 번호를 입력해주세요."}
 					theme={theme}
-					className={"font text-md md:text-xl"}
+					className={"font text-md md:text-lg"}
 					value={value}
 					onChange={handleChange}
+					maxLength={13}
 				/>
 				<Button
 					theme={"dark"}
@@ -160,7 +167,7 @@ const PhoneNumber = ({
 					!touched || isValid ? "opacity-0 translate-y-[-4px]" : "opacity-100 translate-y-0"
 				)}
 			>
-				{touched && !isValid && "유효한 핸드폰 번호를 입력해주세요."}
+				{touched && !isValid && "유효한 휴대폰 번호를 입력해주세요."}
 			</div>
 		</div>
 	)

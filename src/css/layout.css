@@ -1,8 +1,8 @@
 .layout-grid {
     display: grid;
     height: calc(var(--vh, 1vh) * 100);
-    grid-template-rows: 5% 90% 5%;
-    grid-template-columns: 5% 90% 5%;
+    grid-template-rows: 4% 92% 4%;
+    grid-template-columns: 8% 84% 8%;
     grid-template-areas:
     "header-left header-center header-right"
     "main-left main-center main-right"

@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+'use client'
+
+import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
@@ -35,6 +37,8 @@ const Email = ({
 	const [touched, setTouched] = useState(false);
 	const [checking, setChecking] = useState(false);
 
+	const prevValueRef = useRef<string>(value);
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!touched) setTouched(true);
 		onChange(e);
@@ -44,7 +48,10 @@ const Email = ({
 	useEffect(() => {
 		const valid = isValidEmail(value);
 		onValidChange?.(valid);
-		onDuplicateCheck?.(null); // 수정 시 중복 검사 결과 초기화
+		if (prevValueRef.current !== value) {
+			onDuplicateCheck?.(null);
+			prevValueRef.current = value;
+		}
 	}, [value, onValidChange, onDuplicateCheck]);
 
 	// 이메일 중복검사 함수
@@ -123,7 +130,7 @@ const Email = ({
 					name={"email"}
 					placeholder={"이메일을 입력해주세요."}
 					theme={theme}
-					className={"font text-base md:text-xl"}
+					className={"font text-base md:text-lg"}
 					value={value}
 					onChange={handleChange}
 				/>

@@ -6,6 +6,7 @@ import { RootState } from "@/redux/store";
 import { useLogin } from "@/hooks/api/useAuth";
 import { useLoginImages } from "@/hooks/api/useImages";
 import { useSpinner } from "@/providers/SpinnerProvider";
+import { useRouter } from "next/navigation";
 import Input from "@/components/base/Input";
 import Card from "@/components/Card";
 import Button from "@/components/base/Button";
@@ -14,19 +15,26 @@ import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
 import Logo from "@/components/Logo";
 import ImageSlider from "@/components/slider/ImageSlider";
 import Skeleton from "@/components/base/Skeleton";
+import Link from "next/link";
+import { useSession } from "@/hooks/useSession";
+import clsx from "clsx";
 
-interface LoginPageProps {
-	onSwitch: () => void;
-}
-
-const LoginPage = ({ onSwitch }: LoginPageProps) => {
+const LoginPage = () => {
+	const router = useRouter();
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const { mutate: login, isPending: loginPending, error: loginError } = useLogin();
 	const { showToast } = useToast();
 	const { showSpinner, hideSpinner } = useSpinner();
-	const { data: images = [], isPending: imagePending, error: imagesError } = useLoginImages();
+	const { data: images = [], isPending: imagePending } = useLoginImages();
+	const { session, loading } = useSession();
+
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleLogin();
+		}
+	};
 
 	const handleLogin = async () => {
 		if (!email) {
@@ -37,13 +45,6 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 			await login({ email, password });
 		}
 	}
-
-	const handleKeyPress = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			handleLogin();
-		}
-	};
-
 
 	useEffect(() => {
 		if (loginError) {
@@ -74,6 +75,19 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 		else hideSpinner();
 	}, [loginPending, showSpinner, hideSpinner]);
 
+	useEffect(() => {
+		if (!loading && session) {
+			const isEmailVerified = !!session.user.email_confirmed_at;
+			if (isEmailVerified) {
+				router.replace("/");
+			}
+		}
+	}, [loading, session, router]);
+
+	if (loading || (session && session.user.email_confirmed_at)) {
+		return null;
+	}
+
 	return (
 		<Card
 			className={"flex flex-col md:flex-row gap-8 md:gap-16"}
@@ -98,7 +112,7 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 				<div
 					className={"flex justify-center items-center flex-grow-[2]"}
 				>
-					<Logo />
+					<Logo width={400}/>
 				</div>
 				<div
 					className={"flex flex-col gap-2 flex-grow-[3.5]"}
@@ -111,6 +125,7 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 						padding={"py-1"}
 						fontSize={"text-sm md:text-lg"}
 						onClick={() => handleLogin()}
+						reverse={theme === "normal"}
 					>
 						{"로그인"}
 					</Button>
@@ -119,10 +134,25 @@ const LoginPage = ({ onSwitch }: LoginPageProps) => {
 						theme={"dark"}
 						padding={"py-1"}
 						fontSize={"text-sm md:text-lg"}
-						onClick={onSwitch}
+						onClick={() => router.push('/register')}
+						reverse={theme === "normal"}
 					>
 						{"회원가입"}
 					</Button>
+					<div
+						className={"text-sm text-right mt-2 md:text-base"}
+					>
+						<Link
+							href={"/auth/find"}
+							className={clsx(
+								theme === "normal" ? "bg-green-100/90" : "bg-green-700/70",
+								"cursor-pointer px-2.5 py-1 rounded shadow-md"
+							)}
+							tabIndex={0}
+						>
+							{"로그인 정보를 잊으셨나요?"}
+						</Link>
+					</div>
 				</div>
 			</div>
 		</Card>

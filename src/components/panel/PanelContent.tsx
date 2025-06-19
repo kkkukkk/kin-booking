@@ -11,6 +11,7 @@ import { RootState } from "@/redux/store";
 import { HomeIcon } from "@/components/icon/HomeIcon";
 import { useLogout } from "@/hooks/api/useAuth";
 import { useSession } from "@/hooks/useSession";
+import useToast from "@/hooks/useToast";
 
 type PanelContentProps = {
 	isOpen: boolean;
@@ -20,12 +21,15 @@ type PanelContentProps = {
 
 const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentProps) => {
 	const router = useRouter();
-	const currentTheme = useAppSelector((state: RootState) => state.theme.current);
+	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { mutate: logout } = useLogout();
 	const { session } = useSession();
+	const { showToast } = useToast();
+
+	const skipKeys = ["Home", "Login", "Logout"];
 
 	const toggleButton = (key: string) => {
-		if (key === "Home") return;
+		if (skipKeys.includes(key)) return;
 		setActiveButtons((prev) => ({
 			...prev,
 			[key]: !prev[key],
@@ -35,27 +39,38 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 	const panelButtons = [
 		{
 			key: 'Theme',
-			onClick: () => console.log('Theme'),
+			onClick: () => {},
 			name: 'Theme',
 		},
 		...(session
 			? [
 				{
 					key: 'Logout',
-					onClick: () => logout(),
+					onClick: () => {
+						logout(undefined, {
+							onSuccess: () => {
+								showToast({
+									iconType: 'success',
+									message: '로그아웃 되었습니다.',
+									autoCloseTime: 3000
+								})
+								router.push("/login")
+							},
+						});
+					},
 					name: 'Logout',
 				},
 			]
 			: [
 				{
 					key: 'Login',
-					onClick: () => router.push('/join'),
+					onClick: () => router.push('/login'),
 					name: 'Login',
 				},
 			]),
 		{
 			key: 'Home',
-			onClick: () => router.push('/'),
+			onClick: () => router.push("/"),
 			name:
 				<HomeIcon />
 		},
@@ -78,15 +93,15 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 			{panelButtons.map(({ key, onClick, name }) => (
 				<Button
 					key={key}
-					theme={currentTheme !== "normal" ? currentTheme : "dark"} // normal 이면 적용 안 함
+					theme={theme !== "normal" ? theme : "dark"} // normal 이면 적용 안 함
 					onClick={() => {
 						toggleButton(key);
 						onClick();
 					}}
-					fontSize={"text-[10px] md:text-sm"}
+					fontSize={"text-[10px] md:text-xs"}
 					on={!!activeButtons[key]}
-					reverse={!!activeButtons[key] && currentTheme === "normal"} // normal 일 때 on 이면 dark shadow
 					round
+					reverse={theme === "normal"} // normal 일 때 on 이면 dark shadow
 				>
 					{name}
 				</Button>

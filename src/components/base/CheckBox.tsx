@@ -1,6 +1,6 @@
 import { CheckBoxProps } from "@/types/ui/checkbox";
 
-const CheckBox = ({ theme, checked, onChange, required }: CheckBoxProps) => {
+const CheckBox = ({ checked, onChange, required }: CheckBoxProps) => {
 
 	return (
 		<label className="inline-flex items-center cursor-pointer select-none">

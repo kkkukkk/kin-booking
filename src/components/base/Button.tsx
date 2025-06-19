@@ -33,6 +33,7 @@ const HamburgerLines = ({ on }: { on: boolean }) => {
 };
 
 const Button = ({
+	key,
 	width = "w-auto",
 	height = "h-auto",
 	theme = "normal",
@@ -50,7 +51,7 @@ const Button = ({
 		styles[`theme-${theme}`],
 		"transition-all duration-300 cursor-pointer",
 		"relative flex items-center justify-center",
-		round ? "rounded-full w-[42px] h-[42px] md:w-[64px] md:h-[64px]" : ["rounded-[5px]", width, height],
+		round ? "rounded-full w-[42px] h-[42px] md:w-[56px] md:h-[56px]" : ["rounded-[5px]", width, height],
 		fontSize,
 		fontWeight,
 		padding,

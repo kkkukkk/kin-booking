@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 import SpinnerOverlay from "@/components/spinner/SpinnerOverlay";
 
 interface SpinnerContextType {
-	showSpinner: () => void;
+	showSpinner: (withBackgroundImage?: boolean) => void;
 	hideSpinner: () => void;
 }
 
@@ -12,14 +12,22 @@ const SpinnerContext = createContext<SpinnerContextType | undefined>(undefined);
 
 export const SpinnerProvider = ({ children }: { children: ReactNode }) => {
 	const [visible, setVisible] = useState(false);
+	const [withBackgroundImage, setWithBackgroundImage] = useState(false);
 
-	const showSpinner = () => setVisible(true);
-	const hideSpinner = () => setVisible(false);
+	const showSpinner = (withBgImage?: boolean) => {
+		setWithBackgroundImage(withBgImage ?? false);
+		setVisible(true);
+	};
+
+	const hideSpinner = () => {
+		setVisible(false);
+		setWithBackgroundImage(false);
+	};
 
 	return (
 		<SpinnerContext.Provider value={{ showSpinner, hideSpinner }}>
 			{children}
-			{visible && <SpinnerOverlay />}
+			{visible && <SpinnerOverlay withBackgroundImage={withBackgroundImage} />}
 		</SpinnerContext.Provider>
 	);
 };

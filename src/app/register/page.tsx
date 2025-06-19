@@ -7,34 +7,29 @@ import { AnimatePresence, motion } from "framer-motion";
 import { bottomUp, bottomUpDelay } from "@/types/ui/motionVariants";
 import { RegisterStep } from "@/types/ui/registerStep";
 import { useAlert } from "@/providers/AlertProvider";
-import { useLogin, useRegister } from "@/hooks/api/useAuth";
+import { useRegister } from "@/hooks/api/useAuth";
 import { useSpinner } from "@/providers/SpinnerProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { getErrorMessage } from "@/components/utils/error";
 import Card from "@/components/Card";
-import Name from "@/app/join/forms/registerSteps/Name";
-import Email from "@/app/join/forms/registerSteps/Email";
-import Password from "@/app/join/forms/registerSteps/Password";
-import PhoneNumber from "@/app/join/forms/registerSteps/PhoneNumber";
-import Consent from "@/app/join/forms/registerSteps/Consent";
+import Name from "@/app/register/registerSteps/Name";
+import Email from "@/app/register/registerSteps/Email";
+import Password from "@/app/register/registerSteps/Password";
+import PhoneNumber from "@/app/register/registerSteps/PhoneNumber";
+import Consent from "@/app/register/registerSteps/Consent";
 import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
 
-interface RegisterPageProps {
-	onSwitch: () => void;
-}
-
-const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
+const RegisterPage = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const router = useRouter();
 	const { mutate: register, isPending } = useRegister();
-	const { mutate: login } = useLogin();
 	const { showToast, hideToast } = useToast();
-	const { showAlert, hideAlert } = useAlert();
+	const { showAlert } = useAlert();
 	const { showSpinner, hideSpinner } = useSpinner();
 
 	const [step, setStep] = useState<RegisterStep>('consent');
@@ -89,12 +84,12 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			autoCloseTime: 3000,
 		},
 		phone: {
-			message: "유효한 핸드폰 번호를 입력해주세요.",
+			message: "유효한 휴대폰 번호를 입력해주세요.",
 			iconType: "warning",
 			autoCloseTime: 3000,
 		},
 		phoneDuplicate: {
-			message: "핸드폰 번호 중복검사를 해주세요.",
+			message: "휴대폰 번호 중복검사를 해주세요.",
 			iconType: "warning",
 			autoCloseTime: 3000,
 		},
@@ -144,29 +139,9 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			});
 
 			if (confirmed) {
-				onSwitch();
+				router.push('/login');
 			}
 
-			/* 자동 로그인
-			if (confirmed) {
-				try {
-					await login({
-						email,
-						password,
-					});
-					router.push('/')
-					return;
-				} catch {
-					showToast({
-						message: '오류가 발생했습니다.',
-						iconType: 'error',
-						autoCloseTime: 3000,
-					});
-				}
-			}
-
-			onSwitch();
-			*/
 		} catch (error) {
 			const message = getErrorMessage(error);
 			if (message.includes('already registered')) {
@@ -184,11 +159,11 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 			case 'name':
 				return isValidName;
 			case 'email':
-				return isValidEmail && !isDuplicateEmail;
+				return isValidEmail && isDuplicateEmail === false;
 			case 'password':
 				return isValidPassword;
 			case 'phoneNumber':
-				return isValidPhone && !isDuplicatePhone;
+				return isValidPhone && isDuplicatePhone === false;
 			default:
 				return false;
 		}
@@ -198,16 +173,24 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 		switch (step) {
 			case 'consent': return 'consent';
 			case 'name': return 'name';
-			case 'email': return isDuplicateEmail ? 'emailDuplicate' : 'emailInvalid';
+			case 'email':
+				if (!isValidEmail) return 'emailInvalid';
+				if (isDuplicateEmail || isDuplicateEmail === null) return 'emailDuplicate';
+				break;
 			case 'password': return passwordValidationReason === 'invalidFormat' ? 'passwordInvalidFormat' : 'passwordNotMatch';
-			case 'phoneNumber': return isDuplicatePhone ? 'phoneDuplicate' : 'phone';
+			case 'phoneNumber':
+				if (!isValidPhone) return 'phone';
+				if (isDuplicatePhone || isDuplicatePhone === null) return 'phoneDuplicate';
+				break;
 		}
 	}
 
 	const onNext = async () => {
 		hideToast();
 		if (!canProceed()) {
-			showToastAlert(getToastKey());
+			const key = getToastKey();
+			if (!key) return;
+			showToastAlert(key);
 			return;
 		}
 
@@ -229,7 +212,7 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 
 	const onBack = () => {
 		hideToast();
-		if (step === 'consent') onSwitch();
+		if (step === 'consent') router.push('/login');
 		else if (step === 'name') setStep('consent');
 		else if (step === 'phoneNumber') setStep('password');
 		else if (step === 'password') setStep('email');
@@ -300,21 +283,22 @@ const RegisterPage = ({ onSwitch }: RegisterPageProps) => {
 	}, [isPending, showSpinner, hideSpinner]);
 
 	return (
-		<Card>
-			<Button
-				theme={"dark"}
-				padding={"px-2 py-1.5"}
-				onClick={onBack}
-			>
-				{"뒤로가기"}
-			</Button>
-
+		<Card
+			backButton={
+				<Button
+					theme={"dark"}
+					padding={"px-3 py-1.5"}
+					onClick={onBack}
+				>
+					{"뒤로가기"}
+				</Button>
+			}
+		>
 			<ProgressBar
 				steps={steps}
 				currentStep={steps.indexOf(step)}
-			    theme={theme}
+				theme={theme}
 			/>
-
 
 			<AnimatePresence mode="wait">
 				<motion.div

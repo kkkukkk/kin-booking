@@ -9,9 +9,10 @@ import useRehydrated from '@/hooks/useIsRehydrated';
 
 type ThemeDivProps = React.HTMLAttributes<HTMLDivElement> & {
 	children?: React.ReactNode;
+	isChildren?: boolean;
 };
 
-const ThemeDiv = ({ children, className, ...rest }: ThemeDivProps) => {
+const ThemeDiv = ({ children, className, isChildren, ...rest }: ThemeDivProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
 
@@ -19,7 +20,12 @@ const ThemeDiv = ({ children, className, ...rest }: ThemeDivProps) => {
 
 	return (
 		<div
-			className={clsx(styles['theme-div'], styles[theme], className)}
+			className={clsx(
+				styles['theme-div'],
+				styles[theme],
+				isChildren && styles['is-children'],
+				className
+			)}
 			{...rest}
 		>
 			{children}

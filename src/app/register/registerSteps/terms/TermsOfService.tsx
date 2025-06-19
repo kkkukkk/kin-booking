@@ -43,6 +43,7 @@ const TermsOfService = ({ onClose, onConfirm }: TermsOfServiceProps) => {
 					className={"text-sm md:text-lg"}
 					onClick={onConfirm}
 					theme={"dark"}
+					reverse
 				>동의</Button>
 			</div>
 		</section>

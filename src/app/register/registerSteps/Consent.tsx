@@ -4,10 +4,10 @@ import { JSX, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { consent, textContainer, textContainerItem } from "@/types/ui/motionVariants";
 import Modal from "@/components/Modal";
-import PersonalInfo from "@/app/join/forms/registerSteps/terms/PersonalInfo";
-import TermsOfService from "@/app/join/forms/registerSteps/terms/TermsOfService";
-import Marketing from "@/app/join/forms/registerSteps/terms/Marketing";
-import ConsentItem from "@/app/join/forms/registerSteps/ConsentItem"
+import PersonalInfo from "@/app/register/registerSteps/terms/PersonalInfo";
+import TermsOfService from "@/app/register/registerSteps/terms/TermsOfService";
+import Marketing from "@/app/register/registerSteps/terms/Marketing";
+import ConsentItem from "@/app/register/registerSteps/ConsentItem"
 
 interface ConsentProps {
 	key: string;

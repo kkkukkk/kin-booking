@@ -24,7 +24,21 @@
         0 0 12px var(--black_30),
         0 0 20px var(--black_10);
 }
+.theme-normal.reverse:hover {
+    box-shadow:
+        0 0 4px var(--white_70),
+        0 0 8px var(--white_50),
+        0 0 12px var(--white_30),
+        0 0 20px var(--white_10);
+}
 .theme-dark:hover {
+    box-shadow:
+        0 0 4px var(--white_70),
+        0 0 8px var(--white_50),
+        0 0 12px var(--white_30),
+        0 0 20px var(--white_10);
+}
+.theme-dark.reverse:hover {
     box-shadow:
         0 0 4px var(--black_70),
         0 0 8px var(--black_50),
@@ -46,6 +60,13 @@
         0 0 8px var(--black_50),
         0 0 12px var(--black_30),
         0 0 20px var(--black_10);
+}
+.theme-normal.on.reverse {
+    box-shadow:
+        0 0 4px var(--white_70),
+        0 0 8px var(--white_50),
+        0 0 12px var(--white_30),
+        0 0 20px var(--white_10);
 }
 .theme-dark.on {
     box-shadow:

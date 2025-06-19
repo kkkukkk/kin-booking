@@ -69,7 +69,7 @@ const Name = ({
 					name={"name"}
 					placeholder={"이름을 입력해주세요."}
 					theme={theme}
-					className={"font text-md md:text-xl"}
+					className={"font text-md md:text-lg"}
 					value={value}
 					onChange={handleChange}
 				/>

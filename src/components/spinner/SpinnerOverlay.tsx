@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import ReactDOM from "react-dom";
 import styles from "@/css/module/spinner-overlay.module.css";
 import Spinner from "@/components/spinner/Spinner";
@@ -9,7 +9,7 @@ interface SpinnerOverlayProps {
 	withBackgroundImage?: boolean;
 }
 
-const SpinnerOverlay = ({ withBackgroundImage = false }: SpinnerOverlayProps) => {
+const SpinnerOverlay = memo(({ withBackgroundImage = false }: SpinnerOverlayProps) => {
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
@@ -30,6 +30,8 @@ const SpinnerOverlay = ({ withBackgroundImage = false }: SpinnerOverlayProps) =>
 		</div>,
 		document.body
 	);
-};
+});
+
+SpinnerOverlay.displayName = "SpinnerOverlay";
 
 export default SpinnerOverlay;

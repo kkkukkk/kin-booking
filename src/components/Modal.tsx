@@ -1,11 +1,13 @@
-import React, {useEffect} from "react";
+'use client'
+
+import React, { useEffect } from "react";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import clsx from "clsx";
-import {fadeSlideY} from "@/types/ui/motionVariants";
-import {motion} from "framer-motion";
+import { fadeSlideY } from "@/types/ui/motionVariants";
+import { motion } from "framer-motion";
 
 interface ModalProps {
-	children: React.ReactNode,
+	children: React.ReactNode;
 	onClose: () => void;
 }
 
@@ -37,7 +39,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 				className="relative"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<ThemeDiv className={clsx("bg-white p-4 rounded shadow-lg min-w-[300px]")}>
+				<ThemeDiv className={clsx("bg-white p-4 rounded shadow-lg min-w-[300px]")} isChildren>
 					<button
 						className="absolute top-2 right-2 text-gray-500 hover:text-black cursor-pointer"
 						onClick={onClose}
