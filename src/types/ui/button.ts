@@ -15,4 +15,4 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 	padding?: string,
 	reverse?: boolean,
 	key?: React.Key
-};
+}
