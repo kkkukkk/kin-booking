@@ -12,7 +12,7 @@ interface ConsentItemProps {
 const ConsentItem = ({ checked, label, onClickDetail, required }: ConsentItemProps) => {
 	return (
 		<ThemeDiv
-			className="flex items-center justify-between px-2 py-1 rounded text-sm md:text-xl md:py-1.5 cursor-pointer"
+			className="flex items-center justify-between px-2 py-1 rounded text-sm md:text-lg md:py-1.5 cursor-pointer"
 			onClick={onClickDetail}
 			isChildren
 		>

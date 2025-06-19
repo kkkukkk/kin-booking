@@ -6,6 +6,7 @@ import TogglePanel from "@/components/panel/TogglePanel";
 import DynamicVhSetter from "@/components/utils/DynamicVhSetter";
 import PathnameWrapper from "@/components/wrapper/PathnameWrapper";
 import Toast from "@/components/alert/Toast";
+import ClientAuthWrapper from "@/components/wrapper/ClientAuthWrapper";
 
 export const metadata = {
     title: 'KIN',
@@ -27,11 +28,13 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <body>
             <AppProviders>
                 <DynamicVhSetter />
-                <PathnameWrapper>
-                    {children}
-                    <TogglePanel/>
-                    <Toast />
-                </PathnameWrapper>
+                <ClientAuthWrapper>
+                    <PathnameWrapper>
+                        {children}
+                        <TogglePanel/>
+                    </PathnameWrapper>
+                </ClientAuthWrapper>
+                <Toast />
             </AppProviders>
         </body>
         </html>

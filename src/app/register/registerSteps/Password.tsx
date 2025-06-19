@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
@@ -73,7 +75,7 @@ const Password = ({
 					name={"password"}
 					placeholder={"비밀번호를 입력해주세요."}
 					theme={theme}
-					className={"font text-md md:text-xl"}
+					className={"font text-md md:text-lg"}
 					value={value}
 					onChange={handleChange}
 				/>
@@ -82,7 +84,7 @@ const Password = ({
 					name={"confirmPassword"}
 					placeholder={"동일한 비밀번호를 입력해주세요."}
 					theme={theme}
-					className={"font text-md md:text-xl"}
+					className={"font text-md md:text-lg"}
 					value={confirmPassword}
 					onChange={handleConfirmChange}
 				/>

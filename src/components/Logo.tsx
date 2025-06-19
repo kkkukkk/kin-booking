@@ -1,7 +1,9 @@
+'use client'
+
 import Image from "next/image";
 import clsx from "clsx";
-import {useAppSelector} from "@/redux/hooks";
-import {RootState} from "@/redux/store";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
 interface LogoProps {
 	width?: number; // 너비만 받아서 비율 맞춰 높이 자동 계산

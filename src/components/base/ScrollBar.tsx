@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import styles from '@/css/module/scroll-bar.module.css';
 import clsx from 'clsx';
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 
 interface ScrollBarProps {
-	targetRef: React.RefObject<HTMLElement>;
+	targetRef: React.RefObject<HTMLElement | null>;
 	height?: string;
 }
 
@@ -22,7 +24,7 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 	const dragStartY = useRef(0);
 	const dragStartTop = useRef(0);
 
-	const updateTrackPosition = () => {
+	const updateTrackPosition = useCallback(() => {
 		if (!targetRef.current) return;
 		const rect = targetRef.current.getBoundingClientRect();
 		setTrackTop(rect.top);
@@ -30,9 +32,9 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 
 		const rightSpace = window.innerWidth - (rect.left + rect.width);
 		setRightOffset(rightSpace);
-	};
+	}, [targetRef]);
 
-	const updateThumb = () => {
+	const updateThumb = useCallback(() => {
 		if (!targetRef.current) return;
 		const target = targetRef.current;
 		const { scrollTop, scrollHeight, clientHeight } = target;
@@ -52,7 +54,7 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 			: Math.round((scrollTop / maxScrollTop) * maxThumbTop);
 
 		setThumbTop(newThumbTop);
-	};
+	}, [targetRef, trackHeight]);
 
 	useEffect(() => {
 		if (!targetRef.current) return;
@@ -75,7 +77,7 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 			target.removeEventListener('scroll', updateThumb);
 			window.removeEventListener('resize', updateThumb);
 		};
-	}, [targetRef, trackHeight]);
+	}, [targetRef, updateTrackPosition, updateThumb]);
 
 	const onMouseDown = (e: React.MouseEvent) => {
 		setDragging(true);
@@ -84,27 +86,27 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 		document.body.style.userSelect = 'none';
 	};
 
-	const onMouseMove = (e: MouseEvent) => {
+	const onMouseMove = useCallback((e: MouseEvent) => {
 		if (!dragging || !targetRef.current) return;
 		const target = targetRef.current;
 
 		const deltaY = e.clientY - dragStartY.current;
 		const reducedTrackHeight = trackHeight * REDUCED_RATIO;
-		const newTop = Math.min(Math.max(dragStartTop.current + deltaY, 0), reducedTrackHeight - thumbHeight);
+		const newTop = Math.min(
+			Math.max(dragStartTop.current + deltaY, 0),
+			reducedTrackHeight - thumbHeight
+		);
 
 		const scrollRatio = newTop / (reducedTrackHeight - thumbHeight);
 		target.scrollTop = scrollRatio * (target.scrollHeight - target.clientHeight);
-	};
+	}, [dragging, targetRef, trackHeight, thumbHeight]);
 
-	const onMouseUp = () => {
+	const onMouseUp = useCallback(() => {
 		if (dragging) {
 			setDragging(false);
 			document.body.style.userSelect = '';
 		}
-	};
-
-	const reducedHeight = trackHeight * REDUCED_RATIO;
-	const topOffset = (trackHeight - reducedHeight) / 2;
+	}, [dragging]);
 
 	useEffect(() => {
 		window.addEventListener('mousemove', onMouseMove);
@@ -113,7 +115,10 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 			window.removeEventListener('mousemove', onMouseMove);
 			window.removeEventListener('mouseup', onMouseUp);
 		};
-	}, [dragging, thumbHeight, thumbTop, trackHeight]);
+	}, [onMouseMove, onMouseUp]);
+
+	const reducedHeight = trackHeight * REDUCED_RATIO;
+	const topOffset = (trackHeight - reducedHeight) / 2;
 
 	return (
 		<div

@@ -1,20 +1,23 @@
+'use client'
+
 import ThemeDiv from "@/components/base/ThemeDiv";
 import { motion } from "framer-motion";
 import { fadeSlideLeft, tabs } from "@/types/ui/motionVariants";
 import AnimatedText from "@/components/base/AnimatedText";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Input from "@/components/base/Input";
 import Button from "@/components/base/Button";
 import { useAppSelector } from "@/redux/hooks";
-import {RootState} from "@/redux/store";
+import { RootState } from "@/redux/store";
 import useToast from "@/hooks/useToast";
-import {supabase} from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 
 const FindPassword = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [email, setEmail] = useState<string>("");
 	const [phoneNumber, setPhoneNumber] = useState<string>("");
-	const [checking, setChecking] = useState(false);
+	const [checking, setChecking] = useState<boolean>(false);
+	const [hasResult, setHasResult] = useState<boolean | null>(null);
 	const { showToast } = useToast();
 
 	const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +49,45 @@ const FindPassword = () => {
 
 		setChecking(false);
 
-		//TODO 있으면 재설정 메일 전송
+		if (error) {
+			console.error("에러:", error.message);
+			showToast({
+				message: "확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
+				autoCloseTime: 3000,
+				iconType: "error",
+			});
+			setHasResult(null);
+			return;
+		} else {
+			if (data)  {
+				const { error } = await supabase.auth.resetPasswordForEmail(email, {
+					redirectTo: 'https://kin-booking.vercel.app/auth/reset-password',
+				});
+
+				if (error) {
+					showToast({
+						message: "확인 중 오류가 발생했어요. error: " + error.message,
+						autoCloseTime: 3000,
+						iconType: "error",
+					});
+					setHasResult(null);
+				} else  {
+					showToast({
+						message: "비밀번호 재 설정 메일을 보냈어요. 변경 후 이용해주세요!",
+						autoCloseTime: 3000,
+						iconType: "success",
+					});
+					setHasResult(true);
+				}
+			} else {
+				showToast({
+					message: "입력한 정보로 가입된 계정이 없는 것 같아요.",
+					autoCloseTime: 3000,
+					iconType: "error",
+				});
+				setHasResult(false);
+			}
+		}
 	}
 
 	return (
@@ -111,7 +152,8 @@ const FindPassword = () => {
 				<div
 					className={"mt-4 text-sm md:text-base min-h-[20px] transition-all duration-300 ease-in-out break-words whitespace-normal break-normal"}
 				>
-					{<span className="text-red-400">해당하는 이메일이 없어요!</span>}
+
+					{(hasResult !== null && hasResult === false) && <span className="text-red-400">해당하는 계정이 없어요!</span>}
 				</div>
 			</motion.div>
 		</ThemeDiv>

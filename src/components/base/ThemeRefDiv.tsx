@@ -1,3 +1,5 @@
+'use client'
+
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { useAppSelector } from '@/redux/hooks';

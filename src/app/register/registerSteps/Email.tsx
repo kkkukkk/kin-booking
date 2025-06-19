@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
@@ -128,7 +130,7 @@ const Email = ({
 					name={"email"}
 					placeholder={"이메일을 입력해주세요."}
 					theme={theme}
-					className={"font text-base md:text-xl"}
+					className={"font text-base md:text-lg"}
 					value={value}
 					onChange={handleChange}
 				/>

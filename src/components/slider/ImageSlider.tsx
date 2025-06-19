@@ -4,10 +4,10 @@ import {useEffect, useState} from "react";
 import Image from "next/image";
 
 interface ImageSliderProps {
-	images: string[],
-	interval?: number,
-	width?: string,
-	height?: string,
+	images: string[];
+	interval?: number;
+	width?: string;
+	height?: string;
 }
 
 const ImageSlider = ({

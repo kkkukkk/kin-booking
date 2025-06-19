@@ -146,7 +146,7 @@ const LoginPage = () => {
 							href={"/auth/find"}
 							className={clsx(
 								theme === "normal" ? "bg-green-100/90" : "bg-green-700/70",
-								"cursor-pointer px-2.5 py-1 rounded-full shadow-md"
+								"cursor-pointer px-2.5 py-1 rounded shadow-md"
 							)}
 							tabIndex={0}
 						>

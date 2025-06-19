@@ -25,7 +25,6 @@ const FindPage = () => {
 	return (
 		<Card
 			hasLogo
-			innerScroll
 			backButton={
 				<Button
 					theme="dark"

@@ -1,3 +1,5 @@
+'use client'
+
 import ThemeDiv from "@/components/base/ThemeDiv";
 import { motion } from "framer-motion";
 import { fadeSlideLeft, tabs } from "@/types/ui/motionVariants";
@@ -13,9 +15,9 @@ import useToast from "@/hooks/useToast";
 const FindEmail = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [phoneNumber, setPhoneNumber] = useState<string>("");
-	const [checking, setChecking] = useState(false);
+	const [checking, setChecking] = useState<boolean>(false);
 	const [resultEmail, setResultEmail] = useState<string | null>(null);
-	const [noResult, setNoResult] = useState(false);
+	const [noResult, setNoResult] = useState<boolean>(false);
 	const { showToast } = useToast();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

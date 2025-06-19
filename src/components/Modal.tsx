@@ -1,11 +1,13 @@
-import React, {useEffect} from "react";
+'use client'
+
+import React, { useEffect } from "react";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import clsx from "clsx";
-import {fadeSlideY} from "@/types/ui/motionVariants";
-import {motion} from "framer-motion";
+import { fadeSlideY } from "@/types/ui/motionVariants";
+import { motion } from "framer-motion";
 
 interface ModalProps {
-	children: React.ReactNode,
+	children: React.ReactNode;
 	onClose: () => void;
 }
 

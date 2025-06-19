@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const useNeedScrollBar = (ref: React.RefObject<HTMLElement>, ready = true) => {
+const useNeedScrollBar = (ref: React.RefObject<HTMLElement | null>, ready = true) => {
 	const [needScrollBar, setNeedScrollBar] = useState(false);
 
 	useEffect(() => {

@@ -36,11 +36,14 @@ const Card = ({
 }: CardProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
-	const scrollTargetRef = useRef<HTMLDivElement>(null);
+	const scrollTargetRef = useRef<HTMLDivElement | null>(null);
 	const needScrollBar = useNeedScrollBar(scrollTargetRef, rehydrated);
-	const conditionStyle = {
-		...(innerScroll && { overflowY: "auto", position: "relative" }),
-	};
+	const conditionStyle: React.CSSProperties = {};
+
+	if (innerScroll) {
+		conditionStyle.overflowY = "auto";
+		conditionStyle.position = "relative";
+	}
 
 	return (
 		<AnimatePresence mode="wait">

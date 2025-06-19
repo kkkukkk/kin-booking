@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { bottomUp, bottomUpDelay } from "@/types/ui/motionVariants";
 import { RegisterStep } from "@/types/ui/registerStep";
 import { useAlert } from "@/providers/AlertProvider";
-import { useLogin, useRegister } from "@/hooks/api/useAuth";
+import { useRegister } from "@/hooks/api/useAuth";
 import { useSpinner } from "@/providers/SpinnerProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
@@ -142,26 +142,6 @@ const RegisterPage = () => {
 				router.push('/login');
 			}
 
-			/* 자동 로그인
-			if (confirmed) {
-				try {
-					await login({
-						email,
-						password,
-					});
-					router.push('/')
-					return;
-				} catch {
-					showToast({
-						message: '오류가 발생했습니다.',
-						iconType: 'error',
-						autoCloseTime: 3000,
-					});
-				}
-			}
-
-			onSwitch();
-			*/
 		} catch (error) {
 			const message = getErrorMessage(error);
 			if (message.includes('already registered')) {
@@ -208,7 +188,9 @@ const RegisterPage = () => {
 	const onNext = async () => {
 		hideToast();
 		if (!canProceed()) {
-			showToastAlert(getToastKey());
+			const key = getToastKey();
+			if (!key) return;
+			showToastAlert(key);
 			return;
 		}
 

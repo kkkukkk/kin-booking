@@ -1,7 +1,6 @@
 import { CheckBoxWithLabelProps } from "@/types/ui/checkbox";
 
 const CheckBoxWithLabel = ({
-	theme,
 	checked,
 	onChange,
 	label,

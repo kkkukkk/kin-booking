@@ -8,6 +8,7 @@ import ThemeDiv from "@/components/base/ThemeDiv";
 import { CloseIcon } from "@/components/icon/CloseIcon";
 import { ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from "@/components/icon/AlertIcons";
 import { IconType } from "@/types/ui/alert";
+import { createPortal } from "react-dom";
 
 const Toast = () => {
 	const [isHovered, setIsHovered] = useState(false);
@@ -92,9 +93,12 @@ const Toast = () => {
 		};
 	}, [isOpen, isHovered, autoCloseTime, hideToast, updateProgress]);
 
+	useEffect(() => {
+	}, [isOpen, message]);
+
 	if (!isOpen) return null;
 
-	return (
+	return createPortal(
 		<ThemeDiv
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
@@ -134,7 +138,8 @@ const Toast = () => {
 					/>
 				</div>
 			}
-		</ThemeDiv>
+		</ThemeDiv>,
+		document.body
 	);
 };
 
