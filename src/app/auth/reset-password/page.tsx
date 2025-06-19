@@ -122,7 +122,7 @@ const ResetPassword = () => {
 				</div>
 
 				<div className={"mb-4"}>
-					<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"}delay={0.8}/>
+					<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8}/>
 				</div>
 
 				<div

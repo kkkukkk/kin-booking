@@ -27,7 +27,7 @@ const LoginPage = () => {
 	const { mutate: login, isPending: loginPending, error: loginError } = useLogin();
 	const { showToast } = useToast();
 	const { showSpinner, hideSpinner } = useSpinner();
-	const { data: images = [], isPending: imagePending, error: imagesError } = useLoginImages();
+	const { data: images = [], isPending: imagePending } = useLoginImages();
 	const { session, loading } = useSession();
 
 	const handleKeyPress = (e: React.KeyboardEvent) => {
