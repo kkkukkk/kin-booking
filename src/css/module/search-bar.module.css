@@ -1,0 +1,18 @@
+.date-picker-label {
+    box-shadow: 1px 1px 0 1px var(--black_10);
+}
+
+.date-picker-label.normal {
+    background-color: var(--normal-back);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.date-picker-label.dark {
+    background-color: var(--dark-back);
+    border: 1px solid rgba(255,255,255,.5);
+}
+
+.date-picker-label.neon {
+    background-color: var(--dark-back);
+    border: 1px solid rgba(255,255,255,.5);
+}

@@ -289,6 +289,8 @@ const RegisterPage = () => {
 					theme={"dark"}
 					padding={"px-3 py-1.5"}
 					onClick={onBack}
+					reverse={theme === "normal"}
+					light={theme !== "normal"}
 				>
 					{"뒤로가기"}
 				</Button>
@@ -333,6 +335,8 @@ const RegisterPage = () => {
 					fontSize={"text-md md:text-xl"}
 					padding={"px-2 py-1.5"}
 					onClick={onNext}
+					reverse={theme === "normal"}
+					light={theme !== "normal"}
 				>
 					{step === "phoneNumber" ? "가입하기" : "다음"}
 				</Button>

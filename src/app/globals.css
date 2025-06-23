@@ -19,6 +19,8 @@
   --white_30: rgba(255, 255, 255, .3);
   --white_50: rgba(255, 255, 255, .5);
   --white_70: rgba(255, 255, 255, .7);
+  --white: rgb(255, 255, 255);
+  --black: rgb(0,0,0);
   --normal-back: rgba(255, 255, 255, .9);
   --dark-back: rgba(0, 0, 0, .8);
   --check: rgb(55, 176, 83);

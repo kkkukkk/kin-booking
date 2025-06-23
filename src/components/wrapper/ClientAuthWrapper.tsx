@@ -6,7 +6,7 @@ import { useSession } from '@/hooks/useSession';
 import useToast from '@/hooks/useToast';
 import { useSpinner } from '@/providers/SpinnerProvider'; // 경로는 맞게 수정
 
-const publicPaths = ['/login', '/register', '/auth/find'];
+const publicPaths = ['/login', '/register', '/auth/find', '/events'];
 
 const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 	const pathname = usePathname();

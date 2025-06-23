@@ -1,7 +1,6 @@
 import { EventStatus } from "@/types/model/events";
 import { Events } from "@/types/model/events";
 
-
 export interface CreateEventDto {
 	eventName: string;
 	eventDate: string;
@@ -40,6 +39,7 @@ export interface EventWithCurrentStatus {
 	reservedQuantity: number;
 	remainingQuantity: number;
 	isSoldOut: boolean;
+	status: EventStatus;
 }
 
 export interface FetchEventWithCurrentStatusResponseDto {

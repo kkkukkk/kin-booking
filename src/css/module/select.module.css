@@ -1,0 +1,60 @@
+
+.selectButton {
+    box-shadow: 1px 1px 0 1px var(--black_10);
+}
+
+.selectButton.normal,
+.selectUl.normal {
+    color: #000;
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.selectButton.dark,
+.selectUl.dark {
+    color: #eee;
+    background-color: rgba(0, 0, 0, .9);
+    border: 1px solid rgba(255,255,255,.5);
+}
+
+.selectButton.neon,
+.selectUl.neon {
+    color: #eee;
+    background-color: rgba(0, 0, 0, .9);
+    border: 1px solid rgba(255,255,255,.5);
+}
+
+.selectLi {
+    opacity: .8;
+}
+
+.selectLi:last-child {
+    border: none;
+}
+
+.selectLi.normal {
+    border-bottom: 1px solid var(--black_10);
+}
+
+.selectLi.dark {
+    border-bottom: 1px solid var(--white_10);
+}
+
+.selectLi.neon {
+    border-bottom: 1px solid var(--white_10);
+}
+
+.selectLi:hover,
+.selectLi:focus {
+    opacity: 1;
+}
+
+.selectLi.normal:hover {
+    background-color: var(--black_10);
+}
+.selectLi.dark:hover {
+    background-color: var(--white_10);
+}
+.selectLi.neon:hover {
+    background-color: var(--white_10);
+}

@@ -126,6 +126,7 @@ const LoginPage = () => {
 						fontSize={"text-sm md:text-lg"}
 						onClick={() => handleLogin()}
 						reverse={theme === "normal"}
+						light={theme !== "normal"}
 					>
 						{"로그인"}
 					</Button>
@@ -136,6 +137,7 @@ const LoginPage = () => {
 						fontSize={"text-sm md:text-lg"}
 						onClick={() => router.push('/register')}
 						reverse={theme === "normal"}
+						light={theme !== "normal"}
 					>
 						{"회원가입"}
 					</Button>

@@ -14,5 +14,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 	fontWeight?: string,
 	padding?: string,
 	reverse?: boolean,
+	light?: boolean,
 	key?: React.Key
 }
