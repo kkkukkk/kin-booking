@@ -7,7 +7,7 @@ export enum EventStatus {
 
 export const EventStatusKo: Record<EventStatus, string> = {
 	[EventStatus.Pending]: '대기',
-	[EventStatus.Ongoing]: '진행',
+	[EventStatus.Ongoing]: '오픈',
 	[EventStatus.SoldOut]: '매진',
 	[EventStatus.Completed]: '완료',
 };
