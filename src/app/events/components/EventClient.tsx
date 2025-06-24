@@ -1,23 +1,23 @@
 'use client'
 
-import React from 'react';
+import React, {useState} from 'react';
 import SearchBar from "@/components/search/SearchBar";
 import EventList from "@/app/events/components/EventList";
 import { EventStatus, EventStatusKo } from "@/types/model/events";
 
 const statusOptions = [
 	{ value: '', label: '전체' },
-	...Object.values(EventStatus).map(status => ({
+	...Object.values(EventStatus).map((status) => ({
 		value: status,
 		label: EventStatusKo[status],
-	}))
-];
+	})),
+] satisfies { value: EventStatus | ''; label: string }[];
 
 const EventClient = () => {
-	const [eventDateFrom, setEventDateFrom] = React.useState('');
-	const [eventDateTo, setEventDateTo] = React.useState('');
-	const [keyword, setKeyword] = React.useState('');
-	const [status, setStatus] = React.useState('');
+	const [eventDateFrom, setEventDateFrom] = useState('');
+	const [eventDateTo, setEventDateTo] = useState('');
+	const [keyword, setKeyword] = useState('');
+	const [status, setStatus] = useState<EventStatus | ''>('');
 
 	return (
 		<div>
@@ -37,8 +37,8 @@ const EventClient = () => {
 						},
 					},
 					status: {
-						value: status,
-						onChange: setStatus,
+						value: status ?? '',
+						onChange: (value: string) => setStatus(value as EventStatus | ''),
 						options: statusOptions,
 					},
 				}}
@@ -46,7 +46,7 @@ const EventClient = () => {
 			<EventList
 				className={"mt-4"}
 				keyword={keyword}
-				status={status}
+				status={status === '' ? undefined : status}
 				from={eventDateFrom}
 				to={eventDateTo}
 			/>

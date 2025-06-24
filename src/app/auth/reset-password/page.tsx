@@ -13,6 +13,7 @@ import ThemeDiv from "@/components/base/ThemeDiv";
 import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
 import AnimatedText from "@/components/base/AnimatedText";
 import useToast from "@/hooks/useToast";
+import useSourceValidation from "@/hooks/useSourceValidation";
 
 const ResetPassword = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -24,6 +25,8 @@ const ResetPassword = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const initialPathRef = useRef(pathname);
+
+	useSourceValidation('password');
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!touched) setTouched(true);

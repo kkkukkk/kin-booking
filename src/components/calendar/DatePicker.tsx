@@ -87,9 +87,8 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 		return day.isAfter(startDate) && day.isBefore(endDate);
 	};
 
-	const isSameDay = (a: Dayjs | null, b: Dayjs | null) => {
-		return a && b && a.format('YYYY-MM-DD') === b.format('YYYY-MM-DD');
-	};
+	const isSameDay = (a: Dayjs | null, b: Dayjs | null): boolean =>
+		Boolean(a && b && a.format('YYYY-MM-DD') === b.format('YYYY-MM-DD'));
 
 	const isNormal = theme === 'normal';
 	const isDark = theme === 'dark';
@@ -101,7 +100,7 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 		isEnd: boolean,
 		inRange: boolean,
 		isOtherMonth: boolean,
-	) => {
+	): string => {
 		if (isStart || isEnd) {
 			if (isNormal) return styles.normalSelected;
 			if (isDark) return styles.darkSelected;

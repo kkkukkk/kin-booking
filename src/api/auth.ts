@@ -34,7 +34,8 @@ export const register = async ({
 				marketing_consent: marketingConsent,
 			},
 			// 배포 시 수정
-			emailRedirectTo: 'https://kin-booking.vercel.app/auth/callback',
+			emailRedirectTo: 'https://kin-booking.vercel.app/auth/callback?source=email',
+			//emailRedirectTo: 'http://localhost:3000/auth/callback?source=email',
 		}
 	});
 

@@ -1,14 +1,15 @@
 'use client'
+
 import { useEventsWithCurrentStatus } from "@/hooks/api/useEvents";
 import { useSpinner } from "@/providers/SpinnerProvider";
 import { useEffect } from "react";
-import { EventStatusKo } from "@/types/model/events";
+import { EventStatus, EventStatusKo } from "@/types/model/events";
 import dayjs from "dayjs";
 
 interface EventListProps {
 	className?: string;
 	keyword?: string;
-	status?: string;
+	status?: EventStatus;
 	from?: string;
 	to?: string;
 }

@@ -6,7 +6,7 @@ import { useSession } from '@/hooks/useSession';
 import useToast from '@/hooks/useToast';
 import { useSpinner } from '@/providers/SpinnerProvider'; // 경로는 맞게 수정
 
-const publicPaths = ['/login', '/register', '/auth/find', '/events'];
+const publicPaths = ['/login', '/register', '/auth/find', '/auth/callback', '/auth/reset-password', '/events'];
 
 const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 	const pathname = usePathname();
@@ -22,7 +22,7 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 			if (!isLoggedIn && !publicPaths.includes(pathname)) {
 				showSpinner(true);
 				showToast({
-					message: '비 정상적인 접근이에요. 로그인 화면으로 이동합니다.',
+					message: '비정상 접근이에요. 로그인 화면으로 이동합니다.',
 					iconType: 'error',
 					autoCloseTime: 3000,
 				});

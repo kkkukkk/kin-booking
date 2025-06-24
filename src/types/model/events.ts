@@ -1,6 +1,6 @@
 export enum EventStatus {
 	Pending = 'pending',      // 대기
-	Ongoing = 'ongoing',      // 진행
+	Ongoing = 'ongoing',      // 오픈
 	SoldOut = 'soldout',      // 매진
 	Completed = 'completed',  // 완료
 }

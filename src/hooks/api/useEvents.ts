@@ -12,7 +12,6 @@ export const useEvents = (params?: PaginationParams & FetchEventDto) => {
 }
 
 export const useEventsWithCurrentStatus = (params?: PaginationParams & FetchEventDto) => {
-	console.log("called")
 	return useQuery<FetchEventWithCurrentStatusResponseDto>({
 		queryKey: ['events_with_current_status', params],
 		queryFn: () => fetchEventsWithCurrentStatus(params),

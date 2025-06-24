@@ -1,4 +1,6 @@
-import DatePicker from "@/components/base/DatePicker";
+'use client'
+
+import DatePicker from "@/components/calendar/DatePicker";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
@@ -46,7 +48,7 @@ const SearchBar = ({ filters }: SearchBarProps) => {
 		if (filters.keyword && debouncedKeyword !== filters.keyword.value) {
 			filters.keyword.onChange(debouncedKeyword);
 		}
-	}, [debouncedKeyword]);
+	}, [filters.keyword, debouncedKeyword]);
 
 	const handleReset = () => {
 		setTempFrom('');
