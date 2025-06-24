@@ -5,7 +5,7 @@ import { useSession } from "@/hooks/useSession";
 import AnimatedText from "@/components/base/AnimatedText";
 
 const Home = ()=> {
-    const { session} = useSession();
+    const { session } = useSession();
 
     return (
         <Card>
