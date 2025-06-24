@@ -5,9 +5,11 @@ import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { Theme } from "@/types/ui/theme";
 import { isValidPassword } from "@/components/utils/validators";
-import AnimatedText from "@/components/base/AnimatedText";
 import clsx from "clsx";
 import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
+import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
+import { KeyIcon } from "@/components/icon/KeyIcon";
+import { BulbIcon } from "@/components/icon/BulbIcon";
 
 interface PasswordProps {
 	key: string;
@@ -58,10 +60,10 @@ const Password = ({
 	return (
 		<div className="flex flex-col relative overflow-hidden">
 			<div className={"mb-2"}>
-				<AnimatedText fontSize={"text-base md:text-xl"} text={"사용할 비밀번호를 입력해주세요! 🔑"}/>
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"사용할 비밀번호를 입력해주세요!"} rightIcon={<KeyIcon />} />
 			</div>
 			<div className={"mb-4"}>
-				<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8}/>
+				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
 			</div>
 
 			<motion.div

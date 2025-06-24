@@ -8,10 +8,12 @@ import { Theme } from "@/types/ui/theme";
 import { isValidPhoneNumber } from "@/components/utils/validators";
 import { ThumbUpIcon } from "@/components/icon/ThumbUpIcon";
 import Input from "@/components/base/Input";
-import AnimatedText from "@/components/base/AnimatedText";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
 import useToast from "@/hooks/useToast";
+import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
+import { PhoneIcon } from "@/components/icon/PhoneIcon";
+import { BulbIcon } from "@/components/icon/BulbIcon";
 
 interface PhoneNumberProps {
 	key: string;
@@ -117,10 +119,10 @@ const PhoneNumber = ({
 	return (
 		<div className="flex flex-col relative overflow-hidden">
 			<div className={"mb-2"}>
-				<AnimatedText fontSize={"text-base md:text-xl"} text={"휴대폰 번호를 입력해주세요! 📱"}/>
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"휴대폰 번호를 입력해주세요!"} rightIcon={<PhoneIcon />} />
 			</div>
 			<div className={"mb-4"}>
-				<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 숫자만 입력해도 괜찮아요!"} delay={0.8}/>
+				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"숫자만 입력해도 괜찮아요!"} delay={0.8} leftIcon={<BulbIcon />} />
 			</div>
 
 			<motion.div
