@@ -8,10 +8,12 @@ import { Theme } from "@/types/ui/theme";
 import { ThumbUpIcon } from "@/components/icon/ThumbUpIcon";
 import { isValidEmail } from "@/components/utils/validators";
 import Input from "@/components/base/Input";
-import AnimatedText from "@/components/base/AnimatedText";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
 import useToast from "@/hooks/useToast";
+import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
+import { MailIcon } from "@/components/icon/MailIcon";
+import { BulbIcon } from "@/components/icon/BulbIcon";
 
 interface EmailProps {
 	key: string;
@@ -112,10 +114,10 @@ const Email = ({
 	return (
 		<div className="flex flex-col relative overflow-hidden">
 			<div className={"mb-2"}>
-				<AnimatedText fontSize={"text-base md:text-xl"} text={"사용할 이메일을 입력해주세요! 📧"}/>
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"사용할 이메일을 입력해주세요!"} rightIcon={<MailIcon />} />
 			</div>
 			<div className={"mb-4"}>
-				<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 입력한 이메일은 로그인에 사용돼요."} delay={0.8}/>
+				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"입력한 이메일은 로그인에 사용돼요."} delay={0.8} leftIcon={<BulbIcon/>} />
 			</div>
 
 			<motion.div

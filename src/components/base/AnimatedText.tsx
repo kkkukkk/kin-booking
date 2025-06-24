@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import {wordContainer, wordItem} from "@/types/ui/motionVariants";
+import { wordContainer, wordItem } from "@/types/ui/motionVariants";
 import clsx from "clsx";
 
 interface AnimatedTextProps {

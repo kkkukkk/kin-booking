@@ -5,9 +5,11 @@ import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { Theme } from "@/types/ui/theme";
 import Input from "@/components/base/Input";
-import AnimatedText from "@/components/base/AnimatedText";
 import clsx from "clsx";
 import { isValidName } from "@/components/utils/validators";
+import { SmileIcon } from "@/components/icon/SmileIcon";
+import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
+import { BulbIcon } from "@/components/icon/BulbIcon";
 
 interface NameProps {
 	key: string,
@@ -52,10 +54,10 @@ const Name = ({
 	return (
 		<div className="flex flex-col relative overflow-hidden">
 			<div className={"mb-2"}>
-				<AnimatedText fontSize={"text-base md:text-xl"} text={"이름이 어떻게 되시나요? 😊"}/>
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"이름이 어떻게 되시나요?"} rightIcon={<SmileIcon />} />
 			</div>
 			<div className={"mb-4"}>
-				<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 별명도 좋지만 되도록이면 이름을 입력해 주세요!"} delay={0.8}/>
+				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"별명도 좋지만 되도록이면 이름을 입력해 주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
 			</div>
 
 			<motion.div
