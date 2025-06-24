@@ -7,11 +7,20 @@
 }
 
 .card-wrap {
+    border-radius: 10px;
     box-shadow:
             0 0 6px var(--black_70),
             0 0 12px var(--black_50),
             0 0 24px var(--black_30),
             0 0 36px var(--black_10);
+}
+
+.card-wrap.dark {
+    box-shadow:
+            0 0 6px var(--white_70),
+            0 0 12px var(--white_50),
+            0 0 24px var(--white_30),
+            0 0 36px var(--white_10);
 }
 
 .card-wrap.neon {
@@ -44,7 +53,8 @@
 /* 모바일 세로 (<=768px, portrait) */
 @media (max-width: 768px) and (orientation: portrait) {
     /* 모바일 세로용 스타일 */
-    .card {
+    .card,
+    .card-wrap {
         border-radius: 0;
     }
 }
@@ -52,7 +62,8 @@
 /* 모바일 가로 (<=768px, landscape) */
 @media (max-width: 1024px) and (orientation: landscape) {
     /* 모바일 가로용 스타일 */
-    .card {
+    .card,
+    .card-wrap {
         border-radius: 0;
     }
 }

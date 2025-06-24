@@ -4,7 +4,7 @@ import ThemeDiv from "@/components/base/ThemeDiv";
 import { motion } from "framer-motion";
 import { fadeSlideLeft, tabs } from "@/types/ui/motionVariants";
 import AnimatedText from "@/components/base/AnimatedText";
-import React, { useState } from "react";
+import React, { useState} from "react";
 import Input from "@/components/base/Input";
 import Button from "@/components/base/Button";
 import { useAppSelector } from "@/redux/hooks";
@@ -61,7 +61,8 @@ const FindPassword = () => {
 		} else {
 			if (data)  {
 				const { error } = await supabase.auth.resetPasswordForEmail(email, {
-					redirectTo: 'https://kin-booking.vercel.app/auth/reset-password',
+					redirectTo: 'https://kin-booking.vercel.app/auth/reset-password?source=password',
+					//redirectTo: 'http://localhost:3000/auth/reset-password?source=password',
 				});
 
 				if (error) {

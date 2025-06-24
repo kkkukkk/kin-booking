@@ -4,10 +4,13 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import useToast from "@/hooks/useToast";
+import useSourceValidation from "@/hooks/useSourceValidation";
 
 const AuthCallbackPage = () => {
 	const router = useRouter();
 	const { showToast } = useToast();
+
+	useSourceValidation('email');
 
 	useEffect(() => {
 		const logoutAfterEmailVerification = async () => {
@@ -20,13 +23,13 @@ const AuthCallbackPage = () => {
 				iconType: 'success',
 				autoCloseTime: 3000,
 			})
-			router.replace('/login'); // 로그인 페이지
+			router.replace('/login');
 		};
 
 		logoutAfterEmailVerification();
 	}, [router, showToast]);
 
-	return null; // 또는 로딩 스피너 등
+	return null;
 };
 
 export default AuthCallbackPage;

@@ -10,6 +10,9 @@
     background-color: var(--dark-back);
     border: 1px solid rgba(255,255,255,.3);
 }
+.theme-dark.light {
+    background-color: rgba(64, 64, 64, 0.9);
+}
 .theme-neon {
     color: var(--neon-green);
     background-color: var(--dark-back);

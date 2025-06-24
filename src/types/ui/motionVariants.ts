@@ -34,6 +34,12 @@ export const fadeSlideY = {
 	exit: { opacity: 0, y: -50, transition: { duration: 0.5 } },
 };
 
+export const fadeSlideDownSm = {
+	enter: { opacity: 0, y: -10 },
+	center: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+	exit: { opacity: 0, y: 10, transition: { duration: 0.3 } },
+};
+
 export const textContainer = {
 	hidden: {},
 	visible: {

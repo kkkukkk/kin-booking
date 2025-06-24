@@ -4,9 +4,9 @@ import '@/css/layout.css';
 import AppProviders from '@/providers/AppProviders';
 import TogglePanel from "@/components/panel/TogglePanel";
 import DynamicVhSetter from "@/components/utils/DynamicVhSetter";
-import PathnameWrapper from "@/components/wrapper/PathnameWrapper";
+import PathnameWrapper from "@/wrapper/PathnameWrapper";
 import Toast from "@/components/alert/Toast";
-import ClientAuthWrapper from "@/components/wrapper/ClientAuthWrapper";
+import ClientAuthWrapper from "@/wrapper/ClientAuthWrapper";
 
 export const metadata = {
     title: 'KIN',
@@ -16,7 +16,12 @@ export const metadata = {
         siteName: 'KIN',
         type: 'website',
         url: 'https://kin-booking.vercel.app/',
-        images: [''],
+        images: [{
+            url: 'https://kin-booking.vercel.app/images/logo_normal.png',
+            width: 1200,
+            height: 630,
+            alt: 'KIN 공연 예매',
+        }],
     },
 };
 export const viewport = 'width=device-width, initial-scale=1';

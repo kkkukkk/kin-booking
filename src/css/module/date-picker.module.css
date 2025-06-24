@@ -1,0 +1,91 @@
+.cell {
+    padding: 0.5rem;
+    border: 1px solid var(--black_30);
+    width: 2.3rem;
+    height: 2.3rem;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.weekday {
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.875rem;
+}
+
+.sunday {
+    color: #e74c3c;
+}
+.saturday {
+    color: #3498db;
+}
+
+
+.otherMonthNormal {
+    color: var(--black_30);
+    border: 1px solid var(--black_30);
+}
+
+.otherMonthDark {
+    color: var(--white_30);
+    border: 1px solid var(--white_10);
+}
+
+.otherMonthNeon {
+    color: var(--neon-green-light);
+    border: 1px solid var(--neon-green-light);
+}
+
+
+/* --- normal 테마 --- */
+.normalLight {
+    background-color: var(--white);
+    color: var(--foreground);
+}
+.normalSelected {
+    background-color: var(--black_70);
+    color: var(--background);
+    font-weight: 600;
+}
+.normalInRange {
+    background-color: var(--black_50);
+    color: var(--background);
+}
+
+/* --- dark 테마 --- */
+.darkLight {
+    border: 1px solid var(--white_50);
+    background-color: var(--black);
+    color: var(--white_70);
+}
+.darkSelected {
+    background-color: var(--white_50);
+    color: var(--background);
+    font-weight: 600;
+}
+.darkInRange {
+    background-color: var(--white_30);
+    color: var(--background);
+}
+
+/* --- neon 테마 --- */
+.neonLight {
+    border: 1px solid var(--neon-green-medium);
+    background-color: var(--black);
+    color: var(--neon-green-strong);
+}
+.neonSelected {
+    background-color: var(--neon-green-strong);
+    color: var(--background);
+    font-weight: 600;
+}
+.neonInRange {
+    background-color: var(--neon-green-light);
+    color: var(--background);
+}

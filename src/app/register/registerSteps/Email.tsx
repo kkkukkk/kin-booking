@@ -140,6 +140,8 @@ const Email = ({
 					fontSize={"text-sm md:text-base"}
 					padding={"px-2 py-1.5"}
 					onClick={checkDuplicateEmail}
+					reverse={theme === "normal"}
+					light={theme !== "normal"}
 					disabled={checking || isDuplicateEmail === false}
 				>
 					{checking ? (

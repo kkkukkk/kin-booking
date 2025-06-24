@@ -33,7 +33,6 @@ const HamburgerLines = ({ on }: { on: boolean }) => {
 };
 
 const Button = ({
-	key,
 	width = "w-auto",
 	height = "h-auto",
 	theme = "normal",
@@ -41,6 +40,7 @@ const Button = ({
 	variant = "default",
 	on = false,
 	reverse = false,
+	light = false,
 	fontSize = "text-sm md:text-base",
 	fontWeight = "font-medium",
 	padding = "px-2 py-0",
@@ -55,8 +55,9 @@ const Button = ({
 		fontSize,
 		fontWeight,
 		padding,
-		on && styles["on"], // 필요 시 유지
-		reverse && styles["reverse"], // 필요 시 유지
+		on && styles["on"],
+		reverse && styles["reverse"],
+		light && styles["light"],
 		className
 	);
 

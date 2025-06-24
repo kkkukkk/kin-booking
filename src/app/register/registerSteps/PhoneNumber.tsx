@@ -146,6 +146,8 @@ const PhoneNumber = ({
 					fontSize={"text-sm md:text-base"}
 					padding={"px-2 py-1.5"}
 					onClick={checkDuplicatePhone}
+					reverse={theme === "normal"}
+					light={theme !== "normal"}
 					disabled={checking || isDuplicatePhone === false}
 				>
 					{checking ? (
