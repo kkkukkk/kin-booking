@@ -7,6 +7,8 @@ import DynamicVhSetter from "@/components/utils/DynamicVhSetter";
 import PathnameWrapper from "@/wrapper/PathnameWrapper";
 import Toast from "@/components/alert/Toast";
 import ClientAuthWrapper from "@/wrapper/ClientAuthWrapper";
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata = {
     metadataBase: new URL('https://kin-booking.vercel.app'),
@@ -42,6 +44,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 </ClientAuthWrapper>
                 <Toast />
             </AppProviders>
+            <Analytics />
+            <SpeedInsights />
         </body>
         </html>
     );
