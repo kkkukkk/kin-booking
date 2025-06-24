@@ -9,15 +9,16 @@ import Toast from "@/components/alert/Toast";
 import ClientAuthWrapper from "@/wrapper/ClientAuthWrapper";
 
 export const metadata = {
+    metadataBase: new URL('https://kin-booking.vercel.app'),
     title: 'KIN',
     description: 'KIN 공연 예매 사이트입니다.',
     robots: 'index, follow',
     openGraph: {
         siteName: 'KIN',
         type: 'website',
-        url: 'https://kin-booking.vercel.app/',
+        url: '/',
         images: [{
-            url: 'https://kin-booking.vercel.app/images/logo_normal.png',
+            url: '/images/logo_normal.png',
             width: 1200,
             height: 630,
             alt: 'KIN 공연 예매',
