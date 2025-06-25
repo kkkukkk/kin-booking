@@ -4,9 +4,10 @@ import { Events } from "@/types/model/events";
 export interface CreateEventDto {
 	eventName: string;
 	eventDate: string;
-	location?: string | null;
+	location: string;
 	description?: string | null;
 	setCapacity: number;
+	ticketPrice: number;
 }
 
 export interface UpdateEventDto {
@@ -16,6 +17,7 @@ export interface UpdateEventDto {
 	description?: string | null;
 	setCapacity?: number;
 	status?: EventStatus;
+	ticketPrice?: number;
 }
 
 export interface FetchEventDto {
@@ -40,6 +42,9 @@ export interface EventWithCurrentStatus {
 	remainingQuantity: number;
 	isSoldOut: boolean;
 	status: EventStatus;
+	ticketPrice: number;
+	location: string;
+	description: string;
 }
 
 export interface FetchEventWithCurrentStatusResponseDto {

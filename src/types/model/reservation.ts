@@ -15,8 +15,9 @@ export const ReservationStatusKo: Record<ReservationStatus, string> = {
 export interface Reservation {
 	id: number;
 	userId: string;
-	eventId: number;
+	eventId: string;
 	reservedAt: string;
 	quantity: number;
 	status: ReservationStatus;
+	ticketHolder: string;
 }

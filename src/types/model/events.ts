@@ -14,11 +14,12 @@ export const EventStatusKo: Record<EventStatus, string> = {
 
 export interface Events {
 	id: number;
-	eventNsame: string;
+	eventName: string;
 	eventDate: string;
-	location?: string | null;
+	location: string;
 	description?: string | null;
 	createdAt: string;
 	status: EventStatus;
 	seatCapacity: number;
+	ticketPrice: number;
 }

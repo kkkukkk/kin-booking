@@ -40,6 +40,7 @@ const Logo = ({ width, className }: LogoProps) => {
 					src={`/images/logo_${theme}.png`}
 					alt="logo"
 					fill
+					sizes={"450px"}
 					style={{ objectFit: "contain" }}
 					priority
 				/>
