@@ -8,9 +8,10 @@ import { RootState } from "@/redux/store";
 interface LogoProps {
 	width?: number; // 너비만 받아서 비율 맞춰 높이 자동 계산
 	className?: string;
+	priority?: boolean; // priority를 선택적으로 설정할 수 있도록
 }
 
-const Logo = ({ width, className }: LogoProps) => {
+const Logo = ({ width, className, priority = false }: LogoProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 
 	// 기본 크기와 비율
@@ -20,6 +21,11 @@ const Logo = ({ width, className }: LogoProps) => {
 	// width가 없으면 기본값, height는 비율 맞춰서 계산
 	const computedWidth = width ?? defaultWidth;
 	const computedHeight = (computedWidth / defaultWidth) * defaultHeight;
+
+	// 반응형 sizes 설정
+	const sizes = computedWidth <= 200 ? "200px" : 
+				  computedWidth <= 400 ? "400px" : 
+				  `${computedWidth}px`;
 
 	return (
 		<div
@@ -37,12 +43,13 @@ const Logo = ({ width, className }: LogoProps) => {
 			>
 				<Image
 					key={theme}
-					src={`/images/logo_${theme}.png`}
+					src={`/images/logo_${theme}.webp`}
 					alt="logo"
 					fill
-					sizes={"450px"}
+					sizes={sizes}
 					style={{ objectFit: "contain" }}
-					priority
+					priority={priority}
+					loading={priority ? "eager" : "lazy"}
 				/>
 			</div>
 		</div>

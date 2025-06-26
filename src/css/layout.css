@@ -40,6 +40,8 @@
 }
 .main-center {
     grid-area: main-center;
+    height: 100%;
+    min-height: 0;
 }
 .main-center.center {
     display: flex;

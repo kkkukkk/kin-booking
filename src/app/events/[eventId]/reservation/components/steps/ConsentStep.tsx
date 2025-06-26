@@ -19,9 +19,9 @@ interface ConsentStepProps {
 type DetailType = 'seat' | 'cancel';
 
 const messages = [
-	"안녕하세요! 저희 공연을 찾아주셔서 진심으로 감사드립니다.",
-	"예매를 진행하시기 전에 몇 가지 꼭 확인하셔야 할 사항이 있어요.",
-	"불이익이 없도록 안내사항을 꼼꼼히 확인해주세요!"
+	"안녕하세요! 저희 공연을 찾아주셔서 감사드립니다.",
+	"예매를 진행하시기 전에 꼭 확인하실 사항들이 있어요.",
+	"불이익이 없도록 아래 안내사항을 꼼꼼히 확인해주세요!"
 ];
 
 const ConsentStep = ({
@@ -69,10 +69,14 @@ const ConsentStep = ({
 				variants={textContainer}
 				initial="hidden"
 				animate="visible"
-				className="flex flex-col space-y-2 text-base md:text-xl"
+				className="flex flex-col space-y-3 text-sm md:text-base"
 			>
 				{messages.map((msg, idx) => (
-					<motion.p key={idx} variants={textContainerItem}>
+					<motion.p 
+						key={idx} 
+						variants={textContainerItem}
+						className="whitespace-pre-line break-words"
+					>
 						{msg}
 					</motion.p>
 				))}

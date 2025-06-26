@@ -101,6 +101,9 @@ const FindPassword = () => {
 				initial="initial"
 				animate="animate"
 				exit="exit"
+				style={
+					{ maxHeight: "100%", height: "100%", overflow: "hidden" }
+				}
 			>
 				<AnimatedText text={"가입에 사용한 정보를 입력해주세요."}/>
 				<motion.div

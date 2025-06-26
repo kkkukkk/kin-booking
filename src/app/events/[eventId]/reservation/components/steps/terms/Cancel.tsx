@@ -23,6 +23,9 @@ const CancellationPolicy = ({ policy, onClose, onConfirm }: CancellationPolicyPr
 							공연 {rate.daysBefore}일 전까지 취소 시 {rate.rate}% 환불
 						</li>
 					))}
+					<li>
+						공연 <strong>당일</strong> 취소 시 환불이 불가능합니다.
+					</li>
 				</ul>
 			</article>
 

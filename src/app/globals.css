@@ -42,16 +42,19 @@ body {
   color: var(--foreground);
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI",
   Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  min-height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
   width: 100%;
   margin: 0;
   padding: 0;
+  /* overflow: hidden; */ /* 스크롤바 완전 숨김 */
 }
 
 html, #__next {
   height: 100%;
   margin: 0;
   padding: 0;
+  /* overflow: hidden; */ /* 스크롤바 완전 숨김 */
 }
 
 .scrollbar-none {

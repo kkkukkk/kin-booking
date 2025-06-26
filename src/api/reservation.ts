@@ -28,9 +28,9 @@ export const fetchReservation = async (params?: PaginationParams & FetchReservat
 	}
 }
 
-export const createReservation = async (reservation: CreateReservationDto) => {
+export const createReservation = async (reservation: CreateReservationDto): Promise<Reservation> => {
 	const reservationSnake = toSnakeCaseKeys<CreateReservationDto>(reservation);
 	const { data, error } = await supabase.from('reservations').insert(reservationSnake).single();
 	if (error) throw error;
-	return toCamelCaseKeys(data);
+	return toCamelCaseKeys<Reservation>(data);
 }

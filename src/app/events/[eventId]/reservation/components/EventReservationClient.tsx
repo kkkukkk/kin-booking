@@ -11,11 +11,13 @@ import { useAlert } from "@/providers/AlertProvider";
 import ConsentStep from "@/app/events/[eventId]/reservation/components/steps/ConsentStep";
 import ConfirmStep from "@/app/events/[eventId]/reservation/components/steps/ConfirmStep";
 import { AnimatePresence, motion } from "framer-motion";
-import { bottomUp } from "@/types/ui/motionVariants";
+import { bottomUpDelay, bottomUp } from "@/types/ui/motionVariants";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
+import ProgressBar from "@/components/base/ProgressBar";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import { ReservationStep } from "@/types/ui/reservationStep";
 
 
 const EventReservationClient = () => {
@@ -25,17 +27,31 @@ const EventReservationClient = () => {
 	const { session } = useSession();
 	const { mutate: createReservation, isPending } = useCreateReservation();
 	const { showSpinner, hideSpinner } = useSpinner();
-	const steps: ConfirmStep[] = ['consent', 'reservation'];
-	const [step, setStep] = useState<'consent' | 'reservation'>('consent');
-	const [quantity, setQuantity] = useState(1);
-
-	const [seatChecked, setSeatChecked] = useState(false);
-	const [cancelChecked, setCancelChecked] = useState(false);
-
 	const eventId = useParams().eventId as string;
 	const router = useRouter();
 	const { data, isLoading, error } = useEventById(eventId);
+	
+	const steps: ReservationStep[] = ['consent', 'confirm'];
+	const [step, setStep] = useState<ReservationStep>('consent');
+	const [quantity, setQuantity] = useState(1);
+	const [ticketHolder, setTicketHolder] = useState('');
+	const [seatChecked, setSeatChecked] = useState(false);
+	const [cancelChecked, setCancelChecked] = useState(false);
 
+	// 세션이 로드되면 ticketHolder 기본값 설정
+	useEffect(() => {
+		if (session?.user?.user_metadata?.display_name && ticketHolder === '') {
+			setTicketHolder(session.user.user_metadata.display_name);
+		}
+	}, [session]);
+
+	// 로딩 상태 처리
+	useEffect(() => {
+		if (isLoading || isPending) showSpinner();
+		else hideSpinner();
+	}, [isLoading, isPending, showSpinner, hideSpinner]);
+
+	// 에러 처리
 	if (error) throw error;
 	if (!data) return null;
 
@@ -43,7 +59,7 @@ const EventReservationClient = () => {
 
 	const handleClick = async () => {
 		if (!session?.user) {
-			showToast({ message: '로그인 후 예매가 가능해요!', iconType: 'warning' });
+			showToast({ message: '로그인 후 예매가 가능해요!', iconType: 'warning', autoCloseTime: 3000 });
 			router.push('/login');
 			return;
 		}
@@ -54,24 +70,25 @@ const EventReservationClient = () => {
 			message: quantity + '매 예매하시겠습니까?',
 		});
 		if (confirmed) {
-			await handleReservation();
+			handleReservation();
 		}
 	}
 
 	const handleReservation = () => {
+		if (!session?.user) return;
+		
 		createReservation({
 			userId: session.user.id,
 			eventId: event.eventId,
 			quantity: quantity,
-			status: 'pending',
-			ticketHolder: session.user.user_metadata.display_name,
+			ticketHolder: ticketHolder,
 		}, {
 			onSuccess: () => {
-				showToast({ message: '예매가 완료됐어요!', iconType: 'success' });
+				showToast({ message: '예매가 완료됐어요!', iconType: 'success', autoCloseTime: 3000 });
 				router.push('/my/reservations');
 			},
 			onError: (err) => {
-				showToast({ message: err.message || '예매에 실패했어요.', iconType: 'error' });
+				showToast({ message: err.message || '예매에 실패했어요.', iconType: 'error', autoCloseTime: 3000 });
 			}
 		});
 	};
@@ -79,30 +96,66 @@ const EventReservationClient = () => {
 	const renderStep = () => {
 		switch(step) {
 			case 'consent':
-				return <ConsentStep />;
+				return (
+					<ConsentStep
+						key="consent"
+						seatChecked={seatChecked}
+						onChangeSeat={setSeatChecked}
+						cancelChecked={cancelChecked}
+						onChangeCancel={setCancelChecked}
+					/>
+				);
 			case 'confirm':
-				return <ConfirmStep />;
+				return (
+					<ConfirmStep
+						key="confirm"
+						event={event}
+						quantity={quantity}
+						onQuantityChange={setQuantity}
+						ticketHolder={ticketHolder}
+						onTicketHolderChange={setTicketHolder}
+					/>
+				);
 		}
 	};
 
 	const onNext = () => {
 		if (step === 'consent') {
+			if (!seatChecked || !cancelChecked) {
+				showToast({ message: '안내사항을 모두 확인해주세요.', iconType: 'warning', autoCloseTime: 3000 });
+				return;
+			}
 			setStep('confirm');
 		}
 	}
 	const onBack = () => {
 		if (step === 'confirm') {
 			setStep('consent');
+		} else if (step === 'consent') {
+			router.push(`/events/${eventId}`);
 		}
 	}
 
-	useEffect(() => {
-		if (isLoading || isPending) showSpinner();
-		else hideSpinner();
-	}, [isLoading, isPending, showSpinner, hideSpinner]);
-
 	return (
 		<div>
+			<div className="flex justify-start mb-4">
+				<Button
+					theme={"dark"}
+					padding={"px-3 py-1.5"}
+					onClick={onBack}
+					reverse={theme === "normal"}
+					light={theme !== "normal"}
+				>
+					{step === "confirm" ? "이전" : "뒤로가기"}
+				</Button>
+			</div>
+
+			<ProgressBar
+				steps={steps}
+				currentStep={steps.indexOf(step)}
+				theme={theme}
+			/>
+
 			<AnimatePresence mode="wait">
 				<motion.div
 					key={`${step}Motion`}
@@ -122,25 +175,14 @@ const EventReservationClient = () => {
 
 			<motion.div
 				key={`${step}Button`}
-				variants={bottomUp}
+				variants={step === "consent" ? bottomUpDelay : bottomUp}
 				initial="initial"
 				animate="animate"
 				className={clsx(
 					"flex justify-end",
-					step === "email" ? "mt-4 md:mt-6" : "mt-8 md:mt-10"
+					step === "confirm" ? "mt-4 md:mt-6" : "mt-8 md:mt-10"
 				)}
 			>
-				<Button
-					theme={"dark"}
-					width={"w-full"}
-					fontSize={"text-md md:text-xl"}
-					padding={"px-2 py-1.5"}
-					onClick={onBack}
-					reverse={theme === "normal"}
-					light={theme !== "normal"}
-				>
-					{step === "select" ? "이전" : "취소"}
-				</Button>
 				<Button
 					theme={"dark"}
 					width={"w-full"}
@@ -150,7 +192,7 @@ const EventReservationClient = () => {
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
 				>
-					{step === "select" ? "예매하기" : "다음"}
+					{step === "confirm" ? "예매하기" : "다음"}
 				</Button>
 			</motion.div>
 		</div>

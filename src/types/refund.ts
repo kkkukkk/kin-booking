@@ -14,6 +14,5 @@ export const DEFAULT_REFUND_POLICY: RefundPolicy = {
 		{ daysBefore: 5, rate: 100 },
 		{ daysBefore: 3, rate: 70 },
 		{ daysBefore: 1, rate: 50 },
-		{ daysBefore: 0, rate: 0 },
 	],
 };

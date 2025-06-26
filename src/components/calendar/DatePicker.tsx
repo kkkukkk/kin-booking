@@ -123,13 +123,17 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 		if (isDark) return styles.darkLight;
 		if (isNeon) return styles.neonLight;
 
-		return '';
+		return styles.normalLight;
 	};
 
 	useEffect(() => {
-		setStartDate(initialFrom ?? null);
-		setEndDate(initialTo ?? null);
-		if (initialFrom) setCurrentDate(initialFrom);
+		if (initialFrom) {
+			setStartDate(initialFrom);
+			setCurrentDate(initialFrom);
+		}
+		if (initialTo) {
+			setEndDate(initialTo);
+		}
 	}, [initialFrom, initialTo]);
 
 	return (

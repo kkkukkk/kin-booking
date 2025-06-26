@@ -4,7 +4,6 @@ import React, { useRef } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import clsx from "clsx";
-import styles from '@/css/module/card.module.css';
 import Logo from "@/components/Logo";
 import { fadeSlideY } from "@/types/ui/motionVariants";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +11,7 @@ import ScrollBar from "@/components/base/ScrollBar";
 import useNeedScrollBar from "@/hooks/useNeedScrollBar";
 import ThemeRefDiv from "@/components/base/ThemeRefDiv";
 import useRehydrated from "@/hooks/useIsRehydrated";
+import Skeleton from "@/components/base/Skeleton";
 
 interface CardProps {
 	children: React.ReactNode;
@@ -40,6 +40,8 @@ const Card = ({
 	const needScrollBar = useNeedScrollBar(scrollTargetRef, rehydrated);
 	const conditionStyle: React.CSSProperties = {};
 
+	if (!rehydrated) return <Skeleton className={"main-center"} />;
+
 	if (innerScroll) {
 		conditionStyle.overflowY = "auto";
 		conditionStyle.position = "relative";
@@ -54,8 +56,12 @@ const Card = ({
 				exit="exit"
 				transition={{duration: 0.3}}
 				className={clsx(
-					styles["card-wrap"],
-					theme && styles[theme],
+					"rounded-none md:rounded-[10px]",
+					theme === "dark"
+						? "shadow-[0_0_6px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_24px_rgba(255,255,255,0.3),0_0_36px_rgba(255,255,255,0.1)]"
+						: theme === "neon"
+						? "shadow-[0_0_6px_rgba(119,255,153,0.7),0_0_12px_rgba(119,255,153,0.5),0_0_24px_rgba(119,255,153,0.3),0_0_36px_rgba(119,255,153,0.2)]"
+						: "shadow-[0_0_6px_rgba(0,0,0,0.7),0_0_12px_rgba(0,0,0,0.5),0_0_24px_rgba(0,0,0,0.3),0_0_36px_rgba(0,0,0,0.1)]",
 					"relative main-center",
 					width,
 					height
@@ -69,19 +75,24 @@ const Card = ({
 				<ThemeRefDiv
 					ref={scrollTargetRef}
 					className={clsx(
-						styles.card,
-						theme && styles[theme],
-						className,
+						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12",
 						center && "flex justify-center items-center",
-						"scrollbar-none"
+						"scrollbar-none",
+						className
 					)}
-					style={conditionStyle}
+					style={{
+						...conditionStyle,
+						backgroundColor:
+							theme === "dark" || theme === "neon"
+								? "var(--black_70)"
+								: "var(--white_70)",
+					}}
 				>
 					{(backButton || hasLogo) && (
 						<div className="flex w-full items-center justify-between pb-2">
 							<div className="flex-1 flex justify-start items-start">{backButton || null}</div>
 							<div className="flex-1 flex justify-center">
-								{hasLogo && <Logo width={120} />}
+								{hasLogo && <Logo width={120} priority={true} />}
 							</div>
 							<div className="flex-1" />
 						</div>
