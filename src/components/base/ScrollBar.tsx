@@ -39,22 +39,25 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 		const target = targetRef.current;
 		const { scrollTop, scrollHeight, clientHeight } = target;
 
-		const adjustedClientHeight = clientHeight * REDUCED_RATIO;
-		const ratio = adjustedClientHeight / scrollHeight;
-		const newThumbHeight = Math.max(ratio * adjustedClientHeight, 20);
+		// 트랙의 실제 높이 = clientHeight * 0.95
+		const trackHeight = clientHeight * 0.95;
+		const ratio = clientHeight / scrollHeight;
+		const newThumbHeight = Math.max(ratio * trackHeight, 20);
 		setThumbHeight(newThumbHeight);
 
-		const reducedTrackHeight = trackHeight * REDUCED_RATIO;
-		const maxThumbTop = reducedTrackHeight - newThumbHeight;
+		const maxThumbTop = trackHeight - newThumbHeight;
 		const maxScrollTop = scrollHeight - clientHeight;
 		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
 
-		const newThumbTop = isAtBottom
-			? maxThumbTop
-			: Math.round((scrollTop / maxScrollTop) * maxThumbTop);
+		const newThumbTop =
+			maxScrollTop <= 0
+				? 0
+				: isAtBottom
+				? maxThumbTop
+				: Math.round((scrollTop / maxScrollTop) * maxThumbTop);
 
 		setThumbTop(newThumbTop);
-	}, [targetRef, trackHeight]);
+	}, [targetRef]);
 
 	useEffect(() => {
 		if (!targetRef.current) return;
@@ -124,10 +127,10 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 		<div
 			className={clsx(styles['scrollbarTrack'], 'w-1 md:w-2')}
 			style={{
-				position: 'fixed',
-				top: trackTop + topOffset,
-				right: rightOffset + 10,
-				height: reducedHeight,
+				position: 'absolute',
+				top: '2.5%',
+				right: 8,
+				height: '95%',
 				zIndex: 9999,
 			}}
 		>
@@ -144,7 +147,6 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 					height: thumbHeight,
 					top: thumbTop,
 					position: 'absolute',
-					backgroundColor: '#888888',
 					transition: dragging ? 'none' : 'top 0.1s',
 				}}
 				onMouseDown={onMouseDown}

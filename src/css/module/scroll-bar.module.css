@@ -8,7 +8,6 @@
     border-radius: 9999px;
     cursor: pointer;
     transition: margin-top 0.1s;
-    animation: pulse 2s infinite alternate;
 }
 
 .scrollbarThumb {
@@ -18,7 +17,7 @@
 }
 
 .scrollbarThumb.normal {
-    background: var(--black_70);
+    background: var(--black_50);
 }
 
 .scrollbarThumb.dark {

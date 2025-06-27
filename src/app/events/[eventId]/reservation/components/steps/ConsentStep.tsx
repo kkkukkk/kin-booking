@@ -7,6 +7,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { consent, textContainer, textContainerItem } from "@/types/ui/motionVariants";
 import ConsentItem from "@/components/consent/ConsentItem";
 import Modal from "@/components/Modal";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import clsx from "clsx";
 
 interface ConsentStepProps {
 	key: string;
@@ -31,6 +34,7 @@ const ConsentStep = ({
 	onChangeCancel,
 }: ConsentStepProps)  => {
 	const [showDetail, setShowDetail] = useState<DetailType | null>(null);
+	const theme = useAppSelector((state: RootState) => state.theme.current);
 
 	const handleClose = () => setShowDetail(null);
 
@@ -69,7 +73,14 @@ const ConsentStep = ({
 				variants={textContainer}
 				initial="hidden"
 				animate="visible"
-				className="flex flex-col space-y-3 text-sm md:text-base"
+				className={clsx(
+					"flex flex-col space-y-3 text-sm md:text-base p-4 rounded-lg border mt-4",
+					theme === "normal" 
+						? "bg-gray-50 border-gray-200" 
+						: theme === "dark"
+						? "bg-gray-800 border-gray-700"
+						: "bg-gray-800 border-gray-700"
+				)}
 			>
 				{messages.map((msg, idx) => (
 					<motion.p 

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, RefObject } from 'react';
 
-const useNeedScrollBar = (ref: React.RefObject<HTMLElement | null>, ready = true) => {
+const useNeedScrollBar = (ref: RefObject<HTMLElement | null>, ready = true) => {
 	const [needScrollBar, setNeedScrollBar] = useState(false);
 
 	useEffect(() => {
@@ -15,9 +15,10 @@ const useNeedScrollBar = (ref: React.RefObject<HTMLElement | null>, ready = true
 		};
 		update();
 
-		const mutationObserver = new MutationObserver(() => {
-			update();
-		});
+		const resizeObserver = new ResizeObserver(update);
+		resizeObserver.observe(el);
+
+		const mutationObserver = new MutationObserver(update);
 		mutationObserver.observe(el, {
 			childList: true,
 			subtree: true,
@@ -25,6 +26,7 @@ const useNeedScrollBar = (ref: React.RefObject<HTMLElement | null>, ready = true
 		});
 
 		return () => {
+			resizeObserver.disconnect();
 			mutationObserver.disconnect();
 		};
 	}, [ref, ready]);

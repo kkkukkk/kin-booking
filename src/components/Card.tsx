@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import clsx from "clsx";
@@ -11,7 +11,6 @@ import ScrollBar from "@/components/base/ScrollBar";
 import useNeedScrollBar from "@/hooks/useNeedScrollBar";
 import ThemeRefDiv from "@/components/base/ThemeRefDiv";
 import useRehydrated from "@/hooks/useIsRehydrated";
-import Skeleton from "@/components/base/Skeleton";
 
 interface CardProps {
 	children: React.ReactNode;
@@ -37,10 +36,17 @@ const Card = ({
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
 	const scrollTargetRef = useRef<HTMLDivElement | null>(null);
-	const needScrollBar = useNeedScrollBar(scrollTargetRef, rehydrated);
-	const conditionStyle: React.CSSProperties = {};
+	const [refReady, setRefReady] = useState(false);
 
-	if (!rehydrated) return <Skeleton className={"main-center"} />;
+	// ref가 설정되면 refReady를 true로 설정
+	useEffect(() => {
+		if (rehydrated && scrollTargetRef.current) {
+			setRefReady(true);
+		}
+	}, [rehydrated, scrollTargetRef.current]);
+
+	const needScrollBar = useNeedScrollBar(scrollTargetRef, rehydrated && refReady);
+	const conditionStyle: React.CSSProperties = {};
 
 	if (innerScroll) {
 		conditionStyle.overflowY = "auto";
@@ -60,8 +66,8 @@ const Card = ({
 					theme === "dark"
 						? "shadow-[0_0_6px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_24px_rgba(255,255,255,0.3),0_0_36px_rgba(255,255,255,0.1)]"
 						: theme === "neon"
-						? "shadow-[0_0_6px_rgba(119,255,153,0.7),0_0_12px_rgba(119,255,153,0.5),0_0_24px_rgba(119,255,153,0.3),0_0_36px_rgba(119,255,153,0.2)]"
-						: "shadow-[0_0_6px_rgba(0,0,0,0.7),0_0_12px_rgba(0,0,0,0.5),0_0_24px_rgba(0,0,0,0.3),0_0_36px_rgba(0,0,0,0.1)]",
+							? "shadow-[0_0_6px_rgba(119,255,153,0.7),0_0_12px_rgba(119,255,153,0.5),0_0_24px_rgba(119,255,153,0.3),0_0_36px_rgba(119,255,153,0.2)]"
+							: "shadow-[0_0_6px_rgba(0,0,0,0.7),0_0_12px_rgba(0,0,0,0.5),0_0_24px_rgba(0,0,0,0.3),0_0_36px_rgba(0,0,0,0.1)]",
 					"relative main-center",
 					width,
 					height

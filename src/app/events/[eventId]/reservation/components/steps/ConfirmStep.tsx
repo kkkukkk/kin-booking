@@ -7,6 +7,9 @@ import Counter from "@/components/base/Counter";
 import Input from "@/components/base/Input";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import dayjs from "dayjs";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import clsx from "clsx";
 
 interface ConfirmStepProps {
 	event: EventWithCurrentStatus,
@@ -17,6 +20,11 @@ interface ConfirmStepProps {
 	key?: string
 }
 
+const messages = [
+	"예매 내용을 확인하고 수량과 예매자를 입력해주세요!",
+];
+
+
 const ConfirmStep = ({
 	event,
 	quantity,
@@ -24,17 +32,22 @@ const ConfirmStep = ({
 	ticketHolder,
 	onTicketHolderChange
 }: ConfirmStepProps) => {
-	const messages = [
-		"예매 내용을 확인하고 수량과 예매자를 입력해주세요!",
-	];
-
+	const theme = useAppSelector((state: RootState) => state.theme.current);
+	
 	return (
 		<div className="relative overflow-hidden">
 			<motion.div
 				variants={textContainer}
 				initial="hidden"
 				animate="visible"
-				className="flex flex-col space-y-3 text-sm md:text-base"
+				className={clsx(
+					"flex flex-col text-sm md:text-base p-4 rounded-lg border mt-4",
+					theme === "normal" 
+						? "bg-gray-50 border-gray-200" 
+						: theme === "dark"
+						? "bg-gray-800 border-gray-700"
+						: "bg-gray-800 border-gray-700"
+				)}
 			>
 				{messages.map((msg, idx) => (
 					<motion.p
@@ -51,7 +64,7 @@ const ConfirmStep = ({
 				initial={{opacity: 0, y: 20}}
 				animate={{opacity: 1, y: 0}}
 				transition={{delay: 0.3, duration: 0.6}}
-				className="mt-8 md:mt-10 space-y-6"
+				className="mt-6 space-y-6"
 			>
 				{/* 공연 정보 */}
 				<ThemeDiv isChildren className="rounded-lg p-4 md:p-6">
@@ -72,10 +85,6 @@ const ConfirmStep = ({
 						<div className="flex justify-between">
 							<span className="opacity-70">장소</span>
 							<span className="font-medium">{event.location}</span>
-						</div>
-						<div className="flex justify-between">
-							<span className="opacity-70">잔여 좌석</span>
-							<span className="font-medium">{event.remainingQuantity}석</span>
 						</div>
 					</div>
 				</ThemeDiv>
@@ -110,7 +119,10 @@ const ConfirmStep = ({
 								theme="dark"
 								required
 							/>
-							<p className="text-xs md:text-sm opacity-60 mt-2">
+							<p className={clsx(
+								"text-xs md:text-sm opacity-90 mt-2 text-red-500",
+								theme === "normal" ? "text-red-600" : "text-red-400"
+							)}>
 								공연 당일 입장 시 확인받을 분의 이름을 입력해주세요.
 							</p>
 						</div>

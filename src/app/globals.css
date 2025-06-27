@@ -24,6 +24,9 @@
   --normal-back: rgba(255, 255, 255, .9);
   --dark-back: rgba(0, 0, 0, .8);
   --check: rgb(55, 176, 83);
+  
+  /* 카드 배경색 변수들 */
+  --card-bg-dark: rgba(30, 41, 59, 0.9); /* 군청색 계열 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,14 +50,12 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
-  /* overflow: hidden; */ /* 스크롤바 완전 숨김 */
 }
 
 html, #__next {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* overflow: hidden; */ /* 스크롤바 완전 숨김 */
 }
 
 .scrollbar-none {

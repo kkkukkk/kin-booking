@@ -62,11 +62,7 @@ export const fetchEventsWithCurrentStatus = async (params?: PaginationParams & F
 }
 
 export const fetchEventById = async (id: string): Promise<EventWithCurrentStatus> => {
-	console.log("called");
-	console.log(id);
 	const { data } = await fetchEventsWithCurrentStatus({ id });
-
-	console.log(data);
 
 	if (!data.length) throw new Error("Event not found");
 
