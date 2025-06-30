@@ -16,54 +16,43 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 	const [thumbHeight, setThumbHeight] = useState(0);
 	const [thumbTop, setThumbTop] = useState(0);
 	const [dragging, setDragging] = useState(false);
-	const [trackTop, setTrackTop] = useState(0);
 	const [trackHeight, setTrackHeight] = useState(0);
-	const [rightOffset, setRightOffset] = useState(0);
 	const REDUCED_RATIO = 0.98;
 
 	const dragStartY = useRef(0);
 	const dragStartTop = useRef(0);
-
-	const updateTrackPosition = useCallback(() => {
-		if (!targetRef.current) return;
-		const rect = targetRef.current.getBoundingClientRect();
-		setTrackTop(rect.top);
-		setTrackHeight(rect.height);
-
-		const rightSpace = window.innerWidth - (rect.left + rect.width);
-		setRightOffset(rightSpace);
-	}, [targetRef]);
 
 	const updateThumb = useCallback(() => {
 		if (!targetRef.current) return;
 		const target = targetRef.current;
 		const { scrollTop, scrollHeight, clientHeight } = target;
 
-		const adjustedClientHeight = clientHeight * REDUCED_RATIO;
-		const ratio = adjustedClientHeight / scrollHeight;
-		const newThumbHeight = Math.max(ratio * adjustedClientHeight, 20);
+		const trackHeight = clientHeight * 0.95;
+		const ratio = clientHeight / scrollHeight;
+		const newThumbHeight = Math.max(ratio * trackHeight, 20);
 		setThumbHeight(newThumbHeight);
+		setTrackHeight(trackHeight);
 
-		const reducedTrackHeight = trackHeight * REDUCED_RATIO;
-		const maxThumbTop = reducedTrackHeight - newThumbHeight;
+		const maxThumbTop = trackHeight - newThumbHeight;
 		const maxScrollTop = scrollHeight - clientHeight;
 		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
 
-		const newThumbTop = isAtBottom
-			? maxThumbTop
-			: Math.round((scrollTop / maxScrollTop) * maxThumbTop);
+		const newThumbTop =
+			maxScrollTop <= 0
+				? 0
+				: isAtBottom
+				? maxThumbTop
+				: Math.round((scrollTop / maxScrollTop) * maxThumbTop);
 
 		setThumbTop(newThumbTop);
-	}, [targetRef, trackHeight]);
+	}, [targetRef]);
 
 	useEffect(() => {
 		if (!targetRef.current) return;
 
-		updateTrackPosition();
 		updateThumb();
 
 		const resizeObserver = new ResizeObserver(() => {
-			updateTrackPosition();
 			updateThumb();
 		});
 		resizeObserver.observe(targetRef.current);
@@ -77,7 +66,7 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 			target.removeEventListener('scroll', updateThumb);
 			window.removeEventListener('resize', updateThumb);
 		};
-	}, [targetRef, updateTrackPosition, updateThumb]);
+	}, [targetRef, updateThumb]);
 
 	const onMouseDown = (e: React.MouseEvent) => {
 		setDragging(true);
@@ -117,17 +106,14 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 		};
 	}, [onMouseMove, onMouseUp]);
 
-	const reducedHeight = trackHeight * REDUCED_RATIO;
-	const topOffset = (trackHeight - reducedHeight) / 2;
-
 	return (
 		<div
 			className={clsx(styles['scrollbarTrack'], 'w-1 md:w-2')}
 			style={{
-				position: 'fixed',
-				top: trackTop + topOffset,
-				right: rightOffset + 10,
-				height: reducedHeight,
+				position: 'absolute',
+				top: '2.5%',
+				right: 8,
+				height: '95%',
 				zIndex: 9999,
 			}}
 		>
@@ -144,7 +130,6 @@ const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
 					height: thumbHeight,
 					top: thumbTop,
 					position: 'absolute',
-					backgroundColor: '#888888',
 					transition: dragging ? 'none' : 'top 0.1s',
 				}}
 				onMouseDown={onMouseDown}

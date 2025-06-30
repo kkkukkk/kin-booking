@@ -23,7 +23,7 @@ const ThemeButtonSet = ({ isOpen }: ThemeButtonSetProps) => {
 	return (
 		<ThemeDiv
 			className={clsx(
-				"flex flex-col gap-2 p-2 rounded-full shadow-md",
+				"flex flex-col gap-2 p-2 rounded-full shadow-md z-100",
 				"absolute bottom-full mb-2 left-1/2 -translate-x-1/2",
 				"transition-all duration-300 ease-out",
 				isOpen

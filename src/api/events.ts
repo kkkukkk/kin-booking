@@ -38,7 +38,7 @@ export const fetchEvents = async (params?: PaginationParams & FetchEventDto): Pr
 export const fetchEventsWithCurrentStatus = async (params?: PaginationParams & FetchEventDto): Promise<FetchEventWithCurrentStatusResponseDto> => {
 	let query = supabase.from('event_with_reservation_view').select('*', {count: 'exact'});
 	if (params) {
-		if (params.id) query = query.eq('id', params.id);
+		if (params.id) query = query.eq('event_id', params.id);
 		if (params.eventName) query = query.ilike('event_name', `%${params.eventName}%`);
 		if (params.eventDateFrom) query = query.gte('event_date', params.eventDateFrom);
 		if (params.eventDateTo) {
@@ -60,6 +60,14 @@ export const fetchEventsWithCurrentStatus = async (params?: PaginationParams & F
 		totalCount: count ?? 0,
 	}
 }
+
+export const fetchEventById = async (id: string): Promise<EventWithCurrentStatus> => {
+	const { data } = await fetchEventsWithCurrentStatus({ id });
+
+	if (!data.length) throw new Error("Event not found");
+
+	return data[0];
+};
 
 // 공연 생성
 export const createEvent = async (event: CreateEventDto): Promise<Events> => {

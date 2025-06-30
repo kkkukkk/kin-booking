@@ -80,7 +80,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 		<ThemeDiv
 			className={clsx(
 				"absolute bottom-full mb-2 left-1/2 translate-x-[-50%]",
-				"flex flex-col gap-2 p-2 rounded-full shadow-md",
+				"flex flex-col gap-2 p-2 rounded-full shadow-md z-100",
 				"transition-all duration-300 ease-out",
 				isOpen
 					? "opacity-100 scale-100 pointer-events-auto"
@@ -99,7 +99,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 						onClick();
 					}}
 					fontSize={"text-[10px] md:text-xs"}
-					on={!!activeButtons[key]}
+					on={activeButtons[key]}
 					round
 					reverse={theme === "normal"} // normal 일 때 on 이면 dark shadow
 				>

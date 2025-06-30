@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import dayjs, {Dayjs} from "dayjs";
 import clsx from "clsx";
 import {useAppSelector} from "@/redux/hooks";
@@ -52,6 +52,8 @@ const generateCalendar = (date: Dayjs): Dayjs[][] => {
 	return calendar;
 };
 
+const DRAG_THRESHOLD = 120; // ms, 이 시간 이상 누르면 드래그로 간주
+
 const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 	const theme = useAppSelector(state => state.theme.current);
 	const [startDate, setStartDate] = useState<Dayjs | null>(initialFrom ?? null);
@@ -61,6 +63,9 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 	);
 
 	const calendar = generateCalendar(currentDate);
+
+	const isSameDay = (a: Dayjs | null, b: Dayjs | null): boolean =>
+		Boolean(a && b && a.format('YYYY-MM-DD') === b.format('YYYY-MM-DD'));
 
 	const handleDateClick = (day: Dayjs) => {
 		if (day.month() !== currentDate.month()) {
@@ -72,27 +77,35 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 			setEndDate(null);
 		} else if (day.isBefore(startDate)) {
 			setStartDate(day);
+		} else if (isSameDay(day, startDate)) {
+			setEndDate(day);
+			if (onChange) {
+				onChange(day, day);
+			}
 		} else {
-			const from = startDate;
-			const to = day;
-			setEndDate(to);
-			if (onChange && from) {
-				onChange(from, to);
+			setEndDate(day);
+			if (onChange && startDate) {
+				onChange(startDate, day);
 			}
 		}
 	};
+
 
 	const isInRange = (day: Dayjs) => {
 		if (!startDate || !endDate) return false;
 		return day.isAfter(startDate) && day.isBefore(endDate);
 	};
 
-	const isSameDay = (a: Dayjs | null, b: Dayjs | null): boolean =>
-		Boolean(a && b && a.format('YYYY-MM-DD') === b.format('YYYY-MM-DD'));
-
-	const isNormal = theme === 'normal';
-	const isDark = theme === 'dark';
-	const isNeon = theme === 'neon';
+	const isSelected = (day: Dayjs) => {
+		if (startDate && endDate) {
+			return day.isSame(startDate, 'day') || day.isSame(endDate, 'day');
+		}
+		if (startDate && !endDate) {
+			return day.isSame(startDate, 'day');
+		}
+		return false;
+	};
+	const isToday = (day: Dayjs) => day.isSame(dayjs(), 'day');
 
 	const getCellClass = (
 		day: Dayjs,
@@ -101,35 +114,44 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 		inRange: boolean,
 		isOtherMonth: boolean,
 	): string => {
+		// detail 대기 상태 색상과 맞추기 위해 yellow 계열 스타일 추가
+		// 대기 상태는 선택된 날짜 또는 inRange일 때로 간주
+		if ((isStart || isEnd || inRange) && theme === 'normal') return styles.normalPending;
+		if ((isStart || isEnd || inRange) && theme === 'dark') return styles.darkPending;
+		if (isToday(day)) {
+			if (theme === 'normal') return styles.normalToday;
+			if (theme === 'dark') return styles.darkToday;
+			if (theme === 'neon') return styles.neonToday;
+		}
 		if (isStart || isEnd) {
-			if (isNormal) return styles.normalSelected;
-			if (isDark) return styles.darkSelected;
-			if (isNeon) return styles.neonSelected;
+			if (theme === 'normal') return styles.normalSelected;
+			if (theme === 'dark') return styles.darkSelected;
+			if (theme === 'neon') return styles.neonSelected;
 		}
-
 		if (inRange) {
-			if (isNormal) return styles.normalInRange;
-			if (isDark) return styles.darkInRange;
-			if (isNeon) return styles.neonInRange;
+			if (theme === 'normal') return styles.normalInRange;
+			if (theme === 'dark') return styles.darkInRange;
+			if (theme === 'neon') return styles.neonInRange;
 		}
-
 		if (isOtherMonth) {
-			if (isNormal) return styles.otherMonthNormal;
-			if (isDark) return styles.otherMonthDark;
-			if (isNeon) return styles.otherMonthNeon;
+			if (theme === 'normal') return styles.otherMonthNormal;
+			if (theme === 'dark') return styles.otherMonthDark;
+			if (theme === 'neon') return styles.otherMonthNeon;
 		}
-
-		if (isNormal) return styles.normalLight;
-		if (isDark) return styles.darkLight;
-		if (isNeon) return styles.neonLight;
-
-		return '';
+		if (theme === 'normal') return styles.normalLight;
+		if (theme === 'dark') return styles.darkLight;
+		if (theme === 'neon') return styles.neonLight;
+		return styles.normalLight;
 	};
 
 	useEffect(() => {
-		setStartDate(initialFrom ?? null);
-		setEndDate(initialTo ?? null);
-		if (initialFrom) setCurrentDate(initialFrom);
+		if (initialFrom) {
+			setStartDate(initialFrom);
+			setCurrentDate(initialFrom);
+		}
+		if (initialTo) {
+			setEndDate(initialTo);
+		}
 	}, [initialFrom, initialTo]);
 
 	return (
@@ -169,7 +191,10 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 									key={dayIndex}
 									className={clsx(
 										styles.cell,
-										getCellClass(day, isStart, isEnd, inRange, isOtherMonth)
+										getCellClass(day, isStart, isEnd, inRange, isOtherMonth),
+										isSelected(day) && 'selected',
+										isInRange(day) && 'in-range',
+										isToday(day) && 'today'
 									)}
 									onClick={() => handleDateClick(day)}
 								>

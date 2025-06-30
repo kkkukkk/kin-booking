@@ -97,12 +97,13 @@ const LoginPage = () => {
 			>
 				{
 					imagePending
-						? <Skeleton />
+						? <Skeleton width="w-full" height="h-full" className="rounded" />
 						: <ImageSlider
 							images={images}
 							width="w-full"
 							height="h-full"
 							interval={5000}
+							priority={true}
 						/>
 				}
 			</div>
@@ -112,7 +113,7 @@ const LoginPage = () => {
 				<div
 					className={"flex justify-center items-center flex-grow-[2]"}
 				>
-					<Logo width={400}/>
+					<Logo width={400} priority={true}/>
 				</div>
 				<div
 					className={"flex flex-col gap-2 flex-grow-[3.5]"}

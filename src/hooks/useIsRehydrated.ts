@@ -15,7 +15,8 @@ const useRehydrated = () => {
 			});
 
 			// 초기 상태가 이미 부트스트랩 완료면 바로 처리
-			if (persistor?.getState().bootstrapped) {
+			const initialState = persistor?.getState().bootstrapped;
+			if (initialState) {
 				setRehydrated(true);
 				unsubscribe();
 			}
