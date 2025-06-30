@@ -13,6 +13,7 @@ const ErrorPage = () => {
 			<Button
 				theme={"dark"}
 				className={'mt-4'}
+				padding={'px-2 py-1'}
 				onClick={() => router.push('/')}
 			>홈으로</Button>
 		</Card>

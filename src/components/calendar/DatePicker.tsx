@@ -71,14 +71,17 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 		if (day.month() !== currentDate.month()) {
 			setCurrentDate(day.startOf('month'));
 		}
+
 		if (!startDate || (startDate && endDate)) {
 			setStartDate(day);
 			setEndDate(null);
 		} else if (day.isBefore(startDate)) {
 			setStartDate(day);
 		} else if (isSameDay(day, startDate)) {
-			setStartDate(day);
-			setEndDate(null);
+			setEndDate(day);
+			if (onChange) {
+				onChange(day, day);
+			}
 		} else {
 			setEndDate(day);
 			if (onChange && startDate) {
@@ -86,6 +89,7 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 			}
 		}
 	};
+
 
 	const isInRange = (day: Dayjs) => {
 		if (!startDate || !endDate) return false;
@@ -110,6 +114,10 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 		inRange: boolean,
 		isOtherMonth: boolean,
 	): string => {
+		// detail 대기 상태 색상과 맞추기 위해 yellow 계열 스타일 추가
+		// 대기 상태는 선택된 날짜 또는 inRange일 때로 간주
+		if ((isStart || isEnd || inRange) && theme === 'normal') return styles.normalPending;
+		if ((isStart || isEnd || inRange) && theme === 'dark') return styles.darkPending;
 		if (isToday(day)) {
 			if (theme === 'normal') return styles.normalToday;
 			if (theme === 'dark') return styles.darkToday;

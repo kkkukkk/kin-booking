@@ -99,7 +99,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 						onClick();
 					}}
 					fontSize={"text-[10px] md:text-xs"}
-					on={!!activeButtons[key]}
+					on={activeButtons[key]}
 					round
 					reverse={theme === "normal"} // normal 일 때 on 이면 dark shadow
 				>

@@ -44,7 +44,7 @@ const EventReservationClient = () => {
 		if (session?.user?.user_metadata?.display_name && ticketHolder === '') {
 			setTicketHolder(session.user.user_metadata.display_name);
 		}
-	}, [session]);
+	}, [session, ticketHolder]);
 
 	// 로딩 상태 처리
 	useEffect(() => {

@@ -5,10 +5,12 @@ import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { getStorageUrl } from "@/util/storage";
 import clsx from "clsx";
 import Skeleton from "@/components/base/Skeleton";
+import Image from "next/image";
+import { EventMedia } from "@/types/model/eventMedia";
 
 interface EventPosterProps {
 	eventName: string;
-	posterData: any[] | undefined;
+	posterData: EventMedia[] | undefined;
 	theme: string;
 	isLoading?: boolean;
 }
@@ -40,11 +42,15 @@ const EventPoster = ({ eventName, posterData, theme, isLoading = false }: EventP
 		>
 			<div className="relative w-full max-w-md md:w-80">
 				{posterData && posterData.length > 0 ? (
-					<img
+					<Image
 						src={getStorageUrl(posterData[0].url)}
 						alt={`${eventName} 포스터`}
+						width={320}
+						height={320}
 						className="w-full h-auto rounded-lg shadow-lg"
+						style={{ objectFit: 'cover' }}
 						loading="lazy"
+						priority
 					/>
 				) : (
 					<div className={clsx(

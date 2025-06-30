@@ -60,7 +60,7 @@ const SearchBar = ({
       setKeyword(debouncedKeyword);
       filters.keyword.onChange(debouncedKeyword);
     }
-  }, [debouncedKeyword]);
+  }, [debouncedKeyword, filters.keyword]);
 
   const handleReset = () => {
     setTempFrom('');
@@ -91,7 +91,7 @@ const SearchBar = ({
   return (
     <>
       <div className="rounded text-sm flex flex-col">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {icon}
             <span className="font-medium">{label}</span>
@@ -101,14 +101,13 @@ const SearchBar = ({
             width="w-24"
             padding="py-1 md:py-0.5"
             reverse={theme === "normal"}
-            light={theme !== "normal"}
             className="self-end"
             onClick={() => {
               setIsOpen(prev => !prev);
               setShowDatePicker(false);
             }}
           >
-            {isOpen ? "닫기" : "필터"}
+            {isOpen ? "닫기" : "열기"}
           </Button>
         </div>
         <AnimatePresence>
@@ -186,7 +185,6 @@ const SearchBar = ({
                   theme="dark"
                   onClick={handleReset}
                   reverse={theme === "normal"}
-                  light={theme !== "normal"}
                   className="self-end"
                 >
                   리셋

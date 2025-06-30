@@ -43,7 +43,7 @@ const Card = ({
 		if (rehydrated && scrollTargetRef.current) {
 			setRefReady(true);
 		}
-	}, [rehydrated, scrollTargetRef.current]);
+	}, [rehydrated]);
 
 	const needScrollBar = useNeedScrollBar(scrollTargetRef, rehydrated && refReady);
 	const conditionStyle: React.CSSProperties = {};

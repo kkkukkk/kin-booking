@@ -63,7 +63,7 @@ const EventClient = () => {
 							},
 							status: {
 								value: status ?? '',
-								onChange: (value: EventStatus | '') => setStatus(value),
+								onChange: (value: string) => setStatus(value as EventStatus | ''),
 								options: statusOptions,
 							},
 						}}

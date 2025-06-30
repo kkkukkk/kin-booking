@@ -112,6 +112,14 @@
     animation: normalPulse 2s ease-in-out infinite;
 }
 
+.normalPending {
+    background: #fefce8; /* bg-yellow-50 */
+    color: #b45309;      /* text-yellow-700 */
+    border: 2px solid #fde68a; /* border-yellow-200 */
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(253, 230, 138, 0.3);
+}
+
 /* --- dark 테마 --- */
 .darkLight {
     background: linear-gradient(135deg, #212529, #343a40);
@@ -158,6 +166,14 @@
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
     font-weight: 600;
     animation: darkPulse 2s ease-in-out infinite;
+}
+
+.darkPending {
+    background: rgba(113, 63, 18, 0.2); /* bg-yellow-900/20 */
+    color: #fde68a; /* text-yellow-300 */
+    border: 2px solid #b45309; /* border-yellow-700 */
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(253, 230, 138, 0.3);
 }
 
 /* --- neon 테마 --- */

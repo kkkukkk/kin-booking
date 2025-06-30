@@ -161,7 +161,6 @@ const EventDetailClient = () => {
 					<EventAction
 						status={event.status}
 						isSoldOut={event.isSoldOut}
-						eventId={event.eventId}
 						theme={theme}
 						onReservationClick={() => router.push(`/events/${event.eventId}/reservation`)}
 					/>

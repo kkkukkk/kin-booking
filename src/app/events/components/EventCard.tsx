@@ -6,9 +6,17 @@ import { EventStatus, EventStatusKo } from "@/types/model/events";
 import { EventWithCurrentStatus } from "@/types/dto/events";
 import dayjs from "dayjs";
 import { LocationIcon } from "@/components/icon/LocationIcon";
-import { HomeIcon } from "@/components/icon/HomeIcon";
-import { BulbIcon } from "@/components/icon/BulbIcon";
 import ThemeDiv from "@/components/base/ThemeDiv";
+import { CalendarIcon } from "@/components/icon/CalendarIcon";
+import { TicketIcon } from "@/components/icon/TicketIcon";
+import { useEventMedia } from "@/hooks/api/useEventMedia";
+import { getStorageUrl } from "@/util/storage";
+import Skeleton from "@/components/base/Skeleton";
+import { ChairIcon } from "@/components/icon/ChairIcon";
+import clsx from "clsx";
+import { useAppSelector } from "@/redux/hooks";
+import { StatusBadge } from "@/components/base/StatusBadge";
+import Image from "next/image";
 
 interface EventCardProps {
 	event: EventWithCurrentStatus;
@@ -17,23 +25,35 @@ interface EventCardProps {
 
 const EventCard = ({ event, index }: EventCardProps) => {
 	const router = useRouter();
+	const { data: posterData, isLoading } = useEventMedia(event.eventId);
+	const theme = useAppSelector(state => state.theme.current);
 
 	const handleClick = () => {
 		router.push(`/events/${event.eventId}`);
 	};
 
-	const getStatusColor = (status: EventStatus) => {
+	const getStatusBadgeClass = (status: EventStatus, theme: string) => {
 		switch (status) {
-			case EventStatus.Pending:
-				return 'text-blue-500 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20';
 			case EventStatus.Ongoing:
-				return 'text-green-500 bg-green-50 dark:text-green-400 dark:bg-green-900/20';
+				return theme === "normal"
+					? "bg-green-100 text-green-800"
+					: "bg-green-900/30 text-green-300";
+			case EventStatus.Pending:
+				return theme === "normal"
+					? "bg-yellow-100 text-yellow-800"
+					: "bg-yellow-900/30 text-yellow-300";
 			case EventStatus.Completed:
-				return 'text-gray-500 bg-gray-50 dark:text-gray-400 dark:bg-gray-900/20';
+				return theme === "normal"
+					? "bg-blue-100 text-blue-800"
+					: "bg-blue-900/30 text-blue-300";
 			case EventStatus.SoldOut:
-				return 'text-red-500 bg-red-50 dark:text-red-400 dark:bg-red-900/20';
+				return theme === "normal"
+					? "bg-red-100 text-red-800"
+					: "bg-red-900/30 text-red-300";
 			default:
-				return 'text-gray-500 bg-gray-50 dark:text-gray-400 dark:bg-gray-900/20';
+				return theme === "normal"
+					? "bg-gray-100 text-gray-800"
+					: "bg-gray-900/30 text-gray-300";
 		}
 	};
 
@@ -49,20 +69,45 @@ const EventCard = ({ event, index }: EventCardProps) => {
 				isChildren 
 				className="p-4 rounded-lg border hover:border-2 hover:shadow-lg transition-all duration-300 h-full"
 			>
+				{/* 포스터 이미지 */}
+				<div className="relative w-full h-40 rounded-lg overflow-hidden mb-3">
+					{isLoading ? (
+						<Skeleton className="w-full h-full rounded-lg" />
+					) : posterData && posterData.length > 0 ? (
+						<Image
+							src={getStorageUrl(posterData[0].url)}
+							alt={`${event.eventName} 포스터`}
+							width={400}
+							height={160}
+							className="w-full h-full object-cover rounded-lg"
+							style={{ objectFit: 'cover' }}
+							{...(index < 2 ? { priority: true } : { loading: 'lazy' })}
+						/>
+					) : (
+						<div className={clsx(
+							"w-full h-full flex items-center justify-center border-2 border-dashed",
+							theme === "normal"
+								? "bg-gray-50 border-gray-200 text-gray-500"
+								: "bg-gray-800 border-gray-700 text-gray-400"
+						)}>
+							<div className="text-center">
+								<p className="text-lg font-medium mb-2">포스터 준비중</p>
+							</div>
+						</div>
+					)}
+				</div>
 				<div className="space-y-3">
 					{/* 공연 제목 */}
 					<div className="flex items-start justify-between">
 						<h3 className="text-lg font-semibold line-clamp-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
 							{event.eventName}
 						</h3>
-						<span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
-							{EventStatusKo[event.status]}
-						</span>
+						<StatusBadge status={event.status} theme={theme} className="ml-2" />
 					</div>
 
 					{/* 날짜 */}
 					<div className="flex items-center text-sm">
-						<HomeIcon />
+						<CalendarIcon />
 						<span className="ml-2">
 							{dayjs(event.eventDate).format('YYYY년 MM월 DD일 HH:mm')}
 						</span>
@@ -79,7 +124,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
 					{/* 좌석 정보 */}
 					<div className="flex items-center justify-between text-sm">
 						<div className="flex items-center">
-							<BulbIcon />
+							<ChairIcon />
 							<span className="ml-2">
 								{event.isSoldOut ? (
 									<span className="text-red-500 dark:text-red-400 font-medium">매진</span>
@@ -99,7 +144,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
 					{!event.isSoldOut && (
 						<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
 							<div 
-								className="bg-blue-500 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
+								className="bg-green-500 dark:bg-green-400 h-2 rounded-full transition-all duration-300"
 								style={{ 
 									width: `${((event.seatCapacity - event.remainingQuantity) / event.seatCapacity) * 100}%` 
 								}}

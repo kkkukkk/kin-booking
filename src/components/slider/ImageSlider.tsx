@@ -22,17 +22,19 @@ const ImageSlider = ({
 	const [current, setCurrent] = useState(0);
 	const [imageError, setImageError] = useState<number | null>(null);
 
-	// 빈 배열이나 유효하지 않은 이미지 처리
-	if (!images || images.length === 0) {
-		return <Skeleton width={width} height={height} className="rounded" />;
-	}
-
+	// useEffect는 항상 컴포넌트 최상위에서 호출
 	useEffect(() => {
+		if (!images || images.length === 0) return;
 		const id = setInterval(() => {
 			setCurrent((prev) => (prev + 1) % images.length);
 		}, interval);
 		return () => clearInterval(id);
-	}, [images.length, interval]);
+	}, [images.length, interval, images]);
+
+	// 빈 배열이나 유효하지 않은 이미지 처리
+	if (!images || images.length === 0) {
+		return <Skeleton width={width} height={height} className="rounded" />;
+	}
 
 	// 이미지 로드 에러 처리
 	const handleImageError = (index: number) => {

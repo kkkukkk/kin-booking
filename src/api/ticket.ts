@@ -19,7 +19,8 @@ export const getTicketsByReservationId = async (reservationId: string): Promise<
   const { data, error } = await supabase
     .from('ticket')
     .select('*')
-    .eq('reservation_id', reservationId);
+    .eq('reservation_id', reservationId)
+    .in('status', ['active', 'cancelled', 'used']);
 
   if (error) throw error;
   return data;
@@ -31,6 +32,7 @@ export const getTicketsByOwnerId = async (ownerId: string): Promise<Ticket[]> =>
     .from('ticket')
     .select('*')
     .eq('owner_id', ownerId)
+    .in('status', ['active', 'cancelled', 'used'])
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -42,7 +44,8 @@ export const getTicketsByEventId = async (eventId: string): Promise<Ticket[]> =>
   const { data, error } = await supabase
     .from('ticket')
     .select('*')
-    .eq('event_id', eventId);
+    .eq('event_id', eventId)
+    .in('status', ['active', 'cancelled', 'used']);
 
   if (error) throw error;
   return data;
@@ -73,12 +76,18 @@ export const updateTicket = async (ticketId: string, updateData: UpdateTicketReq
   return data;
 };
 
-// 티켓 양도 (이력 기록 포함)
+// 티켓 양도 (이력 기록 + 새 active 티켓 생성)
 export const transferTicket = async (ticketId: string, transferData: TransferTicketRequest): Promise<Ticket> => {
   // 1. 현재 티켓 정보 조회
   const currentTicket = await getTicketById(ticketId);
-  
-  // 2. 양도 이력 기록
+
+  // 2. 기존 티켓 상태를 transferred로 변경
+  await updateTicket(ticketId, {
+    status: 'transferred',
+    transferredAt: new Date().toISOString(),
+  });
+
+  // 3. 양도 이력 기록
   await createTransferHistory({
     ticketId: ticketId,
     fromUserId: currentTicket.ownerId,
@@ -86,27 +95,18 @@ export const transferTicket = async (ticketId: string, transferData: TransferTic
     reason: transferData.reason || '티켓 양도',
   });
 
-  // 3. 티켓 소유권 이전
-  const transferUpdate: UpdateTicketRequest = {
-    status: 'transferred',
-    transferredAt: new Date().toISOString(),
-  };
+  // 4. 새 active 티켓 생성 (ownerId: 양도받는 사람, eventId/reservationId 등 복사)
+  const newTicket = await createTicket({
+    reservationId: currentTicket.reservationId,
+    eventId: currentTicket.eventId,
+    ownerId: transferData.newOwnerId,
+    // 필요하다면 qrCode 등 추가 필드 복사
+  });
 
-  const { data, error } = await supabase
-    .from('ticket')
-    .update({
-      ...transferUpdate,
-      owner_id: transferData.newOwnerId,
-    })
-    .eq('id', ticketId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return newTicket;
 };
 
-// 여러 티켓 동시 양도
+// 여러 티켓 동시 양도 (각각 새 active 티켓 생성)
 export const transferMultipleTickets = async (
   ticketIds: string[], 
   transferData: TransferTicketRequest
@@ -114,7 +114,6 @@ export const transferMultipleTickets = async (
   const transferPromises = ticketIds.map(ticketId => 
     transferTicket(ticketId, transferData)
   );
-  
   return Promise.all(transferPromises);
 };
 

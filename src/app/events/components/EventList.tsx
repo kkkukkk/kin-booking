@@ -56,11 +56,11 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 			className={className}
 		>
 			{/* 헤더 */}
-			<div className="flex items-center justify-between mb-6">
+			<div className="flex items-center justify-between mb-4">
 				<div className="flex items-center space-x-2">
 					<BulbIcon />
 					<AnimatedText
-						fontSize="text-xl md:text-2xl"
+						fontSize="text-lg"
 						text={`공연 목록 (${data?.totalCount ?? 0}건)`}
 					/>
 				</div>
