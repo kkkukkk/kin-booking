@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState  } from 'react';
 import dayjs, {Dayjs} from "dayjs";
 import clsx from "clsx";
 import {useAppSelector} from "@/redux/hooks";
@@ -27,7 +27,6 @@ const generateCalendar = (date: Dayjs): Dayjs[][] => {
 	const calendar: Dayjs[][] = [];
 	let week: Dayjs[] = [];
 
-	// 이전 달 날짜 채우기
 	for (let i = startDay - 1; i >= 0; i--) {
 		week.push(prevMonth.date(daysInPrevMonth - i));
 	}
@@ -41,7 +40,6 @@ const generateCalendar = (date: Dayjs): Dayjs[][] => {
 		}
 	}
 
-	// 다음 달 날짜 채우기 (빈칸 채우기)
 	let nextMonthDay = 1;
 	while (week.length < 7) {
 		const nextMonth = date.add(1, 'month');
@@ -51,8 +49,6 @@ const generateCalendar = (date: Dayjs): Dayjs[][] => {
 
 	return calendar;
 };
-
-const DRAG_THRESHOLD = 120; // ms, 이 시간 이상 누르면 드래그로 간주
 
 const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 	const theme = useAppSelector(state => state.theme.current);
@@ -114,10 +110,6 @@ const DatePicker = ({ onChange, initialFrom, initialTo}: DatePickerProps) => {
 		inRange: boolean,
 		isOtherMonth: boolean,
 	): string => {
-		// detail 대기 상태 색상과 맞추기 위해 yellow 계열 스타일 추가
-		// 대기 상태는 선택된 날짜 또는 inRange일 때로 간주
-		if ((isStart || isEnd || inRange) && theme === 'normal') return styles.normalPending;
-		if ((isStart || isEnd || inRange) && theme === 'dark') return styles.darkPending;
 		if (isToday(day)) {
 			if (theme === 'normal') return styles.normalToday;
 			if (theme === 'dark') return styles.darkToday;
