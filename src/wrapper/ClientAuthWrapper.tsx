@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSession } from '@/hooks/useSession';
 import useToast from '@/hooks/useToast';
-import { useSpinner } from '@/providers/SpinnerProvider'; // 경로는 맞게 수정
+import { useSpinner } from '@/providers/SpinnerProvider';
 
 const publicPaths = ['/login', '/register', '/auth/find', '/auth/callback', '/auth/reset-password'];
 
