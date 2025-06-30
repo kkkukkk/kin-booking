@@ -18,6 +18,7 @@ import ProgressBar from "@/components/base/ProgressBar";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { ReservationStep } from "@/types/ui/reservationStep";
+import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
 
 
 const EventReservationClient = () => {
@@ -146,6 +147,9 @@ const EventReservationClient = () => {
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
 				>
+					<span className="mr-1">
+						<ArrowLeftIcon />
+					</span>
 					{step === "confirm" ? "이전" : "뒤로가기"}
 				</Button>
 			</div>

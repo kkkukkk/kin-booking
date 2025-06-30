@@ -11,6 +11,24 @@
   --neon-green-medium: rgba(119, 255, 153, .5);  /* 중간빛 */
   --neon-green-light: rgba(119, 255, 153, .3);   /* 연한빛 */
   --neon-green-faint: rgba(119, 255, 153, .2);   /* 아주 연한빛 */
+  
+  /* 새로운 네온 색상들 */
+  --neon-cyan: #00ff88;
+  --neon-magenta: #ff0080;
+  --neon-blue: #0080ff;
+  --neon-yellow: #ffff00;
+  --neon-purple: #8000ff;
+  
+  /* 네온 그라데이션 */
+  --neon-cyan-gradient: linear-gradient(135deg, #00ff88, #00cc6a);
+  --neon-magenta-gradient: linear-gradient(135deg, #ff0080, #ff6b9d);
+  --neon-blue-gradient: linear-gradient(135deg, #0080ff, #0066cc);
+  
+  /* 네온 그림자 */
+  --neon-cyan-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+  --neon-magenta-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
+  --neon-blue-shadow: 0 0 20px rgba(0, 128, 255, 0.6);
+  
   --black_10: rgba(0, 0, 0, .1);
   --black_30: rgba(0, 0, 0, .3);
   --black_50: rgba(0, 0, 0, .5);
@@ -50,12 +68,14 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
+  overflow-y: hidden; /* 스크롤바 숨김 */
 }
 
 html, #__next {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-y: hidden; /* 스크롤바 숨김 */
 }
 
 .scrollbar-none {

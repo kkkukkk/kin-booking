@@ -21,6 +21,7 @@ import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
+import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
 
 const RegisterClient = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
@@ -302,6 +303,9 @@ const RegisterClient = () => {
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
 				>
+					<span className="mr-1">
+						<ArrowLeftIcon />
+					</span>
 					{step === "consent" ? "뒤로가기" : "이전"}
 				</Button>
 			</div>
