@@ -48,7 +48,6 @@ const ImageSlider = ({
 
 	return (
 		<div className={`relative overflow-hidden ${width} ${height} rounded`}>
-			{/* 현재 이미지 */}
 			<Image
 				key={`current-${current}`}
 				src={currentImage}
@@ -59,7 +58,6 @@ const ImageSlider = ({
 				priority={priority}
 			/>
 			
-			{/* 다음 이미지 (preload) */}
 			{nextImage && (
 				<Image
 					key={`next-${nextIndex}`}
@@ -71,7 +69,6 @@ const ImageSlider = ({
 				/>
 			)}
 
-			{/* 에러 상태 표시 */}
 			{imageError !== null && (
 				<Skeleton width="w-full" height="h-full" className="absolute inset-0" />
 			)}

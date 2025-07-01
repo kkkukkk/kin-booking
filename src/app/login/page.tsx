@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { useLogin } from "@/hooks/api/useAuth";
 import { useLoginImages } from "@/hooks/api/useImages";
-import { useSpinner } from "@/providers/SpinnerProvider";
+import { useSpinner } from "@/hooks/useSpinner";
 import { useRouter } from "next/navigation";
 import Input from "@/components/base/Input";
 import Card from "@/components/Card";
@@ -29,6 +29,7 @@ const LoginPage = () => {
 	const { showSpinner, hideSpinner } = useSpinner();
 	const { data: images = [], isPending: imagePending } = useLoginImages();
 	const { session, loading } = useSession();
+	const prevLoginPending = useRef(false);
 
 	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
@@ -71,8 +72,13 @@ const LoginPage = () => {
 	}, [loginError, showToast]);
 
 	useEffect(() => {
-		if (loginPending) showSpinner();
-		else hideSpinner();
+		if (!prevLoginPending.current && loginPending) {
+			showSpinner();
+		}
+		if (prevLoginPending.current && !loginPending) {
+			hideSpinner();
+		}
+		prevLoginPending.current = loginPending;
 	}, [loginPending, showSpinner, hideSpinner]);
 
 	useEffect(() => {

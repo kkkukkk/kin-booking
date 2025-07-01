@@ -66,7 +66,6 @@ const ConfirmStep = ({
 				transition={{delay: 0.3, duration: 0.6}}
 				className="mt-6 space-y-6"
 			>
-				{/* 공연 정보 */}
 				<ThemeDiv isChildren className="rounded-lg p-4 md:p-6">
 					<h3 className="text-lg md:text-xl font-semibold mb-4">
 						공연 정보
@@ -89,7 +88,6 @@ const ConfirmStep = ({
 					</div>
 				</ThemeDiv>
 
-				{/* 예매 정보 입력 */}
 				<ThemeDiv isChildren className="rounded-lg p-4 md:p-6">
 					<h3 className="text-lg md:text-xl font-semibold mb-4">
 						예매 정보

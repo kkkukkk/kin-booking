@@ -3,15 +3,15 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEventById } from "@/hooks/api/useEvents";
 import { useEventMediaByType } from "@/hooks/api/useEventMedia";
-import { useSpinner } from "@/providers/SpinnerProvider";
-import { useEffect } from "react";
+import { useSpinner } from "@/hooks/useSpinner";
+import { useEffect, useRef } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import Button from "@/components/base/Button";
 import { motion } from "framer-motion";
 import { fadeSlideLeft, bottomUp } from "@/types/ui/motionVariants";
 import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
-import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
+import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 import { BulbIcon } from "@/components/icon/BulbIcon";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import EventHeader from "./EventHeader";
@@ -32,9 +32,16 @@ const EventDetailClient = () => {
 	const { data: posterData } = useEventMediaByType(eventId, 'image');
 	const { showSpinner, hideSpinner } = useSpinner();
 
+	const prevIsLoading = useRef(false);
+
 	useEffect(() => {
-		if (isLoading) showSpinner();
-		else hideSpinner();
+		if (!prevIsLoading.current && isLoading) {
+			showSpinner();
+		}
+		if (prevIsLoading.current && !isLoading) {
+			hideSpinner();
+		}
+		prevIsLoading.current = isLoading;
 	}, [isLoading, showSpinner, hideSpinner]);
 
 	useEffect(() => {
@@ -103,6 +110,7 @@ const EventDetailClient = () => {
 								eventName={event.eventName}
 								theme={theme}
 								isLoading={isLoading}
+								showPlaceholderText
 							/>
 						</div>
 					</div>

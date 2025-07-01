@@ -21,6 +21,7 @@ export const useEventsWithCurrentStatus = (params?: PaginationParams & FetchEven
 		queryKey: ['events_with_current_status', params],
 		queryFn: () => fetchEventsWithCurrentStatus(params),
 		staleTime: 1000 * 60 * 10,
+		enabled: !!params
 	});
 }
 

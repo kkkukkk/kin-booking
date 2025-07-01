@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,7 +8,7 @@ import { bottomUp, bottomUpDelay } from "@/types/ui/motionVariants";
 import { RegisterStep } from "@/types/ui/registerStep";
 import { useAlert } from "@/providers/AlertProvider";
 import { useRegister } from "@/hooks/api/useAuth";
-import { useSpinner } from "@/providers/SpinnerProvider";
+import { useSpinner } from "@/hooks/useSpinner";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { getErrorMessage } from "@/components/utils/error";
@@ -21,7 +21,7 @@ import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
-import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
+import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 
 const RegisterClient = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
@@ -287,10 +287,16 @@ const RegisterClient = () => {
 		}
 	};
 
-	// 로딩 상태 처리
+	const prevIsPending = useRef(false);
+
 	useEffect(() => {
-		if (isPending) showSpinner();
-		else hideSpinner();
+		if (!prevIsPending.current && isPending) {
+			showSpinner();
+		}
+		if (prevIsPending.current && !isPending) {
+			hideSpinner();
+		}
+		prevIsPending.current = isPending;
 	}, [isPending, showSpinner, hideSpinner]);
 
 	return (

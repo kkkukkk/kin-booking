@@ -13,8 +13,6 @@ export const fetchEventMedia = async (eventId: string): Promise<EventMedia[]> =>
 
 	if (error) throw error;
 
-    console.log(data);
-
 	return toCamelCaseKeys<EventMedia[]>(data ?? []);
 };
 

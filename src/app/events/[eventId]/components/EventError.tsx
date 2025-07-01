@@ -21,7 +21,6 @@ const EventError = ({ theme, onRetry, onGoToList }: EventErrorProps) => {
 					transition={{ duration: 0.5 }}
 					className="space-y-6"
 				>
-					{/* 에러 아이콘 */}
 					<div className="flex justify-center">
 						<div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
 							<div className="transform scale-180 text-red-400">
@@ -30,7 +29,6 @@ const EventError = ({ theme, onRetry, onGoToList }: EventErrorProps) => {
 						</div>
 					</div>
 
-					{/* 에러 메시지 */}
 					<div className="space-y-3">
 						<AnimatedText
 							fontSize="text-xl md:text-2xl"
@@ -44,7 +42,6 @@ const EventError = ({ theme, onRetry, onGoToList }: EventErrorProps) => {
 						/>
 					</div>
 
-					{/* 액션 버튼들 */}
 					<div className="space-y-3 pt-4">
 						<Button
 							theme="dark"

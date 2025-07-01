@@ -28,10 +28,9 @@ const EventClient = () => {
 			variants={fadeSlideLeft}
 			initial="hidden"
 			animate="visible"
-			className="space-y-6"
+			className="space-y-4 md:space-y-6"
 		>
-			{/* 헤더 */}
-			<div className="text-center mb-4">
+			<div className="text-center mb-3 md:mb-4">
 				<AnimatedText
 					fontSize="text-base md:text-lg"
 					text="다양한 공연을 찾아보세요"
@@ -39,13 +38,12 @@ const EventClient = () => {
 				/>
 			</div>
 
-			{/* 검색 및 필터 */}
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.2 }}
 			>
-				<ThemeDiv isChildren className="p-4 rounded-lg border">
+				<ThemeDiv isChildren className="p-3 md:p-4 rounded-lg border">
 					<SearchBar
 						filters={{
 							keyword: {
@@ -71,7 +69,6 @@ const EventClient = () => {
 				</ThemeDiv>
 			</motion.div>
 
-			{/* 공연 목록 */}
 			<EventList
 				keyword={keyword}
 				status={status === '' ? undefined : status}

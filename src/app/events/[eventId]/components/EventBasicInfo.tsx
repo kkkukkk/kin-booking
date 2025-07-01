@@ -14,7 +14,6 @@ interface EventBasicInfoProps {
 const EventBasicInfo = ({ eventDate, location, ticketPrice, theme }: EventBasicInfoProps) => {
 	return (
 		<div className="space-y-3">
-			{/* 날짜 */}
 			<div>
 				<p className="text-sm opacity-70">공연 날짜</p>
 				<p className="text-sm font-medium">
@@ -22,7 +21,6 @@ const EventBasicInfo = ({ eventDate, location, ticketPrice, theme }: EventBasicI
 				</p>
 			</div>
 
-			{/* 장소 */}
 			<div>
 				<p className="text-sm opacity-70">장소</p>
 				<div className="flex items-center space-x-2">
@@ -44,7 +42,6 @@ const EventBasicInfo = ({ eventDate, location, ticketPrice, theme }: EventBasicI
 				</div>
 			</div>
 
-			{/* 티켓 가격 */}
 			<div>
 				<p className="text-sm opacity-70">티켓 가격</p>
 				<p className="text-sm font-medium">

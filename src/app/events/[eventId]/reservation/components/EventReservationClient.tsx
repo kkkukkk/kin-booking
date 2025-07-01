@@ -2,8 +2,8 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEventById } from "@/hooks/api/useEvents";
-import { useSpinner } from "@/providers/SpinnerProvider";
-import React, { useEffect, useState } from "react";
+import { useSpinner } from "@/hooks/useSpinner";
+import React, { useEffect, useState, useRef } from "react";
 import { useCreateReservation } from "@/hooks/api/useReservations";
 import { useSession } from "@/hooks/useSession";
 import useToast from "@/hooks/useToast";
@@ -18,7 +18,7 @@ import ProgressBar from "@/components/base/ProgressBar";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { ReservationStep } from "@/types/ui/reservationStep";
-import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
+import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 
 
 const EventReservationClient = () => {
@@ -38,6 +38,7 @@ const EventReservationClient = () => {
 	const [ticketHolder, setTicketHolder] = useState('');
 	const [seatChecked, setSeatChecked] = useState(false);
 	const [cancelChecked, setCancelChecked] = useState(false);
+	const prevLoadingOrPending = useRef(false);
 
 	// 세션이 로드되면 ticketHolder 기본값 설정
 	useEffect(() => {
@@ -46,13 +47,17 @@ const EventReservationClient = () => {
 		}
 	}, [session, ticketHolder]);
 
-	// 로딩 상태 처리
 	useEffect(() => {
-		if (isLoading || isPending) showSpinner();
-		else hideSpinner();
+		const loadingOrPending = isLoading || isPending;
+		if (!prevLoadingOrPending.current && loadingOrPending) {
+			showSpinner();
+		}
+		if (prevLoadingOrPending.current && !loadingOrPending) {
+			hideSpinner();
+		}
+		prevLoadingOrPending.current = loadingOrPending;
 	}, [isLoading, isPending, showSpinner, hideSpinner]);
 
-	// 에러 처리
 	if (error) throw error;
 	if (!data) return null;
 
