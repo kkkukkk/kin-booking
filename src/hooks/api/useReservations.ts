@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Reservation } from "@/types/model/reservation";
 import { CreateReservationDto } from "@/types/dto/reservation";
-import { createReservation } from "@/api/reservation";
+import { createReservation, fetchReservation } from "@/api/reservation";
 import { approveReservation, rejectReservation } from "@/api/reservation";
 
 export const useCreateReservation = () => {
@@ -43,5 +43,14 @@ export const useRejectReservation = () => {
 			queryClient.invalidateQueries({queryKey: ['reservations']});
 			queryClient.invalidateQueries({queryKey: ['tickets']});
 		},
+	});
+};
+
+// 사용자별 예매 내역 조회
+export const useReservationsByUserId = (userId: string) => {
+	return useQuery({
+		queryKey: ['reservations', 'user', userId],
+		queryFn: () => fetchReservation({ userId }),
+		enabled: !!userId,
 	});
 };

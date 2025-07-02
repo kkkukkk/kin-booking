@@ -91,7 +91,7 @@ const EventReservationClient = () => {
 		}, {
 			onSuccess: () => {
 				showToast({ message: '예매가 완료됐어요!', iconType: 'success', autoCloseTime: 3000 });
-				router.push('/my/reservations');
+				router.push('/my');
 			},
 			onError: (err) => {
 				showToast({ message: err.message || '예매에 실패했어요.', iconType: 'error', autoCloseTime: 3000 });

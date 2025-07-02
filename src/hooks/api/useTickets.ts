@@ -6,12 +6,14 @@ import {
   getTicketsByEventId,
   getTicketById,
   updateTicket,
-  transferTicket,
-  transferMultipleTickets,
   deleteTicket,
   deleteTicketsByReservationId,
+  cancelAllTicketsByEvent,
+  requestCancelTicket,
 } from '@/api/ticket';
-import { CreateTicketRequest, UpdateTicketRequest, TransferTicketRequest } from '@/types/model/ticket';
+import { createTransferHistory } from '@/api/ticketTransferHistory';
+import { CreateTicketRequest, UpdateTicketRequest, TransferTicketRequest, Ticket, TicketStatus } from '@/types/model/ticket';
+import { TicketGroupDto } from '@/types/dto/ticket';
 
 // 예약 ID로 티켓 조회
 export const useTicketsByReservationId = (reservationId: string) => {
@@ -27,6 +29,45 @@ export const useTicketsByOwnerId = (ownerId: string) => {
   return useQuery({
     queryKey: ['tickets', 'owner', ownerId],
     queryFn: () => getTicketsByOwnerId(ownerId),
+    enabled: !!ownerId,
+  });
+};
+
+// 사용자 ID로 티켓 그룹 조회 (프론트에서 그룹화)
+export const useTicketGroupsByOwnerId = (ownerId: string) => {
+  return useQuery({
+    queryKey: ['ticketGroups', 'owner', ownerId],
+    queryFn: async () => {
+      const tickets = await getTicketsByOwnerId(ownerId);
+      // 그룹화 및 통계 계산
+      const grouped = tickets.reduce((acc: { [key: string]: TicketGroupDto & { eventId: string; tickets: Ticket[] } }, ticket: Ticket) => {
+        const eventId = ticket.eventId;
+        if (!acc[eventId]) {
+          acc[eventId] = {
+            eventId,
+            eventName: `공연 ${eventId}`,
+            totalCount: 0,
+            activeCount: 0,
+            usedCount: 0,
+            cancelledCount: 0,
+            latestCreatedAt: ticket.createdAt,
+            tickets: [],
+          };
+        }
+        acc[eventId].tickets.push(ticket);
+        acc[eventId].totalCount++;
+        if (ticket.status === TicketStatus.Active) acc[eventId].activeCount++;
+        else if (ticket.status === TicketStatus.Used) acc[eventId].usedCount++;
+        else if (ticket.status === TicketStatus.Cancelled) acc[eventId].cancelledCount++;
+        else if (ticket.status === TicketStatus.Transferred) acc[eventId].cancelledCount++;
+        else if (ticket.status === TicketStatus.CancelRequested) acc[eventId].cancelledCount++;
+        if (new Date(ticket.createdAt) > new Date(acc[eventId].latestCreatedAt)) {
+          acc[eventId].latestCreatedAt = ticket.createdAt;
+        }
+        return acc;
+      }, {});
+      return Object.values(grouped) as (TicketGroupDto & { eventId: string; tickets: Ticket[] })[];
+    },
     enabled: !!ownerId,
   });
 };
@@ -81,15 +122,54 @@ export const useUpdateTicket = () => {
   });
 };
 
-// 티켓 양도
+// 티켓 양도 (비즈니스 로직)
+export const transferTicket = async (ticketId: string, transferData: TransferTicketRequest): Promise<Ticket> => {
+  // 1. 현재 티켓 정보 조회
+  const currentTicket = await getTicketById(ticketId);
+
+  // 2. 기존 티켓 상태를 transferred로 변경
+  await updateTicket(ticketId, {
+    status: TicketStatus.Transferred,
+    transferredAt: new Date().toISOString(),
+  });
+
+  // 3. 양도 이력 기록
+  await createTransferHistory({
+    ticketId: ticketId,
+    fromUserId: currentTicket.ownerId,
+    toUserId: transferData.newOwnerId,
+    reason: transferData.reason || '티켓 양도',
+  });
+
+  // 4. 새 active 티켓 생성 (ownerId: 양도받는 사람, eventId/reservationId 등 복사)
+  const newTicket = await createTicket({
+    reservationId: currentTicket.reservationId,
+    eventId: currentTicket.eventId,
+    ownerId: transferData.newOwnerId,
+    // 필요하다면 qrCode 등 추가 필드 복사
+  });
+
+  return newTicket;
+};
+
+// 여러 티켓 동시 양도 (각각 새 active 티켓 생성)
+export const transferMultipleTickets = async (
+  ticketIds: string[],
+  transferData: TransferTicketRequest
+): Promise<Ticket[]> => {
+  const transferPromises = ticketIds.map(ticketId =>
+    transferTicket(ticketId, transferData)
+  );
+  return Promise.all(transferPromises);
+};
+
+// useTransferTicket, useTransferMultipleTickets에서 위 로직을 직접 사용하도록 수정
 export const useTransferTicket = () => {
   const queryClient = useQueryClient();
-  
   return useMutation({
     mutationFn: ({ ticketId, transferData }: { ticketId: string; transferData: TransferTicketRequest }) =>
       transferTicket(ticketId, transferData),
     onSuccess: (data) => {
-      // 관련 쿼리들 무효화
       queryClient.invalidateQueries({ queryKey: ['ticket', data.id] });
       queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', data.reservationId] });
       queryClient.invalidateQueries({ queryKey: ['tickets', 'owner', data.ownerId] });
@@ -98,15 +178,12 @@ export const useTransferTicket = () => {
   });
 };
 
-// 여러 티켓 동시 양도
 export const useTransferMultipleTickets = () => {
   const queryClient = useQueryClient();
-  
   return useMutation({
     mutationFn: ({ ticketIds, transferData }: { ticketIds: string[]; transferData: TransferTicketRequest }) =>
       transferMultipleTickets(ticketIds, transferData),
     onSuccess: (data) => {
-      // 관련 쿼리들 무효화
       data.forEach(ticket => {
         queryClient.invalidateQueries({ queryKey: ['ticket', ticket.id] });
         queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', ticket.reservationId] });
@@ -140,6 +217,46 @@ export const useDeleteTicketsByReservationId = () => {
     onSuccess: (_, reservationId) => {
       // 관련 쿼리들 무효화
       queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', reservationId] });
+    },
+  });
+};
+
+// 공연별 전체 티켓 취소 훅 (비즈니스 로직 포함)
+export const useCancelAllTicketsByEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { eventId: string; userId: string; tickets?: any[] }>({
+    mutationFn: async ({ eventId, userId, tickets }) => {
+      // 프론트에서 티켓 리스트를 받아서 직접 체크(권한/상태 등)
+      if (tickets && tickets.length > 0) {
+        const activeTickets = tickets.filter(t => t.ownerId === userId && t.status !== TicketStatus.Cancelled);
+        if (activeTickets.length === 0) throw new Error('이미 모든 티켓이 취소되었습니다.');
+      }
+      const result = await cancelAllTicketsByEvent(eventId, userId);
+      if (!result.updated) throw new Error('취소할 티켓이 없습니다.');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
+    },
+  });
+};
+
+// 티켓 취소 신청 훅 (비즈니스 로직 포함)
+export const useRequestCancelTicket = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { ticketId: string; userId: string; ticket?: any }>({
+    mutationFn: async ({ ticketId, userId, ticket }) => {
+      // 프론트에서 티켓 정보로 권한/상태 체크
+      if (ticket) {
+        if (ticket.ownerId !== userId) throw new Error('본인 소유 티켓만 취소 신청할 수 있습니다.');
+        if (ticket.status !== TicketStatus.Active) throw new Error('취소 신청은 사용 가능한 티켓만 가능합니다.');
+      }
+      const result = await requestCancelTicket(ticketId, userId);
+      if (!result.updated) throw new Error('취소 신청에 실패했습니다.');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
     },
   });
 }; 

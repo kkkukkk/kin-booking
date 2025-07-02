@@ -61,9 +61,10 @@ export const updateUser = async (
 	userId: string,
 	update: UpdateUserDto
 ): Promise<User> => {
+	const updateSnake = toSnakeCaseKeys<UpdateUserDto>(update);
 	const { data, error } = await supabase
 	.from('users')
-	.update(update)
+	.update(updateSnake)
 	.eq('id', userId)
 	.single();
 
@@ -88,3 +89,40 @@ export const softDeleteUser = async (userId: string): Promise<User> => {
 	if (error) throw error;
 	return toCamelCaseKeys<User>(data);
 }
+
+// 특정 유저 조회 api
+export const fetchUserById = async (userId: string): Promise<User | null> => {
+	console.log("called");
+	const { data, error } = await supabase
+		.from('users')
+		.select(`
+			id, 
+			name, 
+			email, 
+			phone_number, 
+			register_date, 
+			marketing_consent, 
+			status,
+			user_roles (
+				role_id,
+				roles (
+					role_code,
+					role_name
+				)
+			)
+		`)
+		.eq('id', userId)
+		.single();
+
+	if (error) {
+		// 사용자가 존재하지 않는 경우
+		if (error.code === 'PGRST116') {
+			return null;
+		}
+		throw error;
+	}
+
+	console.log(data);
+	
+	return toCamelCaseKeys<User>(data);
+};
