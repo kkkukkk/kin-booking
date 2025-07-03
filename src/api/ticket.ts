@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import { Ticket, CreateTicketRequest, UpdateTicketRequest } from '@/types/model/ticket';
+import { TicketWithEventDto } from '@/types/dto/ticket';
+import { toCamelCaseKeys } from '@/util/case/case';
 
 // 티켓 생성
 export const createTicket = async (ticketData: CreateTicketRequest): Promise<Ticket> => {
@@ -129,4 +131,21 @@ export const requestCancelTicket = async (ticketId: string, userId: string): Pro
     .eq('owner_id', userId);
   if (error) throw error;
   return { updated: true };
+};
+
+export const getTicketsWithEventByOwnerId = async (ownerId: string): Promise<TicketWithEventDto[]> => {
+  const { data, error } = await supabase
+    .from('ticket')
+    .select(`*, event:event_id(
+      event_name,
+      event_date,
+      ticket_price
+    )`)
+    .eq('owner_id', ownerId)
+    .in('status', ['active', 'cancelled', 'used', 'transferred'])
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return toCamelCaseKeys<TicketWithEventDto[]>(data ?? []);
 }; 

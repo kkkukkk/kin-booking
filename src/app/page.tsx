@@ -28,6 +28,11 @@ const Home = ()=> {
                             theme={"dark"}
                             padding={'px-2 py-1'}
                         >{"공연 목록"}</Button>
+                        <Button
+                            onClick={() => router.push('/my')}
+                            theme={"dark"}
+                            padding={'px-2 py-1'}
+                        >{"마이페이지"}</Button>
                     </>
 
                 }

@@ -1,24 +1,24 @@
 'use client'
 
 import React from 'react';
-import { useAppSelector } from '@/redux/hooks';
-import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { useUpdateUser } from '@/hooks/api/useUsers';
 import useToast from '@/hooks/useToast';
 import { useAlert } from '@/providers/AlertProvider';
 import Spinner from '@/components/spinner/Spinner';
 import { formatPhoneNumber } from '@/util/phoneNumber';
+import { useRouter } from 'next/navigation';
+import Button from '@/components/base/Button';
 
 interface ProfileTabProps {
 	user: any;
 }
 
 const ProfileTab = ({ user }: ProfileTabProps) => {
-	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { mutate: updateUser, isPending } = useUpdateUser();
 	const { showToast } = useToast();
 	const { showAlert } = useAlert();
+	const router = useRouter();
 
 	if (!user) {
 		return (
@@ -37,10 +37,10 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 	const handleToggle = async () => {
 		const confirmed = await showAlert({
 			type: 'confirm',
-			title: '마케팅 수신 변경',
+			title: '공연정보 수신 변경',
 			message: user.marketingConsent
-				? '마케팅 정보 수신을 거부하시겠습니까?'
-				: '마케팅 정보 수신에 동의하시겠습니까?',
+				? '공연정보 수신을 거부하시겠습니까?'
+				: '공연정보 수신에 동의하시겠습니까?',
 		});
 		if (!confirmed) return;
 
@@ -57,41 +57,62 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 		);
 	};
 
+	const handlePasswordChange = async () => {
+		const confirmed = await showAlert({
+			type: 'confirm',
+			title: '비밀번호 변경',
+			message: '비밀번호를 변경하시겠습니까?\n자동으로 로그아웃 됩니다.',
+		});
+		if (confirmed) {
+			router.push('/auth/reset-password?source=password');
+		}
+	};
+
 	return (
-		<div className="space-y-6">
-			<ThemeDiv className="p-6 rounded-lg" isChildren>
+		<ThemeDiv className="p-6 rounded-lg" isChildren>
+			<div className={"flex justify-between w-full"}>
 				<h3 className="text-xl font-semibold mb-4">프로필 정보</h3>
-				<div className="space-y-4">
-					<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-						<span className="font-medium opacity-70">이름</span>
-						<span>{user.name}</span>
-					</div>
-					<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-						<span className="font-medium opacity-70">이메일</span>
-						<span>{user.email}</span>
-					</div>
-					<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-						<span className="font-medium opacity-70">전화번호</span>
-						<span>{formatPhoneNumber(user.phoneNumber)}</span>
-					</div>
-					<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-						<span className="font-medium opacity-70">가입일</span>
-						<span>{new Date(user.registerDate).toLocaleDateString('ko-KR')}</span>
-					</div>
-					<div className="flex justify-between items-center py-2">
-						<span className="font-medium opacity-70">마케팅 수신</span>
-						<button
-							className={`px-3 py-1 rounded transition-colors duration-200 flex items-center gap-2 ${user.marketingConsent ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700'} ${isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
-							onClick={handleToggle}
-							disabled={isPending}
-						>
-							{isPending && <Spinner size={16} color={user.marketingConsent ? 'white' : 'gray'} />}
-							{user.marketingConsent ? '동의' : '거부'}
-						</button>
-					</div>
+				<div>
+					<Button
+						theme="dark"
+						padding="px-2 py-1"
+						className="text-sm"
+						onClick={handlePasswordChange}
+					>
+						비밀번호 변경
+					</Button>
 				</div>
-			</ThemeDiv>
-		</div>
+			</div>
+			<div className="space-y-4">
+				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+					<span className="font-medium opacity-70">이름</span>
+					<span>{user.name}</span>
+				</div>
+				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+					<span className="font-medium opacity-70">이메일</span>
+					<span>{user.email}</span>
+				</div>
+				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+					<span className="font-medium opacity-70">핸드폰 번호</span>
+					<span>{formatPhoneNumber(user.phoneNumber)}</span>
+				</div>
+				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+					<span className="font-medium opacity-70">가입일</span>
+					<span>{new Date(user.registerDate).toLocaleDateString('ko-KR')}</span>
+				</div>
+				<div className="flex justify-between items-center py-2">
+					<span className="font-medium opacity-70">공연정보 수신</span>
+					<button
+						className={`px-3 py-1 rounded transition-colors duration-200 flex items-center gap-2 ${user.marketingConsent ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700'} ${isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
+						onClick={handleToggle}
+						disabled={isPending}
+					>
+						{isPending && <Spinner size={16} color={user.marketingConsent ? 'white' : 'gray'} />}
+						{user.marketingConsent ? '동의' : '거부'}
+					</button>
+				</div>
+			</div>
+		</ThemeDiv>
 	);
 };
 

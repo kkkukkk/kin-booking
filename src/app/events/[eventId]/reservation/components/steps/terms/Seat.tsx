@@ -20,7 +20,7 @@ const ReservationNotice = ({ onClose, onConfirm }: NoticeProps) => {
 			<article className="mb-4">
 				<h3 className="font-semibold text-base md:text-xl">2. 예매 순서</h3>
 				<p className="text-sm md:text-lg">
-					예매 신청 후, 계좌 입금이 확인되면 관리자가 예매를 확정합니다. 입금 순서에 따라 좌석이 배정되며, 입금 지연 시 예매가 취소될 수 있습니다.
+					예매 신청 후, 계좌 입금이 확인되면 관리자가 예매를 확정합니다. 입금 확인 후 티켓이 배정되며, 입금 지연 시 예매가 취소될 수 있습니다.
 				</p>
 			</article>
 

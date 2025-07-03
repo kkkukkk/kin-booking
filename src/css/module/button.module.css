@@ -16,15 +16,14 @@
 .theme-neon {
     color: var(--neon-green);
     background-color: var(--dark-back);
-    border: 1px solid rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.3);
 }
 
 /* hover 효과 */
 .theme-normal:hover {
     box-shadow:
-        0 0 4px var(--black_70),
-        0 0 8px var(--black_50),
-        0 0 12px var(--black_30),
+        0 0 4px var(--black_50),
+        0 0 8px var(--black_30),
         0 0 20px var(--black_10);
 }
 .theme-normal.reverse:hover {
@@ -43,9 +42,8 @@
 }
 .theme-dark.reverse:hover {
     box-shadow:
-        0 0 4px var(--black_70),
-        0 0 8px var(--black_50),
-        0 0 12px var(--black_30),
+        0 0 4px var(--black_50),
+        0 0 8px var(--black_30),
         0 0 20px var(--black_10);
 }
 .theme-neon:hover {
@@ -59,9 +57,8 @@
 /* on 효과 */
 .theme-normal.on {
     box-shadow:
-        0 0 4px var(--black_70),
-        0 0 8px var(--black_50),
-        0 0 12px var(--black_30),
+        0 0 4px var(--black_50),
+        0 0 8px var(--black_30),
         0 0 20px var(--black_10);
 }
 .theme-normal.on.reverse {
@@ -87,9 +84,8 @@
 }
 .theme-dark.on.reverse {
     box-shadow:
-        0 0 4px var(--black_70),
-        0 0 8px var(--black_50),
-        0 0 12px var(--black_30),
+        0 0 4px var(--black_50),
+        0 0 8px var(--black_30),
         0 0 20px var(--black_10);
 }
 

@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { Theme } from "@/types/ui/theme";
 import { ThumbUpIcon } from "@/components/icon/ThumbUpIcon";
-import { isValidEmail } from "@/components/utils/validators";
+import { isValidEmail } from "@/util/validators";
 import Input from "@/components/base/Input";
 import clsx from "clsx";
 import Button from "@/components/base/Button";

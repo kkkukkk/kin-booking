@@ -5,7 +5,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
-import { isValidPassword } from "@/components/utils/validators";
+import { isValidPassword } from "@/util/validators";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
 import Card from "@/components/Card";

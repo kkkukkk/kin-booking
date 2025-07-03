@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { Theme } from "@/types/ui/theme";
-import { isValidPassword } from "@/components/utils/validators";
+import { isValidPassword } from "@/util/validators";
 import clsx from "clsx";
 import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
 import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";

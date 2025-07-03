@@ -21,9 +21,10 @@ export interface Ticket {
   ownerId: string;
   status: TicketStatus;
   transferredAt: string | null;
-  qrCode: string | null;
   createdAt: string;
   updatedAt: string;
+  color: string;
+  isRare: boolean;
 }
 
 export interface CreateTicketRequest {
@@ -35,7 +36,6 @@ export interface CreateTicketRequest {
 export interface UpdateTicketRequest {
   status?: TicketStatus;
   transferredAt?: string;
-  qrCode?: string;
 }
 
 export interface TransferTicketRequest {

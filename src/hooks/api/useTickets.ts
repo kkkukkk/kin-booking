@@ -10,10 +10,11 @@ import {
   deleteTicketsByReservationId,
   cancelAllTicketsByEvent,
   requestCancelTicket,
+  getTicketsWithEventByOwnerId,
 } from '@/api/ticket';
 import { createTransferHistory } from '@/api/ticketTransferHistory';
 import { CreateTicketRequest, UpdateTicketRequest, TransferTicketRequest, Ticket, TicketStatus } from '@/types/model/ticket';
-import { TicketGroupDto } from '@/types/dto/ticket';
+import { TicketGroupDto, TicketWithEventDto } from '@/types/dto/ticket';
 
 // 예약 ID로 티켓 조회
 export const useTicketsByReservationId = (reservationId: string) => {
@@ -258,5 +259,14 @@ export const useRequestCancelTicket = () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
     },
+  });
+};
+
+export const useTicketsWithEventByOwnerId = (ownerId: string) => {
+  return useQuery<TicketWithEventDto[]>({
+    queryKey: ['tickets-with-event', ownerId],
+    queryFn: () => getTicketsWithEventByOwnerId(ownerId),
+    enabled: !!ownerId,
+    staleTime: 1000 * 60,
   });
 }; 

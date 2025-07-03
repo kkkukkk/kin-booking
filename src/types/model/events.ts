@@ -22,4 +22,5 @@ export interface Events {
 	status: EventStatus;
 	seatCapacity: number;
 	ticketPrice: number;
+	ticketColor: string;
 }

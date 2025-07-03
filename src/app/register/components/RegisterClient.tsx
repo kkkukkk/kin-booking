@@ -11,7 +11,7 @@ import { useRegister } from "@/hooks/api/useAuth";
 import { useSpinner } from "@/hooks/useSpinner";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { getErrorMessage } from "@/components/utils/error";
+import { getErrorMessage } from "@/util/error";
 import Name from "@/app/register/components/Name";
 import Email from "@/app/register/components/Email";
 import Password from "@/app/register/components/Password";
