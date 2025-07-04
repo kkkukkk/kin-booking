@@ -54,7 +54,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 									message: '로그아웃 되었습니다.',
 									autoCloseTime: 3000
 								})
-								router.push("/login")
+								router.push("/login?loggedOut=1")
 							},
 						});
 					},
@@ -80,7 +80,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 		<ThemeDiv
 			className={clsx(
 				"absolute bottom-full mb-2 left-1/2 translate-x-[-50%]",
-				"flex flex-col gap-2 p-2 rounded-full shadow-md z-100",
+				"flex flex-col gap-2 p-2 rounded-full shadow-md z-10000",
 				"transition-all duration-300 ease-out",
 				isOpen
 					? "opacity-100 scale-100 pointer-events-auto"

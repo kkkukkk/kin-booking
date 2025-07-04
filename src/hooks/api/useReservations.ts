@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Reservation } from "@/types/model/reservation";
 import { CreateReservationDto } from "@/types/dto/reservation";
-import { createReservation, fetchReservation } from "@/api/reservation";
+import { createReservation, fetchReservation, cancelPendingReservation } from "@/api/reservation";
 import { approveReservation, rejectReservation } from "@/api/reservation";
 
 export const useCreateReservation = () => {
@@ -52,5 +52,16 @@ export const useReservationsByUserId = (userId: string) => {
 		queryKey: ['reservations', 'user', userId],
 		queryFn: () => fetchReservation({ userId }),
 		enabled: !!userId,
+	});
+};
+
+// 대기중 예매 취소
+export const useCancelPendingReservation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: cancelPendingReservation,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['reservations'] });
+		},
 	});
 };

@@ -28,7 +28,7 @@ const TogglePanel = () => {
 	}, [open]);
 
 	return (
-		<div className="fixed bottom-3.5 right-3.5 flex flex-col items-end gap-2 md:bottom-5 md:right-5 z-100" ref={panelRef}>
+		<div className="fixed bottom-3.5 right-3.5 flex flex-col items-end gap-2 md:bottom-5 md:right-5 z-10000" ref={panelRef}>
 			<PanelContent
 				isOpen={open}
 				activeButtons={activeButtons}

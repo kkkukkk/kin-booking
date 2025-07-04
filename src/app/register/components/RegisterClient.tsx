@@ -11,7 +11,6 @@ import { useRegister } from "@/hooks/api/useAuth";
 import { useSpinner } from "@/hooks/useSpinner";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { getErrorMessage } from "@/util/error";
 import Name from "@/app/register/components/Name";
 import Email from "@/app/register/components/Email";
 import Password from "@/app/register/components/Password";
@@ -97,11 +96,6 @@ const RegisterClient = () => {
 			message: "입력한 정보에 오류가 있어요. 다시 확인해주세요.",
 			iconType: "error",
 			autoCloseTime: 3000,
-		},
-		registerDuplicated: {
-			message: "이미 등록된 이메일이에요.",
-			iconType: "error",
-			autoCloseTime: 3000,
 		}
 	} as const;
 
@@ -120,35 +114,25 @@ const RegisterClient = () => {
 			return;
 		}
 
-		try {
-			register({
-				email,
-				password,
-				name,
-				phoneNumber,
-				marketingConsent: marketingChecked,
-			});
+		register({
+			email,
+			password,
+			name,
+			phoneNumber,
+			marketingConsent: marketingChecked,
+		});
 
-			await supabase.auth.signOut();
+		await supabase.auth.signOut();
 
-			const confirmed = await showAlert({
-				type: 'confirm',
-				title: '가입 완료!',
-				message: '인증 이메일이 발송되었습니다. 메일을 확인해 주세요.',
-				noCancel: true,
-			});
+		const confirmed = await showAlert({
+			type: 'confirm',
+			title: '가입 완료!',
+			message: '인증 이메일이 발송되었습니다. 메일을 확인해 주세요.',
+			noCancel: true,
+		});
 
-			if (confirmed) {
-				router.push('/login');
-			}
-
-		} catch (error) {
-			const message = getErrorMessage(error);
-			if (message.includes('already registered')) {
-				showToast({ message: '이미 등록된 이메일이에요.', iconType: 'error', autoCloseTime: 3000 });
-			} else {
-				showToast({ message: `회원가입 중 오류가 발생했어요. (${message})`, iconType: 'error', autoCloseTime: 3000 });
-			}
+		if (confirmed) {
+			router.push('/login');
 		}
 	};
 

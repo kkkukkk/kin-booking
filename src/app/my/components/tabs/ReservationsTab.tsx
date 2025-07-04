@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
@@ -8,14 +8,30 @@ import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import { calculateReservationStats } from '@/util/reservationStats';
+import clsx from 'clsx';
+import { getStatusInfoColors } from '@/components/base/StatusBadge';
+import { useCancelPendingReservation } from '@/hooks/api/useReservations';
+import CheckCircleIcon from '@/components/icon/CheckCircleIcon';
+import ClockIcon from '@/components/icon/ClockIcon';
+import XCircleIcon from '@/components/icon/XCircleIcon';
+import MenuIcon from '@/components/icon/MenuIcon';
 
 interface ReservationsTabProps {
 	reservations: any;
 }
 
+const FILTERS = [
+	{ key: 'all', label: '전체', icon: MenuIcon },
+	{ key: 'confirmed', label: '확정', icon: CheckCircleIcon },
+	{ key: 'pending', label: '대기', icon: ClockIcon },
+	{ key: 'cancelled', label: '취소', icon: XCircleIcon },
+];
+
 const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const router = useRouter();
+	const { mutate: cancelReservation, isPending: isCancelling } = useCancelPendingReservation();
+	const [activeFilter, setActiveFilter] = useState('all');
 	
 	// 테스트용 하드코딩 데이터
 	const testReservations = [
@@ -58,6 +74,12 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 
 	const stats = calculateReservationStats(displayReservations);
 
+	const handleCancelReservation = (reservationId: string) => {
+		if (window.confirm('정말 이 예매를 취소하시겠습니까?')) {
+			cancelReservation(reservationId);
+		}
+	};
+
 	if (displayReservations.length === 0) {
 		return (
 			<ThemeDiv className="p-8 text-center rounded-lg">
@@ -74,44 +96,64 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 		);
 	}
 
+	// 필터링된 리스트
+	const filteredReservations = activeFilter === 'all'
+		? displayReservations
+		: displayReservations.filter((r: any) => r.status === activeFilter);
+
 	return (
 		<div>
-			{/* 예매 통계 박스 */}
-			<div className="flex gap-4 mb-4">
-				<ThemeDiv className="flex-1 p-4 rounded-lg text-center" isChildren>
-					<div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-						{stats.confirmedCount}
-					</div>
-					<div className="text-sm text-gray-600 dark:text-gray-300">확정</div>
-				</ThemeDiv>
-				<ThemeDiv className="flex-1 p-4 rounded-lg text-center" isChildren>
-					<div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-2">
-						{stats.pendingCount}
-					</div>
-					<div className="text-sm text-gray-600 dark:text-gray-300">대기</div>
-				</ThemeDiv>
-				<ThemeDiv className="flex-1 p-4 rounded-lg text-center" isChildren>
-					<div className="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">
-						{stats.cancelledCount}
-					</div>
-					<div className="text-sm text-gray-600 dark:text-gray-300">취소</div>
-				</ThemeDiv>
+			{/* 통계 필터 버튼 */}
+			<div className="flex gap-2 mb-4">
+				{FILTERS.map(({ key, label, icon: Icon }) => (
+					<Button
+						key={key}
+						theme={theme}
+						padding={"py-2"}
+						onClick={() => setActiveFilter(key)}
+						className={clsx(
+							'flex flex-col items-center justify-center transition font-semibold flex-1 md:flex-row md:gap-1.5',
+						)}
+						reverse={theme === 'normal'}
+						light={activeFilter !== key}
+						on={activeFilter === key}
+					>
+						<Icon className="w-5 h-5 mb-1 flex items-center justify-center md:m-0" />
+						<span className="text-xs md:text-sm">{label}</span>
+						<span className="text-base font-bold mt-0.5">
+							{key === 'confirmed' && stats.confirmedCount}
+							{key === 'pending' && stats.pendingCount}
+							{key === 'cancelled' && stats.cancelledCount}
+							{key === 'all' && displayReservations.length}
+						</span>
+					</Button>
+				))}
 			</div>
-			{/* 기존 예매 리스트 */}
+			{/* 예매 리스트 */}
 			<div className="space-y-3">
-				{displayReservations.map((reservation: any) => (
-					<ThemeDiv key={reservation.id} className="p-5 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200" isChildren>
+				{filteredReservations.map((reservation: any) => (
+					<ThemeDiv 
+						key={reservation.id} 
+						className={clsx(
+							"p-5 rounded-xl border hover:shadow-md transition-all duration-200",
+							theme === 'normal' ? 'border-gray-200' : 'border-gray-700'
+						)} 
+						isChildren
+					>
 						<div className="flex items-start justify-between mb-3">
 							<div className="flex-1">
 								<h4 className="text-lg font-semibold mb-1">{reservation.eventName}</h4>
-								<div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+								<div className={clsx(
+									"flex items-center gap-4 text-sm",
+									theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
+								)}>
 									<span className="flex items-center gap-1">
 										<span className="w-2 h-2 bg-blue-500 rounded-full"></span>
 										{new Date(reservation.reservedAt).toLocaleDateString('ko-KR')}
 									</span>
 									<span className="flex items-center gap-1">
 										<span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-										{reservation.quantity}매
+										{reservation.quantity}
 									</span>
 									<span className="flex items-center gap-1">
 										<span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -119,33 +161,51 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 									</span>
 								</div>
 							</div>
-							<div className="flex flex-col items-end gap-2">
-								<span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-									reservation.status === 'confirmed' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200' :
-									reservation.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200' :
-									'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200'
-								}`}>
-									{reservation.status === 'confirmed' ? '확정' :
-									 reservation.status === 'pending' ? '대기중' : '취소'}
-								</span>
+							<div className="flex flex-col items-center gap-2">
+								{reservation.status === 'pending' && (
+									<Button
+										onClick={() => handleCancelReservation(reservation.id)}
+										theme="dark"
+										padding={"px-1.5 py-0.5"}
+										disabled={isCancelling}
+									>
+										예매 취소
+									</Button>
+								)}
 							</div>
 						</div>
 						
-						{/* 상태별 추가 정보 */}
+						{/* 상태별 안내 메시지: 아래에 항상 표시 */}
 						{reservation.status === 'confirmed' && (
-							<div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-								<div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
+							<div className={clsx(
+								"mt-3 p-3 rounded-lg",
+								theme === 'normal' ? 'bg-green-50' : 'bg-green-900/20'
+							)}>
+								<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors('confirmed', theme))}>
 									<span className="w-2 h-2 bg-green-500 rounded-full"></span>
-									티켓이 발급되었습니다. 티켓 관리 탭에서 확인하세요.
+									티켓이 발급되었어요! 티켓 관리 탭에서 확인하세요.
 								</div>
 							</div>
 						)}
-						
 						{reservation.status === 'pending' && (
-							<div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-								<div className="flex items-center gap-2 text-sm text-yellow-700 dark:text-yellow-300">
+							<div className={clsx(
+								"mt-3 p-3 rounded-lg",
+								theme === 'normal' ? 'bg-yellow-50' : 'bg-yellow-900/20'
+							)}>
+								<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors('pending', theme))}>
 									<span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-									예매 승인을 기다리고 있습니다.
+									예매 승인을 기다리고 있어요!
+								</div>
+							</div>
+						)}
+						{reservation.status === 'cancelled' && (
+							<div className={clsx(
+								"mt-3 p-3 rounded-lg",
+								theme === 'normal' ? 'bg-gray-100' : 'bg-gray-800/40'
+							)}>
+								<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors('cancelled', theme))}>
+									<span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+									예매가 취소되었습니다.
 								</div>
 							</div>
 						)}

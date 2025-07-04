@@ -8,6 +8,10 @@ import TicketCard from '@/components/Ticket';
 import Button from '@/components/base/Button';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useAppSelector } from '@/redux/hooks';
+import { RootState } from '@/redux/store';
+import clsx from 'clsx';
+import { getStatusInfoColors } from '@/components/base/StatusBadge';
 
 interface TicketStackProps {
 	eventId: string;
@@ -31,6 +35,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 	onTicketAction,
 }) => {
 	const [isExpanded, setIsExpanded] = useState(false);
+	const theme = useAppSelector((state: RootState) => state.theme.current);
 
 	// 티켓 상태별 통계 계산
 	const statusStats = useMemo(() => {
@@ -148,15 +153,6 @@ const TicketStack: React.FC<TicketStackProps> = ({
 		groupHeight = headerHeight + actionBarHeight + ticketHeight + overlapOffset + 20;
 	}
 
-	// 상태별 색상 정의
-	const statusColors = {
-		active: 'text-green-600',
-		cancelRequested: 'text-orange-600',
-		cancelled: 'text-red-600',
-		used: 'text-gray-600',
-		transferred: 'text-blue-600',
-	};
-
 	// 공연 일자 포맷팅
 	const formatEventDate = (dateString: string) => {
 		const date = new Date(dateString);
@@ -182,19 +178,23 @@ const TicketStack: React.FC<TicketStackProps> = ({
 
 	return (
 		<ThemeDiv 
-			className="rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+			className="rounded-xl shadow-lg border border-gray-200 overflow-hidden"
 			style={{ minHeight: `${groupHeight}px` }}
+			isChildren
 		>
 			{/* 이벤트 헤더 */}
-			<div className="p-6 border-b border-gray-200 dark:border-gray-700">
-				<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+			<div className={clsx(
+				"p-6 border-b",
+				theme === 'normal' ? 'border-gray-200' : 'border-gray-700'
+			)}>
+				<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 					<div className="flex-1">
 						{/* 이벤트명과 날짜 */}
-						<div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
-							<h3 className="text-xl font-bold text-gray-900 dark:text-white">{eventName}</h3>
+						<div className="flex flex-col md:flex-row md:items-center gap-2 mb-3">
+							<h3 className="text-xl font-bold">{eventName}</h3>
 							{eventDateInfo && (
-								<div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-									<span className="hidden sm:inline">•</span>
+								<div className="flex items-center gap-2 text-sm">
+									<span className="hidden md:inline">•</span>
 									<span className="font-medium">{eventDateInfo.short}</span>
 									<span>{eventDateInfo.time}</span>
 								</div>
@@ -202,12 +202,12 @@ const TicketStack: React.FC<TicketStackProps> = ({
 						</div>
 						
 						{/* 티켓 정보 */}
-						<div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
-							<p className="text-sm text-gray-600 dark:text-gray-400">
+						<div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+							<p className="text-sm">
 								총 {tickets.length}장 • {new Date(latestCreatedAt).toLocaleDateString('ko-KR')} 예약
 							</p>
 							{eventDateInfo && (
-								<div className="text-xs text-gray-500 dark:text-gray-500">
+								<div className="text-xs">
 									{canEnter ? '입장 가능' : '입장 대기'}
 								</div>
 							)}
@@ -216,27 +216,42 @@ const TicketStack: React.FC<TicketStackProps> = ({
 						{/* 상태별 통계 */}
 						<div className="flex flex-wrap gap-2">
 							{statusStats.active > 0 && (
-								<span className={`${statusColors.active} bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full border border-green-200 dark:border-green-800 text-xs font-medium`}>
+								<span className={clsx(
+									"px-3 py-1.5 rounded-full border text-xs font-medium",
+									getStatusInfoColors(TicketStatus.Active, theme)
+								)}>
 									사용가능 {statusStats.active}장
 								</span>
 							)}
 							{statusStats.cancelRequested > 0 && (
-								<span className={`${statusColors.cancelRequested} bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded-full border border-orange-200 dark:border-orange-800 text-xs font-medium`}>
+								<span className={clsx(
+									"px-3 py-1.5 rounded-full border text-xs font-medium",
+									getStatusInfoColors(TicketStatus.CancelRequested, theme)
+								)}>
 									취소신청 {statusStats.cancelRequested}장
 								</span>
 							)}
 							{statusStats.cancelled > 0 && (
-								<span className={`${statusColors.cancelled} bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-full border border-red-200 dark:border-red-800 text-xs font-medium`}>
+								<span className={clsx(
+									"px-3 py-1.5 rounded-full border text-xs font-medium",
+									getStatusInfoColors(TicketStatus.Cancelled, theme)
+								)}>
 									취소완료 {statusStats.cancelled}장
 								</span>
 							)}
 							{statusStats.used > 0 && (
-								<span className={`${statusColors.used} bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-600 text-xs font-medium`}>
+								<span className={clsx(
+									"px-3 py-1.5 rounded-full border text-xs font-medium",
+									getStatusInfoColors(TicketStatus.Used, theme)
+								)}>
 									사용완료 {statusStats.used}장
 								</span>
 							)}
 							{statusStats.transferred > 0 && (
-								<span className={`${statusColors.transferred} bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800 text-xs font-medium`}>
+								<span className={clsx(
+									"px-3 py-1.5 rounded-full border text-xs font-medium",
+									getStatusInfoColors(TicketStatus.Transferred, theme)
+								)}>
 									양도완료 {statusStats.transferred}장
 								</span>
 							)}
@@ -247,13 +262,18 @@ const TicketStack: React.FC<TicketStackProps> = ({
 
 			{/* 액션 바 */}
 			{(canEnter || canTransfer || canCancel) && (
-				<div className="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
-					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+				<div className={clsx(
+					"px-6 py-4 border-b",
+					theme === 'normal' 
+						? 'bg-gray-50 border-gray-200' 
+						: 'bg-gray-700/50 border-gray-600'
+				)}>
+					<div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
 						{/* 입장 버튼 */}
 						{canEnter && (
 							<button
 								onClick={() => handleTicketAction('enter')}
-								className={`flex-1 sm:flex-none px-6 py-3 rounded-lg font-semibold text-sm transition-all ${
+								className={`flex-1 md:flex-none px-6 py-3 rounded-lg font-semibold text-sm transition-all ${
 									canEnter 
 										? 'bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl' 
 										: 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -268,7 +288,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 						{canTransfer && (
 							<button
 								onClick={() => handleTicketAction('transfer')}
-								className="flex-1 sm:flex-none px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg text-sm transition-all shadow-lg hover:shadow-xl"
+								className="flex-1 md:flex-none px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg text-sm transition-all shadow-lg hover:shadow-xl"
 							>
 								🔄 양도하기
 							</button>
@@ -278,7 +298,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 						{canCancel && onCancelRequest && (
 							<button
 								onClick={() => onCancelRequest(eventId)}
-								className="flex-1 sm:flex-none px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-all shadow-lg hover:shadow-xl"
+								className="flex-1 md:flex-none px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-all shadow-lg hover:shadow-xl"
 							>
 								❌ 취소 신청
 							</button>
@@ -327,7 +347,12 @@ const TicketStack: React.FC<TicketStackProps> = ({
 											fontWeight="font-semibold"
 											fontSize="text-base"
 											padding="px-6 py-3"
-											className="border border-blue-200 dark:border-blue-700 shadow-sm hover:shadow-md"
+											className={clsx(
+												"border shadow-sm hover:shadow-md",
+												theme === 'normal' 
+													? 'border-blue-200' 
+													: 'border-blue-700'
+											)}
 											onClick={toggleExpanded}
 										>
 											{isExpanded ? '접기' : `펼치기 (${tickets.length}장)`}
@@ -384,7 +409,12 @@ const TicketStack: React.FC<TicketStackProps> = ({
 											fontWeight="font-semibold"
 											fontSize="text-base"
 											padding="px-6 py-3"
-											className="border border-blue-200 dark:border-blue-700 shadow-sm hover:shadow-md"
+											className={clsx(
+												"border shadow-sm hover:shadow-md",
+												theme === 'normal' 
+													? 'border-blue-200' 
+													: 'border-blue-700'
+											)}
 											onClick={toggleExpanded}
 										>
 											{isExpanded ? '접기' : `펼치기 (${tickets.length}장)`}

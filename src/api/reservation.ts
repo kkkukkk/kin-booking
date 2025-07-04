@@ -116,3 +116,22 @@ export const rejectReservation = async (reservationId: string): Promise<void> =>
 		
 	if (error) throw error;
 };
+
+export const cancelPendingReservation = async (reservationId: string): Promise<void> => {
+	// 예약 상태 확인
+	const { data, error: fetchError } = await supabase
+		.from('reservations')
+		.select('status')
+		.eq('id', reservationId)
+		.single();
+	if (fetchError) throw fetchError;
+	if (!data || data.status !== 'pending') {
+		throw new Error('대기중인 예매만 취소할 수 있습니다.');
+	}
+	// 상태를 cancelled로 변경
+	const { error } = await supabase
+		.from('reservations')
+		.update({ status: 'cancelled' })
+		.eq('id', reservationId);
+	if (error) throw error;
+};

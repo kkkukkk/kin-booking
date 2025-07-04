@@ -11,24 +11,25 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import CustomHead from "@/app/head";
 
-// export const metadata = {
-//     metadataBase: new URL('https://kin-booking.vercel.app'),
-//     title: 'KIN',
-//     description: 'KIN 공연 예매 사이트입니다.',
-//     robots: 'index, follow',
-//     openGraph: {
-//         siteName: 'KIN',
-//         type: 'website',
-//         url: '/',
-//         images: [{
-//             url: '/images/logo_normal.png',
-//             width: 1200,
-//             height: 630,
-//             alt: 'KIN 공연 예매',
-//         }],
-//     },
-// };
-// export const viewport = 'width=device-width, initial-scale=1';
+export const metadata = {
+    metadataBase: new URL('https://kin-booking.vercel.app'),
+    title: 'KIN',
+    description: 'KIN 공연 예매 사이트입니다.',
+    robots: 'index, follow',
+    openGraph: {
+        siteName: 'KIN',
+        type: 'website',
+        url: '/',
+        images: [{
+            url: '/images/logo_normal.png',
+            width: 1200,
+            height: 630,
+            alt: 'KIN 공연 예매',
+        }],
+    },
+};
+export const viewport = 'width=device-width, initial-scale=1';
+
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
 

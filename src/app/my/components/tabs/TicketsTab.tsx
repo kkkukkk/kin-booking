@@ -1,8 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
-import { useAppSelector } from '@/redux/hooks';
-import { RootState } from '@/redux/store';
+import React from 'react';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import { useTicketsWithEventByOwnerId, useCancelAllTicketsByEvent } from '@/hooks/api/useTickets';

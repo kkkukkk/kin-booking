@@ -20,12 +20,15 @@ import { TicketIcon } from '@/components/icon/TicketIcon';
 import { SmileIcon } from '@/components/icon/SmileIcon';
 import { CalendarIcon } from '@/components/icon/CalendarIcon';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
+import { ThumbUpIcon } from '@/components/icon/ThumbUpIcon';
 import { getUserHighestRole, getRoleDisplayName, getRoleBadgeColor } from '@/util/userRole';
 import ProfileTab from '@/app/my/components/tabs/ProfileTab';
 import ReservationsTab from '@/app/my/components/tabs/ReservationsTab';
 import TicketsTab from '@/app/my/components/tabs/TicketsTab';
+import FriendsTab from '@/app/my/components/tabs/FriendsTab';
+import clsx from 'clsx';
 
-type MyPageTab = 'profile' | 'reservations' | 'tickets';
+type MyPageTab = 'profile' | 'reservations' | 'tickets' | 'friends';
 
 const MyPageClient = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -76,7 +79,7 @@ const MyPageClient = () => {
 			try {
 				await supabase.auth.signOut();
 				showToast({ message: '로그아웃되었습니다.', iconType: 'success' });
-				router.push('/');
+				router.push('/login?loggedOut=1');
 			} catch (error) {
 				showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error' });
 			} finally {
@@ -89,6 +92,7 @@ const MyPageClient = () => {
 		{ id: 'profile' as MyPageTab, label: '프로필', icon: SmileIcon },
 		{ id: 'reservations' as MyPageTab, label: '예매 내역', icon: CalendarIcon },
 		{ id: 'tickets' as MyPageTab, label: '티켓 관리', icon: TicketIcon },
+		{ id: 'friends' as MyPageTab, label: '친구 관리', icon: ThumbUpIcon },
 	];
 	
 	const renderTabContent = () => {
@@ -99,6 +103,8 @@ const MyPageClient = () => {
 				return <ReservationsTab reservations={reservations} />;
 			case 'tickets':
 				return <TicketsTab userId={session?.user?.id || ''} />;
+			case 'friends':
+				return <FriendsTab />;
 			default:
 				return null;
 		}
@@ -155,10 +161,16 @@ const MyPageClient = () => {
 									{roleDisplayName}
 								</span>
 							</div>
-							<p className="text-gray-600 mb-1">
+							<p className={clsx(
+								"mb-1",
+								theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
+							)}>
 								{displayUser?.email || '이메일 정보 없음'}
 							</p>
-							<p className="text-sm text-gray-500">
+							<p className={clsx(
+								"text-sm",
+								theme === 'normal' ? 'text-gray-500' : 'text-gray-400'
+							)}>
 								가입일: {displayUser?.registerDate ? new Date(displayUser.registerDate).toLocaleDateString('ko-KR') : '알 수 없음'}
 							</p>
 						</div>
@@ -173,7 +185,8 @@ const MyPageClient = () => {
 				transition={{ delay: 0.1 }}
 				className="mb-4"
 			>
-				<div className="flex gap-2 w-full justify-between md:justify-end">
+				{/* 모바일: 2x2 그리드, 데스크톱: 가로 배치 */}
+				<div className="grid grid-cols-2 gap-1 md:flex md:flex-wrap md:gap-2 w-full md:justify-end">
 					{tabs.map((tab) => {
 						const Icon = tab.icon;
 						const isActive = activeTab === tab.id;
@@ -182,15 +195,15 @@ const MyPageClient = () => {
 								key={tab.id}
 								onClick={() => setActiveTab(tab.id)}
 								theme={theme}
-								padding={'py-1'}
-								className={`gap-2 font-semibold`}
-								style={{ minWidth: 100 }}
+								padding={'py-2.5 md:py-1.5'}
+								className={`gap-1.5 md:gap-2 font-semibold text-sm md:text-base transition-all duration-200`}
+								style={{ minWidth: 'auto', width: '100%' }}
 								reverse={theme === 'normal'}
-								light={theme !== 'normal'}
+								light={activeTab !== tab.id}
 								on={isActive}
 							>
 								<Icon />
-								<span>{tab.label}</span>
+								<span className="truncate">{tab.label}</span>
 							</Button>
 						);
 					})}

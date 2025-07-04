@@ -9,7 +9,7 @@ export const RoleCodeKo: Record<RoleCode, string> = {
 	[RoleCode.MASTER]: '마스터',
 	[RoleCode.MANAGER]: '관리자',
 	[RoleCode.MEMBER]: '멤버',
-	[RoleCode.USER]: '사용자',
+	[RoleCode.USER]: '유저',
 };
 
 export interface Role {

@@ -34,22 +34,12 @@ const EventPoster = ({
 			? "w-full h-full"
 			: "relative w-full max-w-md md:w-80";
 
-	const imageClass =
-		variant === "card"
-			? "w-full h-full object-cover rounded-lg"
-			: "w-full h-auto rounded-lg shadow-lg";
-
 	const skeletonClass =
 		variant === "card"
 			? "w-full h-full rounded-lg"
 			: "w-full h-80 rounded-lg";
 
-	const placeholderClass =
-		variant === "card"
-			? "w-full h-full flex items-center justify-center border-2 border-dashed"
-			: "w-full h-80 rounded-lg border-2 border-dashed flex items-center justify-center";
-
-	const aspectClass = "aspect-[4/5]";
+	const aspectClass = (!posterData || posterData.length === 0) && variant !== "card" ? "" : "aspect-[4/5]";
 
 	return (
 		<motion.div

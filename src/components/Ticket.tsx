@@ -12,14 +12,6 @@ interface TicketCardProps {
   isRare?: boolean
 }
 
-// 그림자 조건부 함수
-const getShadowStyle = (status: TicketStatus) => {
-  return {
-    wrapperFilter: status === TicketStatus.Used ? 'none' : 'drop-shadow(0 8px 16px rgba(0,0,0,0.25))',
-    leftBoxShadow: status === TicketStatus.Used ? '0 6px 12px rgba(0,0,0,0.2)' : 'none',
-  }
-}
-
 const TicketCard: React.FC<TicketCardProps> = ({
   eventName,
   status,
@@ -52,15 +44,13 @@ const TicketCard: React.FC<TicketCardProps> = ({
   const notchCyBottom = maskSize.height
   const rightWidth = maskSize.width - notchCx - 1
 
-  const { wrapperFilter, leftBoxShadow } = getShadowStyle(status)
-
   // rare 티켓용 gold 그라데이션
   const rareGradient = 'linear-gradient(135deg, #ffd700 0%, #fffbe6 100%)';
 
   return (
     <div
       className="relative max-w-md mx-auto my-6"
-      style={{ filter: wrapperFilter }}
+      style={{ filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.25))" }}
     >
       <svg width="0" height="0" aria-hidden="true" focusable="false">
         <defs>
@@ -98,7 +88,6 @@ const TicketCard: React.FC<TicketCardProps> = ({
             width: notchCx,
             boxSizing: 'border-box',
             background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 25%, #e2e8f0 100%)',
-            boxShadow: leftBoxShadow,
           }}
         >
           {/* 이벤트명 */}

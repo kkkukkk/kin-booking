@@ -24,7 +24,7 @@ const LoginPage = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const { mutate: login, isPending: loginPending, error: loginError } = useLogin();
+	const { mutate: login, isPending: loginPending } = useLogin();
 	const { showToast } = useToast();
 	const { showSpinner, hideSpinner } = useSpinner();
 	const { data: images = [], isPending: imagePending } = useLoginImages();
@@ -46,30 +46,6 @@ const LoginPage = () => {
 			await login({ email, password });
 		}
 	}
-
-	useEffect(() => {
-		if (loginError) {
-			if ((loginError as Error).message === "Invalid login credentials") {
-				showToast({
-					message: "이메일과 비밀번호를 확인해주세요.",
-					iconType: "error",
-					autoCloseTime: 3000,
-				});
-			} else if ((loginError as Error).message === "Email not confirmed") {
-				showToast({
-					message: "이메일 인증 후 로그인할 수 있어요.",
-					iconType: "warning",
-					autoCloseTime: 3000,
-				});
-			} else {
-				showToast({
-					message: "로그인 중 오류가 발생했습니다.",
-					iconType: "error",
-					autoCloseTime: 3000,
-				});
-			}
-		}
-	}, [loginError, showToast]);
 
 	useEffect(() => {
 		if (!prevLoginPending.current && loginPending) {
