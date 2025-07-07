@@ -79,11 +79,15 @@ const MyPageClient = () => {
 			try {
 				await supabase.auth.signOut();
 				showToast({ message: '로그아웃되었습니다.', iconType: 'success' });
-				router.push('/login?loggedOut=1');
+				
+				// 스피너가 보이도록 잠시 대기 후 페이지 이동
+				setTimeout(() => {
+					hideSpinner();
+					router.push('/login?loggedOut=1');
+				}, 500);
 			} catch (error) {
-				showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error' });
-			} finally {
 				hideSpinner();
+				showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error' });
 			}
 		}
 	};

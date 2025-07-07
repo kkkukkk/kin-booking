@@ -92,7 +92,6 @@ export const softDeleteUser = async (userId: string): Promise<User> => {
 
 // 특정 유저 조회 api
 export const fetchUserById = async (userId: string): Promise<User | null> => {
-	console.log("called");
 	const { data, error } = await supabase
 		.from('users')
 		.select(`
@@ -121,8 +120,6 @@ export const fetchUserById = async (userId: string): Promise<User | null> => {
 		}
 		throw error;
 	}
-
-	console.log(data);
 	
 	return toCamelCaseKeys<User>(data);
 };

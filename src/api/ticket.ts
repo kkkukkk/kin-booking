@@ -136,11 +136,7 @@ export const requestCancelTicket = async (ticketId: string, userId: string): Pro
 export const getTicketsWithEventByOwnerId = async (ownerId: string): Promise<TicketWithEventDto[]> => {
   const { data, error } = await supabase
     .from('ticket')
-    .select(`*, event:event_id(
-      event_name,
-      event_date,
-      ticket_price
-    )`)
+    .select(`*, event:event_id(*)`)
     .eq('owner_id', ownerId)
     .in('status', ['active', 'cancelled', 'used', 'transferred'])
     .order('created_at', { ascending: false });

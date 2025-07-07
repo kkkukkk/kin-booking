@@ -1,15 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getFriends,
-  getReceivedFriendRequests,
-  getSentFriendRequests,
+  getFriendRequests,
   sendFriendRequest,
   respondToFriendRequest,
-  deleteFriend,
-  blockFriend,
+  deleteFriendRelation,
   searchUsers,
-  checkFriendStatus,
-  cancelFriendRequest
+  checkFriendStatus
 } from '@/api/friend';
 import { CreateFriendRequest, FriendStatus } from '@/types/model/friend';
 import useToast from '@/hooks/useToast';
@@ -25,35 +22,23 @@ export const useFriends = () => {
     enabled: !!session?.user?.id,
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0, // 캐시하지 않음 - 실시간 데이터
   });
 };
 
-// 받은 친구 요청 목록 조회
-export const useReceivedFriendRequests = () => {
-  const { session } = useSession();
-  
-  return useQuery({
-    queryKey: ['friendRequests', 'received'],
-    queryFn: () => getReceivedFriendRequests(session?.user?.id || ''),
-    enabled: !!session?.user?.id,
-    retry: 1,
-    retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
-  });
-};
 
-// 보낸 친구 요청 목록 조회
-export const useSentFriendRequests = () => {
+
+// 받은/보낸 친구 요청을 한번에 조회
+export const useFriendRequests = () => {
   const { session } = useSession();
   
   return useQuery({
-    queryKey: ['friendRequests', 'sent'],
-    queryFn: () => getSentFriendRequests(session?.user?.id || ''),
+    queryKey: ['friendRequests', 'all'],
+    queryFn: () => getFriendRequests(session?.user?.id || ''),
     enabled: !!session?.user?.id,
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0, // 캐시하지 않음 - 실시간 데이터
   });
 };
 
@@ -90,8 +75,24 @@ export const useRespondToFriendRequest = () => {
   return useMutation({
     mutationFn: ({ friendId, status }: { friendId: string; status: FriendStatus }) =>
       respondToFriendRequest(friendId, status, session?.user?.id || ''),
+    onMutate: async ({ friendId, status }) => {
+      // 낙관적 업데이트: 즉시 요청 목록에서 제거
+      await queryClient.cancelQueries({ queryKey: ['friendRequests', 'all'] });
+      
+      const previousRequests = queryClient.getQueryData(['friendRequests', 'all']);
+      
+      queryClient.setQueryData(['friendRequests', 'all'], (old: any) => {
+        if (!old) return old;
+        return {
+          received: old.received.filter((req: any) => req.fromUserId !== friendId),
+          sent: old.sent
+        };
+      });
+      
+      return { previousRequests };
+    },
     onSuccess: (_, { status }) => {
-      queryClient.invalidateQueries({ queryKey: ['friendRequests', 'received'] });
+      queryClient.invalidateQueries({ queryKey: ['friendRequests', 'all'] });
       queryClient.invalidateQueries({ queryKey: ['friends'] });
       
       const message = status === FriendStatus.Accepted 
@@ -99,65 +100,63 @@ export const useRespondToFriendRequest = () => {
         : '친구 요청을 거절했어요.';
       showToast({ message, iconType: 'success', autoCloseTime: 3000 });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, variables, context) => {
+      // 실패 시 롤백
+      if (context?.previousRequests) {
+        queryClient.setQueryData(['friendRequests', 'all'], context.previousRequests);
+      }
       showToast({ message: '친구 요청 처리에 실패했어요. 잠시 후 다시 시도해주세요.', iconType: 'error', autoCloseTime: 3000 });
     },
   });
 };
 
-// 친구 삭제
-export const useDeleteFriend = () => {
+// 친구 관계 삭제 (친구 삭제, 요청 취소, 거절된 요청 삭제)
+export const useDeleteFriendRelation = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const { session } = useSession();
 
   return useMutation({
-    mutationFn: (friendId: string) => deleteFriend(friendId, session?.user?.id || ''),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['friends'] });
-      showToast({ message: '친구를 삭제했어요.', iconType: 'success', autoCloseTime: 3000 });
+    mutationFn: ({ targetId, status }: { targetId?: string; status?: FriendStatus }) => 
+      deleteFriendRelation(session?.user?.id || '', targetId, status),
+    onMutate: async ({ targetId }) => {
+      if (targetId) {
+        // 친구 삭제인 경우 낙관적 업데이트
+        await queryClient.cancelQueries({ queryKey: ['friends'] });
+        
+        const previousFriends = queryClient.getQueryData(['friends']);
+        
+        queryClient.setQueryData(['friends'], (old: any) => {
+          if (!old) return old;
+          return old.filter((friend: any) => friend.friend.id !== targetId);
+        });
+        
+        return { previousFriends };
+      }
     },
-    onError: (error: Error) => {
-      showToast({ message: '친구 삭제에 실패했어요. 잠시 후 다시 시도해주세요.', iconType: 'error', autoCloseTime: 3000 });
+    onSuccess: (_, { targetId, status }) => {
+      if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ['friends'] });
+        showToast({ message: '친구를 삭제했어요.', iconType: 'success', autoCloseTime: 3000 });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['friendRequests', 'all'] });
+        const message = status === FriendStatus.Pending ? '요청을 취소했어요.' : '요청을 삭제했어요.';
+        showToast({ message, iconType: 'success', autoCloseTime: 3000 });
+      }
     },
-  });
-};
-
-// 친구 차단
-export const useBlockFriend = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  const { session } = useSession();
-
-  return useMutation({
-    mutationFn: (friendId: string) => blockFriend(friendId, session?.user?.id || ''),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['friends'] });
-      showToast({ message: '차단을 완료했어요.', iconType: 'success', autoCloseTime: 3000 });
-    },
-    onError: (error: Error) => {
-      showToast({ message: '차단에 실패했어요. 잠시 후 다시 시도해주세요.', iconType: 'error', autoCloseTime: 3000 });
-    },
-  });
-};
-
-// 친구 요청 취소
-export const useCancelFriendRequest = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  const { session } = useSession();
-
-  return useMutation({
-    mutationFn: (requestId: string) => cancelFriendRequest(requestId, session?.user?.id || ''),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['friendRequests', 'sent'] });
-      showToast({ message: '친구 요청을 취소했어요.', iconType: 'success', autoCloseTime: 3000 });
-    },
-    onError: (error: Error) => {
-      showToast({ message: '친구 요청 취소에 실패했어요. 잠시 후 다시 시도해주세요.', iconType: 'error', autoCloseTime: 3000 });
+    onError: (error: Error, variables, context) => {
+      // 실패 시 롤백 (친구 삭제인 경우만)
+      if (variables.targetId && context?.previousFriends) {
+        queryClient.setQueryData(['friends'], context.previousFriends);
+      }
+      showToast({ message: '작업에 실패했어요. 잠시 후 다시 시도해주세요.', iconType: 'error', autoCloseTime: 3000 });
     },
   });
 };
+
+
+
+
 
 // 사용자 검색
 export const useSearchUsers = (query: string) => {
@@ -181,5 +180,6 @@ export const useCheckFriendStatus = (friendId: string) => {
     queryKey: ['friendStatus', friendId],
     queryFn: () => checkFriendStatus(friendId, session?.user?.id || ''),
     enabled: !!friendId && !!session?.user?.id,
+    staleTime: 0, // 캐시하지 않음 - 실시간 데이터
   });
 }; 

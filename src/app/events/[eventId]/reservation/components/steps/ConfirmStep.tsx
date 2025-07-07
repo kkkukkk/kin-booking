@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import clsx from "clsx";
+import ReservationSeatInfo from '@/app/events/[eventId]/components/ReservationSeatInfo';
 
 interface ConfirmStepProps {
 	event: EventWithCurrentStatus,
@@ -85,6 +86,12 @@ const ConfirmStep = ({
 							<span className="opacity-70">장소</span>
 							<span className="font-medium">{event.location}</span>
 						</div>
+						<ReservationSeatInfo
+							seatCapacity={event.seatCapacity}
+							reservedQuantity={event.reservedQuantity}
+							remainingQuantity={event.remainingQuantity}
+							theme={theme}
+						/>
 					</div>
 				</ThemeDiv>
 
@@ -118,7 +125,7 @@ const ConfirmStep = ({
 								required
 							/>
 							<p className={clsx(
-								"text-xs md:text-sm opacity-90 mt-2 text-red-500",
+								"text-xs md:text-sm opacity-90 mt-2",
 								theme === "normal" ? "text-red-600" : "text-red-400"
 							)}>
 								공연 당일 입장 시 확인받을 분의 이름을 입력해주세요.

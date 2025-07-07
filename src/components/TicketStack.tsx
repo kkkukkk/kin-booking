@@ -336,6 +336,11 @@ const TicketStack: React.FC<TicketStackProps> = ({
 											eventId={ticket.eventId}
 											ticketColor={ticketColor}
 											isRare={ticket.isRare}
+											eventDate={eventInfo?.eventDate}
+											location={eventInfo?.location}
+											ticketId={ticket.id}
+											ticketNumber={ticket.ticketNumber}
+											ticketPrice={eventInfo?.ticketPrice}
 										/>
 									</motion.div>
 								))}
@@ -396,6 +401,11 @@ const TicketStack: React.FC<TicketStackProps> = ({
 													eventId={ticket.eventId}
 													ticketColor={ticketColor}
 													isRare={ticket.isRare}
+													eventDate={eventInfo?.eventDate}
+													location={eventInfo?.location}
+													ticketId={ticket.id}
+													ticketNumber={ticket.ticketNumber}
+													ticketPrice={eventInfo?.ticketPrice}
 												/>
 											</div>
 										);

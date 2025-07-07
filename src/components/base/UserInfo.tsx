@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import UserAvatar from './UserAvatar';
 import { Theme } from '@/types/ui/theme';
+import { maskEmail } from '@/util/emailMasking';
 
 interface UserInfoProps {
   name: string;
@@ -12,6 +13,7 @@ interface UserInfoProps {
   gradient?: string;
   className?: string;
   rightElement?: React.ReactNode;
+  maskEmail?: boolean;
 }
 
 const UserInfo = ({ 
@@ -22,7 +24,8 @@ const UserInfo = ({
   avatarSize = 'md',
   gradient,
   className = '',
-  rightElement
+  rightElement,
+  maskEmail: shouldMaskEmail = false
 }: UserInfoProps) => {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
@@ -43,7 +46,7 @@ const UserInfo = ({
           "text-sm",
           theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
         )}>
-          {email}
+          {shouldMaskEmail ? maskEmail(email) : email}
         </p>
         {subtitle && (
           <p className={clsx(

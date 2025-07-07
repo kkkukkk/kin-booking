@@ -7,14 +7,14 @@ import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import { StatusBadge } from '@/components/base/StatusBadge';
 import { 
-  useReceivedFriendRequests, 
-  useSentFriendRequests, 
+  useFriendRequests,
   useRespondToFriendRequest, 
-  useCancelFriendRequest 
+  useDeleteFriendRelation
 } from '@/hooks/api/useFriends';
 import { FriendStatus } from '@/types/model/friend';
 import { InboxIcon, PaperAirplaneIcon } from '@/components/icon/FriendIcons';
 import UserInfo from '@/components/base/UserInfo';
+import { useAlert } from '@/providers/AlertProvider';
 import clsx from 'clsx';
 
 type RequestTab = 'received' | 'sent';
@@ -22,24 +22,34 @@ type RequestTab = 'received' | 'sent';
 const FriendRequests = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const [activeTab, setActiveTab] = useState<RequestTab>('received');
+  const { showAlert } = useAlert();
   
-  const { data: receivedRequests, isLoading: isReceivedLoading, error: receivedError } = useReceivedFriendRequests();
-  const { data: sentRequests, isLoading: isSentLoading, error: sentError } = useSentFriendRequests();
+  const { data: friendRequests, isLoading: isRequestsLoading, error: requestsError } = useFriendRequests();
+  const receivedRequests = friendRequests?.received || [];
+  const sentRequests = friendRequests?.sent || [];
   const { mutate: respondToRequest, isPending: isResponding } = useRespondToFriendRequest();
-  const { mutate: cancelRequest, isPending: isCancelling } = useCancelFriendRequest();
+  const { mutate: deleteFriendRelation, isPending: isDeleting } = useDeleteFriendRelation();
 
   const handleRespond = (requestId: string, status: FriendStatus) => {
     respondToRequest({ friendId: requestId, status });
   };
 
-  const handleCancel = (requestId: string) => {
-    cancelRequest(requestId);
+  const handleCancel = async (requestId: string, status: FriendStatus) => {
+    const confirmed = await showAlert({
+      type: 'confirm',
+      title: status === FriendStatus.Pending ? '친구 요청 취소' : '거절된 요청 삭제',
+      message: status === FriendStatus.Pending ? '친구 요청을 취소할까요?' : '거절된 요청을 삭제할까요?'
+    });
+    
+    if (confirmed) {
+      deleteFriendRelation({ status });
+    }
   };
 
-  const isLoading = activeTab === 'received' ? isReceivedLoading : isSentLoading;
-  const error = activeTab === 'received' ? receivedError : sentError;
+  const isLoading = isRequestsLoading;
+  const error = requestsError;
   const requests = activeTab === 'received' ? receivedRequests : sentRequests;
-
+  
   if (isLoading) {
     return (
       <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
@@ -95,12 +105,12 @@ const FriendRequests = () => {
             )}
           </div>
           <h3 className="text-lg font-semibold mb-2">
-            {activeTab === 'received' ? '받은 친구 요청이 없습니다' : '보낸 친구 요청이 없습니다'}
+            {activeTab === 'received' ? '받은 친구 요청이 없어요' : '보낸 친구 요청이 없어요'}
           </h3>
           <p className="text-sm opacity-70">
             {activeTab === 'received' 
-              ? '새로운 친구 요청이 오면 여기에 표시됩니다.' 
-              : '친구 요청을 보내면 여기에 표시됩니다.'
+              ? '새로운 친구 요청이 오면 여기에 표시할게요!' 
+              : '친구 요청을 보내면 여기서 확인할 수 있어요!'
             }
           </p>
         </ThemeDiv>
@@ -130,13 +140,16 @@ const FriendRequests = () => {
                   subtitle={`${new Date(request.createdAt).toLocaleDateString('ko-KR')} 요청`}
                   theme={theme}
                   avatarSize="md"
+                  maskEmail={true}
                   rightElement={
-                    <StatusBadge 
-                      status={FriendStatus.Pending} 
-                      theme={theme} 
-                      variant="badge" 
-                      size="sm"
-                    />
+                    activeTab === 'sent' ? (
+                      <StatusBadge 
+                        status={request.status} 
+                        theme={theme} 
+                        variant="badge" 
+                        size="sm"
+                      />
+                    ) : null
                   }
                 />
 
@@ -163,15 +176,26 @@ const FriendRequests = () => {
                       </Button>
                     </div>
                   ) : (
-                    // 보낸 요청: 취소 버튼
-                    <Button
-                      onClick={() => handleCancel(request.id)}
-                      theme="dark"
-                      className="px-3 py-1 text-xs bg-gray-500 hover:bg-gray-600"
-                      disabled={isCancelling}
-                    >
-                      취소
-                    </Button>
+                    // 보낸 요청: 상태에 따른 버튼
+                    request.status === FriendStatus.Pending ? (
+                      <Button
+                        onClick={() => handleCancel(request.id, request.status)}
+                        theme="dark"
+                        className="px-3 py-1 text-xs bg-gray-500 hover:bg-gray-600"
+                        disabled={isDeleting}
+                      >
+                        취소
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => handleCancel(request.id, request.status)}
+                        theme="dark"
+                        className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600"
+                        disabled={isDeleting}
+                      >
+                        삭제
+                      </Button>
+                    )
                   )}
                 </div>
               </div>

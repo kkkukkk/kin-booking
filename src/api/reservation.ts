@@ -89,7 +89,7 @@ export const safeRejectReservation = async (reservationId: string): Promise<void
 	const transferredTickets = await getTransferredTicketsByReservation(reservationId);
 	
 	// 2. 양도받은 사람들에게 알림 (실제 구현 시 알림 시스템 연동)
-	console.log(`양도된 티켓 ${transferredTickets.length}개 발견. 양도받은 사용자들에게 알림 필요.`);
+	// TODO: 알림 시스템 구현 시 양도받은 사용자들에게 알림 전송
 	
 	// 3. 모든 관련 티켓 삭제 (양도 이력은 CASCADE로 자동 삭제)
 	await deleteTicketsByReservationId(reservationId);

@@ -8,6 +8,7 @@ import Input from '@/components/base/Input';
 import { useSearchUsers, useSendFriendRequest } from '@/hooks/api/useFriends';
 import useDebounce from '@/hooks/useDebounce';
 import { MagnifyingGlassIcon } from '@/components/icon/FriendIcons';
+import { useAlert } from '@/providers/AlertProvider';
 import clsx from 'clsx';
 import UserSearchResult from './UserSearchResult';
 import { BulbIcon } from '@/components/icon/BulbIcon';
@@ -18,9 +19,18 @@ const AddFriend = () => {
   const debouncedQuery = useDebounce(searchQuery, 300);
   const { data: searchResults, isLoading: isSearching } = useSearchUsers(debouncedQuery);
   const { mutate: sendFriendRequest, isPending } = useSendFriendRequest();
+  const { showAlert } = useAlert();
 
-  const handleSendRequest = (friendId: string) => {
-    sendFriendRequest({ friendId });
+  const handleSendRequest = async (friendId: string, userName: string) => {
+    const confirmed = await showAlert({
+      type: 'confirm',
+      title: '친구 요청 보내기',
+      message: `${userName}님에게 친구 요청을 보낼까요?`
+    });
+    
+    if (confirmed) {
+      sendFriendRequest({ friendId });
+    }
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {

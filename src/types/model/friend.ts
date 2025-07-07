@@ -48,12 +48,10 @@ export interface FriendRequest {
     id: string;
     name: string;
     email: string;
-    avatar?: string;
   };
   toUser: {
     id: string;
     name: string;
     email: string;
-    avatar?: string;
   };
 } 

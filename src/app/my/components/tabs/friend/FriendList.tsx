@@ -6,7 +6,7 @@ import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import { StatusBadge } from '@/components/base/StatusBadge';
-import { useFriends, useDeleteFriend, useBlockFriend } from '@/hooks/api/useFriends';
+import { useFriends, useDeleteFriendRelation } from '@/hooks/api/useFriends';
 import { FriendWithUser, FriendStatus } from '@/types/model/friend';
 import { useAlert } from '@/providers/AlertProvider';
 import { UsersIcon } from '@/components/icon/FriendIcons';
@@ -17,8 +17,7 @@ const FriendList = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const { showAlert } = useAlert();
   const { data: friends, isLoading, error } = useFriends();
-  const { mutate: deleteFriend, isPending: isDeleting } = useDeleteFriend();
-  const { mutate: blockFriend, isPending: isBlocking } = useBlockFriend();
+  const { mutate: deleteFriendRelation, isPending: isDeleting } = useDeleteFriendRelation();
 
   const handleDeleteFriend = async (friend: FriendWithUser) => {
     const confirmed = await showAlert({
@@ -28,21 +27,11 @@ const FriendList = () => {
     });
 
     if (confirmed) {
-      deleteFriend(friend.friendId);
+      deleteFriendRelation({ targetId: friend.friend.id });
     }
   };
 
-  const handleBlockFriend = async (friend: FriendWithUser) => {
-    const confirmed = await showAlert({
-      type: 'confirm',
-      title: '친구 차단',
-      message: `${friend.friend.name}님을 차단하시겠습니까?`,
-    });
 
-    if (confirmed) {
-      blockFriend(friend.friendId);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -115,14 +104,6 @@ const FriendList = () => {
                 disabled={isDeleting}
               >
                 삭제
-              </Button>
-              <Button
-                onClick={() => handleBlockFriend(friend)}
-                theme="dark"
-                className="px-3 py-1 text-xs bg-gray-500 hover:bg-gray-600"
-                disabled={isBlocking}
-              >
-                차단
               </Button>
             </div>
           </div>

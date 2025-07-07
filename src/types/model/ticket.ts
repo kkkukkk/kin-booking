@@ -23,8 +23,9 @@ export interface Ticket {
   transferredAt: string | null;
   createdAt: string;
   updatedAt: string;
-  color: string;
+  color: string | null;
   isRare: boolean;
+  ticketNumber: number;
 }
 
 export interface CreateTicketRequest {

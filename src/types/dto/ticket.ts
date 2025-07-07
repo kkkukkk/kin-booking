@@ -1,4 +1,5 @@
 import { TicketStatus } from "../model/ticket";
+import { Events } from "../model/events";
 
 export interface TicketGroupDto {
 	eventName: string;
@@ -7,12 +8,6 @@ export interface TicketGroupDto {
 	usedCount: number;
 	cancelledCount: number;
 	latestCreatedAt: string;
-}
-
-export interface TicketEventInfoDto {
-	eventName: string;
-	eventDate: string;
-	ticketPrice: number;
 }
 
 export interface TicketWithEventDto {
@@ -26,5 +21,6 @@ export interface TicketWithEventDto {
 	updatedAt: string;
 	color: string;
 	isRare: boolean;
-	event: TicketEventInfoDto;
+	ticketNumber: number;
+	event: Events;
 }

@@ -16,7 +16,7 @@ interface UserSearchResultProps {
     email: string;
     avatar?: string;
   };
-  onSendRequest: (friendId: string) => void;
+  onSendRequest: (friendId: string, userName: string) => void;
   isPending: boolean;
 }
 
@@ -57,7 +57,7 @@ const UserSearchResult = ({ user, onSendRequest, isPending }: UserSearchResultPr
     }
     return (
       <Button
-        onClick={() => onSendRequest(user.id)}
+        onClick={() => onSendRequest(user.id, user.name)}
         theme="dark"
         className="px-3 py-1 text-xs"
         disabled={isPending}
@@ -75,6 +75,7 @@ const UserSearchResult = ({ user, onSendRequest, isPending }: UserSearchResultPr
         email={user.email}
         theme={theme}
         avatarSize="sm"
+        maskEmail={true}
       />
       
       {/* 액션 버튼/뱃지 */}
