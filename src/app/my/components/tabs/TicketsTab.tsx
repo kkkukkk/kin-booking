@@ -88,7 +88,7 @@ const TicketsTab = ({ userId }: TicketsTabProps) => {
 
 	if (isLoading) {
 		return (
-			<ThemeDiv className="p-8 text-center rounded-lg">
+			<ThemeDiv className="p-6 text-center rounded-lg" isChildren>
 				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
 				<p className="text-sm text-gray-600 dark:text-gray-300">티켓 정보를 불러오는 중...</p>
 			</ThemeDiv>
@@ -99,7 +99,7 @@ const TicketsTab = ({ userId }: TicketsTabProps) => {
 	}
 	if (eventGroups.length === 0) {
 		return (
-			<ThemeDiv className="p-8 text-center rounded-lg">
+			<ThemeDiv className="p-6 text-center rounded-lg" isChildren>
 				<TicketIcon />
 				<h3 className="text-lg font-semibold mb-2">보유한 티켓이 없습니다</h3>
 				<p className="text-sm opacity-70">승인된 예매의 티켓이 여기에 표시됩니다.</p>

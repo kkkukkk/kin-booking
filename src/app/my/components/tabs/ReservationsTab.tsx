@@ -18,6 +18,7 @@ import MenuIcon from '@/components/icon/MenuIcon';
 import { useAlert } from '@/providers/AlertProvider';
 import Accordion from '@/components/base/Accordion';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ReservationStatus } from '@/types/model/reservation';
 
 interface ReservationsTabProps {
 	reservations: any;
@@ -25,9 +26,9 @@ interface ReservationsTabProps {
 
 const FILTERS = [
 	{ key: 'all', label: '전체', icon: MenuIcon },
-	{ key: 'confirmed', label: '확정', icon: CheckCircleIcon },
-	{ key: 'pending', label: '대기', icon: ClockIcon },
-	{ key: 'cancelled', label: '취소', icon: XCircleIcon },
+	{ key: ReservationStatus.Confirmed, label: '확정', icon: CheckCircleIcon },
+	{ key: ReservationStatus.Pending, label: '대기', icon: ClockIcon },
+	{ key: ReservationStatus.Cancelled, label: '취소', icon: XCircleIcon },
 ];
 
 const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
@@ -41,35 +42,63 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 	const testReservations = [
 		{
 			id: 1,
+			userId: "test-user-1",
+			eventId: "test-event-1",
 			eventName: "2024 봄맞이 클래식 콘서트",
-			status: "confirmed",
+			status: ReservationStatus.Confirmed,
 			reservedAt: "2024-03-15T10:30:00Z",
 			quantity: 2,
-			ticketHolder: "김철수"
+			ticketHolder: "김철수",
+			event: {
+				eventId: "test-event-1",
+				eventName: "2024 봄맞이 클래식 콘서트",
+				eventDate: "2024-03-15T10:30:00Z"
+			}
 		},
 		{
 			id: 2,
+			userId: "test-user-1",
+			eventId: "test-event-2",
 			eventName: "재즈 나이트 - 스윙의 밤",
-			status: "pending",
+			status: ReservationStatus.Pending,
 			reservedAt: "2024-03-20T14:15:00Z",
 			quantity: 1,
-			ticketHolder: "김철수"
+			ticketHolder: "김철수",
+			event: {
+				eventId: "test-event-2",
+				eventName: "재즈 나이트 - 스윙의 밤",
+				eventDate: "2024-03-20T14:15:00Z"
+			}
 		},
 		{
 			id: 3,
+			userId: "test-user-1",
+			eventId: "test-event-3",
 			eventName: "K-POP 스타 라이브",
-			status: "cancelled",
+			status: ReservationStatus.Cancelled,
 			reservedAt: "2024-03-10T09:00:00Z",
 			quantity: 3,
-			ticketHolder: "김철수"
+			ticketHolder: "김철수",
+			event: {
+				eventId: "test-event-3",
+				eventName: "K-POP 스타 라이브",
+				eventDate: "2024-03-10T09:00:00Z"
+			}
 		},
 		{
 			id: 4,
+			userId: "test-user-1",
+			eventId: "test-event-4",
 			eventName: "오페라 갈라 공연 - 라 트라비아타",
-			status: "confirmed",
+			status: ReservationStatus.Confirmed,
 			reservedAt: "2024-03-25T19:30:00Z",
 			quantity: 1,
-			ticketHolder: "김철수"
+			ticketHolder: "김철수",
+			event: {
+				eventId: "test-event-4",
+				eventName: "오페라 갈라 공연 - 라 트라비아타",
+				eventDate: "2024-03-25T19:30:00Z"
+			}
 		}
 	];
 	
@@ -130,9 +159,9 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 						<Icon className="w-5 h-5 mb-1 flex items-center justify-center md:m-0" />
 						<span className="text-xs md:text-sm">{label}</span>
 						<span className="text-base font-bold mt-0.5">
-							{key === 'confirmed' && stats.confirmedCount}
-							{key === 'pending' && stats.pendingCount}
-							{key === 'cancelled' && stats.cancelledCount}
+							{key === ReservationStatus.Confirmed && stats.confirmedCount}
+							{key === ReservationStatus.Pending && stats.pendingCount}
+							{key === ReservationStatus.Cancelled && stats.cancelledCount}
 							{key === 'all' && displayReservations.length}
 						</span>
 					</Button>
@@ -159,8 +188,7 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 							>
 								<ThemeDiv 
 									className={clsx(
-										"p-5 rounded-xl border hover:shadow-md transition-all duration-200",
-										theme === 'normal' ? 'border-gray-200' : 'border-gray-700'
+										"p-4 rounded-xl transition-all duration-200"
 									)} 
 									isChildren
 								>
@@ -186,7 +214,7 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 											</div>
 										</div>
 										<div className="flex flex-col items-center gap-2">
-											{reservation.status === 'pending' && (
+											{reservation.status === ReservationStatus.Pending && (
 												<Button
 													onClick={() => handleCancelReservation(reservation.id)}
 													theme="dark"
@@ -200,34 +228,34 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 									</div>
 									
 									{/* 상태별 안내 메시지 */}
-									{reservation.status === 'confirmed' && (
+									{reservation.status === ReservationStatus.Confirmed && (
 										<div className={clsx(
 											"mt-3 p-3 rounded-lg",
 											theme === 'normal' ? 'bg-green-50' : 'bg-green-900/20'
 										)}>
-											<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors('confirmed', theme))}>
+											<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors(ReservationStatus.Confirmed, theme))}>
 												<span className="w-2 h-2 bg-green-500 rounded-full"></span>
 												{"티켓이 발급되었어요!"}
 											</div>
 										</div>
 									)}
-									{reservation.status === 'pending' && (
+									{reservation.status === ReservationStatus.Pending && (
 										<div className={clsx(
 											"mt-3 p-3 rounded-lg",
 											theme === 'normal' ? 'bg-yellow-50' : 'bg-yellow-900/20'
 										)}>
-											<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors('pending', theme))}>
+											<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors(ReservationStatus.Pending, theme))}>
 												<span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
 												{"예매 승인을 기다리고 있어요!"}
 											</div>
 										</div>
 									)}
-									{reservation.status === 'cancelled' && (
+									{reservation.status === ReservationStatus.Cancelled && (
 										<div className={clsx(
 											"mt-3 p-3 rounded-lg",
 											theme === 'normal' ? 'bg-red-50' : 'bg-red-900/20'
 										)}>
-											<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors('cancelled', theme))}>
+											<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors(ReservationStatus.Cancelled, theme))}>
 												<span className="w-2 h-2 bg-red-500 rounded-full"></span>
 												{"취소된 예매에요."}
 											</div>

@@ -7,7 +7,7 @@ import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import { StatusBadge } from '@/components/base/StatusBadge';
 import { useFriends, useDeleteFriendRelation } from '@/hooks/api/useFriends';
-import { FriendWithUser, FriendStatus } from '@/types/model/friend';
+import { FriendWithUser, FriendStatus } from '@/types/model/friends';
 import { useAlert } from '@/providers/AlertProvider';
 import { UsersIcon } from '@/components/icon/FriendIcons';
 import UserInfo from '@/components/base/UserInfo';
@@ -23,7 +23,7 @@ const FriendList = () => {
     const confirmed = await showAlert({
       type: 'confirm',
       title: '친구 삭제',
-      message: `${friend.friend.name}님을 친구 목록에서 삭제할까요?`,
+      message: `${friend.friend.name}님과 친구 관계를 끊을까요?`,
     });
 
     if (confirmed) {
@@ -95,7 +95,7 @@ const FriendList = () => {
               }
             />
             
-            {/* 액션 버튼들 */}
+            {/* 액션 버튼 */}
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => handleDeleteFriend(friend)}
@@ -103,7 +103,7 @@ const FriendList = () => {
                 className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600"
                 disabled={isDeleting}
               >
-                삭제
+                끊기
               </Button>
             </div>
           </div>

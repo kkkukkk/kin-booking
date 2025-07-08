@@ -15,6 +15,8 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 	const searchParams = useSearchParams();
 	const isLoggedOut = searchParams.get('loggedOut') === '1';
 
+	console.log(isLoggedOut);
+
 	const [ready, setReady] = useState(false);
 
 	useEffect(() => {
@@ -26,8 +28,11 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 						iconType: 'error',
 						autoCloseTime: 3000,
 					});
+					router.push('/login');
+				} else {
+					// 로그아웃시 ready 상태로 설정
+					setReady(true);
 				}
-				router.push('/login');
 			} else {
 				setReady(true);
 			}

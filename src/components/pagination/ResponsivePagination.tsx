@@ -63,12 +63,8 @@ const ResponsivePagination = ({
         />
       ) : (
         <PaginationButtons
-          currentPage={paginationInfo.page}
-          totalPages={paginationInfo.totalPages}
-          hasPrev={paginationInfo.hasPrev}
-          hasNext={paginationInfo.hasNext}
+          paginationInfo={paginationInfo}
           onPageChange={onPageChange}
-          isLoading={isLoading}
         />
       )}
     </motion.div>

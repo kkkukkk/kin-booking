@@ -11,7 +11,7 @@ import {
   useRespondToFriendRequest, 
   useDeleteFriendRelation
 } from '@/hooks/api/useFriends';
-import { FriendStatus } from '@/types/model/friend';
+import { FriendStatus } from '@/types/model/friends';
 import { InboxIcon, PaperAirplaneIcon } from '@/components/icon/FriendIcons';
 import UserInfo from '@/components/base/UserInfo';
 import { useAlert } from '@/providers/AlertProvider';

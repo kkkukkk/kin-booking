@@ -10,7 +10,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { fadeSlideDownSm } from "@/types/ui/motionVariants";
 import dayjs from "dayjs";
 import clsx from "clsx";
-import styles from "@/css/module/search-bar.module.css";
 import Select from "@/components/base/Select";
 import useDebounce from "@/hooks/useDebounce";
 import { FilterIcon } from "@/components/icon/FilterIcon";
@@ -168,9 +167,10 @@ const SearchBar = ({
                     type="button"
                     onClick={handleDatePickerToggle}
                     className={clsx(
-                      styles["date-picker-label"],
-                      styles[theme],
-                      "px-2 py-1 rounded w-full text-left cursor-pointer"
+                      "shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)] px-2 py-1 rounded w-full text-left cursor-pointer",
+                      theme === "normal" && "bg-white/90 border border-black/20",
+                      theme === "dark" && "bg-black/80 border border-white/50",
+                      theme === "neon" && "bg-black/80 border border-white/50"
                     )}
                   >
                     {tempFrom && tempTo ? `${tempFrom} ~ ${tempTo}` : '기간'}

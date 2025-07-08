@@ -40,7 +40,7 @@ export const getTicketsByOwnerId = async (ownerId: string): Promise<Ticket[]> =>
   return data;
 };
 
-// 공연별(이벤트별) 전체 티켓 취소 (DB 통신만)
+// 공연별(이벤트별) 전체 티켓 취소
 export const cancelAllTicketsByEvent = async (eventId: string, userId: string): Promise<{ updated: number }> => {
   const { data: tickets, error } = await supabase
     .from('ticket')
@@ -52,7 +52,7 @@ export const cancelAllTicketsByEvent = async (eventId: string, userId: string): 
   if (error) throw error;
   if (!tickets || tickets.length === 0) return { updated: 0 };
 
-  const activeTicketIds = tickets.map((t: any) => t.id);
+  const activeTicketIds = tickets.map((t: { id: string }) => t.id);
   if (activeTicketIds.length === 0) return { updated: 0 };
 
   const { error: updateError } = await supabase
@@ -122,7 +122,7 @@ export const deleteTicketsByReservationId = async (reservationId: string): Promi
   if (error) throw error;
 };
 
-// 티켓 취소 신청 (DB 통신만)
+// 티켓 취소 신청
 export const requestCancelTicket = async (ticketId: string, userId: string): Promise<{ updated: boolean }> => {
   const { error } = await supabase
     .from('ticket')

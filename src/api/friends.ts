@@ -1,9 +1,11 @@
 import { supabase } from '@/lib/supabaseClient';
-import { Friend, FriendWithUser, CreateFriendRequest, UpdateFriendRequest, FriendRequest, FriendStatus } from '@/types/model/friend';
-import { toCamelCaseKeys } from '@/util/case/case';
+import { Friends, FriendStatus } from '@/types/model/friends';
+import { FriendWithUser, CreateFriendRequest, FriendRequest } from '@/types/dto/friends';
+import { toCamelCaseKeys, toSnakeCaseKeys } from '@/util/case/case';
+import { User } from '@/types/model/user';
 
 // 친구 요청 보내기
-export const sendFriendRequest = async (request: CreateFriendRequest, userId: string): Promise<Friend> => {
+export const sendFriendRequest = async (request: CreateFriendRequest, userId: string): Promise<Friends> => {
   try {
     const requestData = {
       user_id: userId,
@@ -18,11 +20,11 @@ export const sendFriendRequest = async (request: CreateFriendRequest, userId: st
       .single();
 
     if (error) {
-      console.error('Friend request error:', error);
+      console.error('Friends request error:', error);
       throw error;
     }
     
-    return toCamelCaseKeys<Friend>(data);
+    return toCamelCaseKeys<Friends>(data);
   } catch (error) {
     console.error('sendFriendRequest error:', error);
     throw error;
@@ -30,7 +32,7 @@ export const sendFriendRequest = async (request: CreateFriendRequest, userId: st
 };
 
 // 친구 요청 응답 (수락/거절)
-export const respondToFriendRequest = async (friendId: string, status: FriendStatus, userId: string): Promise<Friend> => {
+export const respondToFriendRequest = async (friendId: string, status: FriendStatus, userId: string): Promise<Friends> => {
   try {
     const { data, error } = await supabase
       .from('friends')
@@ -45,7 +47,7 @@ export const respondToFriendRequest = async (friendId: string, status: FriendSta
       throw error;
     }
     
-    return toCamelCaseKeys<Friend>(data);
+    return toCamelCaseKeys<Friends>(data);
   } catch (error) {
     console.error('respondToFriendRequest error:', error);
     throw error;
@@ -74,11 +76,11 @@ export const getFriends = async (userId: string): Promise<FriendWithUser[]> => {
     }
 
     // 친구들의 ID 수집 (내가 user_id인 경우 friend_id가 친구, 내가 friend_id인 경우 user_id가 친구)
-    const friendIds = (data || []).map((item: any) => 
+    const friendIds = (data || []).map((item: { user_id: string; friend_id: string }) => 
       item.user_id === userId ? item.friend_id : item.user_id
     );
     
-    let usersData: any[] = [];
+    let usersData: Array<{ id: string; name: string; email: string }> = [];
 
     // 사용자 정보를 별도로 조회
     if (friendIds.length > 0) {
@@ -93,9 +95,9 @@ export const getFriends = async (userId: string): Promise<FriendWithUser[]> => {
     }
 
     // 사용자 정보를 Map으로 변환
-    const usersMap = new Map(usersData.map((user: any) => [user.id, user]));
+    const usersMap = new Map(usersData.map((user: { id: string; name: string; email: string }) => [user.id, user]));
     
-    const friendsWithUserData = (data || []).map((item: any) => {
+    const friendsWithUserData = (data || []).map((item: { id: string; user_id: string; friend_id: string; status: string; created_at: string }) => {
       const isMyRequest = item.user_id === userId;
       const friendId = isMyRequest ? item.friend_id : item.user_id;
       const friendUser = usersMap.get(friendId);
@@ -120,8 +122,6 @@ export const getFriends = async (userId: string): Promise<FriendWithUser[]> => {
     return [];
   }
 };
-
-
 
 // 친구 관계 삭제 (친구 삭제, 요청 취소, 거절된 요청 삭제)
 export const deleteFriendRelation = async (
@@ -152,15 +152,12 @@ export const deleteFriendRelation = async (
   }
 };
 
-
-
-// 받은/보낸 친구 요청을 한번에 조회 (pending, rejected 포함)
+// 친구 요청 목록 조회 (raw 데이터만 반환)
 export const getFriendRequests = async (userId: string): Promise<{
-  received: FriendRequest[];
-  sent: FriendRequest[];
+  friends: Friends[];
+  users: User[];
 }> => {
   try {
-    // 받은 요청과 보낸 요청을 동시에 조회 (pending, rejected 상태 포함)
     const { data, error } = await supabase
       .from('friends')
       .select(`
@@ -172,95 +169,21 @@ export const getFriendRequests = async (userId: string): Promise<{
       `)
       .or(`friend_id.eq.${userId},user_id.eq.${userId}`)
       .in('status', ['pending', 'rejected']);
-
-    if (error) {
-      console.error('Get friend requests error:', error);
-      return { received: [], sent: [] };
-    }
-
-    const received: FriendRequest[] = [];
-    const sent: FriendRequest[] = [];
-
-    // 받은 요청의 user_id들 수집
-    const receivedUserIds = (data || [])
-      .filter((item: any) => item.friend_id === userId)
-      .map((item: any) => item.user_id);
-
-    // 보낸 요청의 friend_id들 수집
-    const sentUserIds = (data || [])
-      .filter((item: any) => item.user_id === userId)
-      .map((item: any) => item.friend_id);
-
-    // 사용자 정보를 별도로 조회
+    if (error) return { friends: [], users: [] };
+    const friends = toCamelCaseKeys<Friends[]>(data || []);
+    const receivedUserIds = friends.filter(item => item.friendId === userId).map(item => item.userId);
+    const sentUserIds = friends.filter(item => item.userId === userId).map(item => item.friendId);
     const allUserIds = [...new Set([...receivedUserIds, ...sentUserIds])];
-    let usersData: any[] = [];
-    
+    let users: User[] = [];
     if (allUserIds.length > 0) {
-      // Supabase Function을 사용하여 사용자 정보 조회
-      const { data: users, error: usersError } = await supabase
-        .rpc('get_users_by_ids', {
-          user_ids: allUserIds
-        });
-
-      if (!usersError) {
-        usersData = users || [];
-      }
+      const { data: usersData, error: usersError } = await supabase
+        .rpc('get_users_by_ids', { user_ids: allUserIds });
+      if (!usersError) users = toCamelCaseKeys<User[]>(usersData || []);
     }
-
-    // 사용자 정보를 Map으로 변환
-    const usersMap = new Map(usersData.map((user: any) => [user.id, user]));
-
-    (data || []).forEach((item: any) => {
-      if (item.friend_id === userId) {
-        // 받은 요청 (내가 friend_id)
-        const fromUser = usersMap.get(item.user_id);
-        received.push({
-          id: item.id,
-          fromUserId: item.user_id,
-          toUserId: item.friend_id,
-          status: item.status,
-          createdAt: item.created_at,
-                  fromUser: {
-          id: fromUser?.id || item.user_id,
-          name: fromUser?.name || `사용자 ${item.user_id.slice(0, 8)}`,
-          email: fromUser?.email || '',
-        },
-          toUser: {
-            id: userId,
-            name: '',
-            email: '',
-          }
-        });
-      } else if (item.user_id === userId) {
-        // 보낸 요청 (내가 user_id)
-        const toUser = usersMap.get(item.friend_id);
-        sent.push({
-          id: item.id,
-          fromUserId: item.user_id,
-          toUserId: item.friend_id,
-          status: item.status,
-          createdAt: item.created_at,
-          fromUser: {
-            id: userId,
-            name: '',
-            email: '',
-          },
-          toUser: {
-            id: toUser?.id || item.friend_id,
-            name: toUser?.name || `사용자 ${item.friend_id.slice(0, 8)}`,
-            email: toUser?.email || '',
-          }
-        });
-      }
-    });
-
-    return {
-      received: toCamelCaseKeys<FriendRequest[]>(received),
-      sent: toCamelCaseKeys<FriendRequest[]>(sent)
-    };
+    return { friends, users };
   } catch (error) {
     console.error('getFriendRequests error:', error);
-    return { received: [], sent: [] };
+    return { friends: [], users: [] };
   }
 };
 

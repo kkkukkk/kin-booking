@@ -9,8 +9,8 @@ import { useSession } from '@/hooks/useSession';
 import useToast from '@/hooks/useToast';
 import { useAlert } from '@/providers/AlertProvider';
 import { useSpinner } from '@/hooks/useSpinner';
-import { supabase } from '@/lib/supabaseClient';
 import { useUserById } from '@/hooks/api/useUsers';
+import { useLogout } from '@/hooks/api/useAuth';
 import { useReservationsByUserId } from '@/hooks/api/useReservations';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
@@ -21,7 +21,8 @@ import { SmileIcon } from '@/components/icon/SmileIcon';
 import { CalendarIcon } from '@/components/icon/CalendarIcon';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
 import { ThumbUpIcon } from '@/components/icon/ThumbUpIcon';
-import { getUserHighestRole, getRoleDisplayName, getRoleBadgeColor } from '@/util/userRole';
+import { getUserHighestRole } from '@/util/userRole';
+import { StatusBadge } from '@/components/base/StatusBadge';
 import ProfileTab from '@/app/my/components/tabs/ProfileTab';
 import ReservationsTab from '@/app/my/components/tabs/ReservationsTab';
 import TicketsTab from '@/app/my/components/tabs/TicketsTab';
@@ -37,6 +38,7 @@ const MyPageClient = () => {
 	const { showAlert } = useAlert();
 	const { showSpinner, hideSpinner } = useSpinner();
 	const router = useRouter();
+	const { mutate: logout } = useLogout();
 	
 	const [activeTab, setActiveTab] = useState<MyPageTab>('profile');
 	
@@ -51,7 +53,6 @@ const MyPageClient = () => {
 		phoneNumber: session?.user?.user_metadata?.phone_number || null,
 		registerDate: session?.user?.created_at || new Date().toISOString(),
 		marketingConsent: session?.user?.user_metadata?.marketing_consent || false,
-		status: 'active'
 	} : null;
 	
 	// 예매 내역 조회
@@ -61,8 +62,6 @@ const MyPageClient = () => {
 	
 	// 사용자 권한 정보 (user가 UserWithRoles 타입이므로 타입 단언 사용)
 	const userRole = getUserHighestRole(displayUser as any || null);
-	const roleDisplayName = getRoleDisplayName(userRole);
-	const roleBadgeColor = getRoleBadgeColor(userRole);
 	
 	const isLoading = userLoading || reservationsLoading;
 	
@@ -76,19 +75,20 @@ const MyPageClient = () => {
 		
 		if (confirmed) {
 			showSpinner();
-			try {
-				await supabase.auth.signOut();
-				showToast({ message: '로그아웃되었습니다.', iconType: 'success' });
-				
-				// 스피너가 보이도록 잠시 대기 후 페이지 이동
-				setTimeout(() => {
+			logout(undefined, {
+				onSuccess: () => {
+					showToast({ message: '로그아웃되었습니다.', iconType: 'success' });
+					// 스피너가 보이도록 잠시 대기 후 페이지 이동
+					setTimeout(() => {
+						hideSpinner();
+						router.push('/login?loggedOut=1');
+					}, 500);
+				},
+				onError: () => {
 					hideSpinner();
-					router.push('/login?loggedOut=1');
-				}, 500);
-			} catch (error) {
-				hideSpinner();
-				showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error' });
-			}
+					showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error' });
+				}
+			});
 		}
 	};
 	
@@ -161,9 +161,12 @@ const MyPageClient = () => {
 								<h2 className="text-xl font-bold">
 									{displayUser?.name || '사용자'}
 								</h2>
-								<span className={`px-3 py-1 rounded-full text-xs font-semibold ${roleBadgeColor}`}>
-									{roleDisplayName}
-								</span>
+								<StatusBadge 
+									status={userRole} 
+									theme={theme} 
+									variant="badge" 
+									size="sm" 
+								/>
 							</div>
 							<p className={clsx(
 								"mb-1",

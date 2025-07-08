@@ -1,10 +1,12 @@
 import clsx from "clsx";
 import { EventStatus, EventStatusKo } from "@/types/model/events";
 import { TicketStatus, TicketStatusKo } from "@/types/model/ticket";
-import { FriendStatus, FriendStatusKo } from "@/types/model/friend";
+import { FriendStatus, FriendStatusKo } from "@/types/model/friends";
+import { ReservationStatus, ReservationStatusKo } from "@/types/model/reservation";
+import { UserRoleStatus, UserRoleStatusKo } from "@/types/model/userRole";
 
 // 지원하는 상태 타입들
-type StatusType = EventStatus | TicketStatus | FriendStatus | 'confirmed' | 'pending' | 'cancelled';
+type StatusType = EventStatus | TicketStatus | FriendStatus | ReservationStatus | UserRoleStatus;
 
 // 상태별 색상 정의
 const getStatusColors = (status: StatusType, theme: string, variant: 'badge' | 'text' | 'info' = 'badge') => {
@@ -143,20 +145,10 @@ const getStatusColors = (status: StatusType, theme: string, variant: 'badge' | '
     }
   }
   
-  // 예매 상태 색상
-  if (status === 'confirmed') {
+  // ReservationStatus 색상
+  if (status === ReservationStatus.Pending) {
     if (variant === 'badge') {
-      return isDarkTheme ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-700';
-    } else if (variant === 'text') {
-      return isDarkTheme ? 'text-green-400' : 'text-green-600';
-    } else if (variant === 'info') {
-      return isDarkTheme ? 'bg-green-900/20 text-green-300' : 'bg-green-50 text-green-700';
-    }
-  }
-  
-  if (status === 'pending') {
-    if (variant === 'badge') {
-      return isDarkTheme ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-700';
+      return isDarkTheme ? 'bg-yellow-900/30 text-yellow-300' : 'bg-yellow-100 text-yellow-800';
     } else if (variant === 'text') {
       return isDarkTheme ? 'text-yellow-400' : 'text-yellow-600';
     } else if (variant === 'info') {
@@ -164,15 +156,68 @@ const getStatusColors = (status: StatusType, theme: string, variant: 'badge' | '
     }
   }
   
-  if (status === 'cancelled') {
+  if (status === ReservationStatus.Confirmed) {
     if (variant === 'badge') {
-      return isDarkTheme ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-700';
+      return isDarkTheme ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800';
+    } else if (variant === 'text') {
+      return isDarkTheme ? 'text-green-400' : 'text-green-600';
+    } else if (variant === 'info') {
+      return isDarkTheme ? 'bg-green-900/20 text-green-300' : 'bg-green-50 text-green-700';
+    }
+  }
+  
+  if (status === ReservationStatus.Cancelled) {
+    if (variant === 'badge') {
+      return isDarkTheme ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-800';
     } else if (variant === 'text') {
       return isDarkTheme ? 'text-red-400' : 'text-red-600';
     } else if (variant === 'info') {
       return isDarkTheme ? 'bg-red-900/20 text-red-300' : 'bg-red-50 text-red-700';
     }
   }
+  
+  // 사용자 역할 색상
+  if (status === UserRoleStatus.Master) {
+    if (variant === 'badge') {
+      return 'bg-purple-500 text-white';
+    } else if (variant === 'text') {
+      return 'text-purple-500';
+    } else if (variant === 'info') {
+      return 'bg-purple-100 text-purple-700';
+    }
+  }
+  
+  if (status === UserRoleStatus.Manager) {
+    if (variant === 'badge') {
+      return 'bg-blue-500 text-white';
+    } else if (variant === 'text') {
+      return 'text-blue-500';
+    } else if (variant === 'info') {
+      return 'bg-blue-100 text-blue-700';
+    }
+  }
+  
+  if (status === UserRoleStatus.Member) {
+    if (variant === 'badge') {
+      return 'bg-green-500 text-white';
+    } else if (variant === 'text') {
+      return 'text-green-500';
+    } else if (variant === 'info') {
+      return 'bg-green-100 text-green-700';
+    }
+  }
+  
+  if (status === UserRoleStatus.User) {
+    if (variant === 'badge') {
+      return 'bg-gray-500 text-white';
+    } else if (variant === 'text') {
+      return 'text-gray-500';
+    } else if (variant === 'info') {
+      return 'bg-gray-100 text-gray-700';
+    }
+  }
+  
+
   
   // 기본값
   if (variant === 'badge') {
@@ -203,17 +248,18 @@ const getStatusText = (status: StatusType): string => {
     return FriendStatusKo[status as FriendStatus];
   }
   
-  // 예매 상태
-  switch (status) {
-    case 'confirmed':
-      return '확정';
-    case 'pending':
-      return '대기중';
-    case 'cancelled':
-      return '취소';
-    default:
-      return status;
+  // ReservationStatus
+  if (Object.values(ReservationStatus).includes(status as ReservationStatus)) {
+    return ReservationStatusKo[status as ReservationStatus];
   }
+  
+  // UserRoleStatus
+  if (Object.values(UserRoleStatus).includes(status as UserRoleStatus)) {
+    return UserRoleStatusKo[status as UserRoleStatus];
+  }
+  
+  // 기본값
+  return status;
 };
 
 interface StatusBadgeProps {

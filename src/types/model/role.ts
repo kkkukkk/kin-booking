@@ -7,7 +7,7 @@ export enum RoleCode {
 
 export const RoleCodeKo: Record<RoleCode, string> = {
 	[RoleCode.MASTER]: '마스터',
-	[RoleCode.MANAGER]: '관리자',
+	[RoleCode.MANAGER]: '매니저',
 	[RoleCode.MEMBER]: '멤버',
 	[RoleCode.USER]: '유저',
 };

@@ -6,6 +6,7 @@ import {
 	updateUser,
 	deleteUser,
 	softDeleteUser,
+	searchUsers,
 } from '@/api/user';
 import { User } from '@/types/model/user';
 import {
@@ -15,6 +16,7 @@ import {
 	FetchUserWithRolesResponseDto
 } from "@/types/dto/user";
 import { PaginationParams } from "@/util/pagination/type";
+import { useSession } from '@/hooks/useSession';
 
 // 유저 검색 hook
 export const useUsers = (params?: PaginationParams & FetchUserDto) => {
@@ -124,5 +126,19 @@ export const useUserById = (userId: string) => {
 		queryKey: ['user', userId],
 		queryFn: () => fetchUserById(userId),
 		enabled: !!userId,
+	});
+};
+
+// 사용자 검색 (친구 추가 등)
+export const useSearchUsers = (query: string) => {
+	const { session } = useSession();
+	
+	return useQuery({
+		queryKey: ['users', 'search', query],
+		queryFn: () => searchUsers(query, session?.user?.id || ''),
+		enabled: query.length >= 2 && !!session?.user?.id, // 2글자 이상, 세션이 있을 때만 검색
+		staleTime: 5 * 60 * 1000, // 5분 캐시
+		retry: 1,
+		retryDelay: 1000,
 	});
 };

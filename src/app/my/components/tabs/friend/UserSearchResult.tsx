@@ -7,7 +7,7 @@ import { StatusBadge } from '@/components/base/StatusBadge';
 import Button from '@/components/base/Button';
 import UserInfo from '@/components/base/UserInfo';
 import { useCheckFriendStatus } from '@/hooks/api/useFriends';
-import { FriendStatus } from '@/types/model/friend';
+import { FriendStatus } from '@/types/model/friends';
 
 interface UserSearchResultProps {
   user: {

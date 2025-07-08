@@ -1,6 +1,5 @@
 import React from "react";
 import clsx from "clsx";
-import styles from "@/css/module/button.module.css";
 import { ButtonProps } from "@/types/ui/button";
 
 // 햄버거 버튼 바
@@ -47,29 +46,82 @@ const Button = ({
 	className,
 	...rest
 }: ButtonProps) => {
+	const getThemeStyles = () => {
+		switch (theme) {
+			case "normal":
+				return "text-black bg-white/90 border border-black/20";
+			case "dark":
+				return light 
+					? "text-[#eee] bg-[rgba(64,64,64,0.9)] border border-white/30"
+					: "text-[#eee] bg-black/80 border border-white/30";
+			case "neon":
+				return "text-[rgb(119,255,153)] bg-black/80 border border-[rgb(119,255,153)]/30";
+			default:
+				return "text-black bg-white/90 border border-black/20";
+		}
+	};
+
+	const getHoverStyles = () => {
+		if (theme === "normal") {
+			return reverse 
+				? "hover:shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]"
+				: "hover:shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]";
+		}
+		if (theme === "dark") {
+			return reverse
+				? "hover:shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]"
+				: "hover:shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]";
+		}
+		if (theme === "neon") {
+			return "hover:shadow-[0_0_4px_rgba(119,255,153,0.7),0_0_8px_rgba(119,255,153,0.5),0_0_12px_rgba(119,255,153,0.3),0_0_20px_rgba(119,255,153,0.2)]";
+		}
+		return "";
+	};
+
+	const getOnStyles = () => {
+		if (!on) return "";
+		
+		if (theme === "normal") {
+			return reverse 
+				? "shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]"
+				: "shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]";
+		}
+		if (theme === "dark") {
+			return reverse
+				? "shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]"
+				: "shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]";
+		}
+		if (theme === "neon") {
+			return "shadow-[0_0_4px_rgba(119,255,153,0.7),0_0_8px_rgba(119,255,153,0.5),0_0_12px_rgba(119,255,153,0.3),0_0_20px_rgba(119,255,153,0.2)]";
+		}
+		return "";
+	};
+
 	const baseClass = clsx(
-		styles[`theme-${theme}`],
 		"transition-all duration-300 cursor-pointer",
 		"relative flex items-center justify-center",
 		round ? "rounded-full w-[42px] h-[42px] md:w-[56px] md:h-[56px]" : ["rounded-[5px]", width, height],
 		fontSize,
 		fontWeight,
 		padding,
-		on && styles["on"],
-		reverse && styles["reverse"],
-		light && styles["light"],
+		getThemeStyles(),
+		getHoverStyles(),
+		getOnStyles(),
 		className
 	);
 
+	// 모바일에서 hover 효과 비활성화를 위한 클래스
+	const mobileHoverClass = on ? "" : "max-md:hover:shadow-none";
+
 	if (variant === "hamburger") {
 		return (
-			<button {...rest} className={baseClass} aria-pressed={on}>
+			<button {...rest} className={clsx(baseClass, mobileHoverClass)} aria-pressed={on}>
 				<HamburgerLines on={on} />
 			</button>
 		);
 	}
 
-	return <button {...rest} className={baseClass} aria-pressed={on} />;
+	return <button {...rest} className={clsx(baseClass, mobileHoverClass)} aria-pressed={on} />;
 };
 
 Button.displayName = "Button";

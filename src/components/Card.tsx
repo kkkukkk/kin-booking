@@ -84,6 +84,8 @@ const Card = ({
 						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12",
 						center && "flex justify-center items-center",
 						"scrollbar-none",
+						// ThemeRefDiv의 기본 스타일을 무시하고 Card 전용 스타일 적용
+						"bg-transparent border-none backdrop-blur-sm",
 						className
 					)}
 					style={{
@@ -93,6 +95,7 @@ const Card = ({
 								? "var(--black_70)"
 								: "var(--white_70)",
 					}}
+					lightweight
 				>
 					{(backButton || hasLogo) && (
 						<div className="flex w-full items-center justify-between pb-2">

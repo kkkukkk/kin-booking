@@ -43,7 +43,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
     }
     
     resizeTimeoutRef.current = setTimeout(() => {
-      for (let entry of entries) {
+      for (const entry of entries) {
         const { width, height } = entry.contentRect
         setMaskSize({ width: Math.round(width), height: Math.round(height) })
         setIsReady(true)

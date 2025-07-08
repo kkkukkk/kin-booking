@@ -25,7 +25,7 @@ const generateStripeGradient = (): string => {
   const stripeCount = Math.floor(Math.random() * 5) + 1 // 1~5개
   const direction = randomDirection()
 
-  let stops: string[] = []
+  const stops: string[] = []
   let currentPos = 0
 
   for (let i = 0; i < stripeCount; i++) {

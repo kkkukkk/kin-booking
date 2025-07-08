@@ -123,3 +123,25 @@ export const fetchUserById = async (userId: string): Promise<User | null> => {
 	
 	return toCamelCaseKeys<User>(data);
 };
+
+// 사용자 검색 (친구 추가용 등)
+export const searchUsers = async (query: string, currentUserId: string): Promise<any[]> => {
+	try {
+		// Supabase Function을 사용하여 사용자 검색
+		const { data, error } = await supabase
+			.rpc('search_users_for_friends', {
+				search_query: query,
+				current_user_id: currentUserId
+			});
+
+		if (error) {
+			console.error('Search users error:', error);
+			return [];
+		}
+		
+		return toCamelCaseKeys<any[]>(data || []);
+	} catch (error) {
+		console.error('searchUsers error:', error);
+		return [];
+	}
+};
