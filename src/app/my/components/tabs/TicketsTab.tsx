@@ -60,7 +60,7 @@ const TicketsTab = ({ userId }: TicketsTabProps) => {
 			cancelAllTickets(
 				{ eventId, userId: session.user.id },
 				{
-					onSuccess: () => showToast({ message: '모든 티켓이 취소되었습니다.', iconType: 'success' }),
+					onSuccess: () => showToast({ message: '모든 티켓이 취소 신청 되었습니다.', iconType: 'success' }),
 					onError: (err: any) => showToast({ message: err.message, iconType: 'error' }),
 				}
 			);
@@ -100,7 +100,6 @@ const TicketsTab = ({ userId }: TicketsTabProps) => {
 	if (eventGroups.length === 0) {
 		return (
 			<ThemeDiv className="p-6 text-center rounded-lg" isChildren>
-				<TicketIcon />
 				<h3 className="text-lg font-semibold mb-2">보유한 티켓이 없습니다</h3>
 				<p className="text-sm opacity-70">승인된 예매의 티켓이 여기에 표시됩니다.</p>
 			</ThemeDiv>

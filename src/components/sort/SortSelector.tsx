@@ -3,9 +3,8 @@
 import { motion } from 'framer-motion';
 import { useAppSelector } from '@/redux/hooks';
 import { SortConfig, sortOptions } from '@/types/ui/sort';
-import Select from '@/components/base/Select';
 import Button from '@/components/base/Button';
-import { ArrowUpIcon, ArrowDownIcon } from '@/components/icon/ArrowIcons';
+import { ArrowUpIcon } from '@/components/icon/ArrowIcons';
 import clsx from 'clsx';
 
 interface SortSelectorProps {
@@ -31,33 +30,29 @@ const SortSelector = ({ sortConfig, onSortChange, className = '' }: SortSelector
     });
   };
 
-  const getDirectionIcon = () => {
-    return sortConfig.direction === 'asc' ? (
-      <ArrowUpIcon className="w-4 h-4" />
-    ) : (
-      <ArrowDownIcon className="w-4 h-4" />
-    );
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className={clsx('flex items-center space-x-2', className)}
+      className={clsx('flex items-center space-x-2 justify-end', className)}
     >
-      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-        정렬:
-      </span>
-      
-      <Select
-        value={sortConfig.field}
-        onChange={handleFieldChange}
-        options={sortOptions}
-        placeholder="정렬 선택"
-        className="w-32"
-      />
-      
+      {sortOptions.map(option => (
+        <button
+          key={option.value}
+          onClick={() => handleFieldChange(option.value)}
+          className={clsx(
+            'px-3 py-1 rounded transition font-medium',
+            sortConfig.field === option.value
+              ? 'bg-green-500 text-white shadow'
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100',
+            'focus:outline-none'
+          )}
+          type="button"
+        >
+          {option.label}
+        </button>
+      ))}
       <Button
         theme="dark"
         width="w-8"
@@ -68,7 +63,13 @@ const SortSelector = ({ sortConfig, onSortChange, className = '' }: SortSelector
         className="flex items-center justify-center"
         title={sortConfig.direction === 'asc' ? '오름차순' : '내림차순'}
       >
-        {getDirectionIcon()}
+        <motion.span
+          animate={{ rotate: sortConfig.direction === 'asc' ? 0 : 180 }}
+          transition={{ duration: 0.3 }}
+          className="inline-block"
+        >
+          <ArrowUpIcon className="w-4 h-4" />
+        </motion.span>
       </Button>
     </motion.div>
   );

@@ -32,8 +32,8 @@ const EventClient = () => {
 		>
 			<div className="text-center mb-3 md:mb-4">
 				<AnimatedText
-					fontSize="text-base md:text-lg"
-					text="다양한 공연을 찾아보세요"
+					fontSize="text-lg md:text-lg"
+					text="다양한 공연을 찾아보세요!"
 					delay={0.3}
 				/>
 			</div>

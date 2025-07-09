@@ -22,6 +22,7 @@ interface TicketStackProps {
 	eventInfo?: Events; // 공연 정보 (일자, 시간 등)
 	onCancelRequest?: (eventId: string) => void;
 	onTicketAction?: (ticketIds: string[], action: 'enter' | 'transfer') => void;
+	key?: React.Key;
 }
 
 const TicketStack: React.FC<TicketStackProps> = ({
@@ -83,15 +84,15 @@ const TicketStack: React.FC<TicketStackProps> = ({
 	const canEnter = useMemo(() => {
 		if (stackStatus !== TicketStatus.Active) return false;
 		if (!eventInfo?.eventDate) return true; // 이벤트 정보가 없으면 기본적으로 활성화
-		
+
 		const now = new Date();
 		const eventDate = new Date(eventInfo.eventDate);
-		
+
 		// 공연 시작 30분 전부터 입장 가능
 		const entryStartTime = new Date(eventDate.getTime() - 30 * 60 * 1000);
 		// 공연 종료 후 2시간까지 입장 가능
 		const entryEndTime = new Date(eventDate.getTime() + 2 * 60 * 60 * 1000);
-		
+
 		return now >= entryStartTime && now <= entryEndTime;
 	}, [stackStatus, eventInfo]);
 
@@ -122,7 +123,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 		const activeTicketIds = tickets
 			.filter(ticket => ticket.status === TicketStatus.Active)
 			.map(ticket => ticket.id);
-		
+
 		if (onTicketAction) {
 			onTicketAction(activeTicketIds, action);
 		} else {
@@ -142,7 +143,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 	const ticketHeight = 200; // 기본 티켓 높이
 	const ticketSpacing = 16; // 티켓 간격
 	const actionBarHeight = 60; // 액션 바 높이
-	
+
 	let groupHeight;
 	if (isExpanded) {
 		// 펼친 상태: 세로 배치
@@ -177,7 +178,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 	const eventDateInfo = eventInfo?.eventDate ? formatEventDate(eventInfo.eventDate) : null;
 
 	return (
-		<ThemeDiv 
+		<ThemeDiv
 			className="rounded-xl shadow-lg border border-gray-200 overflow-hidden"
 			style={{ minHeight: `${groupHeight}px` }}
 			isChildren
@@ -200,7 +201,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 								</div>
 							)}
 						</div>
-						
+
 						{/* 티켓 정보 */}
 						<div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
 							<p className="text-sm">
@@ -212,7 +213,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 								</div>
 							)}
 						</div>
-						
+
 						{/* 상태별 통계 */}
 						<div className="flex flex-wrap gap-2">
 							{statusStats.active > 0 && (
@@ -264,8 +265,8 @@ const TicketStack: React.FC<TicketStackProps> = ({
 			{(canEnter || canTransfer || canCancel) && (
 				<div className={clsx(
 					"px-6 py-4 border-b",
-					theme === 'normal' 
-						? 'bg-gray-50 border-gray-200' 
+					theme === 'normal'
+						? 'bg-gray-50 border-gray-200'
 						: 'bg-gray-700/50 border-gray-600'
 				)}>
 					<div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
@@ -283,7 +284,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 								{canEnter ? '🎫 입장하기' : '⏰ 입장 대기'}
 							</button>
 						)}
-						
+
 						{/* 양도 버튼 */}
 						{canTransfer && (
 							<button
@@ -293,7 +294,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 								🔄 양도하기
 							</button>
 						)}
-						
+
 						{/* 취소 신청 버튼 */}
 						{canCancel && onCancelRequest && (
 							<button
@@ -306,7 +307,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 					</div>
 				</div>
 			)}
-			
+
 			{/* 티켓 스택/리스트 */}
 			<div className="p-6">
 				{visibleTickets.length > 0 ? (
@@ -354,8 +355,8 @@ const TicketStack: React.FC<TicketStackProps> = ({
 											padding="px-6 py-3"
 											className={clsx(
 												"border shadow-sm hover:shadow-md",
-												theme === 'normal' 
-													? 'border-blue-200' 
+												theme === 'normal'
+													? 'border-blue-200'
 													: 'border-blue-700'
 											)}
 											onClick={toggleExpanded}
@@ -382,7 +383,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 										const translateX = ticketIdx * 8; // 우측으로
 										const translateY = -(ticketIdx * 8); // 위로 (음수)
 										const opacity = isTopTicket ? 1 : Math.max(0.2, 1 - (ticketIdx * 0.2));
-										
+
 										return (
 											<div
 												key={ticket.id}
@@ -421,8 +422,8 @@ const TicketStack: React.FC<TicketStackProps> = ({
 											padding="px-6 py-3"
 											className={clsx(
 												"border shadow-sm hover:shadow-md",
-												theme === 'normal' 
-													? 'border-blue-200' 
+												theme === 'normal'
+													? 'border-blue-200'
 													: 'border-blue-700'
 											)}
 											onClick={toggleExpanded}

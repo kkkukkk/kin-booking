@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import { useEffect } from "react";
 import Card from "@/components/Card";
 import { useSession } from "@/hooks/useSession";
 import AnimatedText from "@/components/base/AnimatedText";
@@ -18,19 +18,16 @@ const Home = ()=> {
         isTutorialOpen, 
         hasSeenTutorial, 
         openTutorial, 
-        closeTutorial, 
         completeTutorial, 
         dontShowAgain 
     } = useTutorial('main-page-tutorial-seen');
 
     // 첫 방문 시 튜토리얼 자동 열기
-    React.useEffect(() => {
+    useEffect(() => {
         if (!hasSeenTutorial) {
-            // 페이지 로드 후 잠시 대기 후 튜토리얼 열기
             const timer = setTimeout(() => {
                 openTutorial();
-            }, 2000);
-            
+            }, 1000);
             return () => clearTimeout(timer);
         }
     }, [hasSeenTutorial, openTutorial]);
@@ -68,9 +65,7 @@ const Home = ()=> {
             <TutorialOverlay
                 steps={mainPageTutorialSteps}
                 isOpen={isTutorialOpen}
-                onClose={closeTutorial}
                 onComplete={completeTutorial}
-                onDontShowAgain={dontShowAgain}
             />
         </>
     );

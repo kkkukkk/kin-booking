@@ -7,7 +7,7 @@ import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import { StatusBadge } from '@/components/base/StatusBadge';
 import { useFriends, useDeleteFriendRelation } from '@/hooks/api/useFriends';
-import { FriendWithUser, FriendStatus } from '@/types/model/friends';
+import { FriendStatus } from '@/types/model/friends';
 import { useAlert } from '@/providers/AlertProvider';
 import { UsersIcon } from '@/components/icon/FriendIcons';
 import UserInfo from '@/components/base/UserInfo';
@@ -19,15 +19,15 @@ const FriendList = () => {
   const { data: friends, isLoading, error } = useFriends();
   const { mutate: deleteFriendRelation, isPending: isDeleting } = useDeleteFriendRelation();
 
-  const handleDeleteFriend = async (friend: FriendWithUser) => {
+  const handleDeleteFriend = async (friendName: string, friendId: string) => {
     const confirmed = await showAlert({
       type: 'confirm',
       title: '친구 삭제',
-      message: `${friend.friend.name}님과 친구 관계를 끊을까요?`,
+      message: `${friendName}님과 친구 관계를 끊을까요?`,
     });
 
     if (confirmed) {
-      deleteFriendRelation({ targetId: friend.friend.id });
+      deleteFriendRelation({ targetId: friendId });
     }
   };
 
@@ -80,8 +80,8 @@ const FriendList = () => {
           <div className="flex items-center justify-between">
             {/* 사용자 정보 (아바타+이름+뱃지) */}
             <UserInfo 
-              name={friend.friend.name}
-              email={friend.friend.email}
+              name={friend.counterpartName}
+              email={friend.counterpartEmail}
               subtitle={`${new Date(friend.updatedAt || friend.createdAt).toLocaleDateString('ko-KR')} 친구됨`}
               theme={theme}
               avatarSize="md"
@@ -98,7 +98,7 @@ const FriendList = () => {
             {/* 액션 버튼 */}
             <div className="flex items-center gap-2">
               <Button
-                onClick={() => handleDeleteFriend(friend)}
+                onClick={() => handleDeleteFriend(friend.counterpartName, friend.counterpartUserId)}
                 theme="dark"
                 className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600"
                 disabled={isDeleting}

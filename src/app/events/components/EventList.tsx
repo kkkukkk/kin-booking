@@ -108,13 +108,20 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 			animate="visible"
 			className={className}
 		>
+			{/* 모바일용 정렬 */}
+			<div className="md:hidden mb-3">
+				<SortSelector
+					sortConfig={sortConfig}
+					onSortChange={handleSortChange}
+				/>
+			</div>
+
 			<div className="flex items-center justify-between mb-3 md:mb-4">
 				<div className="flex items-center space-x-1 md:space-x-2">
 					<BulbIcon className="w-4 h-4 md:w-5 md:h-5" />
-					<AnimatedText
-						fontSize="text-base md:text-lg"
-						text={`공연 목록 (${totalCount}건)`}
-					/>
+					<span className="text-base md:text-lg">
+						공연 목록 ({totalCount}건)
+					</span>
 				</div>
 				
 				{/* 정렬 */}
@@ -122,14 +129,6 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 					sortConfig={sortConfig}
 					onSortChange={handleSortChange}
 					className="hidden md:flex"
-				/>
-			</div>
-
-			{/* 모바일용 정렬 */}
-			<div className="md:hidden mb-3">
-				<SortSelector
-					sortConfig={sortConfig}
-					onSortChange={handleSortChange}
 				/>
 			</div>
 

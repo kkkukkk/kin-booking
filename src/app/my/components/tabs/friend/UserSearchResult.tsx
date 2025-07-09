@@ -22,10 +22,10 @@ interface UserSearchResultProps {
 
 const UserSearchResult = ({ user, onSendRequest, isPending }: UserSearchResultProps) => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
-  const { data: friendStatus } = useCheckFriendStatus(user.id);
+  const { data: friendStatusData } = useCheckFriendStatus(user.id);
 
   const getActionButton = () => {
-    if (friendStatus === FriendStatus.Accepted) {
+    if (friendStatusData?.status === FriendStatus.Accepted) {
       return (
         <StatusBadge 
           status={FriendStatus.Accepted} 
@@ -35,17 +35,28 @@ const UserSearchResult = ({ user, onSendRequest, isPending }: UserSearchResultPr
         />
       );
     }
-    if (friendStatus === FriendStatus.Pending) {
-      return (
-        <StatusBadge 
-          status={FriendStatus.Pending} 
-          theme={theme} 
-          variant="badge" 
-          size="sm"
-        />
-      );
+    if (friendStatusData?.status === FriendStatus.Pending) {
+      if (friendStatusData.isMyRequest) {
+        return (
+          <StatusBadge 
+            status={FriendStatus.Pending} 
+            theme={theme} 
+            variant="badge" 
+            size="sm"
+          />
+        );
+      } else {
+        return (
+          <StatusBadge 
+            status={FriendStatus.ReceivedForUI} 
+            theme={theme} 
+            variant="badge" 
+            size="sm"
+          />
+        );
+      }
     }
-    if (friendStatus === FriendStatus.Blocked) {
+    if (friendStatusData?.status === FriendStatus.Blocked) {
       return (
         <StatusBadge 
           status={FriendStatus.Blocked} 

@@ -39,6 +39,7 @@ const TogglePanel = () => {
 				isOpen={open}
 				activeButtons={activeButtons}
 				setActiveButtons={setActiveButtons}
+				setOpen={setOpen}
 			/>
 			<Button
 				round

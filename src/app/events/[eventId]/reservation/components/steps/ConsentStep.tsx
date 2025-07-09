@@ -1,5 +1,5 @@
 'use client'
-import { JSX, useState } from "react";
+import React, { JSX, useState } from "react";
 import Seat from "@/app/events/[eventId]/reservation/components/steps/terms/Seat";
 import Cancel from "@/app/events/[eventId]/reservation/components/steps/terms/Cancel";
 import { DEFAULT_REFUND_POLICY } from "@/types/refund";
@@ -12,7 +12,7 @@ import { RootState } from "@/redux/store";
 import clsx from "clsx";
 
 interface ConsentStepProps {
-	key: string;
+	key?: React.Key;
 	seatChecked: boolean;
 	onChangeSeat: (checked: boolean) => void;
 	cancelChecked: boolean;

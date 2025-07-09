@@ -1,40 +1,19 @@
-import { Friends, FriendStatus } from "@/types/model/friends";
+import { Friends } from "@/types/model/friends";
 
 export interface FriendWithUser extends Friends {
-	friend: {
-		id: string;
-		name: string;
-		email: string;
-	};
+	isMyRequest: boolean;    // 내가 요청 보낸 사람인지 여부
+
+	// 상대방 user
+	counterpartUserId: string;
+	counterpartName: string;
+	counterpartEmail: string;
+}
+
+export interface FriendResponse {
+	sent: FriendWithUser[];
+	received: FriendWithUser[];
 }
 
 export interface CreateFriendRequest {
 	friendId: string;
-}
-
-export interface UpdateFriendRequest {
-	status: FriendStatus;
-}
-
-export interface FriendRequestsData {
-	received: FriendRequest[];
-	sent: FriendRequest[];
-}
-
-export interface FriendRequest {
-	id: string;
-	fromUserId: string;
-	toUserId: string;
-	status: FriendStatus;
-	createdAt: string;
-	fromUser: {
-		id: string;
-		name: string;
-		email: string;
-	};
-	toUser: {
-		id: string;
-		name: string;
-		email: string;
-	};
 }

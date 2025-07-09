@@ -39,7 +39,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
 		>
 			<ThemeDiv 
 				isChildren 
-				className="p-3 md:p-4 rounded-lg border hover:border-2 hover:shadow-lg transition-all duration-300 h-full active:scale-[0.98]"
+				className="p-3 md:p-4 rounded-lg border hover:shadow-lg transition-all duration-300 h-full"
 			>
 				<div className="relative w-full rounded-lg overflow-hidden mb-2 md:mb-3">
 					<EventPoster

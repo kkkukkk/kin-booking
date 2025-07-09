@@ -16,9 +16,10 @@ import useToast from "@/hooks/useToast";
 import { useAlert } from "@/providers/AlertProvider";
 
 type PanelContentProps = {
-	isOpen: boolean;
-	activeButtons:{ [key: string]: boolean };
-	setActiveButtons: React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>;
+	isOpen: boolean,
+	activeButtons: { [key: string]: boolean },
+	setActiveButtons: React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>,
+	setOpen: (open: boolean) => void,
 };
 
 // 공통 패널 스타일
@@ -28,7 +29,7 @@ const PANEL_STYLES = {
 	closed: "opacity-0 scale-95 pointer-events-none"
 } as const;
 
-const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentProps) => {
+const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: PanelContentProps) => {
 	const router = useRouter();
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { mutate: logout } = useLogout();
@@ -37,13 +38,16 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons }: PanelContentP
 	const { showAlert } = useAlert();
 
 	const toggleButton = useCallback((key: string) => {
-		const skipKeys = ["Home", "Login", "Logout"];
-		if (skipKeys.includes(key)) return;
+		const skipKeys = ["Home", "Login", "Logout", "My"];
+		if (skipKeys.includes(key)) {
+			setOpen(false); // 라우팅 버튼 클릭 시 패널 닫기
+			return;
+		}
 		setActiveButtons((prev) => ({
 			...prev,
 			[key]: !prev[key],
 		}));
-	}, [setActiveButtons]);
+	}, [setActiveButtons, setOpen]);
 
 	const handleLogout = useCallback(async () => {
 		const confirmed = await showAlert({

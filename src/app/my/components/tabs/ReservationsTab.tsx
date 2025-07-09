@@ -200,16 +200,16 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 												theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
 											)}>
 												<span className="flex items-center gap-1">
-													<span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-													{new Date(reservation.reservedAt).toLocaleDateString('ko-KR')}
+													<span className="w-2 h-2 bg-green-500 rounded-full"></span>
+													{reservation.ticketHolder}
 												</span>
 												<span className="flex items-center gap-1">
 													<span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-													{reservation.quantity}
+													{`${reservation.quantity}매`}
 												</span>
 												<span className="flex items-center gap-1">
-													<span className="w-2 h-2 bg-green-500 rounded-full"></span>
-													{reservation.ticketHolder}
+													<span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+													{new Date(reservation.reservedAt).toLocaleDateString('ko-KR')}
 												</span>
 											</div>
 										</div>

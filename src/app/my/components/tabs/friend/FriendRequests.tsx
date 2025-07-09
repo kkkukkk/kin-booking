@@ -16,6 +16,7 @@ import { InboxIcon, PaperAirplaneIcon } from '@/components/icon/FriendIcons';
 import UserInfo from '@/components/base/UserInfo';
 import { useAlert } from '@/providers/AlertProvider';
 import clsx from 'clsx';
+import {FriendWithUser} from "@/types/dto/friends";
 
 type RequestTab = 'received' | 'sent';
 
@@ -25,10 +26,13 @@ const FriendRequests = () => {
   const { showAlert } = useAlert();
   
   const { data: friendRequests, isLoading: isRequestsLoading, error: requestsError } = useFriendRequests();
-  const receivedRequests = friendRequests?.received || [];
-  const sentRequests = friendRequests?.sent || [];
   const { mutate: respondToRequest, isPending: isResponding } = useRespondToFriendRequest();
   const { mutate: deleteFriendRelation, isPending: isDeleting } = useDeleteFriendRelation();
+
+  const requests: FriendWithUser[] =
+      activeTab === 'received'
+          ? friendRequests?.received ?? []
+          : friendRequests?.sent ?? [];
 
   const handleRespond = (requestId: string, status: FriendStatus) => {
     respondToRequest({ friendId: requestId, status });
@@ -38,35 +42,43 @@ const FriendRequests = () => {
     const confirmed = await showAlert({
       type: 'confirm',
       title: status === FriendStatus.Pending ? '친구 요청 취소' : '거절된 요청 삭제',
-      message: status === FriendStatus.Pending ? '친구 요청을 취소할까요?' : '거절된 요청을 삭제할까요?'
+      message:
+          status === FriendStatus.Pending
+              ? '친구 요청을 취소할까요?'
+              : '거절된 요청을 삭제할까요?'
     });
-    
+
     if (confirmed) {
-      deleteFriendRelation({ status });
+      const request = requests.find(req => req.id === requestId);
+      if (!request) return;
+
+      if (request.isMyRequest) {
+        // 내가 보낸 요청이면 status만 넘김
+        deleteFriendRelation({ status: request.status });
+      } else {
+        // 받은 요청/친구면 targetId만 넘김
+        deleteFriendRelation({ targetId: request.counterpartUserId });
+      }
     }
   };
 
-  const isLoading = isRequestsLoading;
-  const error = requestsError;
-  const requests = activeTab === 'received' ? receivedRequests : sentRequests;
-  
-  if (isLoading) {
+  if (isRequestsLoading) {
     return (
-      <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-        <p>친구 요청을 불러오는 중...</p>
-      </ThemeDiv>
+        <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>친구 요청을 불러오는 중...</p>
+        </ThemeDiv>
     );
   }
 
-  if (error) {
+  if (requestsError) {
     return (
-      <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
-        <p className="text-red-500 mb-4">친구 요청을 불러오는데 실패했습니다.</p>
-        <Button onClick={() => window.location.reload()} theme="dark">
-          다시 시도
-        </Button>
-      </ThemeDiv>
+        <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
+          <p className="text-red-500 mb-4">친구 요청을 불러오는데 실패했습니다.</p>
+          <Button onClick={() => window.location.reload()} theme="dark">
+            다시 시도
+          </Button>
+        </ThemeDiv>
     );
   }
 
@@ -81,7 +93,7 @@ const FriendRequests = () => {
           className="flex-1"
           on={activeTab === 'received'}
         >
-          받은 요청 ({receivedRequests?.length || 0})
+          받은 요청 ({friendRequests?.received.length ?? 0})
         </Button>
         <Button
           onClick={() => setActiveTab('sent')}
@@ -90,7 +102,7 @@ const FriendRequests = () => {
           className="flex-1"
           on={activeTab === 'sent'}
         >
-          보낸 요청 ({sentRequests?.length || 0})
+          보낸 요청 ({friendRequests?.sent.length ?? 0})
         </Button>
       </div>
 
@@ -128,15 +140,9 @@ const FriendRequests = () => {
               
               <div className="flex items-center justify-between mt-2">
                 {/* 사용자 정보 */}
-                <UserInfo 
-                  name={activeTab === 'received' 
-                    ? request.fromUser.name
-                    : request.toUser.name
-                  }
-                  email={activeTab === 'received' 
-                    ? request.fromUser.email
-                    : request.toUser.email
-                  }
+                <UserInfo
+                  name={request.counterpartName}
+                  email={request.counterpartEmail}
                   subtitle={`${new Date(request.createdAt).toLocaleDateString('ko-KR')} 요청`}
                   theme={theme}
                   avatarSize="md"
