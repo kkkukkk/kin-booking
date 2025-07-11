@@ -20,7 +20,13 @@ export const fetchEvents = async (params?: PaginationParams & FetchEventDto): Pr
 		if (params.eventName) query = query.ilike('event_name', `%${params.eventName}%`);
 		if (params.eventDateFrom) query = query.gte('event_date', params.eventDateFrom);
 		if (params.eventDateTo) query = query.lte('event_date', params.eventDateTo);
-		if (params.status) query = query.eq('status', params.status);
+		if (params.status) {
+			if (Array.isArray(params.status)) {
+			  query = query.in('status', params.status);
+			} else {
+			  query = query.eq('status', params.status);
+			}
+		  }
 		if (params.page && params.size) {
 			const range = getPaginationRange(params);
 			query = query.range(range.start, range.end);
@@ -46,7 +52,13 @@ export const fetchEventsWithCurrentStatus = async (params?: PaginationParams & F
 			const adjustedTo = dayjs(params.eventDateTo).add(1, 'day').format('YYYY-MM-DD');
 			query = query.lt('event_date', adjustedTo);
 		}
-		if (params.status) query = query.eq('status', params.status);
+		if (params.status) {
+			if (Array.isArray(params.status)) {
+			  query = query.in('status', params.status);
+			} else {
+			  query = query.eq('status', params.status);
+			}
+		  }
 		if (params.page && params.size) {
 			const range = getPaginationRange(params);
 			query = query.range(range.start, range.end);

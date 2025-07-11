@@ -104,23 +104,23 @@ const LoginPage = () => {
 					<InputWithPasswordToggle placeholder="비밀번호" name={"password"} fontSize={"text-sm md:text-xl"} theme={theme} className={"input-base"} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={handleKeyPress} />
 					<Button
 						type="button"
-						theme={"dark"}
+						theme={theme === "normal" ? "dark" : theme}
 						padding={"py-1"}
 						fontSize={"text-sm md:text-lg"}
 						onClick={() => handleLogin()}
 						reverse={theme === "normal"}
-						light={theme !== "normal"}
+						light={theme === "dark"}
 					>
 						{"로그인"}
 					</Button>
 					<Button
 						type="button"
-						theme={"dark"}
+						theme={theme === "normal" ? "dark" : theme}
 						padding={"py-1"}
 						fontSize={"text-sm md:text-lg"}
 						onClick={() => router.push('/register')}
 						reverse={theme === "normal"}
-						light={theme !== "normal"}
+						light={theme === "dark"}
 					>
 						{"회원가입"}
 					</Button>

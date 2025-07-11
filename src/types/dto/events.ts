@@ -25,7 +25,7 @@ export interface FetchEventDto {
 	eventName?: string;
 	eventDateFrom?: string;
 	eventDateTo?: string;
-	status?: EventStatus;
+	status?: EventStatus | EventStatus[];
 }
 
 export interface FetchEventResponseDto {

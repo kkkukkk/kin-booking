@@ -5,12 +5,12 @@ import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
-import { StatusBadge } from '@/components/base/StatusBadge';
+import { StatusBadge } from '@/components/status/StatusBadge';
 import { useFriends, useDeleteFriendRelation } from '@/hooks/api/useFriends';
 import { FriendStatus } from '@/types/model/friends';
 import { useAlert } from '@/providers/AlertProvider';
 import { UsersIcon } from '@/components/icon/FriendIcons';
-import UserInfo from '@/components/base/UserInfo';
+import UserInfo from '@/components/user/UserInfo';
 import clsx from 'clsx';
 
 const FriendList = () => {
@@ -73,7 +73,6 @@ const FriendList = () => {
           key={friend.id} 
           className={clsx(
             "p-4 rounded-lg border transition-all duration-200",
-            theme === 'normal' ? 'border-gray-200' : 'border-gray-700'
           )} 
           isChildren
         >

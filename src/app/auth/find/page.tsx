@@ -41,7 +41,7 @@ const FindPage = () => {
 				<AnimatedText text={"어떤 도움이 필요하신가요?"} />
 			</div>
 			<div
-				className={"w-full flex"}
+				className={"w-full flex mb-1 gap-1"}
 			>
 				<Button
 					width={"w-[50%]"}

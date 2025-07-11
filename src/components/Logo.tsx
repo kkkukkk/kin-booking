@@ -9,9 +9,10 @@ interface LogoProps {
 	width?: number; // 너비만 받아서 비율 맞춰 높이 자동 계산
 	className?: string;
 	priority?: boolean; // priority를 선택적으로 설정할 수 있도록
+	variant?: 'theme' | 'white'; // 테마 기반 또는 흰색 버전
 }
 
-const Logo = ({ width, className, priority = false }: LogoProps) => {
+const Logo = ({ width, className, priority = false, variant = 'theme' }: LogoProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 
 	// 기본 크기와 비율
@@ -42,8 +43,8 @@ const Logo = ({ width, className, priority = false }: LogoProps) => {
 				}}
 			>
 				<Image
-					key={theme}
-					src={`/images/logo_${theme}.webp`}
+					key={`${theme}-${variant}`}
+					src={variant === 'white' ? '/images/logo_dark.webp' : `/images/logo_${theme}.webp`}
 					alt="logo"
 					fill
 					sizes={sizes}

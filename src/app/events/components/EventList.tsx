@@ -26,6 +26,7 @@ interface EventListProps {
 const EventList = ({ className, keyword, status, from, to }: EventListProps) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageSize] = useState(12); // 한 페이지당 12개 공연
+	const { showSpinner, hideSpinner } = useSpinner();
 	const [sortConfig, setSortConfig] = useState<SortConfig>({
 		field: 'date',
 		direction: 'asc'
@@ -42,8 +43,6 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 	}), [keyword, from, to, status, currentPage, pageSize]);
 
 	const { data, isLoading, isFetching, error } = useEventsWithCurrentStatus(params);
-
-	const { showSpinner, hideSpinner } = useSpinner();
 
 	const prevIsFetching = useRef(false);
 

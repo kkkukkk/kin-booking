@@ -3,9 +3,9 @@
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
-import { StatusBadge } from '@/components/base/StatusBadge';
+import { StatusBadge } from '@/components/status/StatusBadge';
 import Button from '@/components/base/Button';
-import UserInfo from '@/components/base/UserInfo';
+import UserInfo from '@/components/user/UserInfo';
 import { useCheckFriendStatus } from '@/hooks/api/useFriends';
 import { FriendStatus } from '@/types/model/friends';
 

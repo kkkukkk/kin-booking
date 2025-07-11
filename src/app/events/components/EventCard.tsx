@@ -10,7 +10,7 @@ import { CalendarIcon } from "@/components/icon/CalendarIcon";
 import { useEventMedia } from "@/hooks/api/useEventMedia";
 import { ChairIcon } from "@/components/icon/ChairIcon";
 import { useAppSelector } from "@/redux/hooks";
-import { StatusBadge } from "@/components/base/StatusBadge";
+import { StatusBadge } from "@/components/status/StatusBadge";
 import EventPoster from "../[eventId]/components/EventPoster";
 
 interface EventCardProps {

@@ -8,7 +8,6 @@ import { RootState } from '@/redux/store';
 import { useSession } from '@/hooks/useSession';
 import useToast from '@/hooks/useToast';
 import { useAlert } from '@/providers/AlertProvider';
-import { useSpinner } from '@/hooks/useSpinner';
 import { useUserById } from '@/hooks/api/useUsers';
 import { useLogout } from '@/hooks/api/useAuth';
 import { useReservationsByUserId } from '@/hooks/api/useReservations';
@@ -22,7 +21,7 @@ import { CalendarIcon } from '@/components/icon/CalendarIcon';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
 import { ThumbUpIcon } from '@/components/icon/ThumbUpIcon';
 import { getUserHighestRole } from '@/util/userRole';
-import { StatusBadge } from '@/components/base/StatusBadge';
+import { StatusBadge } from '@/components/status/StatusBadge';
 import ProfileTab from '@/app/my/components/tabs/ProfileTab';
 import ReservationsTab from '@/app/my/components/tabs/ReservationsTab';
 import TicketsTab from '@/app/my/components/tabs/TicketsTab';
@@ -36,7 +35,6 @@ const MyPageClient = () => {
 	const { session } = useSession();
 	const { showToast } = useToast();
 	const { showAlert } = useAlert();
-	const { showSpinner, hideSpinner } = useSpinner();
 	const router = useRouter();
 	const { mutate: logout } = useLogout();
 	
@@ -76,11 +74,11 @@ const MyPageClient = () => {
 		if (confirmed) {
 			logout(undefined, {
 				onSuccess: () => {
-					showToast({ message: '로그아웃되었습니다.', iconType: 'success' });
+					showToast({ message: '로그아웃되었습니다.', iconType: 'success', autoCloseTime: 3000 });
 					router.push('/login?loggedOut=1');
 				},
 				onError: () => {
-					showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error' });
+					showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error', autoCloseTime: 3000 });
 				}
 			});
 		}

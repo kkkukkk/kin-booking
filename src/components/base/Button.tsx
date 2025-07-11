@@ -55,7 +55,7 @@ const Button = ({
 					? "text-[#eee] bg-[rgba(64,64,64,0.9)] border border-white/30"
 					: "text-[#eee] bg-black/80 border border-white/30";
 			case "neon":
-				return "text-[rgb(119,255,153)] bg-black/80 border border-[rgb(119,255,153)]/30";
+				return "text-[#eee] bg-black/80 border border-[rgb(119,255,153)]/50";
 			default:
 				return "text-black bg-white/90 border border-black/20";
 		}

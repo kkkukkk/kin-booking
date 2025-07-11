@@ -15,8 +15,6 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 	const searchParams = useSearchParams();
 	const isLoggedOut = searchParams.get('loggedOut') === '1';
 
-	console.log(isLoggedOut);
-
 	const [ready, setReady] = useState(false);
 
 	useEffect(() => {

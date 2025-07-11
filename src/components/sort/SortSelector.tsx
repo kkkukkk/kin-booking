@@ -38,20 +38,17 @@ const SortSelector = ({ sortConfig, onSortChange, className = '' }: SortSelector
       className={clsx('flex items-center space-x-2 justify-end', className)}
     >
       {sortOptions.map(option => (
-        <button
+        <Button
           key={option.value}
+          theme={theme}
+          on={sortConfig.field === option.value}
           onClick={() => handleFieldChange(option.value)}
-          className={clsx(
-            'px-3 py-1 rounded transition font-medium',
-            sortConfig.field === option.value
-              ? 'bg-green-500 text-white shadow'
-              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100',
-            'focus:outline-none'
-          )}
-          type="button"
+          padding={"px-4 py-1"}
+          fontSize='text-base md:text-lg'
+          reverse={theme === "normal"}
         >
           {option.label}
-        </button>
+        </Button>
       ))}
       <Button
         theme="dark"

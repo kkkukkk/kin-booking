@@ -157,6 +157,7 @@ const SearchBar = ({
                   options={filters.status.options}
                   placeholder="선택"
                   className="w-full md:w-1/6"
+                  theme={theme}
                 />
               )}
 

@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import clsx from 'clsx';
-import { getStatusInfoColors } from '@/components/base/StatusBadge';
+import { getStatusInfoColors } from '@/components/status/StatusBadge';
 
 interface TicketStackProps {
 	eventId: string;

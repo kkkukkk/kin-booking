@@ -11,6 +11,7 @@ import ScrollBar from "@/components/base/ScrollBar";
 import useNeedScrollBar from "@/hooks/useNeedScrollBar";
 import ThemeRefDiv from "@/components/base/ThemeRefDiv";
 import useRehydrated from "@/hooks/useIsRehydrated";
+import Footer from "@/app/components/Footer";
 
 interface CardProps {
 	children: React.ReactNode;
@@ -21,6 +22,7 @@ interface CardProps {
 	height?: string;
 	center?: boolean;
 	innerScroll?: boolean;
+	hasFooter?: boolean;
 }
 
 const Card = ({
@@ -32,6 +34,7 @@ const Card = ({
 	height = "h-full",
 	center = false,
 	innerScroll = false,
+	hasFooter = false,
 }: CardProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
@@ -107,6 +110,9 @@ const Card = ({
 						</div>
 					)}
 					{children}
+					
+					{/* Footer */}
+					{hasFooter && <Footer theme={theme} />}
 				</ThemeRefDiv>
 				{innerScroll && needScrollBar && (
 					<ScrollBar targetRef={scrollTargetRef} />

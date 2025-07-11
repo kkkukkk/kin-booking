@@ -5,7 +5,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
-import { StatusBadge } from '@/components/base/StatusBadge';
+import { StatusBadge } from '@/components/status/StatusBadge';
 import { 
   useFriendRequests,
   useRespondToFriendRequest, 
@@ -13,7 +13,7 @@ import {
 } from '@/hooks/api/useFriends';
 import { FriendStatus } from '@/types/model/friends';
 import { InboxIcon, PaperAirplaneIcon } from '@/components/icon/FriendIcons';
-import UserInfo from '@/components/base/UserInfo';
+import UserInfo from '@/components/user/UserInfo';
 import { useAlert } from '@/providers/AlertProvider';
 import clsx from 'clsx';
 import {FriendWithUser} from "@/types/dto/friends";
@@ -88,7 +88,7 @@ const FriendRequests = () => {
       <div className="flex gap-2">
         <Button
           onClick={() => setActiveTab('received')}
-          theme="dark"
+          theme={theme === "normal" ? "dark" : theme}
           light={activeTab !== 'received'}
           className="flex-1"
           on={activeTab === 'received'}
@@ -97,7 +97,7 @@ const FriendRequests = () => {
         </Button>
         <Button
           onClick={() => setActiveTab('sent')}
-          theme="dark"
+          theme={theme === "normal" ? "dark" : theme}
           light={activeTab !== 'sent'}
           className="flex-1"
           on={activeTab === 'sent'}

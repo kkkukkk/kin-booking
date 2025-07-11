@@ -85,7 +85,7 @@ const EventDetailClient = () => {
 					<span className="mr-1">
 						<ArrowLeftIcon />
 					</span>
-					뒤로가기
+					목록으로
 				</Button>
 			</motion.div>
 

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { EventStatus, EventStatusKo } from "@/types/model/events";
 import clsx from "clsx";
-import { StatusBadge } from "@/components/base/StatusBadge";
+import { StatusBadge } from "@/components/status/StatusBadge";
 
 interface EventHeaderProps {
 	eventName: string;

@@ -1,30 +1,29 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
 import clsx from "clsx";
 import { CheckIcon } from "@/components/icon/CheckIcon";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeSlideDownSm } from "@/types/ui/motionVariants";
 
-interface CustomSelectProps {
+interface SelectProps {
 	value: string;
 	onChange: (value: string) => void;
 	options: { value: string; label: string }[];
 	placeholder?: string;
 	className?: string;
+	theme?: string;
 }
 
-const CustomSelect = ({
+const Select = ({
 	value,
 	onChange,
 	options,
 	placeholder = "선택",
 	className = "",
-}: CustomSelectProps) => {
-	const theme = useAppSelector((state: RootState) => state.theme.current);
+	theme = "normal",
+}: SelectProps) => {
 	const selectedLabel = options.find(opt => opt.value === value)?.label ?? placeholder;
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -157,4 +156,4 @@ const CustomSelect = ({
 	);
 };
 
-export default CustomSelect;
+export default Select;

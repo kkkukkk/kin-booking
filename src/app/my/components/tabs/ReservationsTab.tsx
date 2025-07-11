@@ -9,7 +9,7 @@ import Button from '@/components/base/Button';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import { calculateReservationStats } from '@/util/reservationStats';
 import clsx from 'clsx';
-import { getStatusInfoColors } from '@/components/base/StatusBadge';
+import { getStatusInfoColors } from '@/components/status/StatusBadge';
 import { useCancelPendingReservation } from '@/hooks/api/useReservations';
 import CheckCircleIcon from '@/components/icon/CheckCircleIcon';
 import ClockIcon from '@/components/icon/ClockIcon';

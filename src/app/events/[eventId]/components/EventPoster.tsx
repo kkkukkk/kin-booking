@@ -17,6 +17,11 @@ interface EventPosterProps {
 	loading?: "eager" | "lazy";
 	showPlaceholderText?: boolean;
 	variant?: "detail" | "card";
+	overlay?: {
+		title?: string;
+		subtitle?: string;
+		showOverlay?: boolean;
+	};
 }
 
 const EventPoster = ({
@@ -28,10 +33,11 @@ const EventPoster = ({
 	loading,
 	showPlaceholderText = false,
 	variant = "detail",
+	overlay,
 }: EventPosterProps) => {
 	const containerClass =
 		variant === "card"
-			? "w-full h-full"
+			? "w-full flex justify-center"
 			: "relative w-full max-w-md md:w-80";
 
 	const skeletonClass =
@@ -55,18 +61,31 @@ const EventPoster = ({
 						<Skeleton className={skeletonClass} />
 					</div>
 				) : posterData && posterData.length > 0 ? (
-					<Image
-						src={getStorageUrl(posterData[0].url)}
-						alt={`${eventName} 포스터`}
-						width={variant === "card" ? 400 : 320}
-						height={variant === "card" ? 500 : 400}
-						className={variant === "card" ? "w-full h-auto object-contain rounded-lg" : "w-full h-auto rounded-lg shadow-lg object-contain"}
-						style={{ objectFit: "contain" }}
-						priority={priority}
-						loading={priority ? undefined : loading ?? "lazy"}
-					/>
+					<div className="relative">
+						<Image
+							src={getStorageUrl(posterData[0].url)}
+							alt={`${eventName} 포스터`}
+							width={variant === "card" ? 400 : 320}
+							height={variant === "card" ? 500 : 400}
+							className={variant === "card" ? "w-full h-auto object-contain rounded-lg" : "w-full h-auto rounded-lg shadow-lg object-contain"}
+							style={{ objectFit: "contain" }}
+							priority={priority}
+							loading={priority ? undefined : loading ?? "lazy"}
+						/>
+						{/* 오버레이 표시 */}
+						{overlay?.showOverlay && (
+							<div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-2 rounded-lg z-10">
+								<div className="text-sm font-semibold text-white truncate text-center mb-1">
+									{overlay.title}
+								</div>
+								<div className="text-xs text-white/90 text-center">
+									{overlay.subtitle}
+								</div>
+							</div>
+						)}
+					</div>
 				) : (
-					<div className={aspectClass + " w-full"}>
+					<div className={aspectClass + " w-full relative"}>
 						<div
 							className={clsx(
 								variant === "card"
@@ -78,12 +97,23 @@ const EventPoster = ({
 							)}
 						>
 							<div className="text-center">
-								<p className="text-lg font-medium mb-2">포스터 준비중</p>
+								<p className="text-base font-medium mb-2">포스터 준비중</p>
 								{showPlaceholderText ? (
 									<p className="text-sm opacity-70">곧 업데이트될 예정입니다</p>
 								) : null}
 							</div>
 						</div>
+						{/* 대체 div에도 오버레이 표시 */}
+						{overlay?.showOverlay && (
+							<div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-2 rounded-lg z-10">
+								<div className="text-sm font-semibold text-white truncate text-center mb-1">
+									{overlay.title}
+								</div>
+								<div className="text-xs text-white/90 text-center">
+									{overlay.subtitle}
+								</div>
+							</div>
+						)}
 					</div>
 				)}
 			</div>

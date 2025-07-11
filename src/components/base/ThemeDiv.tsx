@@ -26,14 +26,14 @@ const ThemeDiv = ({ children, className, isChildren, lightweight = false, ...res
 			lightweight: 'bg-gray-100 border border-[rgba(0,0,0,0.2)] text-gray-900'
 		},
 		dark: {
-			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.3)] text-gray-100',
+			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.2)] text-gray-100',
 			children: 'bg-[rgba(64,64,64,0.9)] border border-[rgba(255,255,255,0.3)] text-gray-100',
-			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.3)] text-gray-100'
+			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.2)] text-gray-100'
 		},
 		neon: {
-			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.3)] text-gray-100',
-			children: 'bg-[rgba(64,64,64,0.9)] border border-[rgba(255,255,255,0.3)] text-gray-100',
-			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.3)] text-gray-100'
+			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.2)] text-gray-100',
+			children: 'bg-[var(--dark-back)] border border-[rgb(119,255,153)]/70 text-gray-100',
+			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.2)] text-gray-100'
 		}
 	};
 
