@@ -17,6 +17,7 @@ interface EventPosterProps {
 	loading?: "eager" | "lazy";
 	showPlaceholderText?: boolean;
 	variant?: "detail" | "card";
+	smallText?: boolean;
 	overlay?: {
 		title?: string;
 		subtitle?: string;
@@ -33,6 +34,7 @@ const EventPoster = ({
 	loading,
 	showPlaceholderText = false,
 	variant = "detail",
+	smallText = false,
 	overlay,
 }: EventPosterProps) => {
 	const containerClass =
@@ -97,9 +99,9 @@ const EventPoster = ({
 							)}
 						>
 							<div className="text-center">
-								<p className="text-base font-medium mb-2">포스터 준비중</p>
+								<p className={smallText ? "text-xs font-medium mb-1" : "text-base font-medium mb-2"}>포스터 준비중</p>
 								{showPlaceholderText ? (
-									<p className="text-sm opacity-70">곧 업데이트될 예정입니다</p>
+									<p className={smallText ? "text-xs opacity-70" : "text-sm opacity-70"}>곧 업데이트될 예정입니다</p>
 								) : null}
 							</div>
 						</div>

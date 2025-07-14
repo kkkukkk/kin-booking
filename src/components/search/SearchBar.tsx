@@ -18,6 +18,7 @@ import { createPortal } from "react-dom";
 interface SearchBarProps {
   label?: string;
   icon?: React.ReactNode;
+  initialOpen?: boolean;
   filters: {
     keyword?: {
       value: string;
@@ -40,6 +41,7 @@ interface SearchBarProps {
 const SearchBar = ({
   label = "검색 및 필터",
   icon = <FilterIcon />,
+  initialOpen = false,
   filters,
 }: SearchBarProps) => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -47,7 +49,7 @@ const SearchBar = ({
   const [tempFrom, setTempFrom] = useState(filters.dateRange?.from ?? '');
   const [tempTo, setTempTo] = useState(filters.dateRange?.to ?? '');
   const [keyword, setKeyword] = useState(filters.keyword?.value ?? '');
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef<HTMLButtonElement>(null);
   const [datePickerPosition, setDatePickerPosition] = useState({ top: 0, left: 0, width: 0 });

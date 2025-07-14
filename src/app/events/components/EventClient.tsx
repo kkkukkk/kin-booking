@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import SearchBar from "@/components/search/SearchBar";
 import EventList from "@/app/events/components/EventList";
 import { EventStatus, EventStatusKo } from "@/types/model/events";
@@ -18,10 +19,28 @@ const statusOptions = [
 ] satisfies { value: EventStatus | ''; label: string }[];
 
 const EventClient = () => {
+	const searchParams = useSearchParams();
 	const [eventDateFrom, setEventDateFrom] = useState('');
 	const [eventDateTo, setEventDateTo] = useState('');
 	const [keyword, setKeyword] = useState('');
 	const [status, setStatus] = useState<EventStatus | ''>('');
+
+	// URL 파라미터에서 status 값을 가져와서 초기 상태 설정
+	useEffect(() => {
+		const statusParam = searchParams.get('status');
+		if (statusParam && Object.values(EventStatus).includes(statusParam as EventStatus)) {
+			setStatus(statusParam as EventStatus);
+		}
+	}, [searchParams]);
+
+	// URL 파라미터가 있으면 SearchBar를 자동으로 열기
+	const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
+	useEffect(() => {
+		const statusParam = searchParams.get('status');
+		if (statusParam && Object.values(EventStatus).includes(statusParam as EventStatus)) {
+			setIsSearchBarOpen(true);
+		}
+	}, [searchParams]);
 
 	return (
 		<motion.div
@@ -45,6 +64,7 @@ const EventClient = () => {
 			>
 				<ThemeDiv isChildren className="p-3 md:p-4 rounded-lg border">
 					<SearchBar
+						initialOpen={isSearchBarOpen}
 						filters={{
 							keyword: {
 								value: keyword,

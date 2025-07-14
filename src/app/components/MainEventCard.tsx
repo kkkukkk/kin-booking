@@ -26,7 +26,7 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
     ? "w-full max-w-xs md:max-w-sm" 
     : isLarge 
     ? "w-32 h-40 md:w-40 md:h-52" 
-    : "w-20 h-24 md:w-24 md:h-32";
+    : "w-20 h-24 md:w-24 md:h-28";
   
   const titleSize = isHero 
     ? "text-xl font-bold" 
@@ -49,18 +49,19 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
 
   return (
     <ThemeDiv
-      className={`p-3 flex flex-col items-center shadow-lg rounded-lg mb-2 ${isHero ? "w-full" : isLarge ? "w-full" : ""}`}
+      className={`p-4 flex flex-col items-center shadow-xl rounded-2xl mb-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isHero ? "w-full" : isLarge ? "w-full" : ""}`}
       isChildren
     >
-      <div className={`${posterContainerSize} mb-2 flex justify-center`}>
+      <div className={`${posterContainerSize} mb-2 flex justify-center overflow-hidden`}>
         <EventPoster
           eventName={event.eventName}
           posterData={posterData}
           theme={theme}
           isLoading={isLoading}
           variant="card"
+          smallText={isSmall}
           overlay={
-            isSmall && hasPoster
+            isSmall
               ? {
                   title: event.eventName,
                   subtitle: dayjs(event.eventDate).format('MM/DD HH:mm'),
@@ -73,16 +74,17 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
       {/* hero일 때는 버튼과 함께 표시 */}
       {isHero ? (
         <>
-          <div className={`${titleSize} mb-2 truncate w-full text-center`}>
+          <div className={`${titleSize} mb-3 truncate w-full text-center text-gray-800 font-bold`}>
             {event.eventName}
           </div>
-          <div className={`${dateSize} mb-4 text-center`}>
+          <div className={`${dateSize} mb-6 text-center text-gray-600`}>
             {dayjs(event.eventDate).format('YYYY년 MM월 DD일 HH:mm')}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button
               theme="dark"
-              padding="px-4 py-2"
+              padding="px-6 py-3"
+              className="text-base font-medium tracking-wide"
               onClick={handleDetailClick}
             >
               상세보기
@@ -90,13 +92,13 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
           </div>
         </>
       ) : (
-        /* large일 때만 아래에 텍스트 표시 */
+        /* large일 때만 텍스트 표시, small은 overlay로 대체 */
         isLarge && (
           <>
-            <div className={`${titleSize} mb-1 truncate w-full text-center`}>
+            <div className={`${titleSize} mb-2 truncate w-full text-center text-gray-800 font-semibold`}>
               {event.eventName}
             </div>
-            <div className={`${dateSize} text-center`}>
+            <div className={`${dateSize} text-center text-gray-600`}>
               {dayjs(event.eventDate).format('MM/DD HH:mm')}
             </div>
           </>

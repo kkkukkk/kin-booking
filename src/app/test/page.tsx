@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import KinAnimationSection from "@/components/KinAnimationSection";
+import { useRef } from "react";
+import KinAnimationSection from "@/app/components/KinAnimationSection";
 
 const TestScrollPage = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -13,7 +13,7 @@ const TestScrollPage = () => {
         ref={scrollContainerRef}
         className="h-full w-full overflow-y-auto snap-y snap-mandatory"
       >
-        <div className="h-[300vh]">
+        <div className="h-[250vh]">
           <KinAnimationSection scrollContainerRef={scrollContainerRef} />
         </div>
       </div>
