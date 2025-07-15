@@ -69,14 +69,14 @@ const EventPoster = ({
 							alt={`${eventName} 포스터`}
 							width={variant === "card" ? 400 : 320}
 							height={variant === "card" ? 500 : 400}
-							className={variant === "card" ? "w-full h-auto object-contain rounded-lg" : "w-full h-auto rounded-lg shadow-lg object-contain"}
+							className={variant === "card" ? "w-full h-auto object-contain rounded" : "w-full h-auto rounded shadow-lg object-contain"}
 							style={{ objectFit: "contain" }}
 							priority={priority}
 							loading={priority ? undefined : loading ?? "lazy"}
 						/>
 						{/* 오버레이 표시 */}
 						{overlay?.showOverlay && (
-							<div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-2 rounded-lg z-10">
+							<div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-2 rounded z-10">
 								<div className="text-sm font-semibold text-white truncate text-center mb-1">
 									{overlay.title}
 								</div>
@@ -91,8 +91,8 @@ const EventPoster = ({
 						<div
 							className={clsx(
 								variant === "card"
-									? "w-full h-full flex items-center justify-center border-2 border-dashed rounded-lg"
-									: "w-full h-80 rounded-lg border-2 border-dashed flex items-center justify-center",
+									? "w-full h-full flex items-center justify-center border-2 border-dashed rounded"
+									: "w-full h-80 rounded border-2 border-dashed flex items-center justify-center",
 								theme === "normal"
 									? "bg-gray-50 border-gray-200 text-gray-500"
 									: "bg-gray-800 border-gray-700 text-gray-400"
@@ -107,7 +107,7 @@ const EventPoster = ({
 						</div>
 						{/* 대체 div에도 오버레이 표시 */}
 						{overlay?.showOverlay && (
-							<div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-2 rounded-lg z-10">
+							<div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-2 rounded z-10">
 								<div className="text-sm font-semibold text-white truncate text-center mb-1">
 									{overlay.title}
 								</div>

@@ -108,16 +108,15 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 			className={className}
 		>
 			{/* 모바일용 정렬 */}
-			<div className="md:hidden mb-3">
+			<div className="md:hidden mb-4">
 				<SortSelector
 					sortConfig={sortConfig}
 					onSortChange={handleSortChange}
 				/>
 			</div>
 
-			<div className="flex items-center justify-between mb-3 md:mb-4">
+			<div className="flex items-center justify-between mb-4">
 				<div className="flex items-center space-x-1 md:space-x-2">
-					<BulbIcon className="w-4 h-4 md:w-5 md:h-5" />
 					<span className="text-base md:text-lg">
 						공연 목록 ({totalCount}건)
 					</span>

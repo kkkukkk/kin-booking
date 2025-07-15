@@ -9,7 +9,7 @@ interface EventSectionProps {
   variant?: "large" | "small";
 }
 
-const EventSection = ({ title, events, theme, variant = "large" }: EventSectionProps) => {
+const MainEventSection = ({ title, events, theme, variant = "large" }: EventSectionProps) => {
   if (!events || events.length === 0) return null;
   
   return (
@@ -18,14 +18,8 @@ const EventSection = ({ title, events, theme, variant = "large" }: EventSectionP
         {/* 섹션 헤더 */}
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-wide drop-shadow-sm">
-            {title}
+            {title} 
           </h2>
-          <p className="text-white/70 text-base max-w-2xl mx-auto">
-            {variant === "large" 
-              ? "지금 이 순간, 무대에서 펼쳐지는 음악의 향연" 
-              : "곧 만나볼 특별한 순간을 기다리는 중"
-            }
-          </p>
         </div>
 
         {variant === "large" ? (
@@ -39,7 +33,7 @@ const EventSection = ({ title, events, theme, variant = "large" }: EventSectionP
           // 대기 중인 공연: 그리드 레이아웃
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {events.map((event) => (
-              <div key={event.eventId} className="w-full">
+              <div key={event.eventId} className="w-full flex justify-center">
                 <MainEventCard event={event} theme={theme} variant="small" />
               </div>
             ))}
@@ -50,4 +44,4 @@ const EventSection = ({ title, events, theme, variant = "large" }: EventSectionP
   );
 };
 
-export default EventSection; 
+export default MainEventSection;

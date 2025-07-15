@@ -25,23 +25,20 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
   const posterContainerSize = isHero 
     ? "w-full max-w-xs md:max-w-sm" 
     : isLarge 
-    ? "w-32 h-40 md:w-40 md:h-52" 
-    : "w-20 h-24 md:w-24 md:h-28";
+    ? "w-36 h-440 md:w-56 md:h-80" // md 이상에서 더 크게
+    : "w-32 h-40 md:w-36 md:h-44";
   
   const titleSize = isHero 
     ? "text-xl font-bold" 
     : isLarge 
-    ? "text-lg font-bold" 
+    ? "text-lg md:text-2xl font-bold" // md 이상에서 더 크게
     : "text-sm font-semibold";
   
   const dateSize = isHero 
     ? "text-base" 
     : isLarge 
-    ? "text-sm" 
+    ? "text-sm md:text-base" // md 이상에서 더 크게
     : "text-xs";
-
-  // 포스터가 있는지 확인
-  const hasPoster = posterData && posterData.length > 0 && !isLoading;
 
   const handleDetailClick = () => {
     router.push(`/events/${event.eventId}`);
@@ -49,10 +46,10 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
 
   return (
     <ThemeDiv
-      className={`p-4 flex flex-col items-center shadow-xl rounded-2xl mb-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isHero ? "w-full" : isLarge ? "w-full" : ""}`}
+      className={`p-2 flex flex-col items-center shadow-xl rounded mb-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isHero ? "w-full" : isLarge ? "w-full" : "w-fit"}`}
       isChildren
     >
-      <div className={`${posterContainerSize} mb-2 flex justify-center overflow-hidden`}>
+      <div className={`${posterContainerSize} flex justify-center overflow-hidden`}>
         <EventPoster
           eventName={event.eventName}
           posterData={posterData}

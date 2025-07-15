@@ -11,7 +11,7 @@ import ScrollBar from "@/components/base/ScrollBar";
 import useNeedScrollBar from "@/hooks/useNeedScrollBar";
 import ThemeRefDiv from "@/components/base/ThemeRefDiv";
 import useRehydrated from "@/hooks/useIsRehydrated";
-import Footer from "@/app/components/Footer";
+import Footer from "@/components/Footer";
 
 interface CardProps {
 	children: React.ReactNode;
@@ -84,8 +84,8 @@ const Card = ({
 				<ThemeRefDiv
 					ref={scrollTargetRef}
 					className={clsx(
-						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12",
-						center && "flex justify-center items-center",
+						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12 flex flex-col", // flex 추가
+						center && "justify-center items-center",
 						"scrollbar-none",
 						// ThemeRefDiv의 기본 스타일을 무시하고 Card 전용 스타일 적용
 						"bg-transparent border-none backdrop-blur-sm",
@@ -109,8 +109,7 @@ const Card = ({
 							<div className="flex-1" />
 						</div>
 					)}
-					{children}
-					
+					<div className="flex-1 flex flex-col">{children}</div>
 					{/* Footer */}
 					{hasFooter && <Footer theme={theme} />}
 				</ThemeRefDiv>
