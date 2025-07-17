@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { useUpdateUser } from '@/hooks/api/useUsers';
 import useToast from '@/hooks/useToast';
@@ -9,9 +8,10 @@ import Spinner from '@/components/spinner/Spinner';
 import { formatPhoneNumber } from '@/util/phoneNumber';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/base/Button';
+import { User } from '@/types/model/user';
 
 interface ProfileTabProps {
-	user: any;
+	user: User;
 }
 
 const ProfileTab = ({ user }: ProfileTabProps) => {

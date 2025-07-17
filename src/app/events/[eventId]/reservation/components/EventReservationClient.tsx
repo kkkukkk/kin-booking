@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEventById } from "@/hooks/api/useEvents";
 import { useSpinner } from "@/hooks/useSpinner";
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useCreateReservation } from "@/hooks/api/useReservations";
 import { useSession } from "@/hooks/useSession";
 import useToast from "@/hooks/useToast";

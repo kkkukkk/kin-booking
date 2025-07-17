@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '@/redux/hooks';
@@ -11,12 +11,14 @@ import { useAlert } from '@/providers/AlertProvider';
 import { useUserById } from '@/hooks/api/useUsers';
 import { useLogout } from '@/hooks/api/useAuth';
 import { useReservationsByUserId } from '@/hooks/api/useReservations';
-import ThemeDiv from '@/components/base/ThemeDiv';
+import { useTeamMemberById } from '@/hooks/api/useTeamMembers';
 import Button from '@/components/base/Button';
+import ThemeDiv from '@/components/base/ThemeDiv';
 import SpinnerOverlay from '@/components/spinner/SpinnerOverlay';
 import { HomeIcon } from '@/components/icon/HomeIcon';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import { SmileIcon } from '@/components/icon/SmileIcon';
+import { UsersIcon } from '@/components/icon/FriendIcons';
 import { CalendarIcon } from '@/components/icon/CalendarIcon';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
 import { ThumbUpIcon } from '@/components/icon/ThumbUpIcon';
@@ -26,9 +28,11 @@ import ProfileTab from '@/app/my/components/tabs/ProfileTab';
 import ReservationsTab from '@/app/my/components/tabs/ReservationsTab';
 import TicketsTab from '@/app/my/components/tabs/TicketsTab';
 import FriendsTab from '@/app/my/components/tabs/FriendsTab';
+import TeamTab from '@/app/my/components/tabs/TeamTab';
 import clsx from 'clsx';
 
-type MyPageTab = 'profile' | 'reservations' | 'tickets' | 'friends';
+// 탭 타입에 team 추가
+type MyPageTab = 'profile' | 'reservations' | 'tickets' | 'friends' | 'team';
 
 const MyPageClient = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -37,31 +41,22 @@ const MyPageClient = () => {
 	const { showAlert } = useAlert();
 	const router = useRouter();
 	const { mutate: logout } = useLogout();
-	
+
 	const [activeTab, setActiveTab] = useState<MyPageTab>('profile');
 	
-	// 사용자 정보 조회 (API에서 가져오기 실패 시 Supabase Auth 정보 사용)
-	const { data: user, isLoading: userLoading, error: userError } = useUserById(session?.user?.id || '');
-	
-	// API에서 사용자 정보를 가져올 수 없는 경우 Supabase Auth 정보를 사용
-	const fallbackUser = userError ? {
-		id: session?.user?.id || '',
-		name: session?.user?.user_metadata?.display_name || '사용자',
-		email: session?.user?.email || '',
-		phoneNumber: session?.user?.user_metadata?.phone_number || null,
-		registerDate: session?.user?.created_at || new Date().toISOString(),
-		marketingConsent: session?.user?.user_metadata?.marketing_consent || false,
-	} : null;
-	
+	// 사용자 정보 조회
+	const { data: user, isLoading: userLoading } = useUserById(session?.user?.id || '');
+	// 멤버 정보 조회 - 먼저 사용자 ID로 팀 멤버 정보를 찾아야 함
+	const { data: teamMember, isLoading: teamMemberLoading } = useTeamMemberById(session?.user?.id || '');
 	// 예매 내역 조회
 	const { data: reservations, isLoading: reservationsLoading } = useReservationsByUserId(session?.user?.id || '');
 	
-	const displayUser = user || fallbackUser;
+
 	
-	// 사용자 권한 정보 (user가 UserWithRoles 타입이므로 타입 단언 사용)
-	const userRole = getUserHighestRole(displayUser as any || null);
+	// 사용자 권한 정보
+	const userRole = getUserHighestRole(user || null);
 	
-	const isLoading = userLoading || reservationsLoading;
+	const isLoading = userLoading || reservationsLoading || teamMemberLoading;
 	
 	// 로그아웃 처리
 	const handleLogout = async () => {
@@ -83,29 +78,32 @@ const MyPageClient = () => {
 			});
 		}
 	};
-	
+
 	const tabs = [
 		{ id: 'profile' as MyPageTab, label: '프로필', icon: SmileIcon },
 		{ id: 'reservations' as MyPageTab, label: '예매 내역', icon: CalendarIcon },
 		{ id: 'tickets' as MyPageTab, label: '티켓 관리', icon: TicketIcon },
 		{ id: 'friends' as MyPageTab, label: '친구 관리', icon: ThumbUpIcon },
+		...(teamMember ? [{ id: 'team' as MyPageTab, label: '멤버 정보', icon: UsersIcon }] : []),
 	];
-	
+
 	const renderTabContent = () => {
 		switch (activeTab) {
 			case 'profile':
-				return <ProfileTab user={displayUser} />;
+				return user ? <ProfileTab user={user} /> : null;
 			case 'reservations':
 				return <ReservationsTab reservations={reservations} />;
 			case 'tickets':
 				return <TicketsTab userId={session?.user?.id || ''} />;
 			case 'friends':
 				return <FriendsTab />;
+			case 'team':
+				return teamMember ? <TeamTab teamMember={teamMember} /> : null;
 			default:
 				return null;
 		}
 	};
-	
+
 	return (
 		<div className="p-4 md:p-6">
 			{isLoading && <SpinnerOverlay />}
@@ -151,10 +149,10 @@ const MyPageClient = () => {
 						<div className="flex-1">
 							<div className="flex items-center gap-3 mb-2">
 								<h2 className="text-xl font-bold">
-									{displayUser?.name || '사용자'}
+									{user?.name || '사용자'}
 								</h2>
 								<StatusBadge 
-									status={userRole} 
+									status={userRole}
 									theme={theme} 
 									variant="badge" 
 									size="sm" 
@@ -164,13 +162,13 @@ const MyPageClient = () => {
 								"mb-1",
 								theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
 							)}>
-								{displayUser?.email || '이메일 정보 없음'}
+								{user?.email || '이메일 정보 없음'}
 							</p>
 							<p className={clsx(
 								"text-sm",
 								theme === 'normal' ? 'text-gray-500' : 'text-gray-400'
 							)}>
-								가입일: {displayUser?.registerDate ? new Date(displayUser.registerDate).toLocaleDateString('ko-KR') : '알 수 없음'}
+								가입일: {user?.registerDate ? new Date(user.registerDate).toLocaleDateString('ko-KR') : '알 수 없음'}
 							</p>
 						</div>
 					</div>
@@ -192,10 +190,10 @@ const MyPageClient = () => {
 						return (
 							<Button
 								key={tab.id}
-								onClick={() => setActiveTab(tab.id)}
+								onClick={() => setActiveTab(tab.id as MyPageTab)}
 								theme={theme}
 								padding={'py-2.5 md:py-1.5'}
-								className={`gap-1.5 md:gap-2 font-semibold text-sm md:text-base transition-all duration-200`}
+								className={`gap-3 md:gap-3.5 font-semibold text-sm md:text-base transition-all duration-200`}
 								style={{ minWidth: 'auto', width: '100%' }}
 								reverse={theme === 'normal'}
 								light={activeTab !== tab.id}

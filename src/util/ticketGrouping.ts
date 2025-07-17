@@ -16,7 +16,7 @@ export const groupTicketsByEvent = (tickets: Ticket[] | undefined): TicketGroup[
 	}
 
 	// 공연명별로 그룹화
-	const grouped = tickets.reduce((acc: { [key: string]: Ticket[] }, ticket: any) => {
+	const grouped = tickets.reduce((acc: { [key: string]: Ticket[] }, ticket: Ticket) => {
 		const eventName = ticket.eventName;
 		if (!acc[eventName]) {
 			acc[eventName] = [];

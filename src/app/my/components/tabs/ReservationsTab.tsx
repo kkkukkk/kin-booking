@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
@@ -18,10 +18,11 @@ import MenuIcon from '@/components/icon/MenuIcon';
 import { useAlert } from '@/providers/AlertProvider';
 import Accordion from '@/components/base/Accordion';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ReservationStatus } from '@/types/model/reservation';
+import { ReservationStatus} from '@/types/model/reservation';
+import { FetchReservationResponseDto } from '@/types/dto/reservation';
 
 interface ReservationsTabProps {
-	reservations: any;
+	reservations: FetchReservationResponseDto | undefined;
 }
 
 const FILTERS = [
@@ -38,72 +39,8 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 	const { showAlert } = useAlert();
 	const [activeFilter, setActiveFilter] = useState('all');
 	
-	// 테스트용 하드코딩 데이터
-	const testReservations = [
-		{
-			id: 1,
-			userId: "test-user-1",
-			eventId: "test-event-1",
-			eventName: "2024 봄맞이 클래식 콘서트",
-			status: ReservationStatus.Confirmed,
-			reservedAt: "2024-03-15T10:30:00Z",
-			quantity: 2,
-			ticketHolder: "김철수",
-			event: {
-				eventId: "test-event-1",
-				eventName: "2024 봄맞이 클래식 콘서트",
-				eventDate: "2024-03-15T10:30:00Z"
-			}
-		},
-		{
-			id: 2,
-			userId: "test-user-1",
-			eventId: "test-event-2",
-			eventName: "재즈 나이트 - 스윙의 밤",
-			status: ReservationStatus.Pending,
-			reservedAt: "2024-03-20T14:15:00Z",
-			quantity: 1,
-			ticketHolder: "김철수",
-			event: {
-				eventId: "test-event-2",
-				eventName: "재즈 나이트 - 스윙의 밤",
-				eventDate: "2024-03-20T14:15:00Z"
-			}
-		},
-		{
-			id: 3,
-			userId: "test-user-1",
-			eventId: "test-event-3",
-			eventName: "K-POP 스타 라이브",
-			status: ReservationStatus.Cancelled,
-			reservedAt: "2024-03-10T09:00:00Z",
-			quantity: 3,
-			ticketHolder: "김철수",
-			event: {
-				eventId: "test-event-3",
-				eventName: "K-POP 스타 라이브",
-				eventDate: "2024-03-10T09:00:00Z"
-			}
-		},
-		{
-			id: 4,
-			userId: "test-user-1",
-			eventId: "test-event-4",
-			eventName: "오페라 갈라 공연 - 라 트라비아타",
-			status: ReservationStatus.Confirmed,
-			reservedAt: "2024-03-25T19:30:00Z",
-			quantity: 1,
-			ticketHolder: "김철수",
-			event: {
-				eventId: "test-event-4",
-				eventName: "오페라 갈라 공연 - 라 트라비아타",
-				eventDate: "2024-03-25T19:30:00Z"
-			}
-		}
-	];
-	
 	// 실제 데이터가 없으면 테스트 데이터 사용
-	const displayReservations = reservations?.data && reservations.data.length > 0 ? reservations.data : testReservations;
+	const displayReservations = reservations?.data || [];
 
 	const stats = calculateReservationStats(displayReservations);
 

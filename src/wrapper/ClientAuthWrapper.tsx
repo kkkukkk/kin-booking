@@ -22,7 +22,7 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 			if (!isLoggedIn && !publicPaths.includes(pathname)) {
 				if (!isLoggedOut) {
 					showToast({
-						message: '비정상 접근이에요. 로그인 화면으로 이동합니다.',
+						message: '접근 정보가 없거나 만료되었습니다. 이용을 원하시면 로그인해주세요.',
 						iconType: 'error',
 						autoCloseTime: 3000,
 					});

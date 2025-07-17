@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { AnimatePresence, motion } from "framer-motion";

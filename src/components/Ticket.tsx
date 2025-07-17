@@ -17,7 +17,7 @@ interface TicketCardProps {
   ticketPrice?: number
 }
 
-const TicketCard: React.FC<TicketCardProps> = ({
+const TicketCard = ({
   eventName,
   status,
   latestCreatedAt,
@@ -29,7 +29,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
   ticketId,
   ticketNumber,
   ticketPrice,
-}) => {
+}: TicketCardProps) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const [maskSize, setMaskSize] = useState({ width: 320, height: 140 })
   const [maskId] = useState(() => `ticketMask-${Math.random().toString(36).slice(2)}`)

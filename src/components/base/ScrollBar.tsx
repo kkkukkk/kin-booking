@@ -11,7 +11,7 @@ interface ScrollBarProps {
 	height?: string;
 }
 
-const ScrollBar: React.FC<ScrollBarProps> = ({ targetRef }) => {
+const ScrollBar = ({ targetRef }: ScrollBarProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [thumbHeight, setThumbHeight] = useState(0);
 	const [thumbTop, setThumbTop] = useState(0);

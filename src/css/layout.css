@@ -9,20 +9,11 @@
     "footer-left footer-center footer-right";
 }
 
-/*
-.layout-grid.enter {
-    grid-template-rows: 20vh 60vh 20vh;
-    grid-template-columns: 10% 80% 10%;
-}
-*/
-
 .bg-image {
     background-image: var(--background-image-url);
     background-size: cover;
     background-position: center;
 }
-
-
 
 /* grid-area 지정 클래스들 */
 .header-left {

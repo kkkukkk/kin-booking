@@ -9,11 +9,12 @@ import {
 	searchUsers,
 } from '@/api/user';
 import { User } from '@/types/model/user';
+import { UserWithRoles } from '@/types/dto/user';
 import {
 	CreateUserDto,
 	FetchUserDto,
 	UpdateUserDto,
-	FetchUserWithRolesResponseDto
+	FetchUserWithRolesResponseDto,
 } from "@/types/dto/user";
 import { PaginationParams } from "@/util/pagination/type";
 import { useSession } from '@/hooks/useSession';
@@ -24,6 +25,7 @@ export const useUsers = (params?: PaginationParams & FetchUserDto) => {
 		queryKey: ['user', params],
 		queryFn: () => fetchUser(params),
 		enabled: true,
+		retry: 1,
 	});
 };
 
@@ -56,7 +58,7 @@ export const useUpdateUser = () => {
 			const previousUser = queryClient.getQueryData(['user', userId]);
 
 			// 낙관적 업데이트
-			queryClient.setQueryData(['user', userId], (oldData: any) => {
+			queryClient.setQueryData(['user', userId], (oldData: User) => {
 				if (oldData) {
 					return { ...oldData, ...update };
 				}
@@ -68,7 +70,7 @@ export const useUpdateUser = () => {
 		},
 		onSuccess: (updatedUser, variables) => {
 			// 기존 데이터와 서버 응답을 병합하여 캐시 업데이트
-			queryClient.setQueryData(['user', variables.userId], (oldData: any) => {
+			queryClient.setQueryData(['user', variables.userId], (oldData: User) => {
 				if (oldData) {
 					return { ...oldData, ...updatedUser };
 				}
@@ -122,10 +124,11 @@ export const useSoftDeleteUser = () => {
 
 // 특정 유저 조회 hook
 export const useUserById = (userId: string) => {
-	return useQuery<User | null, Error>({
+	return useQuery<UserWithRoles | null, Error>({
 		queryKey: ['user', userId],
 		queryFn: () => fetchUserById(userId),
 		enabled: !!userId,
+		retry: 1,
 	});
 };
 

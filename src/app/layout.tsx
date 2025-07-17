@@ -3,7 +3,7 @@ import './globals.css';
 import '@/css/layout.css';
 import AppProviders from '@/providers/AppProviders';
 import TogglePanel from "@/components/panel/TogglePanel";
-import DynamicVhSetter from "@/components/utils/DynamicVhSetter";
+import DynamicVhSetter from "@/wrapper/DynamicVhSetter";
 import PathnameWrapper from "@/wrapper/PathnameWrapper";
 import Toast from "@/components/alert/Toast";
 import ClientAuthWrapper from "@/wrapper/ClientAuthWrapper";

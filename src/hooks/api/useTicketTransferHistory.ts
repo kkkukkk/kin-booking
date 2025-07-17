@@ -15,6 +15,7 @@ export const useTransferHistoryByTicketId = (ticketId: string) => {
     queryKey: ['transferHistory', 'ticket', ticketId],
     queryFn: () => getTransferHistoryByTicketId(ticketId),
     enabled: !!ticketId,
+    retry: 1,
   });
 };
 
@@ -24,6 +25,7 @@ export const useReceivedTransferHistory = (userId: string) => {
     queryKey: ['transferHistory', 'received', userId],
     queryFn: () => getReceivedTransferHistory(userId),
     enabled: !!userId,
+    retry: 1,
   });
 };
 
@@ -42,6 +44,7 @@ export const useTransferredTicketsByReservation = (reservationId: string) => {
     queryKey: ['transferredTickets', 'reservation', reservationId],
     queryFn: () => getTransferredTicketsByReservation(reservationId),
     enabled: !!reservationId,
+    retry: 1,
   });
 };
 
@@ -51,6 +54,7 @@ export const useTransferHistoryWithDetails = (historyId: string) => {
     queryKey: ['transferHistory', 'details', historyId],
     queryFn: () => getTransferHistoryWithDetails(historyId),
     enabled: !!historyId,
+    retry: 1,
   });
 };
 

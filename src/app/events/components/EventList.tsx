@@ -8,12 +8,11 @@ import EventCard from "./EventCard";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import AnimatedText from "@/components/base/AnimatedText";
-import { BulbIcon } from "@/components/icon/BulbIcon";
 import ResponsivePagination from "@/components/pagination/ResponsivePagination";
 import { getPaginationResponse } from "@/util/pagination/pagination";
 import SortSelector from "@/components/sort/SortSelector";
 import { SortConfig } from "@/types/ui/sort";
-import { sortEvents } from "@/util/sort";
+import { sortEvents } from "@/util/eventSort";
 
 interface EventListProps {
 	className?: string;

@@ -23,7 +23,6 @@ export const fetchReservation = async (params?: PaginationParams & FetchReservat
 	}
 	const { data, count, error } = await query;
 	if (error) throw error;
-
 	return {
 		data: toCamelCaseKeys<Reservation[]>(data ?? []),
 		totalCount: count ?? 0,
@@ -122,6 +121,7 @@ export const cancelPendingReservation = async (reservationId: string): Promise<v
 		.eq('id', reservationId)
 		.single();
 	if (fetchError) throw fetchError;
+
 	if (!data || data.status !== 'pending') {
 		throw new Error('대기중인 예매만 취소할 수 있습니다.');
 	}

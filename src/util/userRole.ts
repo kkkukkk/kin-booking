@@ -1,5 +1,6 @@
 import { UserWithRoles } from '@/types/dto/user';
 import { UserRoleStatus } from '@/types/model/userRole';
+import { RoleCodeKo } from '@/types/model/role';
 
 export const getUserHighestRole = (user: UserWithRoles | null): UserRoleStatus => {
 	if (!user || !user.userRoles) {
@@ -23,14 +24,7 @@ export const getUserHighestRole = (user: UserWithRoles | null): UserRoleStatus =
 };
 
 export const getRoleDisplayName = (roleCode: string): string => {
-	const roleNames = {
-		[UserRoleStatus.Master]: '마스터',
-		[UserRoleStatus.Manager]: '매니저',
-		[UserRoleStatus.Member]: '멤버',
-		[UserRoleStatus.User]: '사용자',
-	};
-
-	return roleNames[roleCode as keyof typeof roleNames] || '사용자';
+	return RoleCodeKo[roleCode as keyof typeof RoleCodeKo] || '사용자';
 };
 
 export const getRoleBadgeColor = (roleCode: string): string => {

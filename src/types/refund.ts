@@ -1,6 +1,6 @@
 export interface RefundRate {
 	daysBefore: number; // 며칠 전까지
-	rate: number;       // 환불률 (%)
+	rate: number;       // 환불 (%)
 }
 
 export interface RefundPolicy {

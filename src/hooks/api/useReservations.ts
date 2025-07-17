@@ -52,6 +52,7 @@ export const useReservationsByUserId = (userId: string) => {
 		queryKey: ['reservations', 'user', userId],
 		queryFn: () => fetchReservation({ userId }),
 		enabled: !!userId,
+		retry: 1,
 	});
 };
 

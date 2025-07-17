@@ -1,8 +1,6 @@
 'use client'
 
-import React from 'react';
 import ThemeDiv from '@/components/base/ThemeDiv';
-import { TicketIcon } from '@/components/icon/TicketIcon';
 import { useTicketsWithEventByOwnerId, useCancelAllTicketsByEvent } from '@/hooks/api/useTickets';
 import { useSession } from '@/hooks/useSession';
 import useToast from '@/hooks/useToast';
@@ -61,7 +59,7 @@ const TicketsTab = ({ userId }: TicketsTabProps) => {
 				{ eventId, userId: session.user.id },
 				{
 					onSuccess: () => showToast({ message: '모든 티켓이 취소 신청 되었습니다.', iconType: 'success' }),
-					onError: (err: any) => showToast({ message: err.message, iconType: 'error' }),
+					onError: (err) => showToast({ message: err.message, iconType: 'error' }),
 				}
 			);
 		}

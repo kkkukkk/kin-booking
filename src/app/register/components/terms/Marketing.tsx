@@ -1,8 +1,8 @@
 import Button from "@/components/base/Button";
 
 interface MarketingProps {
-	onClose: () => void;
-	onConfirm: () => void;
+	onClose?: () => void;
+	onConfirm?: () => void;
 }
 
 const Marketing = ({ onClose, onConfirm }: MarketingProps) => {
@@ -20,22 +20,24 @@ const Marketing = ({ onClose, onConfirm }: MarketingProps) => {
 				<p className="text-sm md:text-lg">수신 동의는 언제든지 철회할 수 있으며, 수신 거부 시 별도의 절차에 따라 진행할 수 있습니다.</p>
 			</article>
 
-			<div className="flex items-center justify-center mt-4 gap-2">
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onClose}
-				>취소</Button>
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onConfirm}
-					theme={"dark"}
-					reverse
-				>동의</Button>
-			</div>
+			{onClose && onConfirm && (
+				<div className="flex items-center justify-center mt-4 gap-2">
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onClose}
+					>취소</Button>
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onConfirm}
+						theme={"dark"}
+						reverse
+					>동의</Button>
+				</div>
+			)}
 		</section>
 	)
 }

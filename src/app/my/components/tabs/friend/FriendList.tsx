@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';

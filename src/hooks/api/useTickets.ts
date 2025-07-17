@@ -287,9 +287,8 @@ export const useCancelAllTicketsByEvent = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   
-  return useMutation<void, Error, { eventId: string; userId: string; tickets?: any[] }>({
+  return useMutation<void, Error, { eventId: string; userId: string; tickets?: Ticket[] }>({
     mutationFn: async ({ eventId, userId, tickets }) => {
-      // 프론트에서 티켓 리스트를 받아서 직접 체크(권한/상태 등)
       if (tickets && tickets.length > 0) {
         const activeTickets = tickets.filter(t => t.ownerId === userId && t.status !== TicketStatus.Cancelled);
         if (activeTickets.length === 0) throw new Error('이미 모든 티켓이 취소되었습니다.');
@@ -314,7 +313,7 @@ export const useRequestCancelTicket = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   
-  return useMutation<void, Error, { ticketId: string; userId: string; ticket?: any }>({
+  return useMutation<void, Error, { ticketId: string; userId: string; ticket?: Ticket }>({
     mutationFn: async ({ ticketId, userId, ticket }) => {
       // 프론트에서 티켓 정보로 권한/상태 체크
       if (ticket) {

@@ -8,8 +8,6 @@ export const useLogin = () => {
 	return useMutation({
 		mutationFn: ({ email, password }: { email: string; password: string }) => login(email, password),
 		onError: (error: Error) => {
-			console.error('Login error:', error);
-			
 			// 에러 메시지에 따른 적절한 토스트 메시지 표시
 			if (error.message === "Invalid login credentials") {
 				showToast({
@@ -31,6 +29,7 @@ export const useLogin = () => {
 				});
 			}
 		},
+		retry: false,
 	});
 };
 

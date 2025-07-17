@@ -1,8 +1,8 @@
 import Button from "@/components/base/Button";
 
 interface NoticeProps {
-	onClose: () => void;
-	onConfirm: () => void;
+	onClose?: () => void;
+	onConfirm?: () => void;
 }
 
 const ReservationNotice = ({ onClose, onConfirm }: NoticeProps) => {
@@ -34,22 +34,24 @@ const ReservationNotice = ({ onClose, onConfirm }: NoticeProps) => {
 				</p>
 			</article>
 
-			<div className="flex items-center justify-center mt-4 gap-2">
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onClose}
-				>취소</Button>
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onConfirm}
-					theme={"dark"}
-					reverse
-				>확인</Button>
-			</div>
+			{onClose && onConfirm && (
+				<div className="flex items-center justify-center mt-4 gap-2">
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onClose}
+					>취소</Button>
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onConfirm}
+						theme={"dark"}
+						reverse
+					>확인</Button>
+				</div>
+			)}
 		</section>
 	);
 };

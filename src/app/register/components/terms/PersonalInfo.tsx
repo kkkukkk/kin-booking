@@ -1,8 +1,8 @@
 import Button from "@/components/base/Button";
 
 interface PersonalInfoProps {
-	onClose: () => void;
-	onConfirm: () => void;
+	onClose?: () => void;
+	onConfirm?: () => void;
 }
 
 const PersonalInfo = ({ onClose, onConfirm }: PersonalInfoProps) => {
@@ -30,22 +30,24 @@ const PersonalInfo = ({ onClose, onConfirm }: PersonalInfoProps) => {
 				<p className="text-sm md:text-lg">동의를 거부할 권리가 있으나, 필수 항목 미동의 시 회원가입 및 예매가 불가능합니다.</p>
 			</article>
 
-			<div className="flex items-center justify-center mt-4 gap-2">
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onClose}
-				>취소</Button>
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onConfirm}
-					theme={"dark"}
-					reverse
-				>동의</Button>
-			</div>
+			{onClose && onConfirm && (
+				<div className="flex items-center justify-center mt-4 gap-2">
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onClose}
+					>취소</Button>
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onConfirm}
+						theme={"dark"}
+						reverse
+					>동의</Button>
+				</div>
+			)}
 		</section>
 	)
 }

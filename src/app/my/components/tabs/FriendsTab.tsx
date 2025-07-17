@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import Button from '@/components/base/Button';

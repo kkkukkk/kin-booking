@@ -4,7 +4,8 @@ import {
 	CreateUserDto,
 	FetchUserDto,
 	UpdateUserDto,
-	FetchUserWithRolesResponseDto, UserWithRoles
+	FetchUserWithRolesResponseDto, 
+	UserWithRoles,
 } from '@/types/dto/user';
 import { PaginationParams } from "@/util/pagination/type";
 import { getPaginationRange } from "@/util/pagination/pagination";
@@ -91,7 +92,7 @@ export const softDeleteUser = async (userId: string): Promise<User> => {
 }
 
 // 특정 유저 조회 api
-export const fetchUserById = async (userId: string): Promise<User | null> => {
+export const fetchUserById = async (userId: string): Promise<UserWithRoles | null> => {
 	const { data, error } = await supabase
 		.from('users')
 		.select(`
@@ -121,13 +122,12 @@ export const fetchUserById = async (userId: string): Promise<User | null> => {
 		throw error;
 	}
 	
-	return toCamelCaseKeys<User>(data);
+	return toCamelCaseKeys<UserWithRoles>(data);
 };
 
 // 사용자 검색 (친구 추가용 등)
-export const searchUsers = async (query: string, currentUserId: string): Promise<any[]> => {
+export const searchUsers = async (query: string, currentUserId: string): Promise<User[]> => {
 	try {
-		// Supabase Function을 사용하여 사용자 검색
 		const { data, error } = await supabase
 			.rpc('search_users_for_friends', {
 				search_query: query,
@@ -139,7 +139,7 @@ export const searchUsers = async (query: string, currentUserId: string): Promise
 			return [];
 		}
 		
-		return toCamelCaseKeys<any[]>(data || []);
+		return toCamelCaseKeys<User[]>(data || []);
 	} catch (error) {
 		console.error('searchUsers error:', error);
 		return [];

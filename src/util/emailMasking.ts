@@ -1,12 +1,4 @@
-/**
- * 이메일 주소를 마스킹 처리하는 함수
- * @param email 원본 이메일 주소
- * @returns 마스킹된 이메일 주소
- * 
- * 예시:
- * - "user@example.com" → "us***@example.com"
- * - "test.user@domain.co.kr" → "te***.us***@domain.co.kr"
- */
+
 export const maskEmail = (email: string): string => {
   if (!email || !email.includes('@')) {
     return email;
@@ -22,15 +14,6 @@ export const maskEmail = (email: string): string => {
   return `${maskedLocalPart}@${domain}`;
 };
 
-/**
- * 이메일 주소의 도메인 부분만 마스킹하는 함수
- * @param email 원본 이메일 주소
- * @returns 도메인이 마스킹된 이메일 주소
- * 
- * 예시:
- * - "user@example.com" → "user@e***.com"
- * - "test@domain.co.kr" → "test@d***.co.kr"
- */
 export const maskEmailDomain = (email: string): string => {
   if (!email || !email.includes('@')) {
     return email;

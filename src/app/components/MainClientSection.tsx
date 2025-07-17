@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { useSession } from "@/hooks/useSession";
+import { useEffect, useRef, useState } from "react";
 import Button from "@/components/base/Button";
 import { useRouter } from "next/navigation";
 import { useTutorial } from "@/hooks/useTutorial";
 import TutorialOverlay from "@/components/tutorial/TutorialOverlay";
-import { mainPageTutorialSteps } from "@/data/tutorialSteps";
+import { mainPageTutorialSteps } from "@/components/tutorial/tutorialSteps";
 import { useEventsWithCurrentStatus } from "@/hooks/api/useEvents";
 import { EventStatus } from "@/types/model/events";
 import MainEventSection from "./MainEventSection";
@@ -19,7 +18,6 @@ import { ArrowDownIcon } from "@/components/icon/ArrowIcons";
 import KinAnimationSection from "@/app/components/KinAnimationSection";
 
 const MainClientSection = () => {
-  const { session } = useSession();
   const { showSpinner, hideSpinner } = useSpinner();
   const router = useRouter();
   const theme = useAppSelector(state => state.theme.current);
@@ -311,7 +309,7 @@ const MainClientSection = () => {
           </div>
         </div>
       </motion.div>
-
+      
       {/* 4. 공연 포스터들 */}
       <MainEventSection title="지금 공연 중" events={openEvents} theme={theme} variant="large" />
       <MainEventSection title="곧 만나볼 공연" events={waitingEvents} theme={theme} variant="small" />
@@ -322,6 +320,43 @@ const MainClientSection = () => {
           <div className="text-sm text-white/70">곧 새로운 음악으로 찾아뵙겠습니다</div>
         </div>
       )}
+
+      
+      {/* 5. 유튜브 동영상 섹션 (임시 숨김) */}
+      {/* <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="mb-16"
+      >
+        <YouTubeVideoSection />
+      </motion.div> */}
+
+      {/* About us 섹션 */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="mb-16"
+      >
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col items-center justify-center">
+            <h3
+              className="text-2xl md:text-2xl font-bold text-white/80 mb-8 md:mb-10 tracking-wide drop-shadow-sm text-center"
+            >저희가 궁금하시다면...</h3>
+            <Button
+              theme="dark"
+              padding="px-6 py-3"
+              fontSize="text-lg"
+              width="w-full md:w-1/3"
+              className="font-medium tracking-wide"
+              onClick={() => router.push('/about')}
+            >
+              {'About us'}
+            </Button>
+          </div>
+        </div>
+      </motion.div>
       
       {/* 튜토리얼 오버레이 */}
       <TutorialOverlay

@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { StatusBadge } from '@/components/status/StatusBadge';
@@ -22,9 +21,10 @@ interface UserSearchResultProps {
 
 const UserSearchResult = ({ user, onSendRequest, isPending }: UserSearchResultProps) => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
-  const { data: friendStatusData } = useCheckFriendStatus(user.id);
+  const { data: friendStatusData, isPending: isFriendStatusPending } = useCheckFriendStatus(user.id);
 
   const getActionButton = () => {
+    if (isFriendStatusPending) return;
     if (friendStatusData?.status === FriendStatus.Accepted) {
       return (
         <StatusBadge 

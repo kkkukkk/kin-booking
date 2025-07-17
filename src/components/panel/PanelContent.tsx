@@ -10,6 +10,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { HomeIcon } from "@/components/icon/HomeIcon";
 import { UsersIcon } from "@/components/icon/FriendIcons";
+import { MicIcon } from "@/components/icon/MediaIcons";
 import { useLogout } from "@/hooks/api/useAuth";
 import { useSession } from "@/hooks/useSession";
 import useToast from "@/hooks/useToast";
@@ -38,9 +39,11 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 	const { showAlert } = useAlert();
 
 	const toggleButton = useCallback((key: string) => {
-		const skipKeys = ["Home", "Login", "Logout", "My"];
+		const skipKeys = ["Home", "Login", "Logout", "My", "Events"];
 		if (skipKeys.includes(key)) {
 			setOpen(false); // 라우팅 버튼 클릭 시 패널 닫기
+			// 라우팅 버튼 클릭 시 activeButtons 초기화
+			setActiveButtons({});
 			return;
 		}
 		setActiveButtons((prev) => ({
@@ -66,6 +69,13 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 					});
 					router.push("/login?loggedOut=1");
 				},
+				onError: () => {
+					showToast({ 
+						message: '로그아웃 중 오류가 발생했습니다.', 
+						iconType: 'error', 
+						autoCloseTime: 3000 
+					});
+				}
 			});
 		}
 	}, [logout, showToast, router, showAlert]);
@@ -79,21 +89,27 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 		},
 		{
 			key: 'Home',
-			order: 3,
+			order: 4,
 			onClick: () => router.push("/"),
 			name: <HomeIcon />
+		},
+		{
+			key: 'Events',
+			order: 2,
+			onClick: () => router.push("/events"),
+			name: <MicIcon />
 		},
 		...(session
 			? [
 				{
 					key: 'My',
-					order: 2,
+					order: 3,
 					onClick: () => router.push("/my"),
 					name: <UsersIcon />
 				},
 				{
 					key: 'Logout',
-					order: 4,
+					order: 5,
 					onClick: handleLogout,
 					name: 'Logout',
 				},
@@ -101,7 +117,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 			: [
 				{
 					key: 'Login',
-					order: 4,
+					order: 5,
 					onClick: () => router.push('/login'),
 					name: 'Login',
 				},

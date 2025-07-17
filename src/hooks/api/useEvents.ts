@@ -13,6 +13,7 @@ export const useEvents = (params?: PaginationParams & FetchEventDto) => {
 		queryKey: ['events', params],
 		queryFn: () => fetchEvents(params),
 		staleTime: 1000 * 60 * 10,
+		retry: 1,
 	});
 }
 
@@ -21,7 +22,8 @@ export const useEventsWithCurrentStatus = (params?: PaginationParams & FetchEven
 		queryKey: ['events_with_current_status', params],
 		queryFn: () => fetchEventsWithCurrentStatus(params),
 		staleTime: 1000 * 60 * 10,
-		enabled: !!params
+		enabled: !!params,
+		retry: 1,
 	});
 }
 
@@ -34,5 +36,6 @@ export const useEventById = (id: string | undefined) => {
 		},
 		enabled: !!id,
 		staleTime: 1000 * 60 * 10,
+		retry: 1,
 	});
 };

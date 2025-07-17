@@ -1,0 +1,64 @@
+.gridAreasTeamCard {
+    display: grid;
+    gap: 1rem;
+    grid-template-areas:
+        "avatar name social role"
+        "bio bio bio bio";
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-rows: auto 1fr;
+    align-items: center;
+}
+
+.gridAreaAvatar {
+    grid-area: avatar;
+}
+
+.gridAreaName {
+    grid-area: name;
+    display: flex;
+    align-items: center;
+}
+
+.gridAreaRole {
+    grid-area: role;
+    display: flex;
+    align-items: center;
+}
+
+.gridAreaSocial {
+    grid-area: social;
+    display: flex;
+    align-items: center;
+}
+
+.gridAreaBio {
+    grid-area: bio;
+}
+
+/* PC/태블릿 (769px 이상) */
+@media (min-width: 769px) {
+    .gridAreasTeamCard {
+        grid-template-areas:
+            "avatar name role"
+            "bio bio bio"
+            "social social social";
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto 1fr auto;
+        gap: 1.5rem;
+        align-items: center;
+    }
+    
+    .gridAreaName {
+        justify-content: center;
+    }
+    
+    .gridAreaRole {
+        justify-content: flex-end;
+    }
+    
+    .gridAreaSocial {
+        justify-content: center;
+        padding-top: 1rem;
+        border-top: 1px solid #4b5563;
+    }
+} 

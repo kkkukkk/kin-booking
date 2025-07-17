@@ -11,10 +11,3 @@ export const sortOptions: { value: string; label: string }[] = [
   { value: 'name', label: '이름' },
   { value: 'status', label: '상태' }
 ];
-
-export const sortLabels: Record<SortOption, string> = {
-  date: '날짜',
-  price: '가격', 
-  name: '이름',
-  status: '상태'
-}; 

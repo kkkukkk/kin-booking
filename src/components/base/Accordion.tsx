@@ -8,7 +8,7 @@ interface AccordionProps {
   className?: string;
 }
 
-const Accordion: React.FC<AccordionProps> = ({ title, children, className }) => {
+const Accordion = ({ title, children, className }: AccordionProps) => {
   const [open, setOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 

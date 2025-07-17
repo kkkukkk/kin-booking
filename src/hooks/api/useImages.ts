@@ -6,6 +6,7 @@ export const useLoginImages = () => {
 		queryKey: ['login-images'],
 		queryFn: () => fetchLoginImages(),
 		staleTime: 1000 * 60 * 10,
+		retry: 1,
 	});
 }
 

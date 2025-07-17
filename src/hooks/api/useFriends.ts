@@ -35,6 +35,7 @@ export const useFriendRequests = () => {
     enabled: !!session?.user?.id,
     staleTime: 0,
     gcTime: 1000 * 60,
+    retry: 1,
     select: (raw: FriendWithUser[]): FriendResponse => {
       if (!raw || !Array.isArray(raw)) {
         return { sent: [], received: [] };
@@ -178,5 +179,6 @@ export const useCheckFriendStatus = (friendId: string) => {
     queryFn: () => checkFriendStatus(friendId, session?.user?.id || ''),
     enabled: !!friendId && !!session?.user?.id,
     staleTime: 0, // 캐시하지 않음
+    retry: 1,
   });
 }; 

@@ -1,4 +1,5 @@
-import React from "react";
+'use client'
+
 import { EventWithCurrentStatus } from "@/types/dto/events";
 import EventPoster from "@/app/events/[eventId]/components/EventPoster";
 import { useEventMedia } from "@/hooks/api/useEventMedia";

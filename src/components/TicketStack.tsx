@@ -25,7 +25,7 @@ interface TicketStackProps {
 	key?: React.Key;
 }
 
-const TicketStack: React.FC<TicketStackProps> = ({
+const TicketStack = ({
 	eventId,
 	eventName,
 	tickets,
@@ -34,7 +34,7 @@ const TicketStack: React.FC<TicketStackProps> = ({
 	eventInfo,
 	onCancelRequest,
 	onTicketAction,
-}) => {
+}: TicketStackProps) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 
