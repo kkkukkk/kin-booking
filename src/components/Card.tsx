@@ -41,7 +41,7 @@ const Card = ({
 	const scrollTargetRef = useRef<HTMLDivElement | null>(null);
 	const [refReady, setRefReady] = useState(false);
 
-	// ref가 설정되면 refReady를 true로 설정
+	// ref가 설정되면 refReady를 true로
 	useEffect(() => {
 		if (rehydrated && scrollTargetRef.current) {
 			setRefReady(true);
@@ -65,7 +65,7 @@ const Card = ({
 				exit="exit"
 				transition={{duration: 0.3}}
 				className={clsx(
-					"rounded-none md:rounded-[10px]",
+					"rounded-none md:rounded-[10px] max-w-7xl mx-auto",
 					theme === "dark"
 						? "shadow-[0_0_6px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_24px_rgba(255,255,255,0.3),0_0_36px_rgba(255,255,255,0.1)]"
 						: theme === "neon"
@@ -84,10 +84,9 @@ const Card = ({
 				<ThemeRefDiv
 					ref={scrollTargetRef}
 					className={clsx(
-						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12 flex flex-col", // flex 추가
+						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12 flex flex-col",
 						center && "justify-center items-center",
 						"scrollbar-none",
-						// ThemeRefDiv의 기본 스타일을 무시하고 Card 전용 스타일 적용
 						"bg-transparent border-none backdrop-blur-sm",
 						className
 					)}
@@ -98,7 +97,6 @@ const Card = ({
 								? "var(--black_70)"
 								: "var(--white_70)",
 					}}
-					lightweight
 				>
 					{(backButton || hasLogo) && (
 						<div className="flex w-full items-center justify-between pb-2">

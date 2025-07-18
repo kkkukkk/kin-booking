@@ -84,7 +84,6 @@ const FriendRequests = () => {
 
   return (
     <div className="space-y-4">
-      {/* 탭 버튼들 */}
       <div className="flex gap-2">
         <Button
           onClick={() => setActiveTab('received')}
@@ -182,7 +181,7 @@ const FriendRequests = () => {
                       </Button>
                     </div>
                   ) : (
-                    // 보낸 요청: 상태에 따른 버튼
+                    // 보낸 요청: 상태에 따른 버튼 (거절된 요청은 삭제버튼 표시)
                     request.status === FriendStatus.Pending ? (
                       <Button
                         onClick={() => handleCancel(request.id, request.status)}

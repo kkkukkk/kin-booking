@@ -79,7 +79,7 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
 
   return (
     <div className="relative h-[600vh]" ref={containerRef}>
-      {/* 고정 애니메이션 영역 */}
+      {/* 고정 영역 */}
       <div 
         className="fixed inset-0 flex items-center justify-center pointer-events-none transition-all duration-500"
         style={{

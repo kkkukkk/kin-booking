@@ -40,7 +40,7 @@ const ResponsivePagination = ({
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  // 데이터가 없거나 한 페이지에 모든 데이터가 있는 경우 페이지네이션 숨김
+  // 데이터가 없거나 한 페이지에 모든 데이터가 있는 경우 숨김
   if (paginationInfo.totalPages <= 1) {
     return null;
   }

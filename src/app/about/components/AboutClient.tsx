@@ -18,7 +18,7 @@ const AboutClient = () => {
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* 뒤로가기 버튼 */}
         <motion.div 
           className="mb-8"
@@ -46,7 +46,7 @@ const AboutClient = () => {
           <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
             About Us
           </h1>
-          <p className="text-base md:text-lg text-gray-300 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-300">
             공연을 사랑하는 우리 팀을 소개합니다
           </p>
         </motion.div>

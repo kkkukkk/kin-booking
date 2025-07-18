@@ -6,6 +6,7 @@ import Input from "@/components/base/Input";
 import ToggleVisibilityIcon from "@/components/icon/ToggleVisibilityIcon";
 import { InputProps } from "@/types/ui/input";
 
+// 비밀번호 보이기 버튼이 있는 Input
 const InputWithPasswordToggle = ({
 	theme = "normal",
 	variant = "box",
@@ -30,7 +31,7 @@ const InputWithPasswordToggle = ({
 				error={error}
 				fontSize={fontSize}
 				fontWeight={fontWeight}
-				className={clsx("pr-10", className)} // 오른쪽 여백 확보
+				className={clsx("pr-10", className)}
 			/>
 			{isPasswordType && (
 				<button

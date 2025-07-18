@@ -63,7 +63,7 @@ const TermsClient = () => {
 
       {/* 탭 네비게이션 */}
       <div className="border-b border-gray-800 bg-gradient-to-r from-gray-900/50 via-green-900/10 to-gray-900/50">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex overflow-x-auto scrollbar-none">
             {tabs.map((tab) => (
               <button
@@ -83,7 +83,7 @@ const TermsClient = () => {
       </div>
 
       {/* 콘텐츠 */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}

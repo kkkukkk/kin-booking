@@ -56,7 +56,7 @@ const Email = ({
 		}
 	}, [value, onValidChange, onDuplicateCheck]);
 
-	// 이메일 중복검사 함수
+	// 중복검사
 	const checkDuplicateEmail = async () => {
 		if (value === "") {
 			showToast({
@@ -80,7 +80,6 @@ const Email = ({
 
 		// Supabase 이메일 중복 여부 체크
 		// Authentication 저장 시 users 테이블에도 저장되므로 users 테이블에서 조회하는 함수 (rls 권한 때문)
-		// 사용중 true, 미사용 false
 		const { data, error } = await supabase.rpc("check_email_duplicate", {
 			input_email: value,
 		});

@@ -67,6 +67,9 @@ const FriendList = () => {
 
   return (
     <div className="space-y-3">
+      <div>
+        <h3>친구({friends.length}명)</h3>
+      </div>
       {friends.map((friend) => (
         <ThemeDiv 
           key={friend.id} 

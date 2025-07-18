@@ -31,7 +31,7 @@ import FriendsTab from '@/app/my/components/tabs/FriendsTab';
 import TeamTab from '@/app/my/components/tabs/TeamTab';
 import clsx from 'clsx';
 
-// 탭 타입에 team 추가
+// 탭 타입
 type MyPageTab = 'profile' | 'reservations' | 'tickets' | 'friends' | 'team';
 
 const MyPageClient = () => {
@@ -46,7 +46,7 @@ const MyPageClient = () => {
 	
 	// 사용자 정보 조회
 	const { data: user, isLoading: userLoading } = useUserById(session?.user?.id || '');
-	// 멤버 정보 조회 - 먼저 사용자 ID로 팀 멤버 정보를 찾아야 함
+	// 멤버 정보 조회
 	const { data: teamMember, isLoading: teamMemberLoading } = useTeamMemberById(session?.user?.id || '');
 	// 예매 내역 조회
 	const { data: reservations, isLoading: reservationsLoading } = useReservationsByUserId(session?.user?.id || '');

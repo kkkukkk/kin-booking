@@ -84,19 +84,19 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 				</div>
 			</div>
 			<div className="space-y-4">
-				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+				<div className="flex justify-between items-center py-2 border-b border-gray-200">
 					<span className="font-medium opacity-70">이름</span>
 					<span>{user.name}</span>
 				</div>
-				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+				<div className="flex justify-between items-center py-2 border-b border-gray-200">
 					<span className="font-medium opacity-70">이메일</span>
 					<span>{user.email}</span>
 				</div>
-				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+				<div className="flex justify-between items-center py-2 border-b border-gray-200">
 					<span className="font-medium opacity-70">핸드폰 번호</span>
 					<span>{formatPhoneNumber(user.phoneNumber)}</span>
 				</div>
-				<div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+				<div className="flex justify-between items-center py-2 border-b border-gray-200">
 					<span className="font-medium opacity-70">가입일</span>
 					<span>{new Date(user.registerDate).toLocaleDateString('ko-KR')}</span>
 				</div>

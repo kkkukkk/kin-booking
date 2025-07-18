@@ -44,7 +44,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
         {/* 이름 */}
         <div className={styles.gridAreaName}>
           <h3 className="text-base md:text-lg font-semibold text-white truncate">
-            {member.name || 'Unknown'}
+            {member.displayName || 'Unknown'}
           </h3>
         </div>
         

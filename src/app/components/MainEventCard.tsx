@@ -22,23 +22,23 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
   const isHero = variant === "hero";
   const isSmall = variant === "small";
   
-  // 포스터 컨테이너 크기 조정 - flex 기반
+  // 포스터 컨테이너 크기
   const posterContainerSize = isHero 
     ? "w-full max-w-xs md:max-w-sm" 
     : isLarge 
-    ? "w-36 h-440 md:w-56 md:h-80" // md 이상에서 더 크게
+    ? "w-36 h-440 md:w-56 md:h-80"
     : "w-32 h-40 md:w-36 md:h-44";
   
   const titleSize = isHero 
     ? "text-xl font-bold" 
     : isLarge 
-    ? "text-lg md:text-2xl font-bold" // md 이상에서 더 크게
+    ? "text-lg md:text-2xl font-bold"
     : "text-sm font-semibold";
   
   const dateSize = isHero 
     ? "text-base" 
     : isLarge 
-    ? "text-sm md:text-base" // md 이상에서 더 크게
+    ? "text-sm md:text-base"
     : "text-xs";
 
   const handleDetailClick = () => {
@@ -69,7 +69,7 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
           }
         />
       </div>
-      {/* hero일 때는 버튼과 함께 표시 */}
+      {/* hero일 때는 버튼과 함께 표시 large일 때만 텍스트 표시, small은 overlay */}
       {isHero ? (
         <>
           <div className={`${titleSize} mb-3 truncate w-full text-center text-gray-800 font-bold`}>
@@ -90,7 +90,6 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
           </div>
         </>
       ) : (
-        /* large일 때만 텍스트 표시, small은 overlay로 대체 */
         isLarge && (
           <>
             <div className={`${titleSize} mb-2 truncate w-full text-center text-gray-800 font-semibold`}>

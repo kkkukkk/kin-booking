@@ -40,7 +40,6 @@ const AddFriend = () => {
 
   return (
     <div className="space-y-4">
-      {/* 검색 입력 */}
       <div>
         <label className={clsx(
           "block text-sm font-medium mb-2",
@@ -57,7 +56,6 @@ const AddFriend = () => {
         />
       </div>
 
-      {/* 검색 결과 */}
       {debouncedQuery.length >= 2 && (
         <ThemeDiv className="rounded-lg" isChildren>
           {isSearching ? (
@@ -87,7 +85,6 @@ const AddFriend = () => {
         </ThemeDiv>
       )}
 
-      {/* 검색 안내 */}
       {searchQuery.length === 0 && (
         <ThemeDiv className="p-6 text-center rounded-lg" isChildren>
           <div className="flex justify-center mb-4">

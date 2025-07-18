@@ -12,13 +12,14 @@ type ThemeDivProps = React.HTMLAttributes<HTMLDivElement> & {
 	lightweight?: boolean;
 };
 
+// theme 따라가는 div
 const ThemeDiv = ({ children, className, isChildren, lightweight = false, ...rest }: ThemeDivProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
 
 	if (!rehydrated) return null;
 
-	// 테마별 스타일 정의
+	// 테마별 스타일
 	const themeStyles = {
 		normal: {
 			base: 'bg-[var(--normal-back)] border border-[rgba(0,0,0,0.2)] text-gray-900',

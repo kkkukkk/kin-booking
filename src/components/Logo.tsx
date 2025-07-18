@@ -8,8 +8,8 @@ import { RootState } from "@/redux/store";
 interface LogoProps {
 	width?: number; // 너비만 받아서 비율 맞춰 높이 자동 계산
 	className?: string;
-	priority?: boolean; // priority를 선택적으로 설정할 수 있도록
-	variant?: 'theme' | 'white'; // 테마 기반 또는 흰색 버전
+	priority?: boolean;
+	variant?: 'theme' | 'white'; // 테마 기반 또는 흰색
 }
 
 const Logo = ({ width, className, priority = false, variant = 'theme' }: LogoProps) => {

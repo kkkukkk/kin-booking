@@ -56,28 +56,41 @@ export const useUpdateTeamMember = () => {
     },
     onMutate: async ({ id, data }) => {
       const { userId } = data;
+      // userId로 조회되는 쿼리만 취소 (실제로 사용되는 쿼리 키)
       await queryClient.cancelQueries({ queryKey: ['team-member', userId] });
+      
+      // 이전 데이터 저장
       const previousTeamMember = queryClient.getQueryData<TeamMember>(['team-member', userId]);
+      
+      // 낙관적 업데이트 - userId에 대해서만 업데이트
       queryClient.setQueryData<TeamMember>(['team-member', userId], (oldData) => {
         if (oldData) {
           return { ...oldData, ...data };
         }
         return oldData;
       });
+      
       return { previousTeamMember };
     },
     onSuccess: (updatedTeamMember, variables) => {
       const { userId } = variables.data;
+      
+      // 성공 시 캐시 업데이트 - userId에 대해서만 업데이트
       queryClient.setQueryData<TeamMember>(['team-member', userId], (oldData) => {
         if (oldData) {
           return { ...oldData, ...updatedTeamMember };
         }
         return updatedTeamMember;
       });
+      
+      // 관련 쿼리들 무효화
       queryClient.invalidateQueries({ queryKey: ['team-member', userId] });
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
     },
     onError: (error, variables, context) => {
       const { userId } = variables.data;
+      
+      // 실패 시 이전 데이터로 롤백
       if (context?.previousTeamMember) {
         queryClient.setQueryData(['team-member', userId], context.previousTeamMember);
       }

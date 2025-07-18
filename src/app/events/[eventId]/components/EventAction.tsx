@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { bottomUp } from "@/types/ui/motionVariants";
 import { EventStatus } from "@/types/model/events";
 import Button from "@/components/base/Button";
-import clsx from "clsx";
 import { StatusNoticeBox } from "@/components/status/StatusNoticeBox";
 
 interface EventActionProps {
@@ -14,6 +13,7 @@ interface EventActionProps {
 	onReservationClick: () => void;
 }
 
+// 공연 상세 하단
 const EventAction = ({ 
 	status, 
 	isSoldOut, 

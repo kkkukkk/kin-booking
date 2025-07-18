@@ -8,7 +8,7 @@ interface FooterProps {
 }
 
 const Footer = ({ theme = 'normal' }: FooterProps) => {
-  // 테마별 색상 클래스
+  // 테마별 색상
   const getTextColor = () => {
     switch (theme) {
       case 'dark':

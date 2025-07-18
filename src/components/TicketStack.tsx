@@ -19,7 +19,7 @@ interface TicketStackProps {
 	tickets: Ticket[];
 	latestCreatedAt: string;
 	ticketColor?: string;
-	eventInfo?: Events; // 공연 정보 (일자, 시간 등)
+	eventInfo?: Events;
 	onCancelRequest?: (eventId: string) => void;
 	onTicketAction?: (ticketIds: string[], action: 'enter' | 'transfer') => void;
 	key?: React.Key;
@@ -106,11 +106,11 @@ const TicketStack = ({
 		return stackStatus === TicketStatus.Active && statusStats.active > 0;
 	}, [stackStatus, statusStats.active]);
 
-	// 성능 최적화: 기본 표시 레이어 수 (펼치지 않았을 때)
+	// 기본 표시 레이어 수 (펼치지 않았을 때)
 	const DEFAULT_VISIBLE_LAYERS = 3;
 	const getVisibleTickets = (tickets: Ticket[], isExpanded: boolean) => {
 		if (isExpanded) return tickets; // 펼치면 모든 티켓 표시
-		return tickets.slice(0, Math.min(tickets.length, DEFAULT_VISIBLE_LAYERS)); // 기본적으로 5장만 표시
+		return tickets.slice(0, Math.min(tickets.length, DEFAULT_VISIBLE_LAYERS));
 	};
 
 	// 펼치기/접기 토글
@@ -138,7 +138,7 @@ const TicketStack = ({
 
 	const visibleTickets = Array.isArray(tickets) ? getVisibleTickets(tickets, isExpanded) : [];
 
-	// 그룹의 실제 높이 계산 (반응형)
+	// 그룹의 실제 높이 계산
 	const headerHeight = 120; // 헤더 높이 증가
 	const ticketHeight = 200; // 기본 티켓 높이
 	const ticketSpacing = 16; // 티켓 간격
@@ -183,14 +183,12 @@ const TicketStack = ({
 			style={{ minHeight: `${groupHeight}px` }}
 			isChildren
 		>
-			{/* 이벤트 헤더 */}
 			<div className={clsx(
 				"p-6 border-b",
 				theme === 'normal' ? 'border-gray-200' : 'border-gray-700'
 			)}>
 				<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 					<div className="flex-1">
-						{/* 이벤트명과 날짜 */}
 						<div className="flex flex-col md:flex-row md:items-center gap-2 mb-3">
 							<h3 className="text-xl font-bold">{eventName}</h3>
 							{eventDateInfo && (
@@ -261,7 +259,6 @@ const TicketStack = ({
 				</div>
 			</div>
 
-			{/* 액션 바 */}
 			{(canEnter || canTransfer || canCancel) && (
 				<div className={clsx(
 					"px-6 py-4 border-b",
@@ -270,7 +267,7 @@ const TicketStack = ({
 						: 'bg-gray-700/50 border-gray-600'
 				)}>
 					<div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-						{/* 입장 버튼 */}
+						{/* 입장  */}
 						{canEnter && (
 							<button
 								onClick={() => handleTicketAction('enter')}
@@ -285,7 +282,7 @@ const TicketStack = ({
 							</button>
 						)}
 
-						{/* 양도 버튼 */}
+						{/* 양도 */}
 						{canTransfer && (
 							<button
 								onClick={() => handleTicketAction('transfer')}
@@ -295,7 +292,7 @@ const TicketStack = ({
 							</button>
 						)}
 
-						{/* 취소 신청 버튼 */}
+						{/* 취소 신청 */}
 						{canCancel && onCancelRequest && (
 							<button
 								onClick={() => onCancelRequest(eventId)}
@@ -345,7 +342,7 @@ const TicketStack = ({
 										/>
 									</motion.div>
 								))}
-								{/* 펼치기/접기 버튼 - 항상 티켓 더미 아래에 위치 */}
+								{/* 펼치기/접기 버튼 */}
 								{tickets.length > 1 && (
 									<div className="flex justify-center">
 										<Button
@@ -379,7 +376,6 @@ const TicketStack = ({
 									{visibleTickets.map((ticket, ticketIdx) => {
 										const isTopTicket = ticketIdx === 0;
 										const zIndex = visibleTickets.length - ticketIdx;
-										// 겹침 효과를 우상단으로 조정
 										const translateX = ticketIdx * 8; // 우측으로
 										const translateY = -(ticketIdx * 8); // 위로 (음수)
 										const opacity = isTopTicket ? 1 : Math.max(0.2, 1 - (ticketIdx * 0.2));
@@ -412,7 +408,7 @@ const TicketStack = ({
 										);
 									})}
 								</div>
-								{/* 펼치기/접기 버튼 - 항상 티켓 더미 아래에 위치 */}
+								{/* 펼치기/접기 버튼 */}
 								{tickets.length > 1 && (
 									<div className="flex justify-center">
 										<Button

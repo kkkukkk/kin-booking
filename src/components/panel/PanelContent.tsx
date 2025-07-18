@@ -10,11 +10,11 @@ import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { HomeIcon } from "@/components/icon/HomeIcon";
 import { UsersIcon } from "@/components/icon/FriendIcons";
-import { MicIcon } from "@/components/icon/MediaIcons";
 import { useLogout } from "@/hooks/api/useAuth";
 import { useSession } from "@/hooks/useSession";
 import useToast from "@/hooks/useToast";
 import { useAlert } from "@/providers/AlertProvider";
+import MusicNoteIcon from "@/components/icon/MusicNoteIcon";
 
 type PanelContentProps = {
 	isOpen: boolean,
@@ -41,8 +41,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 	const toggleButton = useCallback((key: string) => {
 		const skipKeys = ["Home", "Login", "Logout", "My", "Events"];
 		if (skipKeys.includes(key)) {
-			setOpen(false); // 라우팅 버튼 클릭 시 패널 닫기
-			// 라우팅 버튼 클릭 시 activeButtons 초기화
+			setOpen(false);
 			setActiveButtons({});
 			return;
 		}
@@ -97,7 +96,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 			key: 'Events',
 			order: 2,
 			onClick: () => router.push("/events"),
-			name: <MicIcon />
+			name: <MusicNoteIcon />
 		},
 		...(session
 			? [

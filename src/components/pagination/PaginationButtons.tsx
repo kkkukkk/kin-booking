@@ -17,7 +17,7 @@ const PaginationButtons = ({ paginationInfo, onPageChange, className = '' }: Pag
   const theme = useAppSelector(state => state.theme.current);
   const { page: currentPage, totalPages, hasPrev, hasNext } = paginationInfo;
 
-  // 표시할 페이지 번호들을 계산
+  // 표시할 페이지 번호 계산
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisiblePages = 5;

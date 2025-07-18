@@ -80,7 +80,7 @@ const UserSearchResult = ({ user, onSendRequest, isPending }: UserSearchResultPr
 
   return (
     <div className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-      {/* 사용자 정보 (아바타 포함) */}
+      {/* 사용자 정보 */}
       <UserInfo 
         name={user.name}
         email={user.email}

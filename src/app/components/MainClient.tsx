@@ -9,6 +9,7 @@ import { mainPageTutorialSteps } from "@/components/tutorial/tutorialSteps";
 import { useEventsWithCurrentStatus } from "@/hooks/api/useEvents";
 import { EventStatus } from "@/types/model/events";
 import MainEventSection from "./MainEventSection";
+import MainStatsSection from "./MainStatsSection";
 import { useSpinner } from "@/hooks/useSpinner";
 import { useAppSelector } from "@/redux/hooks";
 import { motion } from "framer-motion";
@@ -17,7 +18,7 @@ import { useLoginImages } from "@/hooks/api/useImages";
 import { ArrowDownIcon } from "@/components/icon/ArrowIcons";
 import KinAnimationSection from "@/app/components/KinAnimationSection";
 
-const MainClientSection = () => {
+const MainClient = () => {
   const { showSpinner, hideSpinner } = useSpinner();
   const router = useRouter();
   const theme = useAppSelector(state => state.theme.current);
@@ -28,7 +29,7 @@ const MainClientSection = () => {
   // 스크롤 컨테이너 찾기
   useEffect(() => {
     const findScrollContainer = () => {
-      const container = document.querySelector('.flex-1.overflow-y-auto.scrollbar-none') as HTMLDivElement;
+      const container = document.querySelector('[data-scroll-container="true"]') as HTMLDivElement;
       if (container) {
         scrollContainerRef.current = container;
         setIsContainerReady(true);
@@ -165,7 +166,7 @@ const MainClientSection = () => {
 
   return (
     <>
-      {/* 1. 이미지 슬라이더 (히어로 섹션) */}
+      {/* 이미지 슬라이더 */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -225,92 +226,33 @@ const MainClientSection = () => {
         </motion.div>
       </motion.div>
 
-      {/* 2. KIN 애니메이션 */}
+      {/* KIN 애니메이션 */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className="text-center py-4 relative"
       >
-        {/* KIN 애니메이션 섹션 */}
         <KinAnimationSection 
           scrollContainerRef={isContainerReady ? scrollContainerRef : undefined} 
         />
       </motion.div>
 
-      {/* 3. 현재 공연 현황 */}
+      {/* 공연 현황 */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
         className="mb-16"
       >
-        <div className="max-w-6xl mx-auto px-4">
-          {/* 섹션 헤더 */}
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 tracking-wide drop-shadow-sm">
-              공연 현황
-            </h2>
-          </div>
-
-          {/* 통계 카드 섹션 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-              className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 backdrop-blur-sm border border-white/10 shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-300"
-              onClick={() => handleNavigateToEvents(EventStatus.Ongoing)}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10"></div>
-              <div className="relative p-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="text-3xl md:text-4xl font-bold text-white drop-shadow-sm mb-2">
-                      {openEvents?.length || 0}
-                    </div>
-                    <div className="text-base font-medium text-white tracking-wide">예매 진행 중인 공연</div>
-                  </div>
-                  <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <div className="w-8 h-8 bg-green-400 rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-                <p className="text-white/50 text-sm">
-                  오래 기다렸어요! 이제 함께할 차례예요!
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 }}
-              className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600/20 to-cyan-600/20 backdrop-blur-sm border border-white/10 shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-300"
-              onClick={() => handleNavigateToEvents(EventStatus.Pending)}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-500/10"></div>
-              <div className="relative p-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="text-3xl md:text-4xl font-bold text-white drop-shadow-sm mb-2">
-                      {waitingEvents?.length || 0}
-                    </div>
-                    <div className="text-base font-medium text-white tracking-wide">준비 중인 공연</div>
-                  </div>
-                  <div className="w-16 h-16 rounded-full bg-teal-500/20 flex items-center justify-center">
-                    <div className="w-8 h-8 bg-teal-400 rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-                <p className="text-white/50 text-sm">
-                  곧 만나게 될 특별한 순간을 기다리는 중...
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
+        <MainStatsSection
+          openEventsCount={openEvents?.length || 0}
+          waitingEventsCount={waitingEvents?.length || 0}
+          onNavigateToEvents={handleNavigateToEvents}
+        />
       </motion.div>
       
-      {/* 4. 공연 포스터들 */}
+      {/* 공연 포스터 */}
       <MainEventSection title="지금 공연 중" events={openEvents} theme={theme} variant="large" />
       <MainEventSection title="곧 만나볼 공연" events={waitingEvents} theme={theme} variant="small" />
       
@@ -322,7 +264,7 @@ const MainClientSection = () => {
       )}
 
       
-      {/* 5. 유튜브 동영상 섹션 (임시 숨김) */}
+      {/* 유튜브 동영상 섹션 (임시 숨김) */}
       {/* <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -339,7 +281,7 @@ const MainClientSection = () => {
         transition={{ delay: 0.8 }}
         className="mb-16"
       >
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
             <h3
               className="text-2xl md:text-2xl font-bold text-white/80 mb-8 md:mb-10 tracking-wide drop-shadow-sm text-center"
@@ -368,4 +310,4 @@ const MainClientSection = () => {
   );
 };
 
-export default MainClientSection; 
+export default MainClient;

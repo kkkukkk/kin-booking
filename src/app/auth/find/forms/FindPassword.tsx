@@ -60,6 +60,7 @@ const FindPassword = () => {
 			return;
 		} else {
 			if (data)  {
+				// 인증 후 패스워드 변경 페이지로 이동
 				const { error } = await supabase.auth.resetPasswordForEmail(email, {
 					redirectTo: 'https://kin-booking.vercel.app/auth/reset-password?source=password',
 					//redirectTo: 'http://localhost:3000/auth/reset-password?source=password',

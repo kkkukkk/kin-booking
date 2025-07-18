@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 import useToast from "@/hooks/useToast";
 import useSourceValidation from "@/hooks/useSourceValidation";
 
+// 이메일 인증 콜백 페이지
 const AuthCallbackPage = () => {
 	const router = useRouter();
 	const { showToast } = useToast();

@@ -21,11 +21,14 @@ const ResetPassword = () => {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [touched, setTouched] = useState(false);
 	const [isValid, setIsValid] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [isPasswordChanged, setIsPasswordChanged] = useState(false);
 	const { showToast } = useToast();
 	const router = useRouter();
 	const pathname = usePathname();
 	const initialPathRef = useRef(pathname);
 
+	// url source 포함 여부 체크
 	useSourceValidation('password');
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,32 +48,39 @@ const ResetPassword = () => {
 				iconType: 'warning',
 				autoCloseTime: 3000,
 			});
+			return;
 		}
 
-		const { error } = await supabase.auth.updateUser({ password });
+		setIsLoading(true);
+		try {
+			const { error } = await supabase.auth.updateUser({ password });
 
-		if (!error) {
-			showToast({
-				message: '비밀번호가 성공적으로 변경됐어요!',
-				iconType: 'success',
-				autoCloseTime: 3000,
-			});
-			await supabase.auth.signOut();
-			router.push('/login');
-		} else {
-			if (error.message?.includes('different from the old password')) {
+			if (!error) {
 				showToast({
-					message: '기존 비밀번호와 다른 비밀번호를 사용해주세요!',
-					iconType: 'warning',
+					message: '비밀번호가 성공적으로 변경됐어요!',
+					iconType: 'success',
 					autoCloseTime: 3000,
 				});
+				setIsPasswordChanged(true);
+				await supabase.auth.signOut();
+				router.push('/login');
 			} else {
-				showToast({
-					message: '비밀번호 변경에 실패했어요. 잠시 후 다시 시도해주세요.',
-					iconType: 'warning',
-					autoCloseTime: 3000,
-				});
+				if (error.message?.includes('different from the old password')) {
+					showToast({
+						message: '기존 비밀번호와 다른 비밀번호를 사용해주세요!',
+						iconType: 'warning',
+						autoCloseTime: 3000,
+					});
+				} else {
+					showToast({
+						message: '비밀번호 변경에 실패했어요. 잠시 후 다시 시도해주세요.',
+						iconType: 'warning',
+						autoCloseTime: 3000,
+					});
+				}
 			}
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
@@ -79,21 +89,20 @@ const ResetPassword = () => {
 	};
 
 	useEffect(() => {
-		// 새로고침 또는 브라우저 닫기 시 로그아웃
-		const onBeforeUnload = () => handleLogout();
-		window.addEventListener('beforeunload', onBeforeUnload);
-
-		return () => {
-			window.removeEventListener('beforeunload', onBeforeUnload);
-		};
-	}, []);
-
-	useEffect(() => {
-		// URL 경로가 바뀌면 로그아웃 (Next.js 내부 이동 포함)
-		if (initialPathRef.current !== pathname) {
+		// 비밀번호 변경이 완료되지 않은 경우에만 보안 로그아웃 수행
+		if (isPasswordChanged) return;
+		
+		// 새로고침/브라우저 닫기
+		window.addEventListener('beforeunload', handleLogout);
+		
+		// URL 변경 감지
+		const currentPath = pathname;
+		if (initialPathRef.current !== currentPath) {
 			handleLogout();
 		}
-	}, [pathname]);
+		
+		return () => window.removeEventListener('beforeunload', handleLogout);
+	}, [pathname, isPasswordChanged]);
 
 	useEffect(() => {
 		const passwordValid = isValidPassword(password);
@@ -105,6 +114,16 @@ const ResetPassword = () => {
 			setIsValid(false);
 		}
 	}, [password, confirmPassword]);
+
+	const getValidationError = () => {
+		if (!isValidPassword(password)) {
+			return "비밀번호는 특수문자를 포함해 8자 이상 입력해주세요.";
+		}
+		if (password !== confirmPassword) {
+			return "비밀번호가 서로 일치하지 않아요.";
+		}
+		return null;
+	};
 
 	return (
 		<Card
@@ -121,11 +140,11 @@ const ResetPassword = () => {
 				</div>
 
 				<div className={"mb-2"}>
-					<AnimatedText fontSize={"text-base md:text-xl"} text={"변경 할 비밀번호를 입력해주세요! 🔑"}/>
+					<AnimatedText fontSize={"text-base md:text-xl"} text={"변경 할 비밀번호를 입력해주세요!"}/>
 				</div>
 
 				<div className={"mb-4"}>
-					<AnimatedText fontSize={"text-sm md:text-base"} text={"💡 비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8}/>
+					<AnimatedText fontSize={"text-sm md:text-base"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8}/>
 				</div>
 
 				<div
@@ -158,11 +177,9 @@ const ResetPassword = () => {
 						!touched || isValid ? "opacity-0 translate-y-[-4px]" : "opacity-100 translate-y-0"
 					)}
 				>
-					{touched && !isValid && (
+					{touched && getValidationError() && (
 						<>
-							{!isValidPassword(password)
-								? "비밀번호는 특수문자를 포함해 8자 이상 입력해주세요."
-								: "비밀번호가 서로 일치하지 않아요."}
+							{getValidationError()}
 						</>
 					)}
 				</div>
@@ -173,8 +190,9 @@ const ResetPassword = () => {
 					padding="p-2"
 					className={"mt-6"}
 					onClick={handleClick}
+					disabled={isLoading}
 				>
-					{"변경하기"}
+					{isLoading ? "변경 중..." : "변경하기"}
 				</Button>
 			</ThemeDiv>
 		</Card>

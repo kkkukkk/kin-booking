@@ -80,12 +80,6 @@ const TicketCard = ({
   // rare 티켓용 gold 그라데이션
   const rareGradient = 'linear-gradient(135deg, #ffd700 0%, #fffbe6 100%)';
 
-  // UUID를 더 읽기 쉽게 포맷팅 (앞 8자리만 표시)
-  const formatTicketId = (id?: string) => {
-    if (!id) return 'N/A'
-    return id.substring(0, 8).toUpperCase()
-  }
-
   // 공연 날짜 포맷팅
   const formatEventDate = (date?: string) => {
     if (!date) return '날짜 미정'
@@ -106,7 +100,7 @@ const TicketCard = ({
     })
   }
 
-  // 마스크 요소들을 메모이제이션
+  // 마스크 요소 메모이제이션
   const maskElements = useMemo(() => {
     const elements = []
     const notchCount = Math.floor(maskSize.height / 10)
@@ -125,7 +119,7 @@ const TicketCard = ({
     return elements
   }, [maskSize.height, maskSize.width, notchCx])
 
-  // 크기 측정이 완료되지 않았으면 로딩 상태 표시
+  // 크기 측정이 완료되지 않았으면 로딩 표시
   if (!isReady) {
     return (
       <div
@@ -189,9 +183,8 @@ const TicketCard = ({
             )}
           </div>
           
-          {/* 티켓 정보 섹션 - 더 컴팩트하게 */}
+          {/* 티켓 정보 */}
           <div className="space-y-2">
-            {/* 공연 날짜와 시간을 분리해서 표시 */}
             {eventDate && (
               <div className="bg-white bg-opacity-60 rounded p-2 border border-slate-200">
                 <div className="text-xs text-slate-500 font-medium mb-1">공연일</div>
@@ -213,7 +206,6 @@ const TicketCard = ({
                 </div>
               )}
               
-              {/* 가격 정보 */}
               {ticketPrice && (
                 <div className="bg-white bg-opacity-50 rounded p-2 border border-slate-200">
                   <div className="text-xs text-slate-500 font-medium mb-1">가격</div>
@@ -226,7 +218,7 @@ const TicketCard = ({
           </div>
         </div>
 
-        {/* 우측 영역 - 최소한의 공간만 사용 */}
+        {/* 우측 영역 */}
         <div
           className="flex flex-col justify-center items-center select-none relative overflow-hidden"
           style={{

@@ -59,13 +59,13 @@ const ReservationsTab = ({ reservations }: ReservationsTabProps) => {
 		return (
 			<ThemeDiv className="p-8 text-center rounded-lg">
 				<TicketIcon />
-				<h3 className="text-lg font-semibold mb-2">예매 내역이 없습니다</h3>
+				<h3 className="text-lg font-semibold mb-2">예매 내역이 없어요</h3>
 				<p className="text-sm opacity-70 mb-4">새로운 공연을 예매해보세요!</p>
 				<Button
 					onClick={() => router.push('/events')}
 					theme="dark"
 				>
-					공연 보기
+					공연 보러 가기
 				</Button>
 			</ThemeDiv>
 		);

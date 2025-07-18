@@ -8,22 +8,22 @@ const HamburgerLines = ({ on }: { on: boolean }) => {
 		<>
 			<span
 			  className={clsx(
-			      "absolute w-5 bg-current transition-all duration-300 h-[2px]",
-			      on ? "rotate-45 top-1/2" : "top-1/2 -translate-y-2"
+			      "absolute w-4.5 bg-current transition-all duration-300 h-[1.5px]",
+			      on ? "rotate-45 top-1/2" : "top-1/2 -translate-y-1.5"
 			  )}
 			  style={{ transformOrigin: "center" }}
 			/>
 			<span
 				className={clsx(
-					"absolute w-5 bg-current transition-all duration-300 h-[2px]",
+					"absolute w-4.5 bg-current transition-all duration-300 h-[1.5px]",
 					on ? "opacity-0" : "opacity-100",
-					"top-1/2 -translate-y-1/2"
+					"top-1/2"
 				)}
 			/>
 			<span
 				className={clsx(
-					"absolute w-5 bg-current transition-all duration-300 h-[2px]",
-					on ? "-rotate-45 top-1/2" : "top-1/2 translate-y-2"
+					"absolute w-4.5 bg-current transition-all duration-300 h-[1.5px]",
+					on ? "-rotate-45 top-1/2" : "top-1/2 translate-y-1.5"
 				)}
 				style={{ transformOrigin: "center" }}
 			/>

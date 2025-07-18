@@ -3,7 +3,6 @@ import clsx from "clsx";
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
 	theme?: "normal" | "dark" | "neon";
-	variant?: "box" | "underline";
 	error?: boolean;
 	fontSize?: string;
 	fontWeight?: string;
@@ -11,7 +10,6 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 
 const Textarea = ({
 	theme = "normal",
-	variant = "box",
 	error = false,
 	fontSize,
 	fontWeight,
@@ -20,19 +18,7 @@ const Textarea = ({
 }: TextareaProps) => {
 	// 기본 스타일
 	const getBaseStyles = () => {
-		return "focus:outline-none pl-2 py-1 w-full resize-none";
-	};
-
-	// variant별 스타일
-	const getVariantStyles = () => {
-		switch (variant) {
-			case "box":
-				return "rounded-[5px] shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)]";
-			case "underline":
-				return "bg-transparent border-none rounded-none";
-			default:
-				return "rounded-[5px] shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)]";
-		}
+		return "focus:outline-none pl-2 py-1 w-full resize-none rounded-[5px] shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)]";
 	};
 
 	// 테마별 스타일
@@ -49,22 +35,6 @@ const Textarea = ({
 		}
 	};
 
-	// underline variant + 테마 조합
-	const getUnderlineThemeStyles = () => {
-		if (variant !== "underline") return "";
-		
-		switch (theme) {
-			case "normal":
-				return "rounded-t-[5px] bg-white/50 border-b-2 border-black/70";
-			case "dark":
-				return "border-b border-white/70";
-			case "neon":
-				return "border-b border-[rgba(119,255,153,0.5)]";
-			default:
-				return "rounded-t-[5px] bg-white/50 border-b-2 border-black/70";
-		}
-	};
-
 	// 에러 스타일
 	const getErrorStyles = () => {
 		if (!error) return "";
@@ -76,9 +46,7 @@ const Textarea = ({
 			{...rest}
 			className={clsx(
 				getBaseStyles(),
-				getVariantStyles(),
 				getThemeStyles(),
-				getUnderlineThemeStyles(),
 				getErrorStyles(),
 				fontSize,
 				fontWeight,

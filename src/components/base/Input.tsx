@@ -11,12 +11,11 @@ const Input = ({
 	className,
 	...rest
 }: InputProps) => {
-	// 기본 스타일
 	const getBaseStyles = () => {
 		return "focus:outline-none pl-2 py-1 w-full";
 	};
 
-	// variant별 스타일
+	// variant별
 	const getVariantStyles = () => {
 		switch (variant) {
 			case "box":
@@ -28,7 +27,7 @@ const Input = ({
 		}
 	};
 
-	// 테마별 스타일
+	// 테마별
 	const getThemeStyles = () => {
 		switch (theme) {
 			case "normal":

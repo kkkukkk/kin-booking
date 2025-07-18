@@ -22,14 +22,14 @@ const MainEventSection = ({ title, events, theme, variant = "large" }: EventSect
         </div>
 
         {variant === "large" ? (
-          // 진행 중인 공연: 히어로 섹션 (첫 번째만 표시)
+          // 진행 중인 공연: 히어로
           <div className="flex justify-center">
             <div className="w-full max-w-md">
               <MainEventCard event={events[0]} theme={theme} variant="hero" />
             </div>
           </div>
         ) : (
-          // 대기 중인 공연: 그리드 레이아웃
+          // 대기 중인 공연
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {events.map((event) => (
               <div key={event.eventId} className="w-full flex justify-center">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TeamMember, TeamRoleKo } from '@/types/model/teamMember';
 import Button from '@/components/base/Button';
 import { InstagramIcon, YoutubeIcon } from '@/components/icon/SocialIcons';
@@ -29,6 +29,16 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 		youtubeLink: teamMember.youtubeLink || '',
 	});
 
+	// teamMember prop이 변경될 때 상태 업데이트
+	useEffect(() => {
+		setEditedData({
+			displayName: teamMember.displayName || '',
+			bio: teamMember.bio || '',
+			instagramLink: teamMember.instagramLink || '',
+			youtubeLink: teamMember.youtubeLink || '',
+		});
+	}, [teamMember]);
+
 	const handleChange = (field: string, value: string) => {
 		setEditedData(prev => ({
 			...prev,
@@ -36,15 +46,22 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 		}));
 	};
 
-		const handleSave = () => {
+	const handleSave = () => {
 		updateTeamMember(
 			{ 
 				id: teamMember.id, 
 				data: { ...editedData, userId: teamMember.userId } 
 			},
 			{
-				onSuccess: () => {
+				onSuccess: (updatedTeamMember) => {
 					setEditMode(false);
+					// 업데이트된 데이터로 상태 업데이트
+					setEditedData({
+						displayName: updatedTeamMember.displayName || '',
+						bio: updatedTeamMember.bio || '',
+						instagramLink: updatedTeamMember.instagramLink || '',
+						youtubeLink: updatedTeamMember.youtubeLink || '',
+					});
 					showToast({ message: '팀원 정보가 업데이트되었습니다.', iconType: 'success', autoCloseTime: 3000 });
 				},
 				onError: (err: any) => {

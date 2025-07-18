@@ -23,19 +23,16 @@ const FriendsTab = () => {
       id: 'friends' as FriendsTabType, 
       label: '친구 목록', 
       icon: SmileIcon,
-      count: 0 // TODO: 친구 수 표시
     },
     { 
       id: 'requests' as FriendsTabType, 
       label: '친구 요청', 
       icon: ThumbUpIcon,
-      count: 0 // TODO: 요청 수 표시
     },
     { 
       id: 'add' as FriendsTabType, 
       label: '친구 추가', 
       icon: WritingIcon,
-      count: 0
     },
   ];
 
@@ -54,7 +51,7 @@ const FriendsTab = () => {
 
   return (
     <div>
-      {/* 탭 네비게이션 */}
+      {/* 탭 */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -79,18 +76,12 @@ const FriendsTab = () => {
               >
                 <Icon />
                 <span className="truncate">{tab.label}</span>
-                {tab.count > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
-                    {tab.count}
-                  </span>
-                )}
               </Button>
             );
           })}
         </div>
       </motion.div>
       
-      {/* 탭 콘텐츠 */}
       <motion.div
         key={activeTab}
         initial={{ opacity: 0, x: 20 }}

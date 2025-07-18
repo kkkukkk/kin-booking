@@ -52,7 +52,6 @@ const EventDetailClient = () => {
 		}
 	}, [isLoading, data]);
 
-	// 에러 상태
 	if (error) {
 		return (
 			<EventError

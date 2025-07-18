@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import Button from "@/components/base/Button";
 import PanelContent from "@/components/panel/PanelContent";
 import clsx from "clsx";
@@ -9,12 +10,14 @@ const TogglePanel = () => {
 	const [open, setOpen] = useState(false);
 	const [activeButtons, setActiveButtons] = useState<{ [key: string]: boolean }>({});
 	const panelRef = useRef<HTMLDivElement>(null);
+	const pathname = usePathname();
 
 	const handleToggle = useCallback(() => {
 		if (open) setActiveButtons({});
 		setOpen(!open);
 	}, [open]);
 
+	// 바깥쪽 클릭
 	const handleClickOutside = useCallback((event: MouseEvent) => {
 		if (
 			open &&
@@ -32,6 +35,14 @@ const TogglePanel = () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, [handleClickOutside]);
+
+	// 인증 관련 페이지에서 패널 숨기기
+	const isAuthPage = pathname?.startsWith('/auth') || 
+					  pathname?.startsWith('/reset-password');
+
+	if (isAuthPage) {
+		return null;
+	}
 
 	return (
 		<div className="fixed bottom-3.5 right-3.5 flex flex-col items-end gap-2 md:bottom-5 md:right-5 z-10000" ref={panelRef}>
@@ -64,7 +75,7 @@ const TogglePanel = () => {
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
-						className="block mx-auto" // 가운데 정렬
+						className="block mx-auto"
 					>
 						<line x1="18" y1="6" x2="6" y2="18" />
 						<line x1="6" y1="6" x2="18" y2="18" />
