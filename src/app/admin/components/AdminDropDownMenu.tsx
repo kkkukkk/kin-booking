@@ -1,0 +1,43 @@
+"use client";
+import AdminSidebar from "./AdminSidebar";
+import { AnimatePresence, motion } from "framer-motion";
+import { fadeOverlay, fadeSlideDownSm } from "@/types/ui/motionVariants";
+
+interface AdminDropDownMenuProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function AdminDropDownMenu({ open, onClose }: AdminDropDownMenuProps) {
+  return (
+    <>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="fixed inset-0 bg-black/30 sm:hidden"
+            style={{ zIndex: 40 }}
+            onClick={onClose}
+            variants={fadeOverlay}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="absolute left-0 right-0 top-full bg-white shadow-lg border-b border-gray-200 sm:hidden"
+            style={{ zIndex: 50 }}
+            variants={fadeSlideDownSm}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <AdminSidebar variant="drawer" open={true} onClose={onClose} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+} 

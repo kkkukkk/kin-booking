@@ -3,32 +3,49 @@
 import { useSession } from '@/hooks/useSession';
 import { useUserById } from '@/hooks/api/useUsers';
 import { useRouter } from 'next/navigation';
-import { LogoutIcon } from '@/components/icon/LogoutIcon';
 import { UsersIcon } from '@/components/icon/FriendIcons';
-import UserAvatar from '@/components/user/UserAvatar';
-import { supabase } from '@/lib/supabaseClient';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/redux/hooks';
 import Logo from '@/components/Logo';
 import { useState } from 'react';
-import clsx from 'clsx';
-import { motion, AnimatePresence } from 'framer-motion';
-import AdminSidebar from './AdminSidebar';
+import { useLogout } from '@/hooks/api/useAuth';
+import { useAlert } from '@/providers/AlertProvider';
+import useToast from '@/hooks/useToast';
+import { useAdminSidebar } from '@/providers/AdminSidebarProvider';
+import AdminDropDownMenu from './AdminDropDownMenu';
+import AdminUserInfo from './AdminUserInfo';
 
 const AdminHeader = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const { session } = useSession();
   const router = useRouter();
   const { data: user } = useUserById(session?.user?.id || '');
+  const { mutate: logout } = useLogout();
+  const { showAlert } = useAlert();
+  const { showToast } = useToast();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { open, setOpen } = useAdminSidebar();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
+    const confirmed = await showAlert({
+			type: 'confirm',
+			title: '로그아웃',
+			message: '정말 로그아웃하시겠습니까?',
+		});
+		
+		if (confirmed) {
+			logout(undefined, {
+				onSuccess: () => {
+					showToast({ message: '로그아웃되었습니다.', iconType: 'success', autoCloseTime: 3000 });
+					router.push('/login?loggedOut=1');
+				},
+				onError: () => {
+					showToast({ message: '로그아웃 중 오류가 발생했습니다.', iconType: 'error', autoCloseTime: 3000 });
+				}
+			});
+		}
   };
 
   const toggleUserDropdown = () => {
@@ -46,8 +63,8 @@ const AdminHeader = () => {
           {/* 모바일: 햄버거 버튼 (드로어 토글) */}
           <Button
             variant="hamburger"
-            on={drawerOpen}
-            onClick={() => setDrawerOpen((v) => !v)}
+            on={false}
+            onClick={() => setOpen(!open)}
             theme={theme}
             className="md:hidden"
             aria-label="메뉴 열기"
@@ -55,8 +72,8 @@ const AdminHeader = () => {
           {/* PC: 사이드바 토글 버튼 */}
           <Button
             variant="hamburger"
-            on={sidebarOpen}
-            onClick={() => setSidebarOpen((v) => !v)}
+            on={open}
+            onClick={() => setOpen(!open)}
             theme={theme}
             className="hidden md:inline-flex"
             aria-label="사이드바 토글"
@@ -66,9 +83,7 @@ const AdminHeader = () => {
             관리자 패널
           </div>
         </div>
-        {/* 오른쪽: 사용자 드롭다운 */}
         <div className="relative">
-          {/* 사용자 아이콘 버튼 */}
           <Button
             onClick={toggleUserDropdown}
             theme={theme}
@@ -78,91 +93,18 @@ const AdminHeader = () => {
           >
             <UsersIcon className="w-5 h-5" />
           </Button>
-          {/* 드롭다운 메뉴 */}
-          <AnimatePresence>
-            {isUserDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="absolute right-0 top-full mt-2 w-64 z-50"
-              >
-                <ThemeDiv
-                  className={clsx(
-                    'rounded shadow-lg',
-                    theme === 'dark' ? 'border border-white/40' : ''
-                  )}
-                  isChildren={theme !== 'dark'}
-                >
-                  {/* 사용자 정보 */}
-                  <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center space-x-3">
-                      <UserAvatar
-                        name={user?.name || '관리자'}
-                        size="sm"
-                        className="border border-current"
-                      />
-                      <div>
-                        <div className="text-sm font-medium">
-                          {user?.name || '관리자'}
-                        </div>
-                        <div className="text-xs">
-                          {user?.email || session?.user?.email}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* 로그아웃 버튼 */}
-                  <div className="p-2">
-                    <Button
-                      onClick={handleLogout}
-                      theme={theme}
-                      padding="px-3 py-2"
-                      className="w-full flex items-center justify-center space-x-2"
-                      aria-label="로그아웃"
-                    >
-                      <LogoutIcon className="w-4 h-4" />
-                      <span className="text-sm">로그아웃</span>
-                    </Button>
-                  </div>
-                </ThemeDiv>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* 관리자 정보 */}
+          <AdminUserInfo
+            user={user}
+            session={session}
+            theme={theme as any}
+            handleLogout={handleLogout}
+            isOpen={isUserDropdownOpen}
+            onClose={() => setIsUserDropdownOpen(false)}
+          />
         </div>
       </ThemeDiv>
-      {/* PC: 고정 사이드바 */}
-      <div className={`hidden md:block transition-all duration-300 ${sidebarOpen ? 'w-60' : 'w-0 overflow-hidden'}`}>
-        <AdminSidebar open={sidebarOpen} onToggle={() => setSidebarOpen((v) => !v)} />
-      </div>
-      {/* 모바일 드로어 */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <>
-            {/* 오버레이 */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute left-0 right-0 top-full z-40 bg-black/30 md:hidden"
-              style={{ height: 'calc(100vh - 64px)' }}
-              onClick={() => setDrawerOpen(false)}
-            />
-            {/* 드로어 */}
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute left-0 right-0 top-full z-50 md:hidden"
-            >
-              <AdminSidebar variant="drawer" onClose={() => setDrawerOpen(false)} />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <AdminDropDownMenu open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };

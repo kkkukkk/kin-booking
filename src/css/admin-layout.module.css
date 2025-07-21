@@ -1,3 +1,4 @@
+/* 기본: PC (md 이상, 768px 이상) */
 .admin-layout {
   display: grid;
   height: calc(var(--vh, 1vh) * 100);
@@ -11,6 +12,7 @@
 
 .admin-layout > .sidebar {
   grid-area: sidebar;
+  display: block;
 }
 
 .admin-layout > .main {
@@ -21,8 +23,8 @@
   grid-area: header;
 }
 
-/* 모바일 세로 (<=768px, portrait) */
-@media (max-width: 768px) and (orientation: portrait) {
+/* 768px 미만: 사이드바 숨김, 헤더+메인만 */
+@media (max-width: 767px) {
   .admin-layout {
     grid-template-rows: auto 1fr;
     grid-template-columns: 100%;
@@ -30,18 +32,7 @@
       "header"
       "main";
   }
-  
   .sidebar {
     display: none;
-  }
-}
-
-/* 모바일 가로 (<=768px, landscape) */
-@media (max-width: 1024px) and (orientation: landscape) {
-  .admin-layout {
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "main";
   }
 } 
