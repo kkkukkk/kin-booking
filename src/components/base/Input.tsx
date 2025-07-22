@@ -12,7 +12,7 @@ const Input = ({
 	...rest
 }: InputProps) => {
 	const getBaseStyles = () => {
-		return "focus:outline-none pl-2 py-1 w-full";
+		return "focus:outline-none pl-2 py-1 w-full text-base";
 	};
 
 	// variant별

@@ -2,6 +2,22 @@ import { supabase } from "@/lib/supabaseClient";
 import { CreateUserDto } from "@/types/dto/user";
 
 export const login = async (email: string, password: string) => {
+	// 1. 먼저 상태 조회
+	const { data: status, error: statusError } = await supabase.rpc('check_user_status_by_email', { p_email: email });
+
+	if (statusError) throw statusError;
+
+	console.log('status', status);
+
+	if (!status) {
+		throw new Error('Invalid login credentials');
+	}
+
+	if (status !== 'active') {
+		throw new Error('Account is not active');
+	}
+
+	// 2. active면 로그인 진행
 	const { data, error } = await supabase.auth.signInWithPassword({
 		email: email,
 		password: password

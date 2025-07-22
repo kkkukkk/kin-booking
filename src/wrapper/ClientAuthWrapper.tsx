@@ -14,13 +14,14 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 	const { showToast } = useToast();
 	const searchParams = useSearchParams();
 	const isLoggedOut = searchParams.get('loggedOut') === '1';
+	const isLoggingOut = typeof window !== 'undefined' && localStorage.getItem('isLoggingOut') === '1';
 
 	const [ready, setReady] = useState(false);
 
 	useEffect(() => {
 		if (!loading) {
 			if (!isLoggedIn && !publicPaths.includes(pathname)) {
-				if (!isLoggedOut) {
+				if (!isLoggedOut && !isLoggingOut) {
 					showToast({
 						message: '접근 정보가 없거나 만료되었습니다. 이용을 원하시면 로그인해주세요.',
 						iconType: 'error',
@@ -35,7 +36,7 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 				setReady(true);
 			}
 		}
-	}, [loading, isLoggedIn, pathname, router, showToast, isLoggedOut]);
+	}, [loading, isLoggedIn, pathname, router, showToast, isLoggedOut, isLoggingOut]);
 
 	if (!ready && !publicPaths.includes(pathname)) {
 		return null;

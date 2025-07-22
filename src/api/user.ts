@@ -112,6 +112,7 @@ export const fetchUserById = async (userId: string): Promise<UserWithRoles | nul
 			)
 		`)
 		.eq('id', userId)
+		.eq('status', 'active')
 		.single();
 
 	if (error) {

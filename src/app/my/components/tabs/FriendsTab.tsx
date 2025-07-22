@@ -21,17 +21,17 @@ const FriendsTab = () => {
   const tabs = [
     { 
       id: 'friends' as FriendsTabType, 
-      label: '친구 목록', 
+      label: '목록', 
       icon: SmileIcon,
     },
     { 
       id: 'requests' as FriendsTabType, 
-      label: '친구 요청', 
+      label: '요청', 
       icon: ThumbUpIcon,
     },
     { 
       id: 'add' as FriendsTabType, 
-      label: '친구 추가', 
+      label: '추가', 
       icon: WritingIcon,
     },
   ];
@@ -58,7 +58,7 @@ const FriendsTab = () => {
         transition={{ delay: 0.1 }}
         className="mb-4"
       >
-        <div className="flex flex-wrap gap-1 md:gap-2 w-full justify-between md:justify-start">
+        <div className="grid grid-cols-3 gap-1 md:gap-2 w-full justify-between md:justify-start">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -74,8 +74,10 @@ const FriendsTab = () => {
                 light={activeTab !== tab.id}
                 on={isActive}
               >
-                <Icon />
-                <span className="truncate">{tab.label}</span>
+                <div className="flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5">
+                  <Icon />
+                </div>
+                <span className="truncate"><span className="hidden sm:inline">친구 </span>{tab.label}</span>
               </Button>
             );
           })}

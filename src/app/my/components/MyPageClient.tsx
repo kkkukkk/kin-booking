@@ -148,7 +148,7 @@ const MyPageClient = () => {
 					<div className="flex items-center gap-6">
 						<div className="flex-1">
 							<div className="flex items-center gap-3 mb-2">
-								<h2 className="text-xl font-bold">
+								<h2 className="text-lg sm:text-xl font-bold">
 									{user?.name || '사용자'}
 								</h2>
 								<StatusBadge 
@@ -159,13 +159,13 @@ const MyPageClient = () => {
 								/>
 							</div>
 							<p className={clsx(
-								"mb-1",
+								"mb-1 text-sm sm:text-base",
 								theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
 							)}>
 								{user?.email || '이메일 정보 없음'}
 							</p>
 							<p className={clsx(
-								"text-sm",
+								"text-sm sm:text-base",
 								theme === 'normal' ? 'text-gray-500' : 'text-gray-400'
 							)}>
 								가입일: {user?.registerDate ? new Date(user.registerDate).toLocaleDateString('ko-KR') : '알 수 없음'}
@@ -192,8 +192,8 @@ const MyPageClient = () => {
 								key={tab.id}
 								onClick={() => setActiveTab(tab.id as MyPageTab)}
 								theme={theme}
-								padding={'py-2.5 md:py-1.5'}
-								className={`gap-3 md:gap-3.5 font-semibold text-sm md:text-base transition-all duration-200`}
+								padding={'py-2 md:py-1.5'}
+								className={`gap-3 md:gap-3.5 font-semibold text-base md:text-base transition-all duration-200`}
 								style={{ minWidth: 'auto', width: '100%' }}
 								reverse={theme === 'normal'}
 								light={activeTab !== tab.id}

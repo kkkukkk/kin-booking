@@ -89,7 +89,8 @@ const FriendRequests = () => {
           onClick={() => setActiveTab('received')}
           theme={theme === "normal" ? "dark" : theme}
           light={activeTab !== 'received'}
-          className="flex-1"
+          padding="py-0.5"
+          className="flex-1 text-xs sm:text-sm"
           on={activeTab === 'received'}
         >
           받은 요청 ({friendRequests?.received.length ?? 0})
@@ -98,7 +99,8 @@ const FriendRequests = () => {
           onClick={() => setActiveTab('sent')}
           theme={theme === "normal" ? "dark" : theme}
           light={activeTab !== 'sent'}
-          className="flex-1"
+          padding="py-0.5"
+          className="flex-1 text-xs sm:text-sm"
           on={activeTab === 'sent'}
         >
           보낸 요청 ({friendRequests?.sent.length ?? 0})
@@ -120,8 +122,8 @@ const FriendRequests = () => {
           </h3>
           <p className="text-sm opacity-70">
             {activeTab === 'received' 
-              ? '새로운 친구 요청이 오면 여기에 표시할게요!' 
-              : '친구 요청을 보내면 여기서 확인할 수 있어요!'
+              ? '새로운 친구 요청이 오면 표시할게요!' 
+              : '친구 요청을 보내면 확인할 수 있어요!'
             }
           </p>
         </ThemeDiv>

@@ -25,13 +25,18 @@ const PersonalInfo = ({ onClose, onConfirm }: PersonalInfoProps) => {
 				<p className="text-sm md:text-lg">회원 탈퇴 시까지 보유하며, 관련 법령에 따라 일정 기간 보관 후 파기</p>
 			</article>
 
-			<article>
+			<article className="mb-4">
 				<h3 className="font-semibold text-base md:text-xl">4. 동의 거부 권리 및 불이익</h3>
 				<p className="text-sm md:text-lg">동의를 거부할 권리가 있으나, 필수 항목 미동의 시 회원가입 및 예매가 불가능합니다.</p>
 			</article>
 
+			<article>
+				<h3 className="font-semibold text-base md:text-xl">5. 민감 정보 관리</h3>
+				<p className="text-sm md:text-lg">비밀번호는 보안을 위해 암호화되어 저장되며, 이를 복호화하거나 제공하지 않습니다.</p>
+			</article>
+
 			{onClose && onConfirm && (
-				<div className="flex items-center justify-center mt-4 gap-2">
+				<div className="flex items-center justify-center mt-6 gap-2">
 					<Button
 						width={"w-1/2"}
 						padding={"p-1"}

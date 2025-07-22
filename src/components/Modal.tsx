@@ -39,7 +39,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 				className="relative"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<ThemeDiv className={clsx("p-4 rounded shadow-lg min-w-[300px]")} isChildren>
+				<ThemeDiv className={clsx("p-4 rounded shadow-lg min-w-[300px] max-w-lg md:max-w-xl")} isChildren>
 					<button
 						className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
 						onClick={onClose}

@@ -113,6 +113,7 @@ export const rejectReservation = async (reservationId: string): Promise<void> =>
 	if (error) throw error;
 };
 
+// 승인 대기 예매 취소
 export const cancelPendingReservation = async (reservationId: string): Promise<void> => {
 	// 예약 상태 확인
 	const { data, error: fetchError } = await supabase

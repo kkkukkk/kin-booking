@@ -30,6 +30,12 @@ const LoginClient = () => {
 	const { session, loading } = useSession();
 	const prevLoginPending = useRef(false);
 
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			localStorage.removeItem('isLoggingOut');
+		}
+	}, []);
+
 	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			handleLogin();

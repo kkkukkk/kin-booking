@@ -30,7 +30,7 @@ const MainEventSection = ({ title, events, theme, variant = "large" }: EventSect
           </div>
         ) : (
           // 대기 중인 공연
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
             {events.map((event) => (
               <div key={event.eventId} className="w-full flex justify-center">
                 <MainEventCard event={event} theme={theme} variant="small" />

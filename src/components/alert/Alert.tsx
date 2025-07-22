@@ -32,7 +32,7 @@ const Alert = ({
 	return createPortal(
 		<div className={"fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 z-50"}>
 			<ThemeDiv
-				className={"p-6 rounded-md shadow-lg min-w-[300px] max-w-[90%] md:min-w-[500px]"}
+				className={"p-6 rounded-md shadow-lg min-w-[300px] max-w-[450px] md:min-w-[400px]"}
 				isChildren
 			>
 				<div
@@ -49,7 +49,7 @@ const Alert = ({
 				</div>
 
 				<div
-					className={"mt-4 mb-6 whitespace-pre-line text-sm md:text-lg"}
+					className={"my-6 whitespace-pre-line text-base md:text-lg md:my-8"}
 				>{message}</div>
 
 				{type === 'prompt' && (

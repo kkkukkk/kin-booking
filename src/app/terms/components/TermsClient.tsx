@@ -11,8 +11,10 @@ import Marketing from "@/app/register/components/terms/Marketing";
 import Seat from "@/app/events/[eventId]/reservation/components/steps/terms/Seat";
 import Cancel from "@/app/events/[eventId]/reservation/components/steps/terms/Cancel";
 import { DEFAULT_REFUND_POLICY } from "@/types/refund";
+import WithdrawNotice from '@/app/auth/withdraw/terms/WithdrawNotice';
+import RefundNotice from '@/app/auth/withdraw/terms/RefundNotice';
 
-type TermsTab = "service" | "privacy" | "marketing" | "seat" | "cancel";
+type TermsTab = "service" | "privacy" | "marketing" | "seat" | "cancel" | "withdraw" | "refund";
 
 const TermsClient = () => {
   const router = useRouter();
@@ -20,10 +22,12 @@ const TermsClient = () => {
 
   const tabs = [
     { id: "service" as TermsTab, label: "이용약관" },
-    { id: "privacy" as TermsTab, label: "개인정보처리방침" },
-    { id: "marketing" as TermsTab, label: "마케팅 수신동의" },
+    { id: "privacy" as TermsTab, label: "개인정보 처리 방침" },
+    { id: "marketing" as TermsTab, label: "공연정보 수신 동의" },
     { id: "seat" as TermsTab, label: "좌석 예매 정책" },
     { id: "cancel" as TermsTab, label: "취소/환불 정책" },
+    { id: "withdraw" as TermsTab, label: "회원 탈퇴 안내" },
+    { id: "refund" as TermsTab, label: "티켓/환불 안내" },
   ];
 
   const renderContent = () => {
@@ -38,6 +42,10 @@ const TermsClient = () => {
         return <Seat />;
       case "cancel":
         return <Cancel policy={DEFAULT_REFUND_POLICY} />;
+      case "withdraw":
+        return <WithdrawNotice />;
+      case "refund":
+        return <RefundNotice />;
       default:
         return <TermsOfService />;
     }

@@ -10,9 +10,9 @@ interface UserAvatarProps {
 const UserAvatar = ({ name, size = 'md', gradient, className = '' }: UserAvatarProps) => {
   // 크기별 클래스
   const sizeClasses = {
-    sm: 'w-10 h-10 text-sm',
+    sm: 'w-10 h-10 text-sm', // 글자 크기 살짝 줄임
     md: 'w-12 h-12 text-base',
-    lg: 'w-16 h-16 text-lg'
+    lg: 'w-16 h-16 text-base'
   };
   
   // 이름 기반으로 일관된 그라데이션 생성 (같은 이름은 같은 그라데이션)
@@ -32,15 +32,22 @@ const UserAvatar = ({ name, size = 'md', gradient, className = '' }: UserAvatarP
     return result;
   };
   
-  // 그라데이션 결정: 커스텀 > 일관된 랜덤
+  // 성을 제외한 이름(첫 글자 제외) 추출, 최대 2자까지
+  const getNameWithoutSurname = (name: string): string => {
+    if (!name || name.length < 2) return '';
+    return name.slice(1, 3);
+  };
+
   const avatarGradient = gradient || getConsistentGradient(name);
+
+  const displayChars = getNameWithoutSurname(name) || name.charAt(0);
   
   return (
     <div 
       className={`rounded-full flex items-center justify-center text-white font-semibold ${sizeClasses[size]} ${className}`}
       style={{ background: avatarGradient }}
     >
-      {name.charAt(0)}
+      {displayChars}
     </div>
   );
 };

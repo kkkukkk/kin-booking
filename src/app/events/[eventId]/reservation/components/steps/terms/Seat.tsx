@@ -24,7 +24,7 @@ const ReservationNotice = ({ onClose, onConfirm }: NoticeProps) => {
 				</p>
 			</article>
 
-			<article className="mb-4">
+			<article>
 				<h3 className="font-semibold text-base md:text-xl">3. 총 좌석 수</h3>
 				<p className="text-sm md:text-lg">
 					공연의 특성이나 환경적 조건(예: 스탠딩 제한, 동선 확보, 장비 설치 등)을 고려하여 좌석 수는 공연장 내 좌석 수와 다를 수 있습니다.
@@ -35,7 +35,7 @@ const ReservationNotice = ({ onClose, onConfirm }: NoticeProps) => {
 			</article>
 
 			{onClose && onConfirm && (
-				<div className="flex items-center justify-center mt-4 gap-2">
+				<div className="flex items-center justify-center mt-6 gap-2">
 					<Button
 						width={"w-1/2"}
 						padding={"p-1"}

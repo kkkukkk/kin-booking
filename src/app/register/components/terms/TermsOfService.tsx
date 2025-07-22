@@ -31,7 +31,7 @@ const TermsOfService = ({ onClose, onConfirm }: TermsOfServiceProps) => {
 			</article>
 
 			{onClose && onConfirm && (
-				<div className="flex items-center justify-center mt-4 gap-2">
+				<div className="flex items-center justify-center mt-6 gap-2">
 					<Button
 						width={"w-1/2"}
 						padding={"p-1"}

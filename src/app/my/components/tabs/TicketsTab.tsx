@@ -99,7 +99,7 @@ const TicketsTab = ({ userId }: TicketsTabProps) => {
 		return (
 			<ThemeDiv className="p-6 text-center rounded-lg" isChildren>
 				<h3 className="text-lg font-semibold mb-2">보유한 티켓이 없어요</h3>
-				<p className="text-sm opacity-70">예매가 승인되면 티켓이 여기에 표시될거에요!</p>
+				<p className="text-sm opacity-70">예매가 승인되면 티켓이 생성돼요!</p>
 			</ThemeDiv>
 		);
 	}

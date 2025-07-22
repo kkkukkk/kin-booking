@@ -15,7 +15,7 @@ export function useAdminSidebar() {
 }
 
 export function AdminSidebarProvider({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(true); // PC/모바일 모두 공유
+  const [open, setOpen] = useState(false); // PC/모바일 모두 공유
   return (
     <AdminSidebarContext.Provider value={{ open, setOpen }}>
       {children}

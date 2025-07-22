@@ -3,7 +3,7 @@ import { Friends, FriendStatus } from '@/types/model/friends';
 import { CreateFriendRequest, FriendWithUser } from '@/types/dto/friends';
 import { toCamelCaseKeys } from '@/util/case/case';
 
-// 친구 목록 조회
+// 친구 목록 조회 (view 단에서 status='active' 만 보여줌)
 export const getFriends = async (): Promise<FriendWithUser[]> => {
   const { data, error } = await supabase
   .from('friend_with_user_view')
@@ -18,7 +18,7 @@ export const getFriends = async (): Promise<FriendWithUser[]> => {
   return toCamelCaseKeys<FriendWithUser[]>(data || []);
 };
 
-// 친구 요청 목록 조회
+// 친구 요청 목록 조회 (view 단에서 status='active' 만 보여줌)
 export const getFriendRequests = async (): Promise<FriendWithUser[]> => {
   const { data, error } = await supabase
   .from('friend_with_user_view')

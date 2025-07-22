@@ -188,7 +188,7 @@ const MainClient = () => {
               KIN
             </h1>
             <p className="text-lg md:text-xl mb-8 font-light tracking-wide">
-              일상의 흐름 속 특별한 하루를 함께...
+              일상의 흐름 속 특별한 하루를 함께
             </p>
             <Button
               onClick={handleExploreEvents}

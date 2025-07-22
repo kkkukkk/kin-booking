@@ -9,6 +9,8 @@ import { formatPhoneNumber } from '@/util/phoneNumber';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/base/Button';
 import { User } from '@/types/model/user';
+import { useSoftDeleteUser } from '@/hooks/api/useUsers';
+import { useLogout } from '@/hooks/api/useAuth';
 
 interface ProfileTabProps {
 	user: User;
@@ -16,6 +18,8 @@ interface ProfileTabProps {
 
 const ProfileTab = ({ user }: ProfileTabProps) => {
 	const { mutate: updateUser, isPending } = useUpdateUser();
+	const { mutate: softDeleteUser, isPending: isDeleting } = useSoftDeleteUser();
+	const { mutate: logout } = useLogout();
 	const { showToast } = useToast();
 	const { showAlert } = useAlert();
 	const router = useRouter();
@@ -64,19 +68,31 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 			message: '비밀번호를 변경하시겠습니까?\n자동으로 로그아웃 됩니다.',
 		});
 		if (confirmed) {
-			router.push('/auth/reset-password?source=password');
+			router.push('/auth/reset-password?source=password&logout=true');
 		}
+	};
+
+	const handleWithdraw = () => {
+		router.push('/auth/withdraw');
 	};
 
 	return (
 		<ThemeDiv className="p-6 rounded-lg" isChildren>
-			<div className={"flex justify-between w-full"}>
-				<h3 className="text-xl font-semibold mb-4">프로필 정보</h3>
-				<div>
+			<div className={"flex justify-between items-start w-full mb-6"}>
+				<h3 className="text-lg sm:text-xl font-semibold">프로필</h3>
+				<div className="flex gap-2 items-center">
 					<Button
 						theme="dark"
-						padding="px-2 py-1"
-						className="text-sm"
+						padding="px-2 py-1.5"
+						className="text-xs sm:text-sm"
+						onClick={handleWithdraw}
+					>
+						회원탈퇴
+					</Button>
+					<Button
+						theme="dark"
+						padding="px-2 py-1.5"
+						className="text-xs sm:text-sm"
 						onClick={handlePasswordChange}
 					>
 						비밀번호 변경

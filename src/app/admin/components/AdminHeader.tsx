@@ -58,26 +58,27 @@ const AdminHeader = () => {
         className="flex items-center justify-between px-4 py-4 border-0 border-b border-b-green-500/30 md:px-6 md:py-4"
         isChildren
       >
-        {/* 왼쪽: 햄버거/토글 버튼 + 로고 */}
         <div className="flex items-center gap-3 md:gap-4 px-3 md:px-0">
-          {/* 모바일: 햄버거 버튼 (드로어 토글) */}
-          <Button
-            variant="hamburger"
-            on={false}
-            onClick={() => setOpen(!open)}
-            theme={theme}
-            className="md:hidden"
-            aria-label="메뉴 열기"
-          />
+          {/* 모바일: 드롭다운 토글 */}
+          <div className="w-10 h-10 flex items-center justify-center md:hidden cursor-pointer" onClick={() => setOpen(!open)}>
+            <Button
+              variant="hamburger"
+              on={open}
+              theme={theme}
+              className="md:hidden"
+              aria-label="메뉴 열기"
+            />
+          </div>
           {/* PC: 사이드바 토글 버튼 */}
-          <Button
-            variant="hamburger"
-            on={open}
-            onClick={() => setOpen(!open)}
-            theme={theme}
-            className="hidden md:inline-flex"
-            aria-label="사이드바 토글"
-          />
+          <div className="w-10 h-10 flex items-center justify-center hidden md:inline-flex cursor-pointer" onClick={() => setOpen(!open)}>
+            <Button
+              variant="hamburger"
+              on={open}
+              theme={theme}
+              className="hidden md:inline-flex"
+              aria-label="사이드바 토글"
+            />
+          </div>
           <Logo width={60} className="md:w-[75px]" priority={true} />
           <div className="text-lg font-bold whitespace-nowrap md:text-2xl">
             관리자 패널

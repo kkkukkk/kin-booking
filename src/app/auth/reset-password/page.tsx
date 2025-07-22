@@ -1,11 +1,11 @@
 'use client'
 
-import { useRouter, usePathname } from "next/navigation";
-import React, { useEffect, useState, useRef } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { useAppSelector } from "@/redux/hooks";
-import { RootState } from "@/redux/store";
-import { isValidPassword } from "@/util/validators";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import React, {useEffect, useRef, useState} from "react";
+import {supabase} from "@/lib/supabaseClient";
+import {useAppSelector} from "@/redux/hooks";
+import {RootState} from "@/redux/store";
+import {isValidPassword} from "@/util/validators";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
 import Card from "@/components/Card";
@@ -14,6 +14,7 @@ import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
 import AnimatedText from "@/components/base/AnimatedText";
 import useToast from "@/hooks/useToast";
 import useSourceValidation from "@/hooks/useSourceValidation";
+import useSourceLogout from '@/hooks/useSourceLogout';
 
 const ResetPassword = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -27,9 +28,11 @@ const ResetPassword = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const initialPathRef = useRef(pathname);
+	const searchParams = useSearchParams();
 
 	// url source 포함 여부 체크
 	useSourceValidation('password');
+	useSourceLogout('password');
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!touched) setTouched(true);
@@ -96,8 +99,7 @@ const ResetPassword = () => {
 		window.addEventListener('beforeunload', handleLogout);
 		
 		// URL 변경 감지
-		const currentPath = pathname;
-		if (initialPathRef.current !== currentPath) {
+		if (initialPathRef.current !== pathname) {
 			handleLogout();
 		}
 		
