@@ -13,7 +13,7 @@ export const EventStatusKo: Record<EventStatus, string> = {
 };
 
 export interface Events {
-	id: number;
+	id: string;
 	eventName: string;
 	eventDate: string;
 	location: string;

@@ -1,8 +1,8 @@
 import AdminHeader from './components/AdminHeader';
-import { AdminSidebarProvider } from '../../providers/AdminSidebarProvider';
 import React from 'react';
 import styles from '@/css/admin-layout.module.css';
-import AdminSidebarWithContext from './components/AdminSidebarWithContext';
+import { AdminSidebarProvider } from '@/providers/AdminSidebarProvider';
+import AdminSidebar from './components/AdminSidebar';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <AdminHeader />
         </header>
         <aside className={styles.sidebar}>
-          <AdminSidebarWithContext />
+          <AdminSidebar variant="sidebar" />
         </aside>
         <main className={styles.main}>
           {children}

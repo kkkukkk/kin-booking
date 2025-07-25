@@ -11,9 +11,10 @@ interface PaginationButtonsProps {
   paginationInfo: PaginationInfo;
   onPageChange: (page: number) => void;
   className?: string;
+  showFirstLast?: boolean;
 }
 
-const PaginationButtons = ({ paginationInfo, onPageChange, className = '' }: PaginationButtonsProps) => {
+const PaginationButtons = ({ paginationInfo, onPageChange, className = '', showFirstLast = true }: PaginationButtonsProps) => {
   const theme = useAppSelector(state => state.theme.current);
   const { page: currentPage, totalPages, hasPrev, hasNext } = paginationInfo;
 
@@ -66,6 +67,25 @@ const PaginationButtons = ({ paginationInfo, onPageChange, className = '' }: Pag
       transition={{ duration: 0.3 }}
       className={clsx('flex items-center justify-center space-x-1', className)}
     >
+      {/* 처음 버튼: 2페이지 이상일 때만 노출, 없으면 자리차지 */}
+      {showFirstLast ? (
+        currentPage > 1 ? (
+          <Button
+            theme="dark"
+            width="auto min-w-8"
+            height="h-8"
+            padding="p-1"
+            reverse={theme === "normal"}
+            onClick={() => onPageChange(1)}
+            className="flex items-center justify-center text-xs"
+            title="처음 페이지"
+          >
+            처음
+          </Button>
+        ) : (
+          <span className="inline-block min-w-8 h-8 align-middle" />
+        )
+      ) : null}
       {/* 이전 페이지 버튼 */}
       <Button
         theme="dark"
@@ -118,6 +138,25 @@ const PaginationButtons = ({ paginationInfo, onPageChange, className = '' }: Pag
       >
         <ArrowRightIcon className="w-4 h-4" />
       </Button>
+      {/* 마지막 버튼: 마지막 페이지가 아닐 때만 노출, 없으면 자리차지 */}
+      {showFirstLast ? (
+        currentPage < totalPages ? (
+          <Button
+            theme="dark"
+            width="auto min-w-8"
+            height="h-8"
+            padding="p-1"
+            reverse={theme === "normal"}
+            onClick={() => onPageChange(totalPages)}
+            className="flex items-center justify-center text-xs"
+            title="끝 페이지"
+          >
+            끝
+          </Button>
+        ) : (
+          <span className="inline-block min-w-8 h-8 align-middle" />
+        )
+      ) : null}
     </motion.div>
   );
 };

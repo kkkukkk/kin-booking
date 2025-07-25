@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Reservation } from "@/types/model/reservation";
-import { CreateReservationDto } from "@/types/dto/reservation";
+import { CreateReservationDto, FetchReservationDto } from "@/types/dto/reservation";
 import { createReservation, fetchReservation, cancelPendingReservation } from "@/api/reservation";
 import { approveReservation, rejectReservation } from "@/api/reservation";
+import { PaginationParams } from "@/util/pagination/type";
 
 export const useCreateReservation = () => {
 	const queryClient = useQueryClient();
@@ -64,5 +65,15 @@ export const useCancelPendingReservation = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['reservations'] });
 		},
+	});
+};
+
+// 관리자용 전체 예매 조회
+export const useReservations = (params?: PaginationParams & FetchReservationDto) => {
+	return useQuery({
+		queryKey: ['reservations', 'admin', params],
+		queryFn: () => fetchReservation(params),
+		retry: 1,
+		staleTime: 1000 * 60 * 5, // 5분
 	});
 };

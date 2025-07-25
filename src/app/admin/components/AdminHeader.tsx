@@ -13,9 +13,9 @@ import { useState } from 'react';
 import { useLogout } from '@/hooks/api/useAuth';
 import { useAlert } from '@/providers/AlertProvider';
 import useToast from '@/hooks/useToast';
-import { useAdminSidebar } from '@/providers/AdminSidebarProvider';
 import AdminDropDownMenu from './AdminDropDownMenu';
 import AdminUserInfo from './AdminUserInfo';
+import { useAdminSidebar } from '@/providers/AdminSidebarProvider';
 
 const AdminHeader = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -59,24 +59,14 @@ const AdminHeader = () => {
         isChildren
       >
         <div className="flex items-center gap-3 md:gap-4 px-3 md:px-0">
-          {/* 모바일: 드롭다운 토글 */}
-          <div className="w-10 h-10 flex items-center justify-center md:hidden cursor-pointer" onClick={() => setOpen(!open)}>
+          {/* 메뉴 햄버거 버튼 */}
+          <div className="w-10 h-10 flex items-center justify-center cursor-pointer" onClick={() => setOpen(!open)}>
             <Button
               variant="hamburger"
               on={open}
               theme={theme}
-              className="md:hidden"
+              className="block"
               aria-label="메뉴 열기"
-            />
-          </div>
-          {/* PC: 사이드바 토글 버튼 */}
-          <div className="w-10 h-10 flex items-center justify-center hidden md:inline-flex cursor-pointer" onClick={() => setOpen(!open)}>
-            <Button
-              variant="hamburger"
-              on={open}
-              theme={theme}
-              className="hidden md:inline-flex"
-              aria-label="사이드바 토글"
             />
           </div>
           <Logo width={60} className="md:w-[75px]" priority={true} />

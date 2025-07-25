@@ -1,7 +1,7 @@
 "use client";
 import AdminSidebar from "./AdminSidebar";
 import { AnimatePresence, motion } from "framer-motion";
-import { fadeOverlay, fadeSlideDownSm } from "@/types/ui/motionVariants";
+import { fadeSlideDownSm } from "@/types/ui/motionVariants";
 
 interface AdminDropDownMenuProps {
   open: boolean;
@@ -22,7 +22,7 @@ export default function AdminDropDownMenu({ open, onClose }: AdminDropDownMenuPr
             exit="exit"
             onClick={e => e.stopPropagation()}
           >
-            <AdminSidebar variant="drawer" open={true} onClose={onClose} />
+            <AdminSidebar variant="dropdown" onClose={onClose} />
           </motion.div>
         )}
       </AnimatePresence>

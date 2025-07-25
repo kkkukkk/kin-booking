@@ -8,13 +8,14 @@ export interface CreateReservationDto {
 }
 
 export interface FetchReservationDto {
-	id?: number;
+	id?: string;
 	userId?: string;
 	eventId?: string;
 	reservedFrom?: string;
 	reservedTo?: string;
 	status?: ReservationStatus;
 	ticketHolder?: string;
+	keyword?: string;
 }
 
 export interface FetchReservationResponseDto {

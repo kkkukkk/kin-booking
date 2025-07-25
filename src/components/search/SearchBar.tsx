@@ -91,11 +91,11 @@ const SearchBar = ({
 
   return (
     <>
-      <div className="rounded text-sm flex flex-col">
+      <div className="rounded text-base flex flex-col">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {icon}
-            <span className="font-medium">{label}</span>
+            <span className="text-sm md:text-base">{label}</span>
           </div>
           <Button
             theme="dark"
