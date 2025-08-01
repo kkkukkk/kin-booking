@@ -2,6 +2,9 @@
 
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { TicketStatus } from '@/types/model/ticket'
+import { useAppSelector } from '@/redux/hooks'
+import { RootState } from '@/redux/store'
+import dayjs from 'dayjs';
 
 interface TicketCardProps {
   eventName: string
@@ -30,6 +33,20 @@ const TicketCard = ({
   ticketNumber,
   ticketPrice,
 }: TicketCardProps) => {
+  const theme = useAppSelector((state: RootState) => state.theme.current)
+  
+  // 테마별 그림자 스타일 결정
+  const getShadowStyle = () => {
+    switch (theme) {
+      case 'normal':
+        return "drop-shadow(0 4px 8px rgba(0,0,0,0.25))" // 어두운 그림자
+      case 'dark':
+      case 'neon':
+        return "drop-shadow(0 4px 8px rgba(255,255,255,0.3))" // 밝은 그림자
+      default:
+        return "drop-shadow(0 4px 8px rgba(0,0,0,0.25))"
+    }
+  }
   const contentRef = useRef<HTMLDivElement>(null)
   const [maskSize, setMaskSize] = useState({ width: 320, height: 140 })
   const [maskId] = useState(() => `ticketMask-${Math.random().toString(36).slice(2)}`)
@@ -77,28 +94,16 @@ const TicketCard = ({
   const notchCyBottom = maskSize.height
   const rightWidth = maskSize.width - notchCx - 1
 
-  // rare 티켓용 gold 그라데이션
-  const rareGradient = 'linear-gradient(135deg, #ffd700 0%, #fffbe6 100%)';
+
 
   // 공연 날짜 포맷팅
-  const formatEventDate = (date?: string) => {
-    if (!date) return '날짜 미정'
-    return new Date(date).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'short'
-    })
-  }
+  const formatDate = (date: string) => {
+    return dayjs(date).format('YYYY년 MM월 DD일');
+  };
 
-  // 공연 시간 포맷팅
-  const formatEventTime = (date?: string) => {
-    if (!date) return ''
-    return new Date(date).toLocaleTimeString('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+  const formatTime = (date: string) => {
+    return dayjs(date).format('HH:mm');
+  };
 
   // 마스크 요소 메모이제이션
   const maskElements = useMemo(() => {
@@ -121,12 +126,12 @@ const TicketCard = ({
 
   // 크기 측정이 완료되지 않았으면 로딩 표시
   if (!isReady) {
-    return (
-      <div
-        ref={contentRef}
-        className="relative max-w-md mx-auto my-6"
-        style={{ filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.25))" }}
-      >
+      return (
+    <div
+      ref={contentRef}
+      className="relative max-w-md mx-auto my-6"
+      style={{ filter: getShadowStyle() }}
+    >
         <div className="relative flex">
           <div className="p-4 bg-gray-100 rounded-lg animate-pulse">
             <div className="h-6 bg-gray-200 rounded mb-3"></div>
@@ -143,7 +148,7 @@ const TicketCard = ({
   return (
     <div
       className="relative max-w-md mx-auto my-6"
-      style={{ filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.25))" }}
+      style={{ filter: getShadowStyle() }}
     >
       <svg width="0" height="0" aria-hidden="true" focusable="false">
         <defs>
@@ -175,7 +180,7 @@ const TicketCard = ({
         >
           {/* 이벤트명과 티켓 번호 */}
           <div className="flex items-center justify-between mb-2">
-            <div className="text-slate-800 font-bold text-base leading-tight">{eventName}</div>
+            <div className="text-slate-800 font-bold text-base leading-tight whitespace-nowrap">{eventName}</div>
             {ticketNumber && (
               <div className="text-slate-600 font-semibold text-sm">
                 #{ticketNumber}
@@ -188,11 +193,11 @@ const TicketCard = ({
             {eventDate && (
               <div className="bg-white bg-opacity-60 rounded p-2 border border-slate-200">
                 <div className="text-xs text-slate-500 font-medium mb-1">공연일</div>
-                <div className="text-sm text-slate-700 font-semibold">
-                  {formatEventDate(eventDate)}
+                <div className="text-xs md:text-sm text-slate-700 font-semibold whitespace-nowrap">
+                  {formatDate(eventDate)}
                 </div>
                 <div className="text-xs text-slate-600">
-                  {formatEventTime(eventDate)}
+                  {formatTime(eventDate)}
                 </div>
               </div>
             )}
@@ -207,9 +212,9 @@ const TicketCard = ({
               )}
               
               {ticketPrice && (
-                <div className="bg-white bg-opacity-50 rounded p-2 border border-slate-200">
-                  <div className="text-xs text-slate-500 font-medium mb-1">가격</div>
-                  <div className="text-sm font-semibold text-slate-700">
+                <div className="bg-white bg-opacity-50 rounded p-2 border border-slate-200 flex items-center justify-between md:flex-col md:items-start">
+                  <div className="text-xs text-slate-500 font-medium">가격</div>
+                  <div className="text-xs font-semibold text-slate-700">
                     {ticketPrice.toLocaleString()}원
                   </div>
                 </div>
@@ -223,8 +228,7 @@ const TicketCard = ({
           className="flex flex-col justify-center items-center select-none relative overflow-hidden"
           style={{
             width: rightWidth,
-            borderLeft: '2px dashed rgba(255,255,255,0.3)',
-            background: status === TicketStatus.Used ? 'transparent' : (isRare ? rareGradient : (ticketColor || '#3b82f6')),
+            background: status === TicketStatus.Used ? 'transparent' : (ticketColor || '#3b82f6'),
             color: status === TicketStatus.Used ? 'transparent' : 'white',
             transition: 'all 0.3s ease',
             userSelect: 'none',

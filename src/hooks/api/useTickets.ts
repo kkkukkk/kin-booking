@@ -1,21 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import useToast from '@/hooks/useToast';
 import {
-  createTicket,
   getTicketsByReservationId,
   getTicketsByOwnerId,
   getTicketsByEventId,
   getTicketById,
-  updateTicket,
-  deleteTicket,
-  deleteTicketsByReservationId,
-  cancelAllTicketsByEvent,
-  requestCancelTicket,
+  requestCancelAllTicketsByEvent,
+  approveCancelRequest,
   getTicketsWithEventByOwnerId,
+  getTicketGroups,
+  getTicketGroupsByOwnerId,
+  transferTickets,
+  transferTicketsByReservation,
 } from '@/api/ticket';
-import { createTransferHistory } from '@/api/ticketTransferHistory';
-import { CreateTicketRequest, UpdateTicketRequest, TransferTicketRequest, Ticket, TicketStatus } from '@/types/model/ticket';
-import { TicketGroupDto, TicketWithEventDto } from '@/types/dto/ticket';
-import useToast from '@/hooks/useToast';
+import { Ticket, TicketStatus } from '@/types/model/ticket';
+import { TicketWithEventDto, TicketGroupDto } from '@/types/dto/ticket';
+import { getAllTicketsForStats } from '@/api/ticket';
 
 // 예약 ID로 티켓 조회
 export const useTicketsByReservationId = (reservationId: string) => {
@@ -41,40 +41,37 @@ export const useTicketsByOwnerId = (ownerId: string) => {
   });
 };
 
-// 사용자 ID로 티켓 그룹 조회 (프론트에서 그룹화)
+// 사용자 ID로 티켓 그룹 조회 (DB에서 그룹화)
 export const useTicketGroupsByOwnerId = (ownerId: string) => {
   return useQuery({
-    queryKey: ['ticketGroups', 'owner', ownerId],
-    queryFn: async () => {
-      const tickets = await getTicketsByOwnerId(ownerId);
-      // 그룹화 및 통계 계산
-      const grouped = tickets.reduce((acc: { [key: string]: TicketGroupDto & { eventId: string; tickets: Ticket[] } }, ticket: Ticket) => {
-        const eventId = ticket.eventId;
-        if (!acc[eventId]) {
-          acc[eventId] = {
-            eventId,
-            eventName: `공연 ${eventId}`,
-            totalCount: 0,
-            activeCount: 0,
-            usedCount: 0,
-            cancelledCount: 0,
-            latestCreatedAt: ticket.createdAt,
-            tickets: [],
+    queryKey: ['ticketGroups', ownerId],
+    queryFn: () => getTicketGroupsByOwnerId(ownerId),
+    select: (data) => {
+      if (!data) return [];
+
+      // 그룹핑 처리
+      const groupedTickets: { [key: string]: TicketGroupDto } = {};
+      
+      data.forEach((ticket: any) => {
+        const groupKey = `${ticket.event_id}_${ticket.reservation_id}_${ticket.owner_id}`;
+        
+        if (!groupedTickets[groupKey]) {
+          groupedTickets[groupKey] = {
+            eventId: ticket.event_id,
+            reservationId: ticket.reservation_id,
+            ownerId: ticket.owner_id,
+            eventName: ticket.event?.event_name || '공연명 없음',
+            userName: ticket.user?.name || '사용자명 없음',
+            status: ticket.status,
+            ticketCount: 0,
+            createdAt: ticket.created_at
           };
         }
-        acc[eventId].tickets.push(ticket);
-        acc[eventId].totalCount++;
-        if (ticket.status === TicketStatus.Active) acc[eventId].activeCount++;
-        else if (ticket.status === TicketStatus.Used) acc[eventId].usedCount++;
-        else if (ticket.status === TicketStatus.Cancelled) acc[eventId].cancelledCount++;
-        else if (ticket.status === TicketStatus.Transferred) acc[eventId].cancelledCount++;
-        else if (ticket.status === TicketStatus.CancelRequested) acc[eventId].cancelledCount++;
-        if (new Date(ticket.createdAt) > new Date(acc[eventId].latestCreatedAt)) {
-          acc[eventId].latestCreatedAt = ticket.createdAt;
-        }
-        return acc;
-      }, {});
-      return Object.values(grouped) as (TicketGroupDto & { eventId: string; tickets: Ticket[] })[];
+        
+        groupedTickets[groupKey].ticketCount++;
+      });
+
+      return Object.values(groupedTickets);
     },
     enabled: !!ownerId,
     retry: 1,
@@ -107,241 +104,294 @@ export const useTicketById = (ticketId: string) => {
   });
 };
 
-// 티켓 생성
-export const useCreateTicket = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  
-  return useMutation({
-    mutationFn: (ticketData: CreateTicketRequest) => createTicket(ticketData),
-    onSuccess: (data) => {
-      // 관련 쿼리들 무효화
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', data.reservationId] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'owner', data.ownerId] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'event', data.eventId] });
-      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      showToast({ message: '티켓이 생성되었습니다.', iconType: 'success' });
-    },
-    onError: (error: Error) => {
-      console.error('티켓 생성 실패:', error);
-      showToast({ message: '티켓 생성에 실패했습니다.', iconType: 'error' });
-    },
-  });
-};
-
-// 티켓 업데이트
-export const useUpdateTicket = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  
-  return useMutation({
-    mutationFn: ({ ticketId, updateData }: { ticketId: string; updateData: UpdateTicketRequest }) =>
-      updateTicket(ticketId, updateData),
-    onSuccess: (data) => {
-      // 관련 쿼리들 무효화
-      queryClient.invalidateQueries({ queryKey: ['ticket', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', data.reservationId] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'owner', data.ownerId] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'event', data.eventId] });
-      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      showToast({ message: '티켓이 업데이트되었습니다.', iconType: 'success' });
-    },
-    onError: (error: Error) => {
-      console.error('티켓 업데이트 실패:', error);
-      showToast({ message: '티켓 업데이트에 실패했습니다.', iconType: 'error' });
-    },
-  });
-};
-
-// 티켓 양도 (비즈니스 로직)
-export const transferTicket = async (ticketId: string, transferData: TransferTicketRequest): Promise<Ticket> => {
-  // 1. 현재 티켓 정보 조회
-  const currentTicket = await getTicketById(ticketId);
-
-  // 2. 기존 티켓 상태를 transferred로 변경
-  await updateTicket(ticketId, {
-    status: TicketStatus.Transferred,
-    transferredAt: new Date().toISOString(),
-  });
-
-  // 3. 양도 이력 기록
-  await createTransferHistory({
-    ticketId: ticketId,
-    fromUserId: currentTicket.ownerId,
-    toUserId: transferData.newOwnerId,
-    reason: transferData.reason || '티켓 양도',
-  });
-
-  // 4. 새 active 티켓 생성 (ownerId: 양도받는 사람, eventId/reservationId 등 복사)
-  const newTicket = await createTicket({
-    reservationId: currentTicket.reservationId,
-    eventId: currentTicket.eventId,
-    ownerId: transferData.newOwnerId,
-    // 필요하다면 qrCode 등 추가 필드 복사
-  });
-
-  return newTicket;
-};
-
-// 여러 티켓 동시 양도 (각각 새 active 티켓 생성)
-export const transferMultipleTickets = async (
-  ticketIds: string[],
-  transferData: TransferTicketRequest
-): Promise<Ticket[]> => {
-  const transferPromises = ticketIds.map(ticketId =>
-    transferTicket(ticketId, transferData)
-  );
-  return Promise.all(transferPromises);
-};
-
-// useTransferTicket, useTransferMultipleTickets에서 위 로직을 직접 사용하도록 수정
-export const useTransferTicket = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  
-  return useMutation({
-    mutationFn: ({ ticketId, transferData }: { ticketId: string; transferData: TransferTicketRequest }) =>
-      transferTicket(ticketId, transferData),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['ticket', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', data.reservationId] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'owner', data.ownerId] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'event', data.eventId] });
-      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      showToast({ message: '티켓이 양도되었습니다.', iconType: 'success' });
-    },
-    onError: (error: Error) => {
-      console.error('티켓 양도 실패:', error);
-      showToast({ message: '티켓 양도에 실패했습니다.', iconType: 'error' });
-    },
-  });
-};
-
-export const useTransferMultipleTickets = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  
-  return useMutation({
-    mutationFn: ({ ticketIds, transferData }: { ticketIds: string[]; transferData: TransferTicketRequest }) =>
-      transferMultipleTickets(ticketIds, transferData),
-    onSuccess: (data) => {
-      data.forEach(ticket => {
-        queryClient.invalidateQueries({ queryKey: ['ticket', ticket.id] });
-        queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', ticket.reservationId] });
-        queryClient.invalidateQueries({ queryKey: ['tickets', 'owner', ticket.ownerId] });
-        queryClient.invalidateQueries({ queryKey: ['tickets', 'event', ticket.eventId] });
-      });
-      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      showToast({ message: '티켓들이 양도되었습니다.', iconType: 'success' });
-    },
-    onError: (error: Error) => {
-      console.error('티켓 양도 실패:', error);
-      showToast({ message: '티켓 양도에 실패했습니다.', iconType: 'error' });
-    },
-  });
-};
-
-// 티켓 삭제
-export const useDeleteTicket = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  
-  return useMutation({
-    mutationFn: deleteTicket,
-    onSuccess: (_, ticketId) => {
-      // 티켓 관련 쿼리들 무효화
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      queryClient.removeQueries({ queryKey: ['ticket', ticketId] });
-      showToast({ message: '티켓이 삭제되었습니다.', iconType: 'success' });
-    },
-    onError: (error: Error) => {
-      console.error('티켓 삭제 실패:', error);
-      showToast({ message: '티켓 삭제에 실패했습니다.', iconType: 'error' });
-    },
-  });
-};
-
-// 예약 ID로 모든 티켓 삭제
-export const useDeleteTicketsByReservationId = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  
-  return useMutation({
-    mutationFn: deleteTicketsByReservationId,
-    onSuccess: (_, reservationId) => {
-      // 관련 쿼리들 무효화
-      queryClient.invalidateQueries({ queryKey: ['tickets', 'reservation', reservationId] });
-      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      showToast({ message: '예약의 모든 티켓이 삭제되었습니다.', iconType: 'success' });
-    },
-    onError: (error: Error) => {
-      console.error('티켓 삭제 실패:', error);
-      showToast({ message: '티켓 삭제에 실패했습니다.', iconType: 'error' });
-    },
-  });
-};
-
-// 공연별 전체 티켓 취소 훅 (비즈니스 로직 포함)
-export const useCancelAllTicketsByEvent = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  
-  return useMutation<void, Error, { eventId: string; userId: string; tickets?: Ticket[] }>({
-    mutationFn: async ({ eventId, userId, tickets }) => {
-      if (tickets && tickets.length > 0) {
-        const activeTickets = tickets.filter(t => t.ownerId === userId && t.status !== TicketStatus.Cancelled);
-        if (activeTickets.length === 0) throw new Error('이미 모든 티켓이 취소되었습니다.');
-      }
-      const result = await cancelAllTicketsByEvent(eventId, userId);
-      if (!result.updated) throw new Error('취소할 티켓이 없습니다.');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      showToast({ message: '모든 티켓이 취소되었습니다.', iconType: 'success' });
-    },
-    onError: (error: Error) => {
-      console.error('티켓 취소 실패:', error);
-      showToast({ message: error.message || '티켓 취소에 실패했습니다.', iconType: 'error' });
-    },
-  });
-};
-
-// 티켓 취소 신청 훅 (비즈니스 로직 포함)
+// 티켓 취소 신청 (단일 티켓)
 export const useRequestCancelTicket = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  
-  return useMutation<void, Error, { ticketId: string; userId: string; ticket?: Ticket }>({
-    mutationFn: async ({ ticketId, userId, ticket }) => {
-      // 프론트에서 티켓 정보로 권한/상태 체크
-      if (ticket) {
-        if (ticket.ownerId !== userId) throw new Error('본인 소유 티켓만 취소 신청할 수 있습니다.');
-        if (ticket.status !== TicketStatus.Active) throw new Error('취소 신청은 사용 가능한 티켓만 가능합니다.');
-      }
-      const result = await requestCancelTicket(ticketId, userId);
-      if (!result.updated) throw new Error('취소 신청에 실패했습니다.');
+
+  return useMutation({
+    mutationFn: async ({ ticketId, userId }: { ticketId: string; userId: string }) => {
+      const { requestCancelTicket } = await import('@/api/ticket');
+      return requestCancelTicket(ticketId, userId);
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
-      showToast({ message: '취소 신청이 완료되었습니다.', iconType: 'success' });
+      showToast({ message: '취소 신청이 완료되었습니다.', iconType: 'success', autoCloseTime: 3000 });
     },
     onError: (error: Error) => {
       console.error('취소 신청 실패:', error);
-      showToast({ message: error.message || '취소 신청에 실패했습니다.', iconType: 'error' });
+      showToast({ message: '취소 신청에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
     },
   });
 };
 
+// 티켓 양도 (예매 ID로)
+export const useTransferTicketsByReservation = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      reservationId,
+      eventId,
+      toUserId,
+      fromUserId,
+      transferCount
+    }: {
+      reservationId: string;
+      eventId: string;
+      toUserId: string;
+      fromUserId: string;
+      transferCount: number;
+    }) => {
+      return transferTicketsByReservation(reservationId, eventId, toUserId, fromUserId, transferCount);
+    },
+    onSuccess: (data) => {
+      showToast({
+        message: `${data.transferred}장의 티켓이 성공적으로 양도되었습니다.`,
+        iconType: 'success'
+      });
+      
+      // 관련 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketStats'] });
+    },
+    onError: (error: Error) => {
+      showToast({
+        message: `양도 실패: ${error.message}`,
+        iconType: 'error'
+      });
+    }
+  });
+};
+
+// 티켓 묶음 취소 신청 훅
+export const useRequestCancelAllTicketsByEvent = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ eventId, userId, reservationId, tickets }: { 
+      eventId: string; 
+      userId: string; 
+      reservationId: string;
+      tickets: Ticket[]; 
+    }) => {
+      // 활성 상태의 티켓만 필터링
+      const activeTickets = tickets.filter(t => t.status === TicketStatus.Active);
+      if (activeTickets.length === 0) {
+        throw new Error('취소 신청할 수 있는 활성 티켓이 없습니다.');
+      }
+
+      return requestCancelAllTicketsByEvent(eventId, userId, reservationId);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
+      showToast({ message: `취소 신청이 완료되었습니다. (${data.updated}장)`, iconType: 'success', autoCloseTime: 3000 });
+    },
+    onError: (error: Error) => {
+      console.error('취소 신청 실패:', error);
+      showToast({ message: '취소 신청에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
+    },
+  });
+};
+
+// 이벤트 정보와 함께 사용자 티켓 조회
 export const useTicketsWithEventByOwnerId = (ownerId: string) => {
-  return useQuery<TicketWithEventDto[]>({
-    queryKey: ['tickets-with-event', ownerId],
+  return useQuery({
+    queryKey: ['tickets', 'withEvent', 'owner', ownerId],
     queryFn: () => getTicketsWithEventByOwnerId(ownerId),
     enabled: !!ownerId,
-    staleTime: 1000 * 60,
     retry: 1,
     retryDelay: 1000,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// 티켓 통계 조회 훅
+export const useTicketStats = () => {
+  return useQuery({
+    queryKey: ['ticketStats'],
+    queryFn: () => getAllTicketsForStats(),
+    select: (data) => {
+      if (!data) return null;
+
+      // 그룹별 통계 계산
+      const groupStats: { [key: string]: { 
+        eventId: string; 
+        reservationId: string; 
+        ownerId: string; 
+        statuses: string[]; 
+        ticketCount: number; 
+      }} = {};
+      
+      data.forEach((ticket: any) => {
+        const groupKey = `${ticket.event_id}_${ticket.reservation_id}_${ticket.owner_id}`;
+        
+        if (!groupStats[groupKey]) {
+          groupStats[groupKey] = {
+            eventId: ticket.event_id,
+            reservationId: ticket.reservation_id,
+            ownerId: ticket.owner_id,
+            statuses: [],
+            ticketCount: 0
+          };
+        }
+        
+        groupStats[groupKey].statuses.push(ticket.status);
+        groupStats[groupKey].ticketCount++;
+      });
+
+      // 상태별 통계 계산
+      let totalGroups = 0;
+      let totalTickets = 0;
+      let activeGroups = 0;
+      let activeTickets = 0;
+      let cancelRequestedGroups = 0;
+      let cancelRequestedTickets = 0;
+      let cancelledGroups = 0;
+      let cancelledTickets = 0;
+      let usedGroups = 0;
+      let usedTickets = 0;
+      let transferredGroups = 0;
+      let transferredTickets = 0;
+
+      Object.values(groupStats).forEach(group => {
+        totalGroups++;
+        totalTickets += group.ticketCount;
+
+        // 그룹의 주요 상태 결정 (우선순위: active > cancel_requested > used > transferred > cancelled)
+        let groupStatus = 'cancelled';
+        if (group.statuses.includes('active')) groupStatus = 'active';
+        else if (group.statuses.includes('cancel_requested')) groupStatus = 'cancel_requested';
+        else if (group.statuses.includes('used')) groupStatus = 'used';
+        else if (group.statuses.includes('transferred')) groupStatus = 'transferred';
+
+        // 상태별 그룹 수 카운트
+        switch (groupStatus) {
+          case 'active':
+            activeGroups++;
+            break;
+          case 'cancel_requested':
+            cancelRequestedGroups++;
+            break;
+          case 'cancelled':
+            cancelledGroups++;
+            break;
+          case 'used':
+            usedGroups++;
+            break;
+          case 'transferred':
+            transferredGroups++;
+            break;
+        }
+
+        // 상태별 티켓 수 카운트
+        group.statuses.forEach(status => {
+          switch (status) {
+            case 'active':
+              activeTickets++;
+              break;
+            case 'cancel_requested':
+              cancelRequestedTickets++;
+              break;
+            case 'cancelled':
+              cancelledTickets++;
+              break;
+            case 'used':
+              usedTickets++;
+              break;
+            case 'transferred':
+              transferredTickets++;
+              break;
+          }
+        });
+      });
+
+      return {
+        totalGroups,
+        totalTickets,
+        activeGroups,
+        activeTickets,
+        cancelRequestedGroups,
+        cancelRequestedTickets,
+        cancelledGroups,
+        cancelledTickets,
+        usedGroups,
+        usedTickets,
+        transferredGroups,
+        transferredTickets,
+        averageTicketsPerGroup: totalGroups > 0 ? Number((totalTickets / totalGroups).toFixed(1)) : 0
+      };
+    },
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// 티켓 그룹 조회 훅
+export const useTicketGroups = () => {
+  return useQuery({
+    queryKey: ['ticketGroups'],
+    queryFn: () => getTicketGroups(),
+    select: (data) => {
+      if (!data) return [];
+
+      // 그룹핑 처리
+      const groupedTickets: { [key: string]: TicketGroupDto } = {};
+      
+      data.forEach((ticket: any) => {
+        const groupKey = `${ticket.event_id}_${ticket.reservation_id}_${ticket.owner_id}`;
+        
+        if (!groupedTickets[groupKey]) {
+          groupedTickets[groupKey] = {
+            eventId: ticket.event_id,
+            reservationId: ticket.reservation_id,
+            ownerId: ticket.owner_id,
+            eventName: ticket.event?.event_name || '공연명 없음',
+            userName: ticket.user?.name || '사용자명 없음',
+            status: ticket.status,
+            ticketCount: 0,
+            createdAt: ticket.created_at
+          };
+        }
+        
+        groupedTickets[groupKey].ticketCount++;
+      });
+
+      return Object.values(groupedTickets);
+    },
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// 취소 신청 승인 훅
+export const useApproveCancelRequest = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ eventId, reservationId, ownerId }: { 
+      eventId: string; 
+      reservationId: string; 
+      ownerId: string; 
+    }) => {
+      return approveCancelRequest(eventId, reservationId, ownerId);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
+      showToast({ message: `취소 신청이 승인되었습니다. (${data.updated}장)`, iconType: 'success', autoCloseTime: 3000 });
+    },
+    onError: (error: Error) => {
+      console.error('취소 신청 승인 실패:', error);
+      showToast({ message: '취소 신청 승인에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
+    },
   });
 }; 

@@ -11,7 +11,7 @@ import { useEventMedia } from "@/hooks/api/useEventMedia";
 import { ChairIcon } from "@/components/icon/ChairIcon";
 import { useAppSelector } from "@/redux/hooks";
 import { StatusBadge } from "@/components/status/StatusBadge";
-import EventPoster from "../[eventId]/components/EventPoster";
+import EventPosterWrapper from "../[eventId]/components/EventPosterWrapper";
 
 interface EventCardProps {
 	event: EventWithCurrentStatus;
@@ -22,7 +22,6 @@ const EventCard = ({ event, index }: EventCardProps) => {
 	const router = useRouter();
 	const theme = useAppSelector(state => state.theme.current);
 
-	// 항상 실제 데이터만 사용
 	const { data: posterData, isLoading } = useEventMedia(event.eventId);
 
 	const handleClick = () => {
@@ -42,7 +41,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
 				className="p-3 md:p-4 rounded-lg border hover:shadow-lg transition-all duration-300 h-full"
 			>
 				<div className="relative w-full rounded-lg overflow-hidden mb-2 md:mb-3">
-					<EventPoster
+					<EventPosterWrapper
 						eventName={event.eventName}
 						posterData={posterData}
 						theme={theme}
@@ -58,7 +57,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
 						<h3 className="text-base md:text-lg font-semibold line-clamp-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors flex-1 mr-2">
 							{event.eventName}
 						</h3>
-						<StatusBadge status={event.status} theme={theme} className="flex-shrink-0" />
+						<StatusBadge status={event.status} theme={theme} className="flex-shrink-0" statusType="event" />
 					</div>
 
 					<div className="flex items-center text-xs md:text-sm">

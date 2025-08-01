@@ -9,6 +9,7 @@ export interface Column<T> {
   render: (item: T, index: number) => React.ReactNode;
   width?: string;
   className?: string;
+  sortable?: boolean;
 }
 
 export interface DataTableProps<T> {
@@ -27,6 +28,11 @@ export interface DataTableProps<T> {
     secondRow: React.ReactNode;
     actionButton?: React.ReactNode;
   };
+  sortConfig?: {
+    field: string;
+    direction: 'asc' | 'desc';
+  };
+  onSortChange?: (field: string, direction: 'asc' | 'desc') => void;
 }
 
 function DataTable<T>({
@@ -41,10 +47,19 @@ function DataTable<T>({
   headerClassName = '',
   onRowClick,
   mobileCardSections,
+  sortConfig,
+  onSortChange,
 }: DataTableProps<T>) {
   const handleRowClick = (item: T, index: number) => {
     if (onRowClick) {
       onRowClick(item, index);
+    }
+  };
+
+  const handleHeaderClick = (column: Column<T>) => {
+    if (column.sortable && onSortChange) {
+      const newDirection = sortConfig?.field === column.key && sortConfig?.direction === 'asc' ? 'desc' : 'asc';
+      onSortChange(column.key, newDirection);
     }
   };
 
@@ -96,7 +111,7 @@ function DataTable<T>({
   // 로딩 상태
   if (isLoading) {
     return (
-      <div className={`rounded-lg overflow-hidden ${themeStyles.container} ${className}`}>
+      <div className={`rounded ${themeStyles.container} ${className}`}>
         <div className="px-4 py-8 text-center text-gray-400">
           {loadingMessage}
         </div>
@@ -107,7 +122,7 @@ function DataTable<T>({
   // 빈 상태
   if (data.length === 0) {
     return (
-      <div className={`rounded-lg overflow-hidden ${themeStyles.container} ${className}`}>
+      <div className={`rounded ${themeStyles.container} ${className}`}>
         <div className="px-4 py-8 text-center text-gray-400">
           {emptyMessage}
         </div>
@@ -116,21 +131,31 @@ function DataTable<T>({
   }
 
   return (
-    <div className={`rounded-lg overflow-hidden ${themeStyles.container} ${className}`}>
+    <div className={`rounded ${themeStyles.container} ${className}`}>
       {/* 데스크톱 테이블 */}
-      <div className="hidden md:block h-full overflow-x-auto">
+      <div className="hidden lg:block h-full overflow-x-auto">
         <div className="h-full overflow-y-auto">
           <div className="h-full">
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <thead className={themeStyles.header}>
                 <tr>
                   {columns.map((column) => (
                     <th
                       key={column.key}
-                      className={`px-4 py-3 text-left text-sm font-medium ${themeStyles.headerText} ${column.className || ''}`}
+                      className={`px-4 py-3 text-left text-sm font-medium ${themeStyles.headerText} ${column.className || ''} ${
+                        column.sortable ? 'cursor-pointer hover:opacity-80' : ''
+                      }`}
                       style={{ width: column.width }}
+                      onClick={() => handleHeaderClick(column)}
                     >
-                      {column.header}
+                      <div className="flex items-center gap-1">
+                        <span>{column.header}</span>
+                        {column.sortable && sortConfig?.field === column.key && (
+                          <span className="text-xs">
+                            {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                          </span>
+                        )}
+                      </div>
                     </th>
                   ))}
                 </tr>
@@ -160,17 +185,17 @@ function DataTable<T>({
       </div>
 
       {/* 모바일 카드 뷰 */}
-      <div className="md:hidden space-y-4 p-4 overflow-y-auto max-h-full">
+      <div className="lg:hidden space-y-4 p-4 overflow-y-auto max-h-full">
         {mobileCardSections
           ? data.map((item, index) => {
               const { firstRow, secondRow, actionButton } = mobileCardSections(item, index);
               return (
                 <div
                   key={index}
-                  className={`${themeStyles.card} rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3 ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`${themeStyles.card} rounded p-3 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3 ${onRowClick ? 'cursor-pointer' : ''}`}
                   onClick={() => handleRowClick(item, index)}
                 >
-                  <div className="flex items-center justify-between gap-2 mb-1">{firstRow}</div>
+                  <div className="flex items-center justify-between gap-2 mb-2">{firstRow}</div>
                   <div className="flex items-center justify-between gap-2 text-xs mb-2">{secondRow}</div>
                   {actionButton && <div className="flex gap-2 justify-end">{actionButton}</div>}
                 </div>

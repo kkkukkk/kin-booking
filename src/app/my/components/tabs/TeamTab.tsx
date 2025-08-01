@@ -151,7 +151,7 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 	}
 
 	return (
-		<ThemeDiv className="p-6 rounded-lg" isChildren>
+		<ThemeDiv className="p-6 rounded" isChildren>
 			<h3 className="text-xl font-semibold mb-4">멤버 정보</h3>
 			<div className="space-y-2">
 				<div className="flex justify-between items-center py-2 border-b border-gray-200">

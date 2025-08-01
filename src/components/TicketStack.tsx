@@ -11,18 +11,24 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import clsx from 'clsx';
-import { getStatusInfoColors } from '@/components/status/StatusBadge';
+import { StatusBadge } from '@/components/status/StatusBadge';
+import { useRequestCancelAllTicketsByEvent } from '@/hooks/api/useTickets';
+import { useAlert } from '@/providers/AlertProvider';
+import { useSession } from '@/hooks/useSession';
+import { useRouter } from 'next/navigation';
+import dayjs from 'dayjs';
+import { CalendarIcon } from '@/components/icon/CalendarIcon';
+import { LocationIcon } from '@/components/icon/LocationIcon';
+import { TicketIcon } from '@/components/icon/TicketIcon';
+import { MapIcon } from '@/components/icon/MapIcon';
+import TicketQRModal from '@/components/TicketQRModal';
 
 interface TicketStackProps {
 	eventId: string;
 	eventName: string;
 	tickets: Ticket[];
 	latestCreatedAt: string;
-	ticketColor?: string;
 	eventInfo?: Events;
-	onCancelRequest?: (eventId: string) => void;
-	onTicketAction?: (ticketIds: string[], action: 'enter' | 'transfer') => void;
-	key?: React.Key;
 }
 
 const TicketStack = ({
@@ -30,87 +36,105 @@ const TicketStack = ({
 	eventName,
 	tickets,
 	latestCreatedAt,
-	ticketColor,
 	eventInfo,
-	onCancelRequest,
-	onTicketAction,
 }: TicketStackProps) => {
 	const [isExpanded, setIsExpanded] = useState(false);
+	const [showQRModal, setShowQRModal] = useState(false);
 	const theme = useAppSelector((state: RootState) => state.theme.current);
+	const { mutate: requestCancelAllTickets, isPending: isCancelling } = useRequestCancelAllTicketsByEvent();
+	const { showAlert } = useAlert();
+	const { session } = useSession();
+	const router = useRouter();
 
-	// 티켓 상태별 통계 계산
-	const statusStats = useMemo(() => {
-		const stats = {
-			active: 0,
-			cancelRequested: 0,
-			cancelled: 0,
-			used: 0,
-			transferred: 0,
-		};
-
-		tickets.forEach(ticket => {
-			switch (ticket.status) {
-				case TicketStatus.Active:
-					stats.active++;
-					break;
-				case TicketStatus.CancelRequested:
-					stats.cancelRequested++;
-					break;
-				case TicketStatus.Cancelled:
-					stats.cancelled++;
-					break;
-				case TicketStatus.Used:
-					stats.used++;
-					break;
-				case TicketStatus.Transferred:
-					stats.transferred++;
-					break;
-			}
-		});
-
-		return stats;
+	// 티켓 스택의 통합 상태 (첫 번째 티켓의 상태를 기준으로 함)
+	const stackStatus = useMemo(() => {
+		if (tickets.length === 0) return TicketStatus.Active;
+		return tickets[0].status;
 	}, [tickets]);
 
-	// 티켓 스택의 통합 상태 (양도는 별도 고려)
-	const stackStatus = useMemo(() => {
-		if (statusStats.transferred > 0) return TicketStatus.Transferred;
-		if (statusStats.used > 0) return TicketStatus.Used;
-		if (statusStats.cancelled > 0) return TicketStatus.Cancelled;
-		if (statusStats.cancelRequested > 0) return TicketStatus.CancelRequested;
-		return TicketStatus.Active;
-	}, [statusStats]);
+	// 상태별 스타일 클래스
+	const getStatusStyle = () => {
+		switch (stackStatus) {
+			case TicketStatus.Active:
+				return theme !== 'neon' ? theme === 'dark' ? 'border-gray-500' : 'border-gray-200' : 'border-green-600';
+			case TicketStatus.CancelRequested:
+				return theme === 'normal' 
+					? 'bg-yellow-50 border-yellow-200' 
+					: 'bg-yellow-800/20 border-yellow-600 text-white/90';
+			case TicketStatus.Used:
+				return theme === 'normal' 
+					? 'bg-green-50 border-green-200' 
+					: 'bg-green-800/20 border-green-600 text-white/90';
+			case TicketStatus.Transferred:
+				return theme === 'normal' 
+					? 'bg-blue-50 border-blue-200' 
+					: 'bg-blue-800/20 border-blue-600 text-white/90';
+			case TicketStatus.Cancelled:
+				return theme === 'normal' 
+					? 'bg-red-50 border-red-200' 
+					: 'bg-red-800/20 border-red-600 text-white/90';
+			default:
+				return theme === 'normal' ? 'border-gray-200' : 'border-gray-600';
+		}
+	};
+
+	// 상태별 제목
+	const getStatusTitle = () => {
+		switch (stackStatus) {
+			case TicketStatus.Active:
+				return null;
+			case TicketStatus.CancelRequested:
+				return { text: '취소 신청 대기중', count: tickets.length };
+			case TicketStatus.Used:
+				return { text: '사용 완료', count: tickets.length };
+			case TicketStatus.Transferred:
+				return { text: '양도 완료', count: tickets.length };
+			case TicketStatus.Cancelled:
+				return { text: '취소 완료', count: tickets.length };
+			default:
+				return null;
+		}
+	};
 
 	// 입장 가능 여부 확인 (공연 일자/시간 기준)
 	const canEnter = useMemo(() => {
 		if (stackStatus !== TicketStatus.Active) return false;
-		if (!eventInfo?.eventDate) return true; // 이벤트 정보가 없으면 기본적으로 활성화
+		if (!eventInfo?.eventDate) return false; // 이벤트 정보가 없으면 기본적으로 비활성화
 
-		const now = new Date();
-		const eventDate = new Date(eventInfo.eventDate);
+		const now = dayjs();
+		const eventDate = dayjs(eventInfo.eventDate);
 
 		// 공연 시작 30분 전부터 입장 가능
-		const entryStartTime = new Date(eventDate.getTime() - 30 * 60 * 1000);
-		// 공연 종료 후 2시간까지 입장 가능
-		const entryEndTime = new Date(eventDate.getTime() + 2 * 60 * 60 * 1000);
+		const entryStartTime = eventDate.subtract(30, 'minute');
+		// 공연 시작 후 2시간까지 입장 가능
+		const entryEndTime = eventDate.add(2, 'hour');
 
-		return now >= entryStartTime && now <= entryEndTime;
+		return now.isAfter(entryStartTime) && now.isBefore(entryEndTime);
 	}, [stackStatus, eventInfo]);
+
+	// 입장 대기 여부 확인 (Active 상태이지만 입장 시간이 아닌 경우)
+	const isWaitingForEntry = useMemo(() => {
+		return stackStatus === TicketStatus.Active && !canEnter;
+	}, [stackStatus, canEnter]);
 
 	// 양도 가능 여부 확인
 	const canTransfer = useMemo(() => {
-		return stackStatus === TicketStatus.Active && statusStats.active > 0;
-	}, [stackStatus, statusStats.active]);
+		return stackStatus === TicketStatus.Active && tickets.length > 0;
+	}, [stackStatus, tickets.length]);
 
 	// 취소 가능 여부 확인
 	const canCancel = useMemo(() => {
-		return stackStatus === TicketStatus.Active && statusStats.active > 0;
-	}, [stackStatus, statusStats.active]);
+		return stackStatus === TicketStatus.Active && tickets.length > 0;
+	}, [stackStatus, tickets.length]);
 
 	// 기본 표시 레이어 수 (펼치지 않았을 때)
 	const DEFAULT_VISIBLE_LAYERS = 3;
 	const getVisibleTickets = (tickets: Ticket[], isExpanded: boolean) => {
-		if (isExpanded) return tickets; // 펼치면 모든 티켓 표시
-		return tickets.slice(0, Math.min(tickets.length, DEFAULT_VISIBLE_LAYERS));
+		// 티켓 번호 순으로 정렬 (낮은 번호가 앞으로)
+		const sortedTickets = [...tickets].sort((a, b) => a.ticketNumber - b.ticketNumber);
+		
+		if (isExpanded) return sortedTickets; // 펼치면 모든 티켓 표시
+		return sortedTickets.slice(0, Math.min(sortedTickets.length, DEFAULT_VISIBLE_LAYERS));
 	};
 
 	// 펼치기/접기 토글
@@ -118,143 +142,158 @@ const TicketStack = ({
 		setIsExpanded(!isExpanded);
 	};
 
-	// 티켓 액션 처리
-	const handleTicketAction = (action: 'enter' | 'transfer') => {
-		const activeTicketIds = tickets
-			.filter(ticket => ticket.status === TicketStatus.Active)
-			.map(ticket => ticket.id);
-
-		if (onTicketAction) {
-			onTicketAction(activeTicketIds, action);
-		} else {
-			// 기본 동작
-			if (action === 'enter') {
-				alert(`입장 처리 실행! (${activeTicketIds.length}장)`);
-			} else if (action === 'transfer') {
-				alert(`양도 처리 실행! (${activeTicketIds.length}장)`);
-			}
+	// QR코드 모달 열기
+	const handleShowQRCode = () => {
+		if (tickets.length > 0) {
+			setShowQRModal(true);
 		}
 	};
 
-	const visibleTickets = Array.isArray(tickets) ? getVisibleTickets(tickets, isExpanded) : [];
+	// 티켓 액션 처리
+	const handleTicketAction = (action: 'transfer') => {
+		if (action === 'transfer') {
+			// 양도 페이지로 이동 (핵심 정보만)
+			const params = new URLSearchParams({
+				eventId,
+				reservationId: tickets[0].reservationId
+			});
+			router.push(`/my/transfer?${params.toString()}`);
+		}
+	};
 
-	// 그룹의 실제 높이 계산
-	const headerHeight = 120; // 헤더 높이 증가
-	const ticketHeight = 200; // 기본 티켓 높이
-	const ticketSpacing = 16; // 티켓 간격
-	const actionBarHeight = 60; // 액션 바 높이
+	// 취소 신청 처리
+	const handleCancelRequest = async () => {
+		if (!session?.user?.id) return;
 
-	let groupHeight;
-	if (isExpanded) {
-		// 펼친 상태: 세로 배치
-		groupHeight = headerHeight + actionBarHeight + (visibleTickets.length * ticketHeight) + ((visibleTickets.length - 1) * ticketSpacing) + 20;
-	} else {
-		// 기본 상태: 겹침 배치
-		const overlapOffset = (visibleTickets.length - 1) * 8; // 겹침으로 인한 추가 높이
-		groupHeight = headerHeight + actionBarHeight + ticketHeight + overlapOffset + 20;
-	}
+		const activeTickets = tickets.filter(ticket => ticket.status === TicketStatus.Active);
+		if (activeTickets.length === 0) return;
+
+		// 첫 번째 티켓의 reservationId 사용 (모든 티켓이 같은 예매 그룹)
+		const reservationId = activeTickets[0].reservationId;
+
+		const confirmed = await showAlert({
+			type: 'confirm',
+			title: '티켓 취소 신청',
+			message: `정말 ${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n취소 신청 후에는 관리자 승인이 필요합니다.`,
+		});
+
+		if (confirmed) {
+			requestCancelAllTickets({
+				eventId,
+				userId: session.user.id,
+				reservationId,
+				tickets,
+			});
+		}
+	};
+
+	const visibleTickets = getVisibleTickets(tickets, isExpanded);
 
 	// 공연 일자 포맷팅
 	const formatEventDate = (dateString: string) => {
-		const date = new Date(dateString);
+		const date = dayjs(dateString);
 		return {
-			full: date.toLocaleDateString('ko-KR', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric',
-				weekday: 'long'
-			}),
-			time: date.toLocaleTimeString('ko-KR', {
-				hour: '2-digit',
-				minute: '2-digit'
-			}),
-			short: date.toLocaleDateString('ko-KR', {
-				month: 'short',
-				day: 'numeric'
-			})
+			full: date.format('YYYY년 M월 D일 dddd'),
+			time: date.format('HH:mm'),
+			short: date.format('M월 D일'),
+			detailed: date.format('YYYY년 M월 D일'),
+			weekday: date.format('ddd')
 		};
 	};
 
 	const eventDateInfo = eventInfo?.eventDate ? formatEventDate(eventInfo.eventDate) : null;
 
+	const statusTitle = getStatusTitle();
+	
 	return (
 		<ThemeDiv
-			className="rounded-xl shadow-lg border border-gray-200 overflow-hidden"
-			style={{ minHeight: `${groupHeight}px` }}
+			className={clsx(
+				"rounded-lg shadow-lg border overflow-hidden",
+				getStatusStyle()
+			)}
 			isChildren
 		>
+			{/* 상태 표시 */}
+			{statusTitle && (
+				<div className={clsx(
+					"px-4 py-2 border-b text-sm font-medium",
+					stackStatus === TicketStatus.CancelRequested && (
+						theme === 'normal' 
+							? "bg-yellow-100 border-yellow-200 text-yellow-800" 
+							: "bg-yellow-900/30 border-yellow-800 text-yellow-200"
+					),
+					stackStatus === TicketStatus.Used && (
+						theme === 'normal' 
+							? "bg-green-100 border-green-200 text-green-800" 
+							: "bg-green-900/30 border-green-800 text-green-200"
+					),
+					stackStatus === TicketStatus.Transferred && (
+						theme === 'normal' 
+							? "bg-blue-100 border-blue-200 text-blue-800" 
+							: "bg-blue-900/30 border-blue-800 text-blue-200"
+					),
+					stackStatus === TicketStatus.Cancelled && (
+						theme === 'normal' 
+							? "bg-red-100 border-red-200 text-red-800" 
+							: "bg-red-900/30 border-red-800 text-red-200"
+					)
+				)}>
+					{statusTitle.text} ({statusTitle.count}장)
+				</div>
+			)}
 			<div className={clsx(
 				"p-6 border-b",
 				theme === 'normal' ? 'border-gray-200' : 'border-gray-700'
 			)}>
-				<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-					<div className="flex-1">
-						<div className="flex flex-col md:flex-row md:items-center gap-2 mb-3">
-							<h3 className="text-xl font-bold">{eventName}</h3>
-							{eventDateInfo && (
-								<div className="flex items-center gap-2 text-sm">
-									<span className="hidden md:inline">•</span>
-									<span className="font-medium">{eventDateInfo.short}</span>
-									<span>{eventDateInfo.time}</span>
-								</div>
-							)}
-						</div>
+				<div className="space-y-3">
+					{/* 공연명 + 상태뱃지 */}
+					<div className="flex justify-between items-center">
+						<h3 className="text-lg md:text-xl font-bold">{eventName}</h3>
+						<StatusBadge 
+							status={stackStatus} 
+							theme={theme} 
+							variant="badge"
+							size="sm"
+							className="w-fit"
+							statusType="ticket"
+						/>
+					</div>
 
-						{/* 티켓 정보 */}
-						<div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
-							<p className="text-sm">
-								총 {tickets.length}장 • {new Date(latestCreatedAt).toLocaleDateString('ko-KR')} 예약
-							</p>
-							{eventDateInfo && (
-								<div className="text-xs">
-									{canEnter ? '입장 가능' : '입장 대기'}
-								</div>
-							)}
+					{/* 공연일, 티켓 장수, 예매일 */}
+					<div className="flex flex-col gap-2 text-xs">
+						{eventDateInfo && (
+							<div className="flex items-center gap-2">
+								<CalendarIcon className="w-4 h-4 text-gray-400" />
+								<span>{eventDateInfo.detailed}</span>
+								<span className="text-gray-400">({eventDateInfo.weekday})</span>
+								<span className="text-gray-400">{eventDateInfo.time}</span>
+							</div>
+						)}
+						<div className="flex items-center gap-2">
+							<TicketIcon className="w-4 h-4 text-gray-400" />
+							<span>{tickets.length}장</span>
 						</div>
-
-						{/* 상태별 통계 */}
-						<div className="flex flex-wrap gap-2">
-							{statusStats.active > 0 && (
-								<span className={clsx(
-									"px-3 py-1.5 rounded-full border text-xs font-medium",
-									getStatusInfoColors(TicketStatus.Active, theme)
-								)}>
-									사용가능 {statusStats.active}장
-								</span>
-							)}
-							{statusStats.cancelRequested > 0 && (
-								<span className={clsx(
-									"px-3 py-1.5 rounded-full border text-xs font-medium",
-									getStatusInfoColors(TicketStatus.CancelRequested, theme)
-								)}>
-									취소신청 {statusStats.cancelRequested}장
-								</span>
-							)}
-							{statusStats.cancelled > 0 && (
-								<span className={clsx(
-									"px-3 py-1.5 rounded-full border text-xs font-medium",
-									getStatusInfoColors(TicketStatus.Cancelled, theme)
-								)}>
-									취소완료 {statusStats.cancelled}장
-								</span>
-							)}
-							{statusStats.used > 0 && (
-								<span className={clsx(
-									"px-3 py-1.5 rounded-full border text-xs font-medium",
-									getStatusInfoColors(TicketStatus.Used, theme)
-								)}>
-									사용완료 {statusStats.used}장
-								</span>
-							)}
-							{statusStats.transferred > 0 && (
-								<span className={clsx(
-									"px-3 py-1.5 rounded-full border text-xs font-medium",
-									getStatusInfoColors(TicketStatus.Transferred, theme)
-								)}>
-									양도완료 {statusStats.transferred}장
-								</span>
-							)}
-						</div>
+						{/* 위치 */}
+						{eventInfo?.location && (
+							<div className="flex items-center gap-2">
+								<MapIcon className="w-4 h-4 text-gray-400" />
+								<span className="text-xs">{eventInfo.location}</span>
+								<a
+									href={`https://map.kakao.com/link/search/${encodeURIComponent(eventInfo.location)}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className={clsx(
+										"inline-flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors border",
+										theme === "normal"
+											? "bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-300 hover:border-blue-500"
+											: "bg-blue-900/30 text-blue-300 hover:bg-blue-900/50 border-blue-600 hover:border-blue-400"
+									)}
+								>
+									<LocationIcon className="w-3 h-3"/>
+									<span className="whitespace-nowrap">카카오맵</span>
+								</a>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
@@ -268,17 +307,21 @@ const TicketStack = ({
 				)}>
 					<div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
 						{/* 입장  */}
-						{canEnter && (
+						{(canEnter || isWaitingForEntry) && (
 							<button
-								onClick={() => handleTicketAction('enter')}
-								className={`flex-1 md:flex-none px-6 py-3 rounded-lg font-semibold text-sm transition-all ${
+								onClick={handleShowQRCode}
+								className={`flex-1 md:flex-none px-6 py-3 rounded font-medium text-sm transition-all cursor-pointer ${
 									canEnter 
-										? 'bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl' 
-										: 'bg-gray-300 text-gray-500 cursor-not-allowed'
+										? theme === 'normal'
+											? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-[0_2px_8px_rgba(34,197,94,0.3)]'
+											: 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-[0_2px_8px_rgba(34,197,94,0.4)]'
+										: theme === 'normal'
+											? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+											: 'bg-gray-700 text-gray-400 cursor-not-allowed border border-gray-600'
 								}`}
 								disabled={!canEnter}
 							>
-								{canEnter ? '🎫 입장하기' : '⏰ 입장 대기'}
+								{canEnter ? '입장하기' : '입장 대기'}
 							</button>
 						)}
 
@@ -286,19 +329,28 @@ const TicketStack = ({
 						{canTransfer && (
 							<button
 								onClick={() => handleTicketAction('transfer')}
-								className="flex-1 md:flex-none px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg text-sm transition-all shadow-lg hover:shadow-xl"
+								className={`flex-1 md:flex-none px-6 py-3 rounded font-medium text-sm transition-all cursor-pointer ${
+									theme === 'normal'
+										? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-[0_2px_8px_rgba(59,130,246,0.3)]'
+										: 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-[0_2px_8px_rgba(59,130,246,0.4)]'
+								}`}
 							>
-								🔄 양도하기
+								양도하기
 							</button>
 						)}
 
 						{/* 취소 신청 */}
-						{canCancel && onCancelRequest && (
+						{canCancel && (
 							<button
-								onClick={() => onCancelRequest(eventId)}
-								className="flex-1 md:flex-none px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-all shadow-lg hover:shadow-xl"
+								onClick={handleCancelRequest}
+								disabled={isCancelling}
+								className={`flex-1 md:flex-none px-6 py-3 rounded font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
+									theme === 'normal'
+										? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-[0_2px_8px_rgba(239,68,68,0.3)]'
+										: 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white shadow-[0_2px_8px_rgba(239,68,68,0.4)]'
+								}`}
 							>
-								❌ 취소 신청
+								{isCancelling ? '처리 중...' : '취소 신청'}
 							</button>
 						)}
 					</div>
@@ -306,135 +358,127 @@ const TicketStack = ({
 			)}
 
 			{/* 티켓 스택/리스트 */}
-			<div className="p-6">
+			<div className={clsx(
+				"pr-6 py-6",
+				isExpanded ? "pl-6" : "pl-4 md:pl-6"
+			)}>
 				{visibleTickets.length > 0 ? (
-					<AnimatePresence initial={false}>
-						{isExpanded ? (
-							<motion.div
-								key="expanded"
-								initial={{ opacity: 0, height: 0 }}
-								animate={{ opacity: 1, height: 'auto' }}
-								exit={{ opacity: 0, height: 0 }}
-								transition={{ duration: 0.35, ease: 'easeInOut' }}
-								className="space-y-4"
-							>
-								{visibleTickets.map((ticket) => (
-									<motion.div
-										key={ticket.id}
-										initial={{ opacity: 0 }}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-										transition={{ duration: 0.2, ease: 'easeInOut' }}
-										className="relative"
-									>
-										<TicketCard
-											eventName={eventName}
-											status={stackStatus}
-											latestCreatedAt={ticket.createdAt}
-											eventId={ticket.eventId}
-											ticketColor={ticketColor}
-											isRare={ticket.isRare}
-											eventDate={eventInfo?.eventDate}
-											location={eventInfo?.location}
-											ticketId={ticket.id}
-											ticketNumber={ticket.ticketNumber}
-											ticketPrice={eventInfo?.ticketPrice}
-										/>
-									</motion.div>
-								))}
-								{/* 펼치기/접기 버튼 */}
-								{tickets.length > 1 && (
-									<div className="flex justify-center">
-										<Button
-											theme="dark"
-											fontWeight="font-semibold"
-											fontSize="text-base"
-											padding="px-6 py-3"
-											className={clsx(
-												"border shadow-sm hover:shadow-md",
-												theme === 'normal'
-													? 'border-blue-200'
-													: 'border-blue-700'
-											)}
-											onClick={toggleExpanded}
+					<>
+						<AnimatePresence initial={false}>
+							{isExpanded ? (
+								<motion.div
+									key="expanded"
+									initial={{ opacity: 0, height: 0 }}
+									animate={{ opacity: 1, height: 'auto' }}
+									exit={{ opacity: 0, height: 0 }}
+									transition={{ duration: 0.35, ease: 'easeInOut' }}
+									className="space-y-4"
+								>
+									{visibleTickets.map((ticket) => (
+										<motion.div
+											key={ticket.id}
+											initial={{ opacity: 0 }}
+											animate={{ opacity: 1 }}
+											exit={{ opacity: 0 }}
+											transition={{ duration: 0.2, ease: 'easeInOut' }}
+											className="relative"
 										>
-											{isExpanded ? '접기' : `펼치기 (${tickets.length}장)`}
-										</Button>
-									</div>
-								)}
-							</motion.div>
-						) : (
-							<motion.div
-								key="collapsed"
-								initial={{ opacity: 0, height: 0 }}
-								animate={{ opacity: 1, height: 'auto' }}
-								exit={{ opacity: 0, height: 0 }}
-								transition={{ duration: 0.3, ease: 'easeInOut' }}
-								className="space-y-4"
-							>
-								<div className="relative" style={{ minHeight: '220px' }}>
-									{visibleTickets.map((ticket, ticketIdx) => {
-										const isTopTicket = ticketIdx === 0;
-										const zIndex = visibleTickets.length - ticketIdx;
-										const translateX = ticketIdx * 8; // 우측으로
-										const translateY = -(ticketIdx * 8); // 위로 (음수)
-										const opacity = isTopTicket ? 1 : Math.max(0.2, 1 - (ticketIdx * 0.2));
+											<TicketCard
+												eventName={eventName}
+												status={stackStatus}
+												latestCreatedAt={ticket.createdAt}
+												eventId={ticket.eventId}
+												ticketColor={ticket.color || undefined}
+												isRare={ticket.isRare}
+												eventDate={eventInfo?.eventDate}
+												ticketId={ticket.id}
+												ticketNumber={ticket.ticketNumber}
+												ticketPrice={eventInfo?.ticketPrice}
+											/>
+										</motion.div>
+									))}
+								</motion.div>
+							) : (
+								<motion.div
+									key="collapsed"
+									initial={{ opacity: 0, height: 0 }}
+									animate={{ opacity: 1, height: 'auto' }}
+									exit={{ opacity: 0, height: 0 }}
+									transition={{ duration: 0.3, ease: 'easeInOut' }}
+									className="space-y-4"
+								>
+									<div className="relative" style={{ minHeight: '220px' }}>
+										{visibleTickets.map((ticket, ticketIdx) => {
+											const isTopTicket = ticketIdx === 0;
+											const zIndex = visibleTickets.length - ticketIdx;
+											const translateX = ticketIdx * 8; // 우측으로
+											const translateY = -(ticketIdx * 8); // 위로 (음수)
+											const opacity = isTopTicket ? 1 : Math.max(0.2, 1 - (ticketIdx * 0.2));
 
-										return (
-											<div
-												key={ticket.id}
-												className="absolute top-0 left-0 w-full"
-												style={{
-													zIndex,
-													transform: `translate(${translateX}px, ${translateY}px)`,
-													opacity,
-													pointerEvents: isTopTicket ? 'auto' : 'none',
-												}}
-											>
-												<TicketCard
-													eventName={eventName}
-													status={stackStatus}
-													latestCreatedAt={ticket.createdAt}
-													eventId={ticket.eventId}
-													ticketColor={ticketColor}
-													isRare={ticket.isRare}
-													eventDate={eventInfo?.eventDate}
-													location={eventInfo?.location}
-													ticketId={ticket.id}
-													ticketNumber={ticket.ticketNumber}
-													ticketPrice={eventInfo?.ticketPrice}
-												/>
-											</div>
-										);
-									})}
-								</div>
-								{/* 펼치기/접기 버튼 */}
-								{tickets.length > 1 && (
-									<div className="flex justify-center">
-										<Button
-											theme="dark"
-											fontWeight="font-semibold"
-											fontSize="text-base"
-											padding="px-6 py-3"
-											className={clsx(
-												"border shadow-sm hover:shadow-md",
-												theme === 'normal'
-													? 'border-blue-200'
-													: 'border-blue-700'
-											)}
-											onClick={toggleExpanded}
-										>
-											{isExpanded ? '접기' : `펼치기 (${tickets.length}장)`}
-										</Button>
+											return (
+												<div
+													key={ticket.id}
+													className="absolute top-0 left-0 w-full"
+													style={{
+														zIndex,
+														transform: `translate(${translateX}px, ${translateY}px)`,
+														opacity,
+														pointerEvents: isTopTicket ? 'auto' : 'none',
+													}}
+												>
+													<TicketCard
+														eventName={eventName}
+														status={stackStatus}
+														latestCreatedAt={ticket.createdAt}
+														eventId={ticket.eventId}
+														ticketColor={ticket.color || undefined}
+														isRare={ticket.isRare}
+														eventDate={eventInfo?.eventDate}
+														ticketId={ticket.id}
+														ticketNumber={ticket.ticketNumber}
+														ticketPrice={eventInfo?.ticketPrice}
+													/>
+												</div>
+											);
+										})}
 									</div>
-								)}
-							</motion.div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+						
+						{/* 펼치기/접기 버튼 - 통합 */}
+						{tickets.length > 1 && (
+							<div className="flex justify-center mt-6">
+								<Button
+									theme="dark"
+									fontWeight="font-semibold"
+									fontSize="text-sm md:text-base"
+									padding="px-4 py-2"
+									reverse={theme === 'normal'}
+									onClick={toggleExpanded}
+								>
+									{isExpanded ? '접기' : `펼치기 (${tickets.length}장)`}
+								</Button>
+							</div>
 						)}
-					</AnimatePresence>
+					</>
 				) : (
 					<div className="text-center text-gray-400 py-8">티켓이 없습니다.</div>
 				)}
 			</div>
+
+			{/* QR코드 모달 */}
+			{tickets.length > 0 && (
+				<TicketQRModal
+					isOpen={showQRModal}
+					onClose={() => setShowQRModal(false)}
+					ticketNumbers={tickets.map(ticket => ticket.ticketNumber)}
+					eventName={eventName}
+					eventId={eventId}
+					userId={session?.user?.id || ''}
+					reservationId={tickets[0].reservationId}
+				/>
+			)}
 		</ThemeDiv>
 	);
 };

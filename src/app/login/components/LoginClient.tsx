@@ -98,8 +98,8 @@ const LoginClient = () => {
 					<Input 
 						placeholder="이메일" 
 						name={"email"} 
-						fontSize={"text-sm md:text-xl"} 
-						theme={theme} 
+						fontSize={"text-base"} 
+						theme={theme}
 						className={"input-base"} 
 						value={email} 
 						onChange={(e) => setEmail(e.target.value)} 
@@ -108,7 +108,7 @@ const LoginClient = () => {
 					<InputWithPasswordToggle 
 						placeholder="비밀번호" 
 						name={"password"} 
-						fontSize={"text-sm md:text-xl"} 
+						fontSize={"text-base"} 
 						theme={theme} 
 						className={"input-base"} 
 						value={password} 
@@ -119,7 +119,7 @@ const LoginClient = () => {
 						type="button"
 						theme={theme === "normal" ? "dark" : theme}
 						padding={"py-1"}
-						fontSize={"text-sm md:text-lg"}
+						fontSize={"text-base"}
 						onClick={() => handleLogin()}
 						reverse={theme === "normal"}
 						light={theme === "dark"}
@@ -130,7 +130,7 @@ const LoginClient = () => {
 						type="button"
 						theme={theme === "normal" ? "dark" : theme}
 						padding={"py-1"}
-						fontSize={"text-sm md:text-lg"}
+						fontSize={"text-base"}
 						onClick={() => router.push('/register')}
 						reverse={theme === "normal"}
 						light={theme === "dark"}
@@ -141,8 +141,10 @@ const LoginClient = () => {
 						<Link
 							href={"/auth/find"}
 							className={clsx(
-								theme === "normal" ? "bg-green-100/90" : "bg-green-700/70",
-								"cursor-pointer px-2.5 py-1 rounded shadow-md"
+								"cursor-pointer underline hover:no-underline transition-all duration-200",
+								theme === "normal" 
+									? "text-green-700 hover:text-green-800" 
+									: "text-green-400 hover:text-green-300"
 							)}
 							tabIndex={0}
 						>

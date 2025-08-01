@@ -1,88 +1,26 @@
 'use client'
 
-import ThemeDiv from '@/components/base/ThemeDiv';
-import { useTicketsWithEventByOwnerId, useCancelAllTicketsByEvent } from '@/hooks/api/useTickets';
 import { useSession } from '@/hooks/useSession';
-import useToast from '@/hooks/useToast';
+import { useAppSelector } from '@/redux/hooks';
+import { RootState } from '@/redux/store';
+import ThemeDiv from '@/components/base/ThemeDiv';
+import { useTicketsWithEventByOwnerId } from '@/hooks/api/useTickets';
 import { TicketWithEventDto } from '@/types/dto/ticket';
-import { Events } from '@/types/model/events';
 import TicketStack from '@/components/TicketStack';
+import { TicketIcon } from '@/components/icon/TicketIcon';
+import clsx from 'clsx';
 
-interface TicketsTabProps {
-	userId: string;
-}
+interface TicketsTabProps {}
 
-// 이벤트 별 그룹
-interface EventTicketGroup {
-	eventId: string;
-	eventName: string;
-	tickets: TicketWithEventDto[];
-	latestCreatedAt: string;
-	eventInfo?: Events;
-}
-
-const TicketsTab = ({ userId }: TicketsTabProps) => {
+const TicketsTab = ({}: TicketsTabProps) => {
 	const { session } = useSession();
-	const { showToast } = useToast();
-	const { mutate: cancelAllTickets } = useCancelAllTicketsByEvent();
+	const theme = useAppSelector((state: RootState) => state.theme.current);
 
-	// 개별 티켓
-	const { data: tickets, isLoading, error } = useTicketsWithEventByOwnerId(userId);
+	// 개별 티켓 조회 (rare 티켓 정보 포함)
+	const { data: tickets, isLoading, error } = useTicketsWithEventByOwnerId(session?.user?.id || '');
 
 	// 데이터가 없으면 빈 배열
 	const safeTickets = Array.isArray(tickets) ? tickets : [];
-
-	// 이벤트별로 그룹화
-	const eventGroups: EventTicketGroup[] = safeTickets.reduce((groups: EventTicketGroup[], ticket: TicketWithEventDto) => {
-		const existingGroup = groups.find(g => g.eventId === ticket.eventId);
-		if (existingGroup) {
-			existingGroup.tickets.push(ticket);
-			if (new Date(ticket.createdAt) > new Date(existingGroup.latestCreatedAt)) {
-				existingGroup.latestCreatedAt = ticket.createdAt;
-			}
-		} else {
-			groups.push({
-				eventId: ticket.eventId,
-				eventName: ticket.event?.eventName || `공연 ${ticket.eventId}`,
-				tickets: [ticket],
-				latestCreatedAt: ticket.createdAt,
-				eventInfo: ticket.event, // 이벤트 정보 추가
-			});
-		}
-		return groups;
-	}, []);
-
-	const handleCancelAll = (eventId: string) => {
-		if (!session?.user?.id) return;
-		if (window.confirm('티켓을 취소 신청하시겠습니까?')) {
-			cancelAllTickets(
-				{ eventId, userId: session.user.id },
-				{
-					onSuccess: () => showToast({ message: '모든 티켓이 취소 신청 되었습니다.', iconType: 'success' }),
-					onError: (err) => showToast({ message: err.message, iconType: 'error' }),
-				}
-			);
-		}
-	};
-
-	// 티켓 액션 핸들러
-	const handleTicketAction = (ticketIds: string[], action: 'enter' | 'transfer') => {
-		if (action === 'enter') {
-			// 입장 처리 로직
-			showToast({ 
-				message: `${ticketIds.length}장의 티켓으로 입장 처리되었습니다.`, 
-				iconType: 'success' 
-			});
-			console.log('입장 처리:', ticketIds);
-		} else if (action === 'transfer') {
-			// 양도 처리 로직
-			showToast({ 
-				message: `${ticketIds.length}장의 티켓 양도가 시작되었습니다.`, 
-				iconType: 'info' 
-			});
-			console.log('양도 처리:', ticketIds);
-		}
-	};
 
 	if (isLoading) {
 		return (
@@ -93,32 +31,89 @@ const TicketsTab = ({ userId }: TicketsTabProps) => {
 		);
 	}
 	if (error) {
-		console.warn('TicketsTab error:', error);
+		console.error('TicketsTab error:', error);
 	}
-	if (eventGroups.length === 0) {
+	if (safeTickets.length === 0) {
 		return (
-			<ThemeDiv className="p-6 text-center rounded-lg" isChildren>
-				<h3 className="text-lg font-semibold mb-2">보유한 티켓이 없어요</h3>
-				<p className="text-sm opacity-70">예매가 승인되면 티켓이 생성돼요!</p>
+			<ThemeDiv className="p-8 text-center rounded" isChildren>
+				<div className="mb-6">
+					<div className="relative mx-auto w-24 h-24 mb-4">
+						{/* 티켓 아이콘 배경 */}
+						<div className={clsx(
+							"absolute inset-0 rounded-full opacity-20",
+							theme === "normal" ? "bg-green-100" : "bg-[var(--neon-green)]/20"
+						)}></div>
+						{/* 티켓 아이콘 */}
+						<div className={clsx(
+							"absolute inset-2 rounded-full flex items-center justify-center",
+							theme === "normal" ? "bg-green-50" : "bg-[var(--neon-green)]/30"
+						)}>
+							<TicketIcon className="w-8 h-8 opacity-60" />
+						</div>
+					</div>
+				</div>
+				<h3 className="text-base md:text-xl font-bold mb-3">보유한 티켓이 없어요</h3>
+				<p className="text-sm opacity-70 mb-6 leading-relaxed">
+					예매가 승인되면 티켓이 생성 될거에요!
+				</p>
 			</ThemeDiv>
 		);
 	}
 
+	// 그룹화: eventId + reservationId 조합으로 그룹 키 생성
+	const groupMap = new Map<string, TicketWithEventDto[]>();
+	
+	safeTickets.forEach(ticket => {
+		const groupKey = `${ticket.eventId}-${ticket.reservationId}`;
+		if (!groupMap.has(groupKey)) {
+			groupMap.set(groupKey, []);
+		}
+		groupMap.get(groupKey)!.push(ticket);
+	});
+
+	// 그룹을 상태별로 정렬 (Active 우선)
+	const sortedGroups = Array.from(groupMap.entries()).sort(([, ticketsA], [, ticketsB]) => {
+		// 각 그룹의 주요 상태 결정
+		const getGroupStatus = (tickets: TicketWithEventDto[]) => {
+			const statusCounts = tickets.reduce((acc, ticket) => {
+				acc[ticket.status] = (acc[ticket.status] || 0) + 1;
+				return acc;
+			}, {} as Record<string, number>);
+			
+			// 우선순위: Active > CancelRequested > Used > Transferred > Cancelled
+			if (statusCounts['active'] > 0) return 0;
+			if (statusCounts['cancel_requested'] > 0) return 1;
+			if (statusCounts['used'] > 0) return 2;
+			if (statusCounts['transferred'] > 0) return 3;
+			if (statusCounts['cancelled'] > 0) return 4;
+			return 5;
+		};
+		
+		return getGroupStatus(ticketsA) - getGroupStatus(ticketsB);
+	});
+
 	return (
 		<div className="space-y-6">
-			{eventGroups.map((group, groupIdx) => (
-				<TicketStack
-					key={group.eventId || `ticket-group-${groupIdx}`}
-					eventId={group.eventId}
-					eventName={group.eventName}
-					tickets={group.tickets}
-					latestCreatedAt={group.latestCreatedAt}
-					ticketColor={group.eventInfo?.ticketColor || group.tickets[0]?.color || '#3b82f6'} // 이벤트 색상 우선, 없으면 티켓 색상, 없으면 기본색
-					eventInfo={group.eventInfo}
-					onCancelRequest={handleCancelAll}
-					onTicketAction={handleTicketAction}
-				/>
-			))}
+			{/* 이벤트 + 예매별로 그룹화 */}
+			{sortedGroups.map(([groupKey, groupTickets]) => {
+				const firstTicket = groupTickets[0];
+				
+				// 안전성 검사
+				if (!firstTicket || !firstTicket.event) {
+					return null;
+				}
+				
+				return (
+					<TicketStack
+						key={groupKey}
+						eventId={firstTicket.eventId}
+						eventName={firstTicket.event.eventName || '알 수 없는 공연'}
+						tickets={groupTickets}
+						latestCreatedAt={firstTicket.createdAt}
+						eventInfo={firstTicket.event}
+					/>
+				);
+			})}
 		</div>
 	);
 };

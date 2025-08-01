@@ -7,11 +7,11 @@ export enum TicketStatus {
 }
 
 export const TicketStatusKo: Record<TicketStatus, string> = {
-  [TicketStatus.Active]: '유효',
-  [TicketStatus.Transferred]: '양도',
-  [TicketStatus.Cancelled]: '취소',
-  [TicketStatus.Used]: '완료',
-  [TicketStatus.CancelRequested]: '취소 신청',
+  [TicketStatus.Active]: '사용가능',
+  [TicketStatus.Transferred]: '양도완료',
+  [TicketStatus.Cancelled]: '취소완료',
+  [TicketStatus.Used]: '사용완료',
+  [TicketStatus.CancelRequested]: '취소신청',
 };
 
 export interface Ticket {
@@ -32,6 +32,7 @@ export interface CreateTicketRequest {
   reservationId: string;
   eventId: string;
   ownerId: string;
+  color?: string;
 }
 
 export interface UpdateTicketRequest {

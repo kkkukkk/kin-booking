@@ -58,7 +58,6 @@ const SearchBar = ({
 
   useEffect(() => {
     if (filters.keyword && debouncedKeyword !== filters.keyword.value) {
-      setKeyword(debouncedKeyword);
       filters.keyword.onChange(debouncedKeyword);
     }
   }, [debouncedKeyword, filters.keyword]);
@@ -98,7 +97,7 @@ const SearchBar = ({
             <span className="text-sm md:text-base">{label}</span>
           </div>
           <Button
-            theme="dark"
+            theme={theme === "normal" ? "dark" : theme}
             width="w-24"
             padding="py-1 md:py-0.5"
             reverse={theme === "normal"}
@@ -107,6 +106,7 @@ const SearchBar = ({
               setIsOpen(prev => !prev);
               setShowDatePicker(false);
             }}
+            neonVariant='pink'
           >
             {isOpen ? "닫기" : "열기"}
           </Button>
@@ -145,7 +145,6 @@ const SearchBar = ({
                   value={keyword}
                   onChange={e => {
                     setKeyword(e.target.value);
-                    filters.keyword?.onChange(e.target.value);
                   }}
                   placeholder={filters.keyword.placeholder ?? '검색어 입력'}
                   className="px-2 py-1 rounded w-full md:w-1/2"
@@ -185,7 +184,7 @@ const SearchBar = ({
                 <Button
                   width="w-full"
                   padding="py-1 md:py-0.5"
-                  theme="dark"
+                  theme={theme === "normal" ? "dark" : theme}
                   onClick={handleReset}
                   reverse={theme === "normal"}
                   className="self-end"
@@ -208,7 +207,7 @@ const SearchBar = ({
           transition={{ duration: 0.3 }}
           className="fixed z-[9999] text-sm"
           style={{
-            top: datePickerPosition.top,
+            top: datePickerPosition.top + 5,
             left: datePickerPosition.left,
             width: datePickerPosition.width,
           }}

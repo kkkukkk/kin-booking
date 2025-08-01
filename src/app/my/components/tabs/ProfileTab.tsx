@@ -9,8 +9,10 @@ import { formatPhoneNumber } from '@/util/phoneNumber';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/base/Button';
 import { User } from '@/types/model/user';
-import { useSoftDeleteUser } from '@/hooks/api/useUsers';
-import { useLogout } from '@/hooks/api/useAuth';
+import dayjs from 'dayjs';
+import clsx from 'clsx';
+import { useAppSelector } from '@/redux/hooks';
+import { RootState } from '@/redux/store';
 
 interface ProfileTabProps {
 	user: User;
@@ -18,22 +20,37 @@ interface ProfileTabProps {
 
 const ProfileTab = ({ user }: ProfileTabProps) => {
 	const { mutate: updateUser, isPending } = useUpdateUser();
-	const { mutate: softDeleteUser, isPending: isDeleting } = useSoftDeleteUser();
-	const { mutate: logout } = useLogout();
 	const { showToast } = useToast();
 	const { showAlert } = useAlert();
 	const router = useRouter();
+	const theme = useAppSelector((state: RootState) => state.theme.current);
 
 	if (!user) {
 		return (
-			<div className="space-y-6">
-				<ThemeDiv className="p-6 rounded-lg">
-					<h3 className="text-xl font-semibold mb-4">프로필 정보</h3>
-					<div className="text-center py-8">
-						<p className="text-gray-500">사용자 정보를 불러올 수 없습니다.</p>
-						<p className="text-sm text-gray-400 mt-2">관리자에게 문의해주세요.</p>
+			<div className="text-center">
+				<div className="mb-6">
+					<div className="relative mx-auto w-24 h-24 mb-4">
+						{/* 사용자 아이콘 배경 */}
+						<div className={clsx(
+							"absolute inset-0 rounded-full opacity-20",
+							theme === "normal" ? "bg-yellow-100" : "bg-[var(--neon-yellow)]/20"
+						)}></div>
+						{/* 사용자 아이콘 */}
+						<div className={clsx(
+							"absolute inset-2 rounded-full flex items-center justify-center",
+							theme === "normal" ? "bg-yellow-50" : "bg-[var(--neon-yellow)]/30"
+						)}>
+							<svg className="w-8 h-8 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+								<path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+							</svg>
+						</div>
 					</div>
-				</ThemeDiv>
+				</div>
+				<h3 className="text-base md:text-xl font-bold mb-3">사용자 정보를 불러올 수 없어요</h3>
+				<p className="text-sm opacity-70 mb-6 leading-relaxed">
+					정보를 불러오는데 실패했어요!<br />
+					관리자에게 문의해주세요
+				</p>
 			</div>
 		);
 	}
@@ -77,14 +94,15 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 	};
 
 	return (
-		<ThemeDiv className="p-6 rounded-lg" isChildren>
+		<ThemeDiv className="p-6 rounded" isChildren>
 			<div className={"flex justify-between items-start w-full mb-6"}>
 				<h3 className="text-lg sm:text-xl font-semibold">프로필</h3>
 				<div className="flex gap-2 items-center">
 					<Button
 						theme="dark"
 						padding="px-2 py-1.5"
-						className="text-xs sm:text-sm"
+						className="text-xs md:text-sm"
+						reverse={true}
 						onClick={handleWithdraw}
 					>
 						회원탈퇴
@@ -92,14 +110,15 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 					<Button
 						theme="dark"
 						padding="px-2 py-1.5"
-						className="text-xs sm:text-sm"
+						className="text-xs md:text-sm"
+						reverse={true}
 						onClick={handlePasswordChange}
 					>
 						비밀번호 변경
 					</Button>
 				</div>
 			</div>
-			<div className="space-y-4">
+			<div className="space-y-4 text-sm md:text-base">
 				<div className="flex justify-between items-center py-2 border-b border-gray-200">
 					<span className="font-medium opacity-70">이름</span>
 					<span>{user.name}</span>
@@ -114,7 +133,7 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 				</div>
 				<div className="flex justify-between items-center py-2 border-b border-gray-200">
 					<span className="font-medium opacity-70">가입일</span>
-					<span>{new Date(user.registerDate).toLocaleDateString('ko-KR')}</span>
+					<span>{dayjs(user.registerDate).format('YYYY년 MM월 DD일')}</span>
 				</div>
 				<div className="flex justify-between items-center py-2">
 					<span className="font-medium opacity-70">공연정보 수신</span>

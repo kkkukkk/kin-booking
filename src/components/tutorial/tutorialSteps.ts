@@ -41,18 +41,21 @@ export const panelTutorialSteps: TutorialStep[] = [
 export const mainPageTutorialSteps: TutorialStep[] = [
   {
     id: 'welcome',
+    title: '환영합니다!',
     target: 'body',
     message: 'KIN을 찾아주셔서 감사합니다!\n유용한 기능 하나를 소개해 드릴게요!',
     position: 'top'
   },
   {
     id: 'panel-location',
+    title: '기능 패널',
     target: '.panel-toggle-button',
     message: '오른쪽 아래 "KIN" 버튼 보이시나요?\n여기가 기능 패널이에요!',
     position: 'left'
   },
   {
     id: 'panel-features',
+    title: '기능 패널',
     target: '.panel-toggle-button',
     message: '테마 변경, 페이지 이동, 로그아웃 등\n여러 기능들을 유용하게 사용해보세요!',
     position: 'top'

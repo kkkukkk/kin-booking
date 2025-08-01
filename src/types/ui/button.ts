@@ -1,5 +1,6 @@
 import React from "react";
 import {Theme} from "@/types/ui/theme";
+import { NeonVariant } from "./neonVariant";
 
 export type ButtonType = "default" | "hamburger";
 
@@ -15,5 +16,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 	padding?: string,
 	reverse?: boolean,
 	light?: boolean,
+	neonVariant?: NeonVariant,
 	key?: React.Key
 }

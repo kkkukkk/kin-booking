@@ -1,7 +1,7 @@
 'use client'
 
 import { EventWithCurrentStatus } from "@/types/dto/events";
-import EventPoster from "@/app/events/[eventId]/components/EventPoster";
+import EventPosterWrapper from "@/app/events/[eventId]/components/EventPosterWrapper";
 import { useEventMedia } from "@/hooks/api/useEventMedia";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import Button from "@/components/base/Button";
@@ -24,10 +24,10 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
   
   // 포스터 컨테이너 크기
   const posterContainerSize = isHero 
-    ? "w-full max-w-xs md:max-w-sm" 
+    ? "w-full max-w-xs md:max-w-sm aspect-[602/852]" 
     : isLarge 
     ? "w-36 h-440 md:w-56 md:h-80"
-    : "w-32 h-40 md:w-36 md:h-44";
+    : "w-32 h-40 md:w-36 md:h-44 relative";
   
   const titleSize = isHero 
     ? "text-xl font-bold" 
@@ -50,13 +50,13 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
       className={`p-2 flex flex-col items-center shadow-xl rounded mb-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isHero ? "w-full" : isLarge ? "w-full" : "w-fit"}`}
       isChildren
     >
-      <div className={`${posterContainerSize} flex justify-center overflow-hidden`}>
-        <EventPoster
+      <div className={`${posterContainerSize} flex justify-center overflow-hidden ${isSmall ? '' : 'py-2'}`}>
+        <EventPosterWrapper
           eventName={event.eventName}
           posterData={posterData}
           theme={theme}
           isLoading={isLoading}
-          variant="card"
+          variant={isSmall ? "small" : "hero"}
           smallText={isSmall}
           overlay={
             isSmall
@@ -81,7 +81,7 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
           <div className="flex gap-3">
             <Button
               theme="dark"
-              padding="px-6 py-3"
+              padding="px-4 py-2"
               className="text-base font-medium tracking-wide"
               onClick={handleDetailClick}
             >

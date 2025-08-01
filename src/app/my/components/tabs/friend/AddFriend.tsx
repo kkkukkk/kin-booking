@@ -6,33 +6,19 @@ import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Input from '@/components/base/Input';
 import { useSearchUsers } from '@/hooks/api/useUsers';
-import { useSendFriendRequest } from '@/hooks/api/useFriends';
 import useDebounce from '@/hooks/useDebounce';
-import { MagnifyingGlassIcon } from '@/components/icon/FriendIcons';
-import { useAlert } from '@/providers/AlertProvider';
+import { SearchIcon } from '@/components/icon/FriendIcons';
 import clsx from 'clsx';
 import UserSearchResult from './UserSearchResult';
-import { BulbIcon } from '@/components/icon/BulbIcon';
 
 const AddFriend = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedQuery = useDebounce(searchQuery, 300);
   const { data: searchResults, isLoading: isSearching } = useSearchUsers(debouncedQuery);
-  const { mutate: sendFriendRequest, isPending } = useSendFriendRequest();
-  const { showAlert } = useAlert();
 
-  const handleSendRequest = async (friendId: string, userName: string) => {
-    const confirmed = await showAlert({
-      type: 'confirm',
-      title: '친구 요청 보내기',
-      message: `${userName}님에게 친구 요청을 보낼까요?`
-    });
-    
-    if (confirmed) {
-      sendFriendRequest({ friendId });
-    }
-  };
+  // 검색 상태 관리: 실제 검색 중이거나 debounce 대기 중일 때
+  const isActuallySearching = isSearching || (searchQuery.length >= 2 && searchQuery !== debouncedQuery);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -49,6 +35,7 @@ const AddFriend = () => {
         </label>
         <Input
           type="text"
+          theme={theme}
           placeholder="이름 또는 이메일로 검색..."
           value={searchQuery}
           onChange={handleSearch}
@@ -56,14 +43,14 @@ const AddFriend = () => {
         />
       </div>
 
-      {debouncedQuery.length >= 2 && (
+      {searchQuery.length >= 2 && (
         <ThemeDiv className="rounded-lg" isChildren>
-          {isSearching ? (
+          {isActuallySearching ? (
             <div className="p-4 text-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-2"></div>
               <p className="text-sm">검색 중...</p>
             </div>
-          ) : searchResults && searchResults.length > 0 ? (
+          ) : debouncedQuery.length >= 2 && searchResults && searchResults.length > 0 ? (
             <div className="space-y-2">
               <h4 className="text-sm font-medium p-3 border-b border-gray-200 dark:border-gray-700">
                 검색 결과 ({searchResults.length}명)
@@ -72,32 +59,26 @@ const AddFriend = () => {
                 <UserSearchResult 
                   key={user.id} 
                   user={user} 
-                  onSendRequest={handleSendRequest}
-                  isPending={isPending}
                 />
               ))}
             </div>
-          ) : (
+          ) : debouncedQuery.length >= 2 && searchResults && searchResults.length === 0 ? (
             <div className="p-4 text-center">
-              <p className="text-sm opacity-70">검색 결과가 없습니다.</p>
+              <p className="text-sm opacity-70">검색 결과가 없어요!</p>
             </div>
-          )}
+          ) : null}
         </ThemeDiv>
       )}
 
       {searchQuery.length === 0 && (
         <ThemeDiv className="p-6 text-center rounded-lg" isChildren>
           <div className="flex justify-center mb-4">
-            <MagnifyingGlassIcon size={64} className="opacity-50" />
+            <SearchIcon size={64} className="opacity-50" />
           </div>
-          <h3 className="text-lg font-semibold mb-2">친구 찾기</h3>
-          <p className="text-sm opacity-70 mb-2">
+          <h3 className="text-base md:text-xl font-semibold mb-2">친구 찾기</h3>
+          <p className="text-xs md:text-sm opacity-70 mb-2">
             이름이나 이메일로 사용자를 검색하세요!
           </p>
-          <div className="text-xs opacity-70 flex gap-1 item-center justify-center">
-            <BulbIcon />
-            {"정확하게 입력하면 더 쉽게 찾을 수 있어요!"}
-          </div>
         </ThemeDiv>
       )}
     </div>

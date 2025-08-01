@@ -8,6 +8,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { CloseIcon } from "@/components/icon/CloseIcon";
 import { AlertProps } from "@/types/ui/alert";
 import { createPortal } from "react-dom";
+import clsx from "clsx";
 
 const Alert = ({
 	type = 'confirm',
@@ -30,46 +31,88 @@ const Alert = ({
 	if (!mounted) return null;
 
 	return createPortal(
-		<div className={"fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 z-50"}>
+		<div className={clsx(
+			"fixed top-0 left-0 w-full h-full flex items-center justify-center z-10001",
+			theme === "normal" && "bg-gradient-to-br from-black/50 via-black/40 to-black/50",
+			theme === "dark" && "bg-gradient-to-br from-black/60 via-black/50 to-black/60",
+			theme === "neon" && "bg-gradient-to-br from-black/70 via-purple-900/30 to-black/70"
+		)}>
 			<ThemeDiv
-				className={"p-6 rounded-md shadow-lg min-w-[300px] max-w-[450px] md:min-w-[400px]"}
+				className={"relative min-w-[320px] max-w-[480px] md:min-w-[400px] md:max-w-[520px] rounded shadow-2xl"}
 				isChildren
 			>
-				<div
-					className={"flex items-center cursor-pointer absolute top-4 right-4 font-bold"}
-					onClick={onCancel}
-				>
-					<CloseIcon />
-				</div>
+				{/* 메인 컨텐츠 */}
+				<div className="p-4 md:p-6">
+					{/* 헤더 영역 */}
+					<div className="flex items-center justify-between pb-4 border-b border-gray-200/10">
+						<div className={clsx(
+							"text-lg w-full font-bold text-center md:text-xl relative",
+							theme === "normal" && "text-blue-600",
+							theme === "dark" && "text-gray-100",
+							theme === "neon" && "text-cyan-400"
+						)}>
+							<span className="relative z-10">{title}</span>
+						</div>
+						<button
+							className="absolute top-0 right-0 p-2 hover:bg-gray-100/20 dark:hover:bg-gray-800/20 rounded transition-colors"
+							onClick={onCancel}
+						>
+							<CloseIcon />
+						</button>
+					</div>
 
-				<div
-					className={"text-lg w-full font-bold text-center md:text-xl"}
-				>
-					{title}
-				</div>
+					{/* 바디 영역 */}
+					<div className="py-6">
+						<div className="whitespace-pre-line text-sm md:text-base">
+							{message}
+						</div>
 
-				<div
-					className={"my-6 whitespace-pre-line text-base md:text-lg md:my-8"}
-				>{message}</div>
+						{type === 'prompt' && (
+							<Input
+								type="text"
+								value={inputValue}
+								variant={'underline'}
+								theme={theme}
+								onChange={(e) => onChangeInput?.(e.target.value)}
+								className={"rounded px-2 py-1 w-full"}
+							/>
+						)}
+					</div>
 
-				{type === 'prompt' && (
-					<Input
-						type="text"
-						value={inputValue}
-						variant={'underline'}
-						theme={theme}
-						onChange={(e) => onChangeInput?.(e.target.value)}
-						className={"rounded px-2 py-1 w-full mb-4"}
-					/>
-				)}
-
-				<div className={"flex justify-center gap-2"}>
-					<Button onClick={onConfirm} theme={"dark"} width={"w-1/3"} padding={"px-2 py-1"}>
-						확인
-					</Button>
-					{!noCancel && <Button onClick={onCancel} theme={"normal"} width={"w-1/3"} padding={"px-2 py-1"}>
-						취소
-					</Button>}
+					{/* 액션 영역 */}
+					<div className="flex justify-center gap-3 pt-4 border-t border-gray-200/10">
+						<Button 
+							onClick={onConfirm} 
+							theme={"dark"} 
+							width={"w-1/3"} 
+							padding={"px-3 py-1.5"}
+							reverse={true}
+							className={clsx(
+								"transition-all duration-200",
+								theme === "normal" && "hover:bg-blue-600 hover:border-blue-600",
+								theme === "dark" && "hover:bg-gray-700 hover:border-gray-700",
+								theme === "neon" && "hover:bg-cyan-600 hover:border-cyan-600"
+							)}
+						>
+							확인
+						</Button>
+						{!noCancel && (
+							<Button 
+								onClick={onCancel} 
+								theme={"normal"} 
+								width={"w-1/3"} 
+								padding={"px-3 py-1.5"}
+								className={clsx(
+									"transition-all duration-200",
+									theme === "normal" && "hover:bg-gray-100 hover:border-gray-300",
+									theme === "dark" && "hover:bg-gray-800 hover:border-gray-600",
+									theme === "neon" && "hover:bg-purple-900/20 hover:border-purple-500"
+								)}
+						>
+							취소
+						</Button>
+						)}
+					</div>
 				</div>
 			</ThemeDiv>
 		</div>,

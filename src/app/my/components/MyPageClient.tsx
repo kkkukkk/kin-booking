@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
@@ -10,18 +10,14 @@ import useToast from '@/hooks/useToast';
 import { useAlert } from '@/providers/AlertProvider';
 import { useUserById } from '@/hooks/api/useUsers';
 import { useLogout } from '@/hooks/api/useAuth';
-import { useReservationsByUserId } from '@/hooks/api/useReservations';
 import { useTeamMemberById } from '@/hooks/api/useTeamMembers';
 import Button from '@/components/base/Button';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import SpinnerOverlay from '@/components/spinner/SpinnerOverlay';
 import { HomeIcon } from '@/components/icon/HomeIcon';
-import { TicketIcon } from '@/components/icon/TicketIcon';
-import { SmileIcon } from '@/components/icon/SmileIcon';
-import { UsersIcon } from '@/components/icon/FriendIcons';
+import { SingleTicketIcon, ProfileIcon, UsersIcon, TeamIcon } from '@/components/icon/FriendIcons';
 import { CalendarIcon } from '@/components/icon/CalendarIcon';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
-import { ThumbUpIcon } from '@/components/icon/ThumbUpIcon';
 import { getUserHighestRole } from '@/util/userRole';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import ProfileTab from '@/app/my/components/tabs/ProfileTab';
@@ -30,6 +26,7 @@ import TicketsTab from '@/app/my/components/tabs/TicketsTab';
 import FriendsTab from '@/app/my/components/tabs/FriendsTab';
 import TeamTab from '@/app/my/components/tabs/TeamTab';
 import clsx from 'clsx';
+import dayjs from 'dayjs';
 
 // 탭 타입
 type MyPageTab = 'profile' | 'reservations' | 'tickets' | 'friends' | 'team';
@@ -40,23 +37,28 @@ const MyPageClient = () => {
 	const { showToast } = useToast();
 	const { showAlert } = useAlert();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const { mutate: logout } = useLogout();
 
 	const [activeTab, setActiveTab] = useState<MyPageTab>('profile');
+
+	// URL 파라미터에서 탭 설정
+	useEffect(() => {
+		const tabParam = searchParams.get('tab') as MyPageTab;
+		if (tabParam && ['profile', 'reservations', 'tickets', 'friends', 'team'].includes(tabParam)) {
+			setActiveTab(tabParam);
+		}
+	}, [searchParams]);
 	
 	// 사용자 정보 조회
 	const { data: user, isLoading: userLoading } = useUserById(session?.user?.id || '');
 	// 멤버 정보 조회
 	const { data: teamMember, isLoading: teamMemberLoading } = useTeamMemberById(session?.user?.id || '');
-	// 예매 내역 조회
-	const { data: reservations, isLoading: reservationsLoading } = useReservationsByUserId(session?.user?.id || '');
-	
-
 	
 	// 사용자 권한 정보
 	const userRole = getUserHighestRole(user || null);
 	
-	const isLoading = userLoading || reservationsLoading || teamMemberLoading;
+	const isLoading = userLoading || teamMemberLoading;
 	
 	// 로그아웃 처리
 	const handleLogout = async () => {
@@ -80,11 +82,11 @@ const MyPageClient = () => {
 	};
 
 	const tabs = [
-		{ id: 'profile' as MyPageTab, label: '프로필', icon: SmileIcon },
+		{ id: 'profile' as MyPageTab, label: '프로필', icon: ProfileIcon },
 		{ id: 'reservations' as MyPageTab, label: '예매 내역', icon: CalendarIcon },
-		{ id: 'tickets' as MyPageTab, label: '티켓 관리', icon: TicketIcon },
-		{ id: 'friends' as MyPageTab, label: '친구 관리', icon: ThumbUpIcon },
-		...(teamMember ? [{ id: 'team' as MyPageTab, label: '멤버 정보', icon: UsersIcon }] : []),
+		{ id: 'tickets' as MyPageTab, label: '티켓 관리', icon: SingleTicketIcon },
+		{ id: 'friends' as MyPageTab, label: '친구 관리', icon: UsersIcon },
+		...(teamMember ? [{ id: 'team' as MyPageTab, label: '멤버 정보', icon: TeamIcon }] : []),
 	];
 
 	const renderTabContent = () => {
@@ -92,9 +94,9 @@ const MyPageClient = () => {
 			case 'profile':
 				return user ? <ProfileTab user={user} /> : null;
 			case 'reservations':
-				return <ReservationsTab reservations={reservations} />;
+				return <ReservationsTab />;
 			case 'tickets':
-				return <TicketsTab userId={session?.user?.id || ''} />;
+				return <TicketsTab />;
 			case 'friends':
 				return <FriendsTab />;
 			case 'team':
@@ -144,7 +146,7 @@ const MyPageClient = () => {
 				transition={{ delay: 0.1 }}
 				className="mb-4"
 			>
-				<ThemeDiv className="p-6 rounded-lg" isChildren>
+				<ThemeDiv className="p-6 rounded" isChildren>
 					<div className="flex items-center gap-6">
 						<div className="flex-1">
 							<div className="flex items-center gap-3 mb-2">
@@ -156,19 +158,20 @@ const MyPageClient = () => {
 									theme={theme} 
 									variant="badge" 
 									size="sm" 
+									statusType="userRole"
 								/>
 							</div>
 							<p className={clsx(
-								"mb-1 text-sm sm:text-base",
+								"mb-1 text-sm md:text-base",
 								theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
 							)}>
 								{user?.email || '이메일 정보 없음'}
 							</p>
 							<p className={clsx(
-								"text-sm sm:text-base",
+								"text-xs md:text-sm",
 								theme === 'normal' ? 'text-gray-500' : 'text-gray-400'
 							)}>
-								가입일: {user?.registerDate ? new Date(user.registerDate).toLocaleDateString('ko-KR') : '알 수 없음'}
+								{user?.registerDate ? dayjs(user.registerDate).format('YYYY년 MM월 DD일') : '알 수 없음'} 가입
 							</p>
 						</div>
 					</div>
@@ -182,25 +185,35 @@ const MyPageClient = () => {
 				transition={{ delay: 0.1 }}
 				className="mb-4"
 			>
-				{/* 모바일: 2x2 그리드, 데스크톱: 가로 배치 */}
-				<div className="grid grid-cols-2 gap-1 md:flex md:flex-wrap md:gap-2 w-full md:justify-end">
+				<div className="grid grid-cols-2 gap-1 md:flex md:gap-2 w-full md:justify-end">
 					{tabs.map((tab) => {
 						const Icon = tab.icon;
 						const isActive = activeTab === tab.id;
 						return (
 							<Button
 								key={tab.id}
-								onClick={() => setActiveTab(tab.id as MyPageTab)}
+								onClick={() => {
+									setActiveTab(tab.id as MyPageTab);
+									// URL 업데이트 (탭 변경 시)
+									const newUrl = new URL(window.location.href);
+									newUrl.searchParams.set('tab', tab.id);
+									
+									// 다른 탭의 파라미터들 정리
+									newUrl.searchParams.delete('filter');  // reservations 탭
+									newUrl.searchParams.delete('section'); // friends 탭
+									
+									router.replace(newUrl.pathname + newUrl.search);
+								}}
 								theme={theme}
 								padding={'py-2 md:py-1.5'}
-								className={`gap-3 md:gap-3.5 font-semibold text-base md:text-base transition-all duration-200`}
+								className={`gap-3 md:gap-3.5 font-semibold text-sm md:text-base`}
 								style={{ minWidth: 'auto', width: '100%' }}
 								reverse={theme === 'normal'}
-								light={activeTab !== tab.id}
+								light={true}
 								on={isActive}
 							>
-								<Icon />
-								<span className="truncate">{tab.label}</span>
+								<Icon className="w-4.5 h-4.5" />
+								<span className={"truncate"}>{tab.label}</span>
 							</Button>
 						);
 					})}

@@ -4,8 +4,7 @@ import { getPaginationRange } from "@/util/pagination/pagination";
 import {toCamelCaseKeys, toSnakeCaseKeys} from "@/util/case/case";
 import { CreateReservationDto, FetchReservationDto, FetchReservationResponseDto } from "@/types/dto/reservation";
 import { Reservation } from "@/types/model/reservation";
-import { createTicket, deleteTicketsByReservationId } from "./ticket";
-import { getTransferredTicketsByReservation } from "./ticketTransferHistory";
+import { generateRandomGradient } from "@/util/adminGradientGenerator";
 
 export const fetchReservation = async (params?: PaginationParams & FetchReservationDto): Promise<FetchReservationResponseDto> => {
 	let query = supabase.from('reservations').select('*', { count: 'exact' });
@@ -37,10 +36,7 @@ export const createReservation = async (reservation: CreateReservationDto): Prom
 }
 
 export const deleteReservation = async (reservationId: string): Promise<void> => {
-	// 먼저 관련 티켓들 삭제
-	await deleteTicketsByReservationId(reservationId);
-	
-	// 그 다음 예약 삭제
+	// 예약 삭제 (티켓은 별도 관리)
 	const { error } = await supabase
 		.from('reservations')
 		.delete()
@@ -49,71 +45,66 @@ export const deleteReservation = async (reservationId: string): Promise<void> =>
 	if (error) throw error;
 };
 
-// 예매 승인 및 티켓 생성
+// 예매 확정 및 티켓 생성
 export const approveReservation = async (reservationId: string): Promise<void> => {
-	// 1. 예약 상태를 승인으로 변경
+	// 1. 예약 정보 조회
 	const { data: reservation, error: reservationError } = await supabase
 		.from('reservations')
-		.update({ status: 'approved' })
+		.select('*')
 		.eq('id', reservationId)
-		.select()
 		.single();
 		
 	if (reservationError) throw reservationError;
 	
-	// 2. 해당 예약에 대한 티켓들 생성
-	const ticketPromises = Array.from({ length: reservation.quantity }, () =>
-		createTicket({
-			reservationId: reservation.id,
-			eventId: reservation.event_id,
-			ownerId: reservation.user_id,
-		})
-	);
+	// 2. 이벤트 정보 조회 (ticket_color, seat_capacity 가져오기)
+	const { data: event, error: eventError } = await supabase
+		.from('events')
+		.select('ticket_color, seat_capacity')
+		.eq('id', reservation.event_id)
+		.single();
+		
+	if (eventError) throw eventError;
 	
-	try {
-		await Promise.all(ticketPromises);
-	} catch (ticketError) {
-		// 티켓 생성 실패 시 예약 상태를 원래대로 되돌림
-		await supabase
-			.from('reservations')
-			.update({ status: 'pending' })
-			.eq('id', reservationId);
-		throw ticketError;
+	// 3. 좌석 수 미리 체크 (active, cancel_requested 상태 포함)
+	const { data: currentTickets, error: countError } = await supabase
+		.from('ticket')
+		.select('id', { count: 'exact' })
+		.eq('event_id', reservation.event_id)
+		.in('status', ['active', 'cancel_requested']);
+		
+	if (countError) throw countError;
+	
+	const currentTicketCount = currentTickets?.length || 0;
+	const availableSeats = event.seat_capacity - currentTicketCount;
+	
+	if (availableSeats < reservation.quantity) {
+		throw new Error(`좌석 수 부족: 요청 ${reservation.quantity}석, 남은 좌석 ${availableSeats}석`);
 	}
-};
-
-// 예매 거절 (양도된 티켓 고려)
-export const safeRejectReservation = async (reservationId: string): Promise<void> => {
-	// 1. 양도된 티켓들 확인
-	const transferredTickets = await getTransferredTicketsByReservation(reservationId);
 	
-	// 3. 모든 관련 티켓 삭제 (양도 이력은 CASCADE로 자동 삭제)
-	await deleteTicketsByReservationId(reservationId);
-	
-	// 4. 예약 상태를 거절로 변경
-	const { error } = await supabase
-		.from('reservations')
-		.update({ status: 'rejected' })
-		.eq('id', reservationId);
+	// 4. Rare 티켓 정보 미리 계산
+	const ticketData = [];
+	for (let i = 0; i < reservation.quantity; i++) {
+		const isRare = Math.random() < 0.05; // 5% 확률
+		const color = isRare ? generateRandomGradient() : event.ticket_color;
 		
-	if (error) throw error;
-};
-
-// 예매 거절 시 티켓 삭제 (이미 승인된 경우)
-export const rejectReservation = async (reservationId: string): Promise<void> => {
-	// 먼저 관련 티켓들 삭제 (승인된 예약의 경우)
-	await deleteTicketsByReservationId(reservationId);
+		ticketData.push({
+			color,
+			is_rare: isRare
+		});
+	}
 	
-	// 예약 상태를 거절로 변경
-	const { error } = await supabase
-		.from('reservations')
-		.update({ status: 'rejected' })
-		.eq('id', reservationId);
-		
-	if (error) throw error;
+	// 5. 트랜잭션으로 예매 승인과 티켓 생성 (취소된 티켓 번호 재사용)
+	const { error: transactionError } = await supabase.rpc('approve_reservation_safe', {
+		p_reservation_id: reservationId,
+		p_event_id: reservation.event_id,
+		p_user_id: reservation.user_id,
+		p_ticket_data: ticketData
+	});
+
+	if (transactionError) throw transactionError;
 };
 
-// 승인 대기 예매 취소
+// 예매 취소 (대기중인 예매만)
 export const cancelPendingReservation = async (reservationId: string): Promise<void> => {
 	// 예약 상태 확인
 	const { data, error: fetchError } = await supabase
@@ -121,15 +112,18 @@ export const cancelPendingReservation = async (reservationId: string): Promise<v
 		.select('status')
 		.eq('id', reservationId)
 		.single();
+		
 	if (fetchError) throw fetchError;
 
 	if (!data || data.status !== 'pending') {
 		throw new Error('대기중인 예매만 취소할 수 있습니다.');
 	}
-	// 상태를 cancelled로 변경
+	
+	// 예약 상태를 voided로 변경
 	const { error } = await supabase
 		.from('reservations')
-		.update({ status: 'cancelled' })
+		.update({ status: 'voided' })
 		.eq('id', reservationId);
+		
 	if (error) throw error;
 };

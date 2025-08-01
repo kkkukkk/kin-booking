@@ -5,36 +5,73 @@ import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import clsx from 'clsx';
 import useRehydrated from '@/hooks/useIsRehydrated';
+import { NeonVariant, DEFAULT_NEON_VARIANT } from '@/types/ui/neonVariant';
 
 type ThemeDivProps = React.HTMLAttributes<HTMLDivElement> & {
 	children?: React.ReactNode;
 	isChildren?: boolean;
 	lightweight?: boolean;
+	neonVariant?: NeonVariant;
 };
 
 // theme 따라가는 div
-const ThemeDiv = ({ children, className, isChildren, lightweight = false, ...rest }: ThemeDivProps) => {
+const ThemeDiv = ({ children, className, isChildren, lightweight = false, neonVariant = DEFAULT_NEON_VARIANT, ...rest }: ThemeDivProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
 
 	if (!rehydrated) return null;
 
+	// 네온 색상 변형 (CSS 변수 사용)
+	const getNeonStyles = (variant: NeonVariant) => {
+		const colors = {
+			green: { 
+				border: 'border-[var(--neon-green)]/70', 
+				shadow: 'shadow-[inset_0_1px_0_var(--neon-green-light),0_1px_3px_rgba(0,0,0,0.4)]' 
+			},
+			cyan: { 
+				border: 'border-[var(--neon-cyan)]/70', 
+				shadow: 'shadow-[inset_0_1px_0_rgba(0,255,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+			},
+			magenta: { 
+				border: 'border-[var(--neon-magenta)]/90', 
+				shadow: 'shadow-[inset_0_1px_0_rgba(255,0,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+			},
+			pink: { 
+				border: 'border-[var(--neon-pink)]/90', 
+				shadow: 'shadow-[inset_0_1px_0_rgba(255,100,200,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+			},
+			blue: { 
+				border: 'border-[var(--neon-blue)]/70', 
+				shadow: 'shadow-[inset_0_1px_0_rgba(0,150,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+			},
+			yellow: { 
+				border: 'border-[var(--neon-yellow)]/70', 
+				shadow: 'shadow-[inset_0_1px_0_rgba(255,255,0,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+			},
+			purple: { 
+				border: 'border-[var(--neon-purple)]/70', 
+				shadow: 'shadow-[inset_0_1px_0_rgba(150,0,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+			}
+		};
+		return colors[variant as keyof typeof colors] || colors.green;
+	};
+
 	// 테마별 스타일
 	const themeStyles = {
 		normal: {
-			base: 'bg-[var(--normal-back)] border border-[rgba(0,0,0,0.2)] text-gray-900',
-			children: 'bg-[rgba(245,245,245,0.9)] border border-[rgba(0,0,0,0.2)] text-gray-900',
-			lightweight: 'bg-gray-100 border border-[rgba(0,0,0,0.2)] text-gray-900'
+			base: 'bg-[var(--normal-back)] border border-[rgba(0,0,0,0.2)] text-gray-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_4px_rgba(0,0,0,0.1)]',
+			children: 'bg-[rgba(245,245,245,0.9)] border border-[rgba(0,0,0,0.2)] text-gray-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_1px_3px_rgba(0,0,0,0.08)]',
+			lightweight: 'bg-gray-100 border border-[rgba(0,0,0,0.2)] text-gray-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_1px_2px_rgba(0,0,0,0.05)]'
 		},
 		dark: {
-			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.2)] text-gray-100',
-			children: 'bg-[rgba(64,64,64,0.9)] border border-[rgba(255,255,255,0.3)] text-gray-100',
-			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.2)] text-gray-100'
+			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.2)] text-gray-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.3)]',
+			children: 'bg-[rgba(30,30,30,0.95)] border border-[rgba(255,255,255,0.25)] text-gray-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_1px_3px_rgba(0,0,0,0.4)]',
+			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.2)] text-gray-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.2)]'
 		},
 		neon: {
-			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.2)] text-gray-100',
-			children: 'bg-[var(--dark-back)] border border-[rgb(119,255,153)]/70 text-gray-100',
-			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.2)] text-gray-100'
+			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.2)] text-gray-100 shadow-[inset_0_1px_0_var(--neon-green-light),0_2px_4px_rgba(0,0,0,0.3)]',
+			children: `bg-[var(--dark-back)] border ${getNeonStyles(neonVariant).border} text-gray-100 ${getNeonStyles(neonVariant).shadow}`,
+			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.2)] text-gray-100 shadow-[inset_0_1px_0_var(--neon-green-faint),0_1px_2px_rgba(0,0,0,0.2)]'
 		}
 	};
 

@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import clsx from 'clsx';
-import UserAvatar from '@/components/user/UserAvatar';
+import UserInfo from '@/components/user/UserInfo';
 import Button from '@/components/base/Button';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
 import { fadeSlideDownSm } from '@/types/ui/motionVariants';
@@ -36,21 +36,12 @@ export default function AdminUserInfo({ user, session, theme, handleLogout, isOp
           >
             {/* 사용자 정보 */}
             <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <UserAvatar
-                  name={user?.name || '관리자'}
-                  size="sm"
-                  className="border border-current"
-                />
-                <div>
-                  <div className="text-sm font-medium">
-                    {user?.name || '관리자'}
-                  </div>
-                  <div className="text-xs">
-                    {user?.email || session?.user?.email}
-                  </div>
-                </div>
-              </div>
+              <UserInfo
+                name={user?.name || '관리자'}
+                email={user?.email || session?.user?.email}
+                theme={theme}
+                avatarSize="sm"
+              />
             </div>
             {/* 로그아웃 버튼 */}
             <div className="p-2">

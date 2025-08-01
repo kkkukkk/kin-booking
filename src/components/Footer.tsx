@@ -46,7 +46,7 @@ const Footer = ({ theme = 'normal' }: FooterProps) => {
   };
 
   return (
-    <footer className={`mt-6 pt-4 border-t ${getBorderColor()}`}>
+    <footer className={`mt-8 pt-6 border-t ${getBorderColor()}`}>
       <div className="flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0 text-xs md:text-sm">
         {/* About & Terms 버튼 */}
         <div className="flex space-x-4 md:space-x-6">

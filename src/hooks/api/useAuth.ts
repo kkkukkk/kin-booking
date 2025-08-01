@@ -42,7 +42,7 @@ export const useLogin = () => {
 export const useRegister = () => {
 	const { showToast } = useToast();
 	
-	return useMutation({
+	const mutation = useMutation({
 		mutationFn: register,
 		onError: (error: Error) => {
 			console.error('Register error:', error);
@@ -69,6 +69,11 @@ export const useRegister = () => {
 			}
 		},
 	});
+
+	return {
+		...mutation,
+		mutateAsync: mutation.mutateAsync,
+	};
 };
 
 export const useLogout = () => {

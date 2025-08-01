@@ -44,7 +44,7 @@ const SortSelector = ({ sortConfig, onSortChange, className = '' }: SortSelector
           on={sortConfig.field === option.value}
           onClick={() => handleFieldChange(option.value)}
           padding={"px-4 py-1"}
-          fontSize='text-base md:text-lg'
+          fontSize='text-sm md:text-base'
           reverse={theme === "normal"}
         >
           {option.label}

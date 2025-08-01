@@ -26,6 +26,8 @@ const AdminSidebar = ({ variant = 'sidebar', onClose }: AdminSidebarProps) => {
     { href: '/admin/events', label: '공연 관리' },
     { href: '/admin/reservations', label: '예매 관리' },
     { href: '/admin/tickets', label: '티켓 관리' },
+    { href: '/admin/entry-check', label: '입장 확인' },
+    { href: '/admin/qr-scanner', label: 'QR 스캔' },
   ];
 
   return (

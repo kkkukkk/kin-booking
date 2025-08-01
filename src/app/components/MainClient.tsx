@@ -93,7 +93,9 @@ const MainClient = () => {
     
     if (container && endMarker) {
       const markerTop = endMarker.offsetTop;
-      const targetScrollTop = markerTop - container.offsetTop;
+      // 스크롤 위치를 더 아래로 조정 (예: 100px 추가)
+      const offset = 200;
+      const targetScrollTop = markerTop - container.offsetTop + offset;
       const startScrollTop = container.scrollTop;
       const distance = targetScrollTop - startScrollTop;
       const duration = 8000;

@@ -26,7 +26,7 @@ const RegisterClient = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const router = useRouter();
-	const { mutate: register, isPending } = useRegister();
+	const { mutateAsync: registerAsync, mutate: register, isPending } = useRegister();
 	const { showToast, hideToast } = useToast();
 	const { showAlert } = useAlert();
 	const { showSpinner, hideSpinner } = useSpinner();
@@ -114,25 +114,31 @@ const RegisterClient = () => {
 			return;
 		}
 
-		register({
-			email,
-			password,
-			name,
-			phoneNumber,
-			marketingConsent: marketingChecked,
-		});
+		try {
+			// registerAsync를 사용하여 비동기 처리
+			await registerAsync({
+				email,
+				password,
+				name,
+				phoneNumber,
+				marketingConsent: marketingChecked,
+			});
 
-		await supabase.auth.signOut();
+			await supabase.auth.signOut();
 
-		const confirmed = await showAlert({
-			type: 'confirm',
-			title: '가입 완료!',
-			message: '인증 이메일이 발송되었습니다. 메일을 확인해 주세요.',
-			noCancel: true,
-		});
+			const confirmed = await showAlert({
+				type: 'confirm',
+				title: '가입 완료!',
+				message: '인증 이메일이 발송되었습니다. 메일을 확인해 주세요.',
+				noCancel: true,
+			});
 
-		if (confirmed) {
-			router.push('/login');
+			if (confirmed) {
+				router.push('/login');
+			}
+		} catch (error) {
+			// 에러는 useRegister 훅의 onError에서 처리됨
+			console.error('회원가입 중 오류 발생:', error);
 		}
 	};
 

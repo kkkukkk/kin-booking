@@ -103,76 +103,87 @@ const TutorialOverlay = ({
           animate="animate"
           exit="exit"
           transition={{ duration: 0.2 }}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 rounded-lg shadow-lg p-4 md:p-6 max-w-xs md:max-w-xl w-[90vw] md:w-[28rem]"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-xs md:max-w-xl w-[90vw] md:w-[28rem]"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* 제목 */}
-          {currentStepData.title && (
-            <h3 className="font-bold text-base mb-5 text-gray-800 text-center">
-              {currentStepData.title}
-            </h3>
-          )}
-
-          {/* 메시지 */}
-          <div className="my-4">
-            {(() => {
-              let accDelay = 0.2;
-              return (currentStepData.message ?? "").split('\n').map((line, idx, arr) => {
-                const delay = accDelay;
-                accDelay += line.length * 0.05;
-                return (
-                  <AnimatedText
-                    key={currentStep + '-' + idx}
-                    text={line}
-                    fontSize="text-sm md:text-base"
-                    delay={delay}
-                  />
-                );
-              });
-            })()}
-          </div>
-
-          {/* 버튼들 */}
-          <div className="flex items-center justify-end">
-            <div className="flex gap-2">
-              {/* 이전 버튼 */}
-              {!isFirstStep && (
-                <Button
-                  onClick={handlePrev}
-                  theme="dark"
-                  fontSize="text-xs"
-                  padding="px-3 py-1"
-                >
-                  이전
-                </Button>
+          {/* 글래스모피즘 배경 */}
+          <div className="relative">
+            {/* 배경 블러 효과 */}
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-md rounded border border-white/10 shadow-2xl" />
+            
+            {/* 그라데이션 오버레이 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl" />
+            
+            {/* 메인 컨텐츠 */}
+            <div className="relative px-6 py-4">
+              {/* 제목 */}
+              {currentStepData.title && (
+                <div className="mb-4">
+                  <h3 className="font-bold text-lg text-white text-center drop-shadow-sm">
+                    {currentStepData.title}
+                  </h3>
+                  <div className="mt-3 h-px bg-white/20 rounded-full" />
+                </div>
               )}
 
-              {/* 다음/완료 버튼 */}
-              <Button
-                onClick={handleNext}
-                theme="dark"
-                fontSize="text-xs"
-                padding="px-3 py-1"
-              >
-                {isLastStep ? '완료' : '다음'}
-              </Button>
-            </div>
-          </div>
+              {/* 메시지 */}
+              <div className="my-6 flex flex-col gap-2">
+                {(() => {
+                  let accDelay = 0.2;
+                  return (currentStepData.message ?? "").split('\n').map((line, idx, arr) => {
+                    const delay = accDelay;
+                    accDelay += line.length * 0.05;
+                    return (
+                      <div className="text-white/90 drop-shadow-sm">
+                        <AnimatedText
+                          key={currentStep + '-' + idx}
+                          text={line}
+                          fontSize="text-sm md:text-base"
+                          delay={delay}
+                        />
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
 
-          {/* 진행 표시 */}
-          <div className="flex justify-center">
-            <div className="flex gap-1">
-              {steps.map((_, index) => (
-                <div
-                  key={index}
-                  className={clsx(
-                    "w-2 h-2 rounded-full transition-colors",
-                    index === currentStep 
-                      ? "bg-blue-500" 
-                      : "bg-gray-300"
+              {/* 버튼들 */}
+              <div className="flex items-center justify-between mb-4">
+                {/* 진행 표시 */}
+                <div className="flex gap-2">
+                  {steps.map((_, index) => (
+                    <div
+                      key={index}
+                      className={clsx(
+                        "w-2 h-2 rounded-full transition-all duration-300",
+                        index === currentStep 
+                          ? "bg-white shadow-lg scale-110" 
+                          : "bg-white/30"
+                      )}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex gap-3">
+                  {/* 이전 버튼 */}
+                  {!isFirstStep && (
+                    <button
+                      onClick={handlePrev}
+                      className="px-3 py-1 text-sm bg-white/20 text-white rounded transition-all duration-200 backdrop-blur-sm border border-white/30 cursor-pointer"
+                    >
+                      이전
+                    </button>
                   )}
-                />
-              ))}
+
+                  {/* 다음/완료 버튼 */}
+                  <button
+                    onClick={handleNext}
+                    className="px-3 py-1 text-sm bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded transition-all duration-200 shadow-lg transform cursor-pointer"
+                  >
+                    {isLastStep ? '완료' : '다음'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

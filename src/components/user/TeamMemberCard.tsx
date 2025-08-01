@@ -37,7 +37,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
         <div className={styles.gridAreaAvatar}>
           <UserAvatar 
             name={member.name || 'Unknown'} 
-            size="md" 
+            size="sm md:md" 
           />
         </div>
         

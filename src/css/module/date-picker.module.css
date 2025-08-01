@@ -21,10 +21,6 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-.cell:hover {
-    transform: scale(1.05);
-}
-
 /* 드래그 중일 때 커서 스타일 */
 .dragging {
     cursor: grabbing !important;
@@ -79,7 +75,6 @@
     box-shadow: 
         0 0 8px rgba(108, 117, 125, 0.3),
         0 0 15px rgba(108, 117, 125, 0.1);
-    transform: scale(1.05);
 }
 
 .normalSelected {
@@ -135,7 +130,6 @@
     box-shadow: 
         0 0 8px rgba(173, 181, 189, 0.3),
         0 0 15px rgba(173, 181, 189, 0.1);
-    transform: scale(1.05);
 }
 
 .darkSelected {
@@ -192,7 +186,6 @@
     box-shadow: 
         0 0 10px rgba(0, 255, 136, 0.4),
         0 0 15px rgba(0, 255, 136, 0.2);
-    transform: scale(1.05);
 }
 
 .neonSelected {

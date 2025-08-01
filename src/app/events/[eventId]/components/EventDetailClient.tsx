@@ -15,7 +15,7 @@ import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 import { BulbIcon } from "@/components/icon/BulbIcon";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import EventHeader from "./EventHeader";
-import EventPoster from "./EventPoster";
+import EventPosterWrapper from "./EventPosterWrapper";
 import EventBasicInfo from "./EventBasicInfo";
 import EventSeatInfo from "./EventSeatInfo";
 import EventNotice from "./EventNotice";
@@ -75,15 +75,12 @@ const EventDetailClient = () => {
 				className="mb-6"
 			>
 				<Button
-					theme="dark"
+					theme={theme === "normal" ? "dark" : theme}
 					padding="px-3 py-1.5"
 					onClick={() => router.push("/events")}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
 				>
-					<span className="mr-1">
-						<ArrowLeftIcon />
-					</span>
 					목록으로
 				</Button>
 			</motion.div>
@@ -103,8 +100,8 @@ const EventDetailClient = () => {
 					className="flex flex-col md:flex-row md:gap-8 md:items-start"
 				>
 					<div className="flex justify-center mb-5 md:mb-0 md:flex-shrink-0">
-						<div className="relative w-full max-w-md md:w-80">
-							<EventPoster
+						<div className="w-full max-w-md md:w-80 aspect-[602/852]">
+							<EventPosterWrapper
 								posterData={posterData}
 								eventName={event.eventName}
 								theme={theme}
@@ -115,7 +112,7 @@ const EventDetailClient = () => {
 					</div>
 
 					<div className="flex-1">
-						<ThemeDiv isChildren className="p-4 rounded-lg border">
+						<ThemeDiv isChildren className="p-4 rounded-lg border" neonVariant='cyan'>
 							<div className="space-y-2">
 								<EventBasicInfo
 									eventDate={event.eventDate}
@@ -149,10 +146,10 @@ const EventDetailClient = () => {
 					>
 						<AnimatedTextWithIcon
 							fontSize="text-lg md:text-xl"
-							text="소개"
+							text="공연 소개"
 							leftIcon={<BulbIcon />}
 						/>
-						<ThemeDiv isChildren className="p-4 rounded-lg border">
+						<ThemeDiv isChildren className="p-4 rounded-lg border" neonVariant='cyan'>
 							<EventDescription description={event.description} />
 						</ThemeDiv>
 					</motion.div>

@@ -60,6 +60,7 @@ const TogglePanel = () => {
 				theme="neon"
 				className={clsx(
 					"panel-toggle-button transition-opacity duration-200",
+					"text-[rgb(119,255,153)]/95",
 					open ? "opacity-100" : "opacity-60"
 				)}
 				style={{ border: "1px solid rgba(255,255,255,.3)" }}

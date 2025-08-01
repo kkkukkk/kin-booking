@@ -62,7 +62,7 @@ const EventClient = () => {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.2 }}
 			>
-				<ThemeDiv isChildren className="p-3 md:p-4 rounded-lg border">
+				<ThemeDiv isChildren className="p-3 md:p-4 rounded-lg border" neonVariant='cyan'>
 					<SearchBar
 						initialOpen={isSearchBarOpen}
 						filters={{

@@ -78,13 +78,16 @@ export const respondToFriendRequest = async (friendId: string, status: FriendSta
 export const deleteFriendRelation = async (
   userId: string, 
   targetId?: string, 
-  status?: FriendStatus
+  status?: FriendStatus,
+  requestId?: string
 ): Promise<void> => {
   if (!userId) throw new Error('userId is required');
 
   let query = supabase.from('friends').delete();
 
-  if (targetId) {
+  if (requestId) {
+    query = query.eq('id', requestId);
+  } else if (targetId) {
     // 특정 사용자와의 관계 삭제 (친구 삭제, 요청 취소 등)
     // 양방향 관계 모두 삭제: (user → friend) OR (friend → user)
     query = query.or(
@@ -94,8 +97,7 @@ export const deleteFriendRelation = async (
     // 내가 보낸 특정 상태의 요청들만 삭제
     query = query.eq('user_id', userId).eq('status', status);
   } else {
-    // 이도저도 아닐 경우
-    throw new Error('Either targetId or status must be provided');
+    throw new Error('Either requestId, targetId, or status must be provided');
   }
 
   const { error } = await query;

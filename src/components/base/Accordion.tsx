@@ -13,7 +13,7 @@ const Accordion = ({ title, children, className }: AccordionProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <ThemeDiv className={clsx('rounded shadow-sm transition-all', className)} isChildren>
+    <ThemeDiv className={clsx('rounded shadow-sm transition-all', className)} isChildren neonVariant='blue'>
       <button
         type="button"
         className={clsx(

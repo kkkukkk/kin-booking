@@ -9,7 +9,7 @@ import ThemeButtonSet from "@/components/panel/ThemeButtonSet";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { HomeIcon } from "@/components/icon/HomeIcon";
-import { UsersIcon } from "@/components/icon/FriendIcons";
+import { ProfileIcon } from "@/components/icon/FriendIcons";
 import { useLogout } from "@/hooks/api/useAuth";
 import { useSession } from "@/hooks/useSession";
 import useToast from "@/hooks/useToast";
@@ -104,7 +104,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 					key: 'My',
 					order: 3,
 					onClick: () => router.push("/my"),
-					name: <UsersIcon />
+					name: <ProfileIcon />
 				},
 				{
 					key: 'Logout',
@@ -149,7 +149,8 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 					className={clsx(
 						key === 'Home' && 'home-button',
 						key === 'My' && 'my-page-button',
-						key === 'Logout' && 'logout-button'
+						key === 'Logout' && 'logout-button',
+						theme === 'neon' && 'text-[rgb(119,255,153)]/95'
 					)}
 				>
 					{name}

@@ -28,7 +28,7 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 	const { showSpinner, hideSpinner } = useSpinner();
 	const [sortConfig, setSortConfig] = useState<SortConfig>({
 		field: 'date',
-		direction: 'asc'
+		direction: 'desc'
 	});
 
 	// params 객체를 useMemo로 감싸기
@@ -114,7 +114,7 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 				/>
 			</div>
 
-			<div className="flex items-center justify-between mb-4">
+			<div className="flex items-center justify-between mb-6">
 				<div className="flex items-center space-x-1 md:space-x-2">
 					<span className="text-base md:text-lg">
 						공연 목록 ({totalCount}건)

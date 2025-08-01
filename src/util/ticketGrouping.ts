@@ -1,8 +1,9 @@
-import { Ticket } from '@/types/model/ticket';
+import { TicketWithEventDto } from '@/types/dto/ticket';
+import dayjs from 'dayjs';
 
 export interface TicketGroup {
 	eventName: string;
-	tickets: Ticket[];
+	tickets: TicketWithEventDto[];
 	activeCount: number;
 	usedCount: number;
 	cancelledCount: number;
@@ -10,14 +11,14 @@ export interface TicketGroup {
 	latestCreatedAt: string;
 }
 
-export const groupTicketsByEvent = (tickets: Ticket[] | undefined): TicketGroup[] => {
+export const groupTicketsByEvent = (tickets: TicketWithEventDto[] | undefined): TicketGroup[] => {
 	if (!tickets || tickets.length === 0) {
 		return [];
 	}
 
 	// 공연명별로 그룹화
-	const grouped = tickets.reduce((acc: { [key: string]: Ticket[] }, ticket: Ticket) => {
-		const eventName = ticket.eventName;
+	const grouped = tickets.reduce((acc: { [key: string]: TicketWithEventDto[] }, ticket: TicketWithEventDto) => {
+		const eventName = ticket.event?.eventName || '알 수 없는 공연';
 		if (!acc[eventName]) {
 			acc[eventName] = [];
 		}
@@ -26,15 +27,15 @@ export const groupTicketsByEvent = (tickets: Ticket[] | undefined): TicketGroup[
 	}, {});
 
 	// 그룹별 통계 계산
-	return Object.entries(grouped).map(([eventName, eventTickets]) => {
+	const groupedTickets = Object.entries(grouped).map(([eventName, eventTickets]) => {
 		const activeCount = eventTickets.filter(t => t.status === 'active').length;
 		const usedCount = eventTickets.filter(t => t.status === 'used').length;
 		const cancelledCount = eventTickets.filter(t => t.status === 'cancelled').length;
 		const totalCount = eventTickets.length;
 		
-		// 가장 최근 생성일 찾기
+		// 각 그룹의 최신 생성일 찾기
 		const latestCreatedAt = eventTickets.reduce((latest, ticket) => {
-			return new Date(ticket.createdAt) > new Date(latest) ? ticket.createdAt : latest;
+			return dayjs(ticket.createdAt).isAfter(dayjs(latest)) ? ticket.createdAt : latest;
 		}, eventTickets[0].createdAt);
 
 		return {
@@ -46,5 +47,10 @@ export const groupTicketsByEvent = (tickets: Ticket[] | undefined): TicketGroup[
 			totalCount,
 			latestCreatedAt
 		};
-	}).sort((a, b) => new Date(b.latestCreatedAt).getTime() - new Date(a.latestCreatedAt).getTime());
+	});
+
+	// 최신 생성일 기준으로 정렬
+	return groupedTickets.sort((a, b) => 
+		dayjs(b.latestCreatedAt).valueOf() - dayjs(a.latestCreatedAt).valueOf()
+	);
 }; 

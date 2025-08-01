@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Reservation } from "@/types/model/reservation";
 import { CreateReservationDto, FetchReservationDto } from "@/types/dto/reservation";
-import { createReservation, fetchReservation, cancelPendingReservation } from "@/api/reservation";
-import { approveReservation, rejectReservation } from "@/api/reservation";
+import { createReservation, fetchReservation, cancelPendingReservation, approveReservation } from "@/api/reservation";
 import { PaginationParams } from "@/util/pagination/type";
 
 export const useCreateReservation = () => {
@@ -38,7 +37,7 @@ export const useRejectReservation = () => {
 	const queryClient = useQueryClient();
 	
 	return useMutation({
-		mutationFn: rejectReservation,
+		mutationFn: cancelPendingReservation,
 		onSuccess: () => {
 			// 예매 관련 쿼리들 무효화
 			queryClient.invalidateQueries({queryKey: ['reservations']});
