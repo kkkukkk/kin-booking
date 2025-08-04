@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { setTheme } from "@/redux/slices/themeSlice";
@@ -12,35 +12,39 @@ type ThemeButtonSetProps = {
 	isOpen: boolean;
 };
 
+// 공통 패널
+const PANEL_STYLES = {
+	base: "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col gap-2 p-2 rounded-full shadow-md z-10000 transition-all duration-300 ease-out",
+	open: "opacity-100 scale-100 pointer-events-auto",
+	closed: "opacity-0 scale-95 pointer-events-none"
+} as const;
+
+const THEMES = ["normal", "dark", "neon"] as const;
+
 const ThemeButtonSet = ({ isOpen }: ThemeButtonSetProps) => {
 	const dispatch = useAppDispatch();
 	const currentTheme = useAppSelector((state: RootState) => state.theme.current);
 
-	const handleClick = (theme: "normal" | "dark" | "neon") => {
+	const handleClick = useCallback((theme: "normal" | "dark" | "neon") => {
 		dispatch(setTheme(theme));
-	};
+	}, [dispatch]);
 
 	return (
 		<ThemeDiv
 			className={clsx(
-				"flex flex-col gap-2 p-2 rounded-full shadow-md z-100",
-				"absolute bottom-full mb-2 left-1/2 -translate-x-1/2",
-				"transition-all duration-300 ease-out",
-				isOpen
-					? "opacity-100 scale-100 pointer-events-auto"
-					: "opacity-0 scale-95 pointer-events-none"
+				"theme-button-set",
+				PANEL_STYLES.base,
+				isOpen ? PANEL_STYLES.open : PANEL_STYLES.closed
 			)}
-			style={{
-				width: "fit-content",
-			}}
+			style={{ width: "fit-content" }}
 		>
-			{(["normal", "dark", "neon"] as const).map((theme) => (
+			{THEMES.map((theme) => (
 				<Button
 					key={theme}
 					type="button"
 					theme={theme}
 					onClick={() => handleClick(theme)}
-					fontSize={"text-[10px] md:text-xs"}
+					fontSize="text-[10px] md:text-xs"
 					round
 					on={currentTheme === theme}
 					reverse={currentTheme !== theme}

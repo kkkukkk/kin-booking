@@ -1,41 +1,45 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import {
+	createContext,
+	useState,
+	ReactNode,
+	useCallback,
+	useRef,
+} from "react";
 import SpinnerOverlay from "@/components/spinner/SpinnerOverlay";
 
 interface SpinnerContextType {
 	showSpinner: (withBackgroundImage?: boolean) => void;
 	hideSpinner: () => void;
+	isVisible: boolean;
 }
 
-const SpinnerContext = createContext<SpinnerContextType | undefined>(undefined);
+export const SpinnerContext = createContext<SpinnerContextType | undefined>(undefined);
 
 export const SpinnerProvider = ({ children }: { children: ReactNode }) => {
 	const [visible, setVisible] = useState(false);
 	const [withBackgroundImage, setWithBackgroundImage] = useState(false);
+	const spinnerCount = useRef(0);
 
-	const showSpinner = (withBgImage?: boolean) => {
+	const showSpinner = useCallback((withBgImage?: boolean) => {
+		spinnerCount.current += 1;
 		setWithBackgroundImage(withBgImage ?? false);
 		setVisible(true);
-	};
+	}, []);
 
-	const hideSpinner = () => {
-		setVisible(false);
-		setWithBackgroundImage(false);
-	};
+	const hideSpinner = useCallback(() => {
+		spinnerCount.current = Math.max(0, spinnerCount.current - 1);
+		if (spinnerCount.current === 0) {
+			setVisible(false);
+			setWithBackgroundImage(false);
+		}
+	}, []);
 
 	return (
-		<SpinnerContext.Provider value={{ showSpinner, hideSpinner }}>
+		<SpinnerContext.Provider value={{ showSpinner, hideSpinner, isVisible: visible }}>
 			{children}
 			{visible && <SpinnerOverlay withBackgroundImage={withBackgroundImage} />}
 		</SpinnerContext.Provider>
 	);
-};
-
-export const useSpinner = () => {
-	const context = useContext(SpinnerContext);
-	if (!context) {
-		throw new Error("useSpinner must be used within a SpinnerProvider");
-	}
-	return context;
 };

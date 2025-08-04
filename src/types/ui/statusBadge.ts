@@ -1,0 +1,1 @@
+export type StatusBadgeType = 'event' | 'ticket' | 'friend' | 'reservation' | 'userRole'; 

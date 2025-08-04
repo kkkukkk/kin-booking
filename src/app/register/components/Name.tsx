@@ -6,7 +6,7 @@ import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { Theme } from "@/types/ui/theme";
 import Input from "@/components/base/Input";
 import clsx from "clsx";
-import { isValidName } from "@/components/utils/validators";
+import { isValidName } from "@/util/validators";
 import { SmileIcon } from "@/components/icon/SmileIcon";
 import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
 import { BulbIcon } from "@/components/icon/BulbIcon";

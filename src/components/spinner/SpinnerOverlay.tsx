@@ -4,12 +4,14 @@ import React, { useEffect, useState, memo } from "react";
 import ReactDOM from "react-dom";
 import styles from "@/css/module/spinner-overlay.module.css";
 import Spinner from "@/components/spinner/Spinner";
+import { usePathname } from "next/navigation";
 
 interface SpinnerOverlayProps {
 	withBackgroundImage?: boolean;
 }
 
 const SpinnerOverlay = memo(({ withBackgroundImage = false }: SpinnerOverlayProps) => {
+	const pathname = usePathname();
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
@@ -21,7 +23,7 @@ const SpinnerOverlay = memo(({ withBackgroundImage = false }: SpinnerOverlayProp
 	return ReactDOM.createPortal(
 		<div
 			className={styles.overlay}
-			data-background={withBackgroundImage ? "image" : "none"}
+			data-background={withBackgroundImage && !pathname.startsWith('/admin') ? "image" : "none"}
 		>
 			<div className={styles.backdrop} />
 			<div className={styles.spinnerWrapper}>

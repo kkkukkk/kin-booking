@@ -11,6 +11,7 @@ import ScrollBar from "@/components/base/ScrollBar";
 import useNeedScrollBar from "@/hooks/useNeedScrollBar";
 import ThemeRefDiv from "@/components/base/ThemeRefDiv";
 import useRehydrated from "@/hooks/useIsRehydrated";
+import Footer from "@/components/Footer";
 
 interface CardProps {
 	children: React.ReactNode;
@@ -21,6 +22,7 @@ interface CardProps {
 	height?: string;
 	center?: boolean;
 	innerScroll?: boolean;
+	hasFooter?: boolean;
 }
 
 const Card = ({
@@ -32,13 +34,14 @@ const Card = ({
 	height = "h-full",
 	center = false,
 	innerScroll = false,
+	hasFooter = false,
 }: CardProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const rehydrated = useRehydrated();
 	const scrollTargetRef = useRef<HTMLDivElement | null>(null);
 	const [refReady, setRefReady] = useState(false);
 
-	// ref가 설정되면 refReady를 true로 설정
+	// ref가 설정되면 refReady를 true로
 	useEffect(() => {
 		if (rehydrated && scrollTargetRef.current) {
 			setRefReady(true);
@@ -62,7 +65,7 @@ const Card = ({
 				exit="exit"
 				transition={{duration: 0.3}}
 				className={clsx(
-					"rounded-none md:rounded-[10px]",
+					"rounded-none md:rounded-[10px] max-w-7xl mx-auto",
 					theme === "dark"
 						? "shadow-[0_0_6px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_24px_rgba(255,255,255,0.3),0_0_36px_rgba(255,255,255,0.1)]"
 						: theme === "neon"
@@ -81,9 +84,10 @@ const Card = ({
 				<ThemeRefDiv
 					ref={scrollTargetRef}
 					className={clsx(
-						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12",
-						center && "flex justify-center items-center",
+						"w-full h-full rounded-none md:rounded-[10px] p-6 md:px-12 flex flex-col",
+						center && "justify-center items-center",
 						"scrollbar-none",
+						"bg-transparent border-none backdrop-blur-sm",
 						className
 					)}
 					style={{
@@ -103,7 +107,9 @@ const Card = ({
 							<div className="flex-1" />
 						</div>
 					)}
-					{children}
+					<div className="flex-1 flex flex-col">{children}</div>
+					{/* Footer */}
+					{hasFooter && <Footer theme={theme} />}
 				</ThemeRefDiv>
 				{innerScroll && needScrollBar && (
 					<ScrollBar targetRef={scrollTargetRef} />

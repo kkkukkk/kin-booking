@@ -35,9 +35,9 @@ export const fadeSlideY = {
 };
 
 export const fadeSlideDownSm = {
-	enter: { opacity: 0, y: -10 },
-	center: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-	exit: { opacity: 0, y: 10, transition: { duration: 0.3 } },
+	hidden: { opacity: 0, y: -16 },
+	visible: { opacity: 1, y: 0, transition: { duration: 0.22 } },
+	exit: { opacity: 0, y: -16, transition: { duration: 0.22 } },
 };
 
 export const textContainer = {
@@ -97,3 +97,9 @@ export const tabs = {
 	animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 	exit: { opacity: 0, y: -10, transition: { duration: 0.5 } },
 }
+
+export const fadeOverlay = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.18 } },
+  exit: { opacity: 0, transition: { duration: 0.18 } },
+};

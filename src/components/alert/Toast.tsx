@@ -105,7 +105,7 @@ const Toast = () => {
 			onTouchStart={() => setIsHovered(true)}
 			onTouchEnd={() => setIsHovered(false)}
 			className={clsx(
-				"fixed bottom-12 left-1/2 -translate-x-1/2 bg-white px-4 py-3 rounded shadow-lg w-[300px] z-50 md:w-[400px]",
+				"fixed bottom-12 left-1/2 -translate-x-1/2 px-4 py-3 rounded shadow-lg w-[300px] z-50 md:w-[400px]",
 				isOpen  ? styles["toast-enter-active"] : styles["toast-enter"]
 			)}
 			tabIndex={-1}
@@ -116,7 +116,7 @@ const Toast = () => {
 					{iconType && getIcon(iconType)}
 				</div>
 
-				<div className="break-words whitespace-normal break-normal pl-1">
+				<div className="break-words whitespace-normal break-normal pl-1 pr-3 text-sm">
 					{message}
 				</div>
 

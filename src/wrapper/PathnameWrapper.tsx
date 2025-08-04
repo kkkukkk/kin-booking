@@ -9,10 +9,11 @@ interface Props {
 
 const PathnameWrapper = ({ children }: Props) => {
 	const pathname = usePathname();
-	const isEnterPage = pathname === '/enter';
+	const isFullWidthPage = pathname === '/terms' || pathname === '/about' || pathname === '/';
+	const isAdminPath = pathname.startsWith('/admin');
 
 	return (
-		<div className={`layout-grid ${isEnterPage ? 'enter' : ''} bg-image`}>
+		<div className={`${isFullWidthPage || isAdminPath ? '' : 'layout-grid'} ${isAdminPath ? '' : 'bg-image'}`}>
 			{children}
 		</div>
 	);

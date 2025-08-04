@@ -1,0 +1,45 @@
+/* 기본: PC (md 이상, 768px 이상) */
+.admin-layout {
+  display: grid;
+  height: calc(var(--vh, 1vh) * 100);
+  grid-template-rows: auto calc(var(--vh, 1vh) * 100 - 77px);
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+}
+
+.admin-layout > .sidebar {
+  grid-area: sidebar;
+  display: block;
+  min-width: 0;
+  max-width: 240px;
+  width: auto;
+}
+
+.admin-layout > .main {
+  grid-area: main;
+  overflow-y: auto;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.admin-layout > .header {
+  grid-area: header;
+}
+
+/* 768px 미만: 사이드바 숨김, 헤더+메인만 */
+@media (max-width: 767px) {
+  .admin-layout {
+    grid-template-rows: auto 0 1fr;
+    grid-template-columns: 100%;
+    grid-template-areas:
+      "header"
+      "sidebar"
+      "main";
+  }
+  .sidebar {
+    display: none;
+  }
+} 

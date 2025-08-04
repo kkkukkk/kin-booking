@@ -10,7 +10,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { fadeSlideDownSm } from "@/types/ui/motionVariants";
 import dayjs from "dayjs";
 import clsx from "clsx";
-import styles from "@/css/module/search-bar.module.css";
 import Select from "@/components/base/Select";
 import useDebounce from "@/hooks/useDebounce";
 import { FilterIcon } from "@/components/icon/FilterIcon";
@@ -19,6 +18,7 @@ import { createPortal } from "react-dom";
 interface SearchBarProps {
   label?: string;
   icon?: React.ReactNode;
+  initialOpen?: boolean;
   filters: {
     keyword?: {
       value: string;
@@ -41,6 +41,7 @@ interface SearchBarProps {
 const SearchBar = ({
   label = "검색 및 필터",
   icon = <FilterIcon />,
+  initialOpen = false,
   filters,
 }: SearchBarProps) => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -48,7 +49,7 @@ const SearchBar = ({
   const [tempFrom, setTempFrom] = useState(filters.dateRange?.from ?? '');
   const [tempTo, setTempTo] = useState(filters.dateRange?.to ?? '');
   const [keyword, setKeyword] = useState(filters.keyword?.value ?? '');
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef<HTMLButtonElement>(null);
   const [datePickerPosition, setDatePickerPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -57,7 +58,6 @@ const SearchBar = ({
 
   useEffect(() => {
     if (filters.keyword && debouncedKeyword !== filters.keyword.value) {
-      setKeyword(debouncedKeyword);
       filters.keyword.onChange(debouncedKeyword);
     }
   }, [debouncedKeyword, filters.keyword]);
@@ -90,14 +90,14 @@ const SearchBar = ({
 
   return (
     <>
-      <div className="rounded text-sm flex flex-col">
+      <div className="rounded text-base flex flex-col">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {icon}
-            <span className="font-medium">{label}</span>
+            <span className="text-sm md:text-base">{label}</span>
           </div>
           <Button
-            theme="dark"
+            theme={theme === "normal" ? "dark" : theme}
             width="w-24"
             padding="py-1 md:py-0.5"
             reverse={theme === "normal"}
@@ -106,6 +106,7 @@ const SearchBar = ({
               setIsOpen(prev => !prev);
               setShowDatePicker(false);
             }}
+            neonVariant='pink'
           >
             {isOpen ? "닫기" : "열기"}
           </Button>
@@ -144,7 +145,6 @@ const SearchBar = ({
                   value={keyword}
                   onChange={e => {
                     setKeyword(e.target.value);
-                    filters.keyword?.onChange(e.target.value);
                   }}
                   placeholder={filters.keyword.placeholder ?? '검색어 입력'}
                   className="px-2 py-1 rounded w-full md:w-1/2"
@@ -158,6 +158,7 @@ const SearchBar = ({
                   options={filters.status.options}
                   placeholder="선택"
                   className="w-full md:w-1/6"
+                  theme={theme}
                 />
               )}
 
@@ -168,9 +169,10 @@ const SearchBar = ({
                     type="button"
                     onClick={handleDatePickerToggle}
                     className={clsx(
-                      styles["date-picker-label"],
-                      styles[theme],
-                      "px-2 py-1 rounded w-full text-left cursor-pointer"
+                      "shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)] px-2 py-1 rounded w-full text-left cursor-pointer",
+                      theme === "normal" && "bg-white/90 border border-black/20",
+                      theme === "dark" && "bg-black/80 border border-white/50",
+                      theme === "neon" && "bg-black/80 border border-white/50"
                     )}
                   >
                     {tempFrom && tempTo ? `${tempFrom} ~ ${tempTo}` : '기간'}
@@ -182,7 +184,7 @@ const SearchBar = ({
                 <Button
                   width="w-full"
                   padding="py-1 md:py-0.5"
-                  theme="dark"
+                  theme={theme === "normal" ? "dark" : theme}
                   onClick={handleReset}
                   reverse={theme === "normal"}
                   className="self-end"
@@ -205,7 +207,7 @@ const SearchBar = ({
           transition={{ duration: 0.3 }}
           className="fixed z-[9999] text-sm"
           style={{
-            top: datePickerPosition.top,
+            top: datePickerPosition.top + 5,
             left: datePickerPosition.left,
             width: datePickerPosition.width,
           }}

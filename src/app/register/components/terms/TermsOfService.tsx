@@ -1,8 +1,8 @@
 import Button from "@/components/base/Button";
 
 interface TermsOfServiceProps {
-	onClose: () => void;
-	onConfirm: () => void;
+	onClose?: () => void;
+	onConfirm?: () => void;
 }
 
 const TermsOfService = ({ onClose, onConfirm }: TermsOfServiceProps) => {
@@ -17,7 +17,7 @@ const TermsOfService = ({ onClose, onConfirm }: TermsOfServiceProps) => {
 
 			<article className="mb-4">
 				<h3 className="font-semibold text-base md:text-xl">2. 회원의 의무</h3>
-				<p className="text-sm md:text-lg">회원 정보는 정확하게 입력해야 하며, 비밀번호 관리에 책임을 집니다.</p>
+				<p className="text-sm md:text-lg ">회원 정보는 정확하게 입력해야 하며, 비밀번호 관리에 책임을 집니다.</p>
 			</article>
 
 			<article className="mb-4">
@@ -30,22 +30,24 @@ const TermsOfService = ({ onClose, onConfirm }: TermsOfServiceProps) => {
 				<p className="text-sm md:text-lg">부정 이용 시 서비스 이용이 제한될 수 있습니다.</p>
 			</article>
 
-			<div className="flex items-center justify-center mt-4 gap-2">
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onClose}
-				>취소</Button>
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onConfirm}
-					theme={"dark"}
-					reverse
-				>동의</Button>
-			</div>
+			{onClose && onConfirm && (
+				<div className="flex items-center justify-center mt-6 gap-2">
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onClose}
+					>취소</Button>
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onConfirm}
+						theme={"dark"}
+						reverse
+					>동의</Button>
+				</div>
+			)}
 		</section>
 	)
 }

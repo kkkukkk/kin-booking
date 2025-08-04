@@ -8,13 +8,12 @@ import { AlertProvider } from "@/providers/AlertProvider";
 import { SpinnerProvider } from "@/providers/SpinnerProvider";
 import { SessionProvider } from "@/providers/SessionProvider";
 import QueryProvider from "./QueryProvider";
-import SpinnerOverlay from "@/components/spinner/SpinnerOverlay";
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<ReduxProvider store={store}>
 			<PersistGate
-				loading={<SpinnerOverlay withBackgroundImage />}
+				loading={null}
 				persistor={persistor}
 			>
 				<SessionProvider>

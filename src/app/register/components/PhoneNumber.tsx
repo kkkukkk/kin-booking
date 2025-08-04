@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
 import { Theme } from "@/types/ui/theme";
-import { isValidPhoneNumber } from "@/components/utils/validators";
+import { isValidPhoneNumber } from "@/util/validators";
 import { ThumbUpIcon } from "@/components/icon/ThumbUpIcon";
 import Input from "@/components/base/Input";
 import clsx from "clsx";

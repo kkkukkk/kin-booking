@@ -51,7 +51,6 @@ const FindEmail = () => {
 		setChecking(false);
 
 		if (error) {
-			console.error("휴대폰 번호 체크 실패:", error.message);
 			showToast({
 				message: "확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
 				autoCloseTime: 3000,

@@ -10,7 +10,7 @@ interface EventNoticeProps {
 const EventNotice = ({ theme }: EventNoticeProps) => {
 	return (
 		<div>
-			<p className="text-sm opacity-70 mb-2">예매 안내</p>
+			<p className="text-sm opacity-70 my-3">예매 안내</p>
 			<div className={clsx(
 				"p-3 rounded-lg border text-xs space-y-1",
 				theme === "normal" 

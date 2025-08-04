@@ -4,7 +4,8 @@ import {
 	CreateUserDto,
 	FetchUserDto,
 	UpdateUserDto,
-	FetchUserWithRolesResponseDto, UserWithRoles
+	FetchUserWithRolesResponseDto, 
+	UserWithRoles,
 } from '@/types/dto/user';
 import { PaginationParams } from "@/util/pagination/type";
 import { getPaginationRange } from "@/util/pagination/pagination";
@@ -61,9 +62,10 @@ export const updateUser = async (
 	userId: string,
 	update: UpdateUserDto
 ): Promise<User> => {
+	const updateSnake = toSnakeCaseKeys<UpdateUserDto>(update);
 	const { data, error } = await supabase
 	.from('users')
-	.update(update)
+	.update(updateSnake)
 	.eq('id', userId)
 	.single();
 
@@ -88,3 +90,59 @@ export const softDeleteUser = async (userId: string): Promise<User> => {
 	if (error) throw error;
 	return toCamelCaseKeys<User>(data);
 }
+
+// 특정 유저 조회 api
+export const fetchUserById = async (userId: string): Promise<UserWithRoles | null> => {
+	const { data, error } = await supabase
+		.from('users')
+		.select(`
+			id, 
+			name, 
+			email, 
+			phone_number, 
+			register_date, 
+			marketing_consent, 
+			status,
+			user_roles (
+				role_id,
+				roles (
+					role_code,
+					role_name
+				)
+			)
+		`)
+		.eq('id', userId)
+		.eq('status', 'active')
+		.single();
+
+	if (error) {
+		// 사용자가 존재하지 않는 경우
+		if (error.code === 'PGRST116') {
+			return null;
+		}
+		throw error;
+	}
+	
+	return toCamelCaseKeys<UserWithRoles>(data);
+};
+
+// 사용자 검색 (친구 추가용 등)
+export const searchUsers = async (query: string, currentUserId: string): Promise<User[]> => {
+	try {
+		const { data, error } = await supabase
+			.rpc('search_users_for_friends', {
+				search_query: query,
+				current_user_id: currentUserId
+			});
+
+		if (error) {
+			console.error('Search users error:', error);
+			return [];
+		}
+		
+		return toCamelCaseKeys<User[]>(data || []);
+	} catch (error) {
+		console.error('searchUsers error:', error);
+		return [];
+	}
+};

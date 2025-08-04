@@ -9,7 +9,8 @@ export interface CreateUserDto {
 }
 
 export interface UpdateUserDto {
-	status: UserStatus;
+	status?: UserStatus;
+	marketingConsent?: boolean;
 }
 
 export interface FetchUserDto {

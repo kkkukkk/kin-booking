@@ -1,11 +1,10 @@
-import React from "react";
 import { RefundPolicy } from "@/types/refund";
 import Button from "@/components/base/Button";
 
 interface CancellationPolicyProps {
 	policy: RefundPolicy;
-	onClose: () => void;
-	onConfirm: () => void;
+	onClose?: () => void;
+	onConfirm?: () => void;
 }
 
 const CancellationPolicy = ({ policy, onClose, onConfirm }: CancellationPolicyProps) => {
@@ -39,7 +38,7 @@ const CancellationPolicy = ({ policy, onClose, onConfirm }: CancellationPolicyPr
 				</ul>
 			</article>
 
-			<article className="mb-4">
+			<article>
 				<h3 className="font-semibold text-base md:text-xl">3. 티켓 양도</h3>
 				<ul className="text-sm md:text-lg list-disc pl-5">
 					<li>본 공연은 티켓 양도가 가능합니다.</li>
@@ -49,22 +48,24 @@ const CancellationPolicy = ({ policy, onClose, onConfirm }: CancellationPolicyPr
 				</ul>
 			</article>
 
-			<div className="flex items-center justify-center mt-4 gap-2">
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onClose}
-				>취소</Button>
-				<Button
-					width={"w-1/2"}
-					padding={"p-1"}
-					className={"text-sm md:text-lg"}
-					onClick={onConfirm}
-					theme={"dark"}
-					reverse
-				>확인</Button>
-			</div>
+			{onClose && onConfirm && (
+				<div className="flex items-center justify-center mt-6 gap-2">
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onClose}
+					>취소</Button>
+					<Button
+						width={"w-1/2"}
+						padding={"p-1"}
+						className={"text-sm md:text-lg"}
+						onClick={onConfirm}
+						theme={"dark"}
+						reverse
+					>확인</Button>
+				</div>
+			)}
 		</section>
 	);
 };

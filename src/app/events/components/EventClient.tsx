@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import SearchBar from "@/components/search/SearchBar";
 import EventList from "@/app/events/components/EventList";
 import { EventStatus, EventStatusKo } from "@/types/model/events";
@@ -18,35 +19,52 @@ const statusOptions = [
 ] satisfies { value: EventStatus | ''; label: string }[];
 
 const EventClient = () => {
+	const searchParams = useSearchParams();
 	const [eventDateFrom, setEventDateFrom] = useState('');
 	const [eventDateTo, setEventDateTo] = useState('');
 	const [keyword, setKeyword] = useState('');
 	const [status, setStatus] = useState<EventStatus | ''>('');
+
+	// URL 파라미터에서 status 값을 가져와서 초기 상태 설정
+	useEffect(() => {
+		const statusParam = searchParams.get('status');
+		if (statusParam && Object.values(EventStatus).includes(statusParam as EventStatus)) {
+			setStatus(statusParam as EventStatus);
+		}
+	}, [searchParams]);
+
+	// URL 파라미터가 있으면 SearchBar를 자동으로 열기
+	const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
+	useEffect(() => {
+		const statusParam = searchParams.get('status');
+		if (statusParam && Object.values(EventStatus).includes(statusParam as EventStatus)) {
+			setIsSearchBarOpen(true);
+		}
+	}, [searchParams]);
 
 	return (
 		<motion.div
 			variants={fadeSlideLeft}
 			initial="hidden"
 			animate="visible"
-			className="space-y-6"
+			className="space-y-4 md:space-y-6"
 		>
-			{/* 헤더 */}
-			<div className="text-center mb-4">
+			<div className="text-center mb-3 md:mb-4">
 				<AnimatedText
-					fontSize="text-base md:text-lg"
-					text="다양한 공연을 찾아보세요"
+					fontSize="text-lg md:text-lg"
+					text="다양한 공연을 찾아보세요!"
 					delay={0.3}
 				/>
 			</div>
 
-			{/* 검색 및 필터 */}
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.2 }}
 			>
-				<ThemeDiv isChildren className="p-4 rounded-lg border">
+				<ThemeDiv isChildren className="p-3 md:p-4 rounded-lg border" neonVariant='cyan'>
 					<SearchBar
+						initialOpen={isSearchBarOpen}
 						filters={{
 							keyword: {
 								value: keyword,
@@ -71,7 +89,6 @@ const EventClient = () => {
 				</ThemeDiv>
 			</motion.div>
 
-			{/* 공연 목록 */}
 			<EventList
 				keyword={keyword}
 				status={status === '' ? undefined : status}

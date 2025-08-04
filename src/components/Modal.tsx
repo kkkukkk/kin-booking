@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import clsx from "clsx";
 import { fadeSlideY } from "@/types/ui/motionVariants";
@@ -22,9 +23,18 @@ const Modal = ({ children, onClose }: ModalProps) => {
 		return () => document.removeEventListener("keydown", handleKeyDown);
 	}, [onClose]);
 
-	return (
+	// 스크롤 위치 고정
+	useEffect(() => {
+		const originalStyle = window.getComputedStyle(document.body).overflow;
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = originalStyle;
+		};
+	}, []);
+
+	const modalContent = (
 		<motion.div
-			className="fixed inset-0 w-full h-full flex justify-center items-center bg-black/50 z-50"
+			className="fixed inset-0 w-full h-screen flex justify-center items-center bg-black/50 z-50"
 			initial={{opacity: 0}}
 			animate={{opacity: 1}}
 			exit={{opacity: 0}}
@@ -39,9 +49,9 @@ const Modal = ({ children, onClose }: ModalProps) => {
 				className="relative"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<ThemeDiv className={clsx("bg-white p-4 rounded shadow-lg min-w-[300px]")} isChildren>
+				<ThemeDiv className={clsx("p-4 rounded shadow-lg min-w-[300px] max-w-lg md:max-w-xl max-h-[90vh] overflow-y-auto")} isChildren>
 					<button
-						className="absolute top-2 right-2 text-gray-500 hover:text-black cursor-pointer"
+						className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
 						onClick={onClose}
 						aria-label="닫기"
 					>
@@ -55,7 +65,12 @@ const Modal = ({ children, onClose }: ModalProps) => {
 				</ThemeDiv>
 			</motion.div>
 		</motion.div>
-	)
+	);
+
+	// 포털을 사용하여 document.body에 직접 렌더링
+	return typeof window !== 'undefined' 
+		? createPortal(modalContent, document.body)
+		: modalContent;
 }
 
 export default Modal;

@@ -5,7 +5,7 @@ interface SpinnerProps {
 	color?: string;
 }
 
-const Spinner: React.FC<SpinnerProps> = ({ size = 64, color = "var(--neon-green)" }) => (
+const Spinner = ({ size = 64, color = "var(--neon-green)" }: SpinnerProps) => (
 	<svg
 		width={size}
 		height={size}

@@ -1,52 +1,69 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import Button from "@/components/base/Button";
 import PanelContent from "@/components/panel/PanelContent";
+import clsx from "clsx";
 
 const TogglePanel = () => {
 	const [open, setOpen] = useState(false);
 	const [activeButtons, setActiveButtons] = useState<{ [key: string]: boolean }>({});
 	const panelRef = useRef<HTMLDivElement>(null);
+	const pathname = usePathname();
+
+	const handleToggle = useCallback(() => {
+		if (open) setActiveButtons({});
+		setOpen(!open);
+	}, [open]);
+
+	// 바깥쪽 클릭
+	const handleClickOutside = useCallback((event: MouseEvent) => {
+		if (
+			open &&
+			panelRef.current &&
+			!panelRef.current.contains(event.target as Node)
+		) {
+			setOpen(false);
+			setActiveButtons({}); // 모든 버튼 비활성화
+		}
+	}, [open]);
 
 	useEffect(() => {
-		function handleClickOutside(event: MouseEvent) {
-			if (
-				open &&
-				panelRef.current &&
-				!panelRef.current.contains(event.target as Node)
-			) {
-				setOpen(false);
-				setActiveButtons({}); // 모든 버튼 비활성화
-			}
-		}
-
 		document.addEventListener("mousedown", handleClickOutside);
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, [open]);
+	}, [handleClickOutside]);
+
+	// 인증 관련 페이지에서 패널 숨기기
+	const isAuthPage = pathname?.startsWith('/auth') || 
+					  pathname?.startsWith('/reset-password');
+
+	if (isAuthPage) {
+		return null;
+	}
 
 	return (
-		<div className="fixed bottom-3.5 right-3.5 flex flex-col items-end gap-2 md:bottom-5 md:right-5 z-100" ref={panelRef}>
+		<div className="fixed bottom-3.5 right-3.5 flex flex-col items-end gap-2 md:bottom-5 md:right-5 z-10000" ref={panelRef}>
 			<PanelContent
 				isOpen={open}
 				activeButtons={activeButtons}
 				setActiveButtons={setActiveButtons}
+				setOpen={setOpen}
 			/>
 			<Button
 				round
-				onClick={() => {
-					if (open) setActiveButtons({});
-					setOpen(!open);
-				}}
-				fontSize={"text-[10px] md:text-base"}
+				onClick={handleToggle}
+				fontSize="text-[10px] md:text-base"
 				on={open}
 				theme="neon"
-				style={{
-					opacity: open ? "1" : "0.6",
-					border: "1px solid rgba(255,255,255,.3)",
-				}}
+				className={clsx(
+					"panel-toggle-button transition-opacity duration-200",
+					"text-[rgb(119,255,153)]/95",
+					open ? "opacity-100" : "opacity-60"
+				)}
+				style={{ border: "1px solid rgba(255,255,255,.3)" }}
 			>
 				{open ? (
 					<svg
@@ -59,7 +76,7 @@ const TogglePanel = () => {
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
-						style={{ display: 'block', margin: '0 auto' }} // 가운데 정렬
+						className="block mx-auto"
 					>
 						<line x1="18" y1="6" x2="6" y2="18" />
 						<line x1="6" y1="6" x2="18" y2="18" />

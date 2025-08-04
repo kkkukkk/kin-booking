@@ -4,6 +4,7 @@ import {
   CreateTransferHistoryRequest, 
   TransferHistoryWithDetails 
 } from '@/types/model/ticketTransferHistory';
+import { toCamelCaseKeys } from '@/util/case/case';
 
 // 양도 이력 생성
 export const createTransferHistory = async (historyData: CreateTransferHistoryRequest): Promise<TicketTransferHistory> => {
@@ -19,7 +20,7 @@ export const createTransferHistory = async (historyData: CreateTransferHistoryRe
     .single();
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TicketTransferHistory>(data);
 };
 
 // 티켓 ID로 양도 이력 조회
@@ -31,7 +32,7 @@ export const getTransferHistoryByTicketId = async (ticketId: string): Promise<Ti
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TicketTransferHistory[]>(data ?? []);
 };
 
 // 사용자 ID로 양도 이력 조회 (받은 티켓)
@@ -43,7 +44,7 @@ export const getReceivedTransferHistory = async (userId: string): Promise<Ticket
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TicketTransferHistory[]>(data ?? []);
 };
 
 // 사용자 ID로 양도 이력 조회 (보낸 티켓)
@@ -55,7 +56,7 @@ export const getSentTransferHistory = async (userId: string): Promise<TicketTran
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TicketTransferHistory[]>(data ?? []);
 };
 
 // 예약 ID로 양도된 티켓들 조회 (롤백용)
@@ -70,7 +71,7 @@ export const getTransferredTicketsByReservation = async (reservationId: string):
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TransferHistoryWithDetails[]>(data ?? []);
 };
 
 // 양도 이력 상세 조회 (사용자 정보 포함)
@@ -87,5 +88,5 @@ export const getTransferHistoryWithDetails = async (historyId: string): Promise<
     .single();
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TransferHistoryWithDetails>(data);
 }; 

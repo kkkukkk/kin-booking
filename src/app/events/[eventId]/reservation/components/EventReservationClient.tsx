@@ -2,8 +2,8 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEventById } from "@/hooks/api/useEvents";
-import { useSpinner } from "@/providers/SpinnerProvider";
-import React, { useEffect, useState } from "react";
+import { useSpinner } from "@/hooks/useSpinner";
+import { useEffect, useState, useRef } from "react";
 import { useCreateReservation } from "@/hooks/api/useReservations";
 import { useSession } from "@/hooks/useSession";
 import useToast from "@/hooks/useToast";
@@ -18,7 +18,7 @@ import ProgressBar from "@/components/base/ProgressBar";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { ReservationStep } from "@/types/ui/reservationStep";
-import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
+import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 
 
 const EventReservationClient = () => {
@@ -36,57 +36,59 @@ const EventReservationClient = () => {
 	const [step, setStep] = useState<ReservationStep>('consent');
 	const [quantity, setQuantity] = useState(1);
 	const [ticketHolder, setTicketHolder] = useState('');
+	const [didSetDefault, setDidSetDefault] = useState(false);
 	const [seatChecked, setSeatChecked] = useState(false);
 	const [cancelChecked, setCancelChecked] = useState(false);
+	const prevLoadingOrPending = useRef(false);
 
-	// 세션이 로드되면 ticketHolder 기본값 설정
 	useEffect(() => {
-		if (session?.user?.user_metadata?.display_name && ticketHolder === '') {
+		if (
+			!didSetDefault &&
+			session?.user?.user_metadata?.display_name &&
+			ticketHolder === ''
+		) {
 			setTicketHolder(session.user.user_metadata.display_name);
+			setDidSetDefault(true);
 		}
-	}, [session, ticketHolder]);
+	}, [session, ticketHolder, didSetDefault]);
 
-	// 로딩 상태 처리
 	useEffect(() => {
-		if (isLoading || isPending) showSpinner();
-		else hideSpinner();
+		const loadingOrPending = isLoading || isPending;
+		if (!prevLoadingOrPending.current && loadingOrPending) {
+			showSpinner();
+		}
+		if (prevLoadingOrPending.current && !loadingOrPending) {
+			hideSpinner();
+		}
+		prevLoadingOrPending.current = loadingOrPending;
 	}, [isLoading, isPending, showSpinner, hideSpinner]);
 
-	// 에러 처리
 	if (error) throw error;
 	if (!data) return null;
 
 	const event = data!;
 
-	const handleClick = async () => {
+	const handleReservation = async () => {
 		if (!session?.user) {
 			showToast({ message: '로그인 후 예매가 가능해요!', iconType: 'warning', autoCloseTime: 3000 });
 			router.push('/login');
 			return;
 		}
-
-		const confirmed = await showAlert({
-			type: 'confirm',
-			title: "공연 예매",
-			message: quantity + '매 예매하시겠습니까?',
-		});
-		if (confirmed) {
-			handleReservation();
-		}
-	}
-
-	const handleReservation = () => {
-		if (!session?.user) return;
-		
 		createReservation({
 			userId: session.user.id,
 			eventId: event.eventId,
 			quantity: quantity,
 			ticketHolder: ticketHolder,
 		}, {
-			onSuccess: () => {
-				showToast({ message: '예매가 완료됐어요!', iconType: 'success', autoCloseTime: 3000 });
-				router.push('/my/reservations');
+			onSuccess: async () => {
+				const goMyPage = await showAlert({
+					type: 'confirm',
+					title: '예매 완료',
+					message: '예매 신청을 완료했어요!\n관리자 승인 후 티켓이 발급 될거에요.\n마이페이지로 이동할까요?',
+				});
+				if (goMyPage) {
+					router.push('/my');
+				}
 			},
 			onError: (err) => {
 				showToast({ message: err.message || '예매에 실패했어요.', iconType: 'error', autoCloseTime: 3000 });
@@ -120,13 +122,22 @@ const EventReservationClient = () => {
 		}
 	};
 
-	const onNext = () => {
+	const onNext = async () => {
 		if (step === 'consent') {
 			if (!seatChecked || !cancelChecked) {
 				showToast({ message: '안내사항을 모두 확인해주세요.', iconType: 'warning', autoCloseTime: 3000 });
 				return;
 			}
 			setStep('confirm');
+		} else if (step === 'confirm') {
+			const confirmed = await showAlert({
+				type: 'confirm',
+				title: '공연 예매',
+				message: `${quantity}매 예매하시겠습니까?`,
+			});
+			if (confirmed) {
+				handleReservation();
+			}
 		}
 	}
 	const onBack = () => {

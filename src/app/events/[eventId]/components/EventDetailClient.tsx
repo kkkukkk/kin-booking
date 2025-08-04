@@ -3,19 +3,19 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEventById } from "@/hooks/api/useEvents";
 import { useEventMediaByType } from "@/hooks/api/useEventMedia";
-import { useSpinner } from "@/providers/SpinnerProvider";
-import { useEffect } from "react";
+import { useSpinner } from "@/hooks/useSpinner";
+import { useEffect, useRef } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import Button from "@/components/base/Button";
 import { motion } from "framer-motion";
 import { fadeSlideLeft, bottomUp } from "@/types/ui/motionVariants";
 import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
-import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
+import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 import { BulbIcon } from "@/components/icon/BulbIcon";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import EventHeader from "./EventHeader";
-import EventPoster from "./EventPoster";
+import EventPosterWrapper from "./EventPosterWrapper";
 import EventBasicInfo from "./EventBasicInfo";
 import EventSeatInfo from "./EventSeatInfo";
 import EventNotice from "./EventNotice";
@@ -32,9 +32,16 @@ const EventDetailClient = () => {
 	const { data: posterData } = useEventMediaByType(eventId, 'image');
 	const { showSpinner, hideSpinner } = useSpinner();
 
+	const prevIsLoading = useRef(false);
+
 	useEffect(() => {
-		if (isLoading) showSpinner();
-		else hideSpinner();
+		if (!prevIsLoading.current && isLoading) {
+			showSpinner();
+		}
+		if (prevIsLoading.current && !isLoading) {
+			hideSpinner();
+		}
+		prevIsLoading.current = isLoading;
 	}, [isLoading, showSpinner, hideSpinner]);
 
 	useEffect(() => {
@@ -45,7 +52,6 @@ const EventDetailClient = () => {
 		}
 	}, [isLoading, data]);
 
-	// 에러 상태
 	if (error) {
 		return (
 			<EventError
@@ -69,16 +75,13 @@ const EventDetailClient = () => {
 				className="mb-6"
 			>
 				<Button
-					theme="dark"
+					theme={theme === "normal" ? "dark" : theme}
 					padding="px-3 py-1.5"
 					onClick={() => router.push("/events")}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
 				>
-					<span className="mr-1">
-						<ArrowLeftIcon />
-					</span>
-					뒤로가기
+					목록으로
 				</Button>
 			</motion.div>
 
@@ -97,18 +100,19 @@ const EventDetailClient = () => {
 					className="flex flex-col md:flex-row md:gap-8 md:items-start"
 				>
 					<div className="flex justify-center mb-5 md:mb-0 md:flex-shrink-0">
-						<div className="relative w-full max-w-md md:w-80">
-							<EventPoster
+						<div className="w-full max-w-md md:w-80 aspect-[602/852]">
+							<EventPosterWrapper
 								posterData={posterData}
 								eventName={event.eventName}
 								theme={theme}
 								isLoading={isLoading}
+								showPlaceholderText
 							/>
 						</div>
 					</div>
 
 					<div className="flex-1">
-						<ThemeDiv isChildren className="p-4 rounded-lg border">
+						<ThemeDiv isChildren className="p-4 rounded-lg border" neonVariant='cyan'>
 							<div className="space-y-2">
 								<EventBasicInfo
 									eventDate={event.eventDate}
@@ -142,10 +146,10 @@ const EventDetailClient = () => {
 					>
 						<AnimatedTextWithIcon
 							fontSize="text-lg md:text-xl"
-							text="소개"
+							text="공연 소개"
 							leftIcon={<BulbIcon />}
 						/>
-						<ThemeDiv isChildren className="p-4 rounded-lg border">
+						<ThemeDiv isChildren className="p-4 rounded-lg border" neonVariant='cyan'>
 							<EventDescription description={event.description} />
 						</ThemeDiv>
 					</motion.div>

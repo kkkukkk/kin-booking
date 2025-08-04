@@ -7,6 +7,7 @@ const EventsPage = () => {
 		<Card
 			hasLogo
 			innerScroll
+			hasFooter
 		>
 			<EventClient />
 		</Card>

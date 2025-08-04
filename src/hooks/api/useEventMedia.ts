@@ -8,6 +8,7 @@ export const useEventMedia = (eventId: string) => {
 		queryFn: () => fetchEventMedia(eventId),
 		enabled: !!eventId,
 		staleTime: 1000 * 60 * 10,
+		retry: 1,
 	});
 };
 
@@ -17,5 +18,6 @@ export const useEventMediaByType = (eventId: string, mediaType: string) => {
 		queryFn: () => fetchEventMediaByType(eventId, mediaType),
 		enabled: !!eventId && !!mediaType,
 		staleTime: 1000 * 60 * 10,
+		retry: 1,
 	});
 };

@@ -1,39 +1,15 @@
-'use client';
+import MainClient from "@/app/components/MainClient";
+import MainHeader from "@/app/components/MainHeader";
+import MainFooter from "@/app/components/MainFooter";
 
-import Card from "@/components/Card";
-import { useSession } from "@/hooks/useSession";
-import AnimatedText from "@/components/base/AnimatedText";
-import Button from "@/components/base/Button";
-import {useRouter} from "next/navigation";
-
-const Home = ()=> {
-    const { session } = useSession();
-    const router = useRouter();
-
-    return (
-        <Card>
-            <div className={'text-lg'}>
-                {
-                    session?.user?.user_metadata?.display_name && <AnimatedText text={`안녕하세요, ${session.user.user_metadata.display_name} 님!`} fontSize={"text-base md:text-xl"} />
-                }
-                {
-                    <>
-                        <br/>
-                        <AnimatedText text={"서비스 준비 중 입니다."} delay={0.8} fontSize={"text-base md:text-xl"} />
-                        <br/>
-                        <AnimatedText text={"나중에 만나요!"} delay={1.6} fontSize={"text-base md:text-xl"} />
-                        <br/>
-                        <Button
-                            onClick={() => router.push('/events')}
-                            theme={"dark"}
-                            padding={'px-2 py-1'}
-                        >{"공연 목록"}</Button>
-                    </>
-
-                }
-            </div>
-        </Card>
-    );
+export default function Home() {
+  return (
+    <div className="w-screen h-screen flex flex-col overflow-hidden">
+      <MainHeader />
+      <div className="flex-1 overflow-y-auto scrollbar-none relative" data-scroll-container="true">
+        <MainClient />
+      </div>
+      <MainFooter />
+    </div>
+  );
 }
-
-export default Home;

@@ -9,6 +9,7 @@ interface ConsentItemProps {
 	required?: boolean;
 }
 
+// 체크박스 + 라벨 + 버튼 (동의 용)
 const ConsentItem = ({ checked, label, onClickDetail, required }: ConsentItemProps) => {
 	return (
 		<ThemeDiv

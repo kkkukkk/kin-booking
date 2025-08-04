@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,10 +8,9 @@ import { bottomUp, bottomUpDelay } from "@/types/ui/motionVariants";
 import { RegisterStep } from "@/types/ui/registerStep";
 import { useAlert } from "@/providers/AlertProvider";
 import { useRegister } from "@/hooks/api/useAuth";
-import { useSpinner } from "@/providers/SpinnerProvider";
+import { useSpinner } from "@/hooks/useSpinner";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { getErrorMessage } from "@/components/utils/error";
 import Name from "@/app/register/components/Name";
 import Email from "@/app/register/components/Email";
 import Password from "@/app/register/components/Password";
@@ -21,13 +20,13 @@ import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
-import { ArrowLeftIcon } from "@/components/icon/ArrowLeftIcon";
+import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 
 const RegisterClient = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const router = useRouter();
-	const { mutate: register, isPending } = useRegister();
+	const { mutateAsync: registerAsync, mutate: register, isPending } = useRegister();
 	const { showToast, hideToast } = useToast();
 	const { showAlert } = useAlert();
 	const { showSpinner, hideSpinner } = useSpinner();
@@ -97,11 +96,6 @@ const RegisterClient = () => {
 			message: "입력한 정보에 오류가 있어요. 다시 확인해주세요.",
 			iconType: "error",
 			autoCloseTime: 3000,
-		},
-		registerDuplicated: {
-			message: "이미 등록된 이메일이에요.",
-			iconType: "error",
-			autoCloseTime: 3000,
 		}
 	} as const;
 
@@ -121,7 +115,8 @@ const RegisterClient = () => {
 		}
 
 		try {
-			register({
+			// registerAsync를 사용하여 비동기 처리
+			await registerAsync({
 				email,
 				password,
 				name,
@@ -141,14 +136,9 @@ const RegisterClient = () => {
 			if (confirmed) {
 				router.push('/login');
 			}
-
 		} catch (error) {
-			const message = getErrorMessage(error);
-			if (message.includes('already registered')) {
-				showToast({ message: '이미 등록된 이메일이에요.', iconType: 'error', autoCloseTime: 3000 });
-			} else {
-				showToast({ message: `회원가입 중 오류가 발생했어요. (${message})`, iconType: 'error', autoCloseTime: 3000 });
-			}
+			// 에러는 useRegister 훅의 onError에서 처리됨
+			console.error('회원가입 중 오류 발생:', error);
 		}
 	};
 
@@ -287,10 +277,16 @@ const RegisterClient = () => {
 		}
 	};
 
-	// 로딩 상태 처리
+	const prevIsPending = useRef(false);
+
 	useEffect(() => {
-		if (isPending) showSpinner();
-		else hideSpinner();
+		if (!prevIsPending.current && isPending) {
+			showSpinner();
+		}
+		if (prevIsPending.current && !isPending) {
+			hideSpinner();
+		}
+		prevIsPending.current = isPending;
 	}, [isPending, showSpinner, hideSpinner]);
 
 	return (
