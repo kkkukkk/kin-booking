@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import jsQR from 'jsqr';
 import Modal from '@/components/Modal';
 import Button from '@/components/base/Button';
@@ -32,10 +32,10 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 
 			// getUserMedia API 호환성 처리
 			const getUserMedia = navigator.mediaDevices.getUserMedia || 
-				(navigator as any).getUserMedia || 
-				(navigator as any).webkitGetUserMedia || 
-				(navigator as any).mozGetUserMedia || 
-				(navigator as any).msGetUserMedia;
+				(navigator as Navigator & { getUserMedia?: typeof navigator.mediaDevices.getUserMedia }).getUserMedia || 
+				(navigator as Navigator & { webkitGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).webkitGetUserMedia || 
+				(navigator as Navigator & { mozGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).mozGetUserMedia || 
+				(navigator as Navigator & { msGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).msGetUserMedia;
 
 			if (!getUserMedia) {
 				throw new Error('카메라 접근 API를 지원하지 않습니다.');
@@ -54,24 +54,25 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 				streamRef.current = stream;
 				setIsScanning(true);
 			}
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('카메라 접근 실패:', err);
 			
 			// 구체적인 에러 메시지 제공
-			if (err.name === 'NotAllowedError') {
+			const error = err as Error;
+			if (error.name === 'NotAllowedError') {
 				setError('카메라 권한이 거부되었습니다. 브라우저 설정에서 카메라 권한을 허용해주세요.');
-			} else if (err.name === 'NotFoundError') {
+			} else if (error.name === 'NotFoundError') {
 				setError('카메라를 찾을 수 없습니다. 카메라가 연결되어 있는지 확인해주세요.');
-			} else if (err.name === 'NotSupportedError') {
+			} else if (error.name === 'NotSupportedError') {
 				setError('이 브라우저는 카메라 접근을 지원하지 않습니다. Chrome, Safari, Firefox를 사용해주세요.');
 			} else {
-				setError(`카메라 접근에 실패했습니다: ${err.message}`);
+				setError(`카메라 접근에 실패했습니다: ${error.message}`);
 			}
 		}
 	};
 
 	// QR 스캔 로직
-	const scanQR = () => {
+	const scanQR = useCallback(() => {
 		if (!videoRef.current || !canvasRef.current || !isScanning) return;
 
 		const video = videoRef.current;
@@ -107,7 +108,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 
 		// 다음 프레임에서 다시 스캔
 		animationRef.current = requestAnimationFrame(scanQR);
-	};
+	}, [isScanning, onScan]);
 
 	// 카메라 중지
 	const stopCamera = () => {
@@ -141,7 +142,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 				scanQR();
 			};
 		}
-	}, [isScanning]);
+	}, [isScanning, scanQR]);
 
 	if (!isOpen) return null;
 

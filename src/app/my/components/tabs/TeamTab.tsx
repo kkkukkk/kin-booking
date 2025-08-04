@@ -64,7 +64,7 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 					});
 					showToast({ message: '팀원 정보가 업데이트되었습니다.', iconType: 'success', autoCloseTime: 3000 });
 				},
-				onError: (err: any) => {
+				onError: (err: Error) => {
 					showToast({ message: err?.message || '업데이트에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
 				}
 			}

@@ -10,7 +10,6 @@ import {
   getTicketsWithEventByOwnerId,
   getTicketGroups,
   getTicketGroupsByOwnerId,
-  transferTickets,
   transferTicketsByReservation,
 } from '@/api/ticket';
 import { Ticket, TicketStatus } from '@/types/model/ticket';
@@ -52,19 +51,19 @@ export const useTicketGroupsByOwnerId = (ownerId: string) => {
       // 그룹핑 처리
       const groupedTickets: { [key: string]: TicketGroupDto } = {};
       
-      data.forEach((ticket: any) => {
-        const groupKey = `${ticket.event_id}_${ticket.reservation_id}_${ticket.owner_id}`;
+      data.forEach((ticket: TicketGroupDto) => {
+        const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
         
         if (!groupedTickets[groupKey]) {
           groupedTickets[groupKey] = {
-            eventId: ticket.event_id,
-            reservationId: ticket.reservation_id,
-            ownerId: ticket.owner_id,
-            eventName: ticket.event?.event_name || '공연명 없음',
-            userName: ticket.user?.name || '사용자명 없음',
+            eventId: ticket.eventId,
+            reservationId: ticket.reservationId,
+            ownerId: ticket.ownerId,
+            eventName: ticket.eventName,
+            userName: ticket.userName,
             status: ticket.status,
             ticketCount: 0,
-            createdAt: ticket.created_at
+            createdAt: ticket.createdAt
           };
         }
         
@@ -228,14 +227,14 @@ export const useTicketStats = () => {
         ticketCount: number; 
       }} = {};
       
-      data.forEach((ticket: any) => {
-        const groupKey = `${ticket.event_id}_${ticket.reservation_id}_${ticket.owner_id}`;
+      data.forEach((ticket: TicketGroupDto) => {
+        const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
         
         if (!groupStats[groupKey]) {
           groupStats[groupKey] = {
-            eventId: ticket.event_id,
-            reservationId: ticket.reservation_id,
-            ownerId: ticket.owner_id,
+            eventId: ticket.eventId,
+            reservationId: ticket.reservationId,
+            ownerId: ticket.ownerId,
             statuses: [],
             ticketCount: 0
           };
@@ -344,19 +343,19 @@ export const useTicketGroups = () => {
       // 그룹핑 처리
       const groupedTickets: { [key: string]: TicketGroupDto } = {};
       
-      data.forEach((ticket: any) => {
-        const groupKey = `${ticket.event_id}_${ticket.reservation_id}_${ticket.owner_id}`;
+      data.forEach((ticket: TicketGroupDto) => {
+        const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
         
         if (!groupedTickets[groupKey]) {
           groupedTickets[groupKey] = {
-            eventId: ticket.event_id,
-            reservationId: ticket.reservation_id,
-            ownerId: ticket.owner_id,
-            eventName: ticket.event?.event_name || '공연명 없음',
-            userName: ticket.user?.name || '사용자명 없음',
+            eventId: ticket.eventId,
+            reservationId: ticket.reservationId,
+            ownerId: ticket.ownerId,
+            eventName: ticket.eventName,
+            userName: ticket.userName,
             status: ticket.status,
             ticketCount: 0,
-            createdAt: ticket.created_at
+            createdAt: ticket.createdAt
           };
         }
         

@@ -16,6 +16,7 @@ import useToast from '@/hooks/useToast';
 import AdminDropDownMenu from './AdminDropDownMenu';
 import AdminUserInfo from './AdminUserInfo';
 import { useAdminSidebar } from '@/providers/AdminSidebarProvider';
+import {Theme} from "@/types/ui/theme";
 
 const AdminHeader = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -88,7 +89,7 @@ const AdminHeader = () => {
           <AdminUserInfo
             user={user}
             session={session}
-            theme={theme as any}
+            theme={theme as Theme}
             handleLogout={handleLogout}
             isOpen={isUserDropdownOpen}
             onClose={() => setIsUserDropdownOpen(false)}

@@ -14,9 +14,7 @@ import FriendSelectionStep from './steps/FriendSelectionStep';
 import CountSelectionStep from './steps/CountSelectionStep';
 import ConfirmationStep from './steps/ConfirmationStep';
 
-interface TransferClientProps {}
-
-const TransferClient = ({}: TransferClientProps) => {
+const TransferClient = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { session } = useSession();
@@ -45,7 +43,7 @@ const TransferClient = ({}: TransferClientProps) => {
         ticket.status === 'active'
       );
       if (targetTickets.length > 0) {
-        setTransferCount(Math.min(transferCount, targetTickets.length));
+        setTransferCount(prevCount => Math.min(prevCount, targetTickets.length));
       }
     }
   }, [userTickets, eventId, reservationId]);

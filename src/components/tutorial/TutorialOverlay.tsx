@@ -3,14 +3,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
-import Button from '@/components/base/Button';
 import { createPortal } from 'react-dom';
 import AnimatedText from "@/components/base/AnimatedText";
 import { tabs } from '@/types/ui/motionVariants';
 
 export interface TutorialStep {
   id: string;
-  target: string; // CSS 선택자
+  target: string;
   message: string;
   position: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   title?: string;
@@ -106,17 +105,14 @@ const TutorialOverlay = ({
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-xs md:max-w-xl w-[90vw] md:w-[28rem]"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* 글래스모피즘 배경 */}
           <div className="relative">
-            {/* 배경 블러 효과 */}
             <div className="absolute inset-0 bg-white/10 backdrop-blur-md rounded border border-white/10 shadow-2xl" />
-            
+
             {/* 그라데이션 오버레이 */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl" />
             
             {/* 메인 컨텐츠 */}
             <div className="relative px-6 py-4">
-              {/* 제목 */}
               {currentStepData.title && (
                 <div className="mb-4">
                   <h3 className="font-bold text-lg text-white text-center drop-shadow-sm">
@@ -126,7 +122,6 @@ const TutorialOverlay = ({
                 </div>
               )}
 
-              {/* 메시지 */}
               <div className="my-6 flex flex-col gap-2">
                 {(() => {
                   let accDelay = 0.2;
@@ -134,9 +129,8 @@ const TutorialOverlay = ({
                     const delay = accDelay;
                     accDelay += line.length * 0.05;
                     return (
-                      <div className="text-white/90 drop-shadow-sm">
+                      <div key={currentStep + '-' + idx} className="text-white/90 drop-shadow-sm">
                         <AnimatedText
-                          key={currentStep + '-' + idx}
                           text={line}
                           fontSize="text-sm md:text-base"
                           delay={delay}
@@ -149,7 +143,6 @@ const TutorialOverlay = ({
 
               {/* 버튼들 */}
               <div className="flex items-center justify-between mb-4">
-                {/* 진행 표시 */}
                 <div className="flex gap-2">
                   {steps.map((_, index) => (
                     <div
@@ -165,7 +158,6 @@ const TutorialOverlay = ({
                 </div>
 
                 <div className="flex gap-3">
-                  {/* 이전 버튼 */}
                   {!isFirstStep && (
                     <button
                       onClick={handlePrev}
@@ -175,7 +167,6 @@ const TutorialOverlay = ({
                     </button>
                   )}
 
-                  {/* 다음/완료 버튼 */}
                   <button
                     onClick={handleNext}
                     className="px-3 py-1 text-sm bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded transition-all duration-200 shadow-lg transform cursor-pointer"

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 import Button from '@/components/base/Button';
@@ -34,49 +34,8 @@ const EntryCheckPage = () => {
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 
-	// URL 파라미터에서 직접 접근한 경우 처리
-	useEffect(() => {
-		const ticket = searchParams.get('ticket');
-		const event = searchParams.get('event');
-		const user = searchParams.get('user');
-		const reservation = searchParams.get('reservation');
-
-		if (ticket && event && user && reservation) {
-			processTicketData({
-				ticketNumber: parseInt(ticket),
-				eventId: event,
-				userId: user,
-				reservationId: reservation
-			});
-		}
-	}, [searchParams]);
-
-	// QR 스캔 결과 처리 (URL 파라미터에서 직접 처리)
-	const handleScanFromURL = (data: string) => {
-		try {
-			// URL 파싱
-			const url = new URL(data);
-			const params = new URLSearchParams(url.search);
-			
-			const ticketInfo: TicketInfo = {
-				ticketNumber: parseInt(params.get('ticket') || '0'),
-				eventId: params.get('event') || '',
-				userId: params.get('user') || '',
-				reservationId: params.get('reservation') || ''
-			};
-
-			processTicketData(ticketInfo);
-		} catch (error) {
-			showToast({
-				message: '올바르지 않은 QR 코드입니다.',
-				iconType: 'error',
-				autoCloseTime: 3000,
-			});
-		}
-	};
-
 	// 티켓 정보 처리
-	const processTicketData = async (info: TicketInfo) => {
+	const processTicketData = useCallback(async (info: TicketInfo) => {
 		setIsProcessing(true);
 		setTicketInfo(info);
 
@@ -100,6 +59,47 @@ const EntryCheckPage = () => {
 			setIsProcessing(false);
 			showToast({
 				message: '티켓 정보 조회에 실패했습니다.',
+				iconType: 'error',
+				autoCloseTime: 3000,
+			});
+		}
+	}, [showToast]);
+
+	// URL 파라미터에서 직접 접근한 경우 처리
+	useEffect(() => {
+		const ticket = searchParams.get('ticket');
+		const event = searchParams.get('event');
+		const user = searchParams.get('user');
+		const reservation = searchParams.get('reservation');
+
+		if (ticket && event && user && reservation) {
+			processTicketData({
+				ticketNumber: parseInt(ticket),
+				eventId: event,
+				userId: user,
+				reservationId: reservation
+			});
+		}
+	}, [searchParams, processTicketData]);
+
+	// QR 스캔 결과 처리 (URL 파라미터에서 직접 처리)
+	const handleScanFromURL = (data: string) => {
+		try {
+			// URL 파싱
+			const url = new URL(data);
+			const params = new URLSearchParams(url.search);
+			
+			const ticketInfo: TicketInfo = {
+				ticketNumber: parseInt(params.get('ticket') || '0'),
+				eventId: params.get('event') || '',
+				userId: params.get('user') || '',
+				reservationId: params.get('reservation') || ''
+			};
+
+			processTicketData(ticketInfo);
+		} catch (error) {
+			showToast({
+				message: '올바르지 않은 QR 코드입니다.',
 				iconType: 'error',
 				autoCloseTime: 3000,
 			});
@@ -217,7 +217,7 @@ const EntryCheckPage = () => {
 							<div className="text-sm text-gray-500 text-left">
 								<p className="font-semibold mb-2">사용 방법:</p>
 								<ul className="space-y-1">
-									<li>• <strong>QR 스캔:</strong> 사이드바의 "QR 스캔" 메뉴 사용</li>
+									<li>• <strong>QR 스캔:</strong> 사이드바의 &quot;QR 스캔&quot; 메뉴 사용</li>
 									<li>• <strong>앱 스캔:</strong> 카카오톡/네이버 앱으로 스캔 후 링크 접속</li>
 									<li>• <strong>직접 접근:</strong> 사용자가 QR 코드를 보여주면 직접 확인</li>
 								</ul>

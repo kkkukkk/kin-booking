@@ -48,14 +48,14 @@ export const useCreateUser = () => {
 export const useUpdateUser = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<User, Error, { userId: string; update: UpdateUserDto }>({
+	return useMutation<User, Error, { userId: string; update: UpdateUserDto }, { previousUser: User | undefined }>({
 		mutationFn: ({ userId, update }) => updateUser(userId, update),
 		onMutate: async ({ userId, update }) => {
 			// 이전 데이터를 저장하기 위해 쿼리 취소
 			await queryClient.cancelQueries({ queryKey: ['user', userId] });
 
 			// 이전 데이터 스냅샷 저장
-			const previousUser = queryClient.getQueryData(['user', userId]);
+			const previousUser = queryClient.getQueryData(['user', userId]) as User | undefined;
 
 			// 낙관적 업데이트
 			queryClient.setQueryData(['user', userId], (oldData: User) => {
@@ -65,7 +65,6 @@ export const useUpdateUser = () => {
 				return oldData;
 			});
 
-			// 이전 데이터를 반환하여 롤백에 사용
 			return { previousUser };
 		},
 		onSuccess: (updatedUser, variables) => {
@@ -79,7 +78,7 @@ export const useUpdateUser = () => {
 			// 사용자 목록 쿼리 무효화 (목록에서도 변경사항 반영)
 			queryClient.invalidateQueries({ queryKey: ['users'] });
 		},
-		onError: (error: Error, variables, context: any) => {
+		onError: (error: Error, variables, context) => {
 			console.error('사용자 수정 실패:', error.message);
 			
 			// 실패 시 이전 데이터로 롤백
@@ -101,7 +100,6 @@ export const useDeleteUser = () => {
 		},
 		onError: (error: Error) => {
 			console.error('사용자 삭제 실패:', error.message);
-			//alert(`삭제 중 오류 발생: ${error.message}`);
 		},
 	});
 };
@@ -117,7 +115,6 @@ export const useSoftDeleteUser = () => {
 		},
 		onError: (error: Error) => {
 			console.error('사용자 삭제(상태 변경) 실패:', error.message);
-			//alert(`삭제 중 오류 발생: ${error.message}`);
 		},
 	});
 };

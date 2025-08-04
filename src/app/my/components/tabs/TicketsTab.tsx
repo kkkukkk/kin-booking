@@ -10,9 +10,7 @@ import TicketStack from '@/components/TicketStack';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import clsx from 'clsx';
 
-interface TicketsTabProps {}
-
-const TicketsTab = ({}: TicketsTabProps) => {
+const TicketsTab = () => {
 	const { session } = useSession();
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 

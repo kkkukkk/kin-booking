@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Modal from '@/components/Modal';
 import QRCode from 'qrcode';
 import Button from '@/components/base/Button';
+import Image from 'next/image';
 
 interface TicketQRModalProps {
 	isOpen: boolean;
@@ -18,14 +19,7 @@ interface TicketQRModalProps {
 const TicketQRModal = ({ isOpen, onClose, ticketNumbers, eventName, eventId, userId, reservationId }: TicketQRModalProps) => {
 	const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
-	// QR코드 생성
-	useEffect(() => {
-		if (isOpen && ticketNumbers.length > 0) {
-			generateQRCode();
-		}
-	}, [isOpen, ticketNumbers]);
-
-	const generateQRCode = async () => {
+	const generateQRCode = useCallback(async () => {
 		try {
 			// 현재 도메인 기반으로 전체 링크 생성
 			const baseUrl = typeof window !== 'undefined' 
@@ -45,7 +39,14 @@ const TicketQRModal = ({ isOpen, onClose, ticketNumbers, eventName, eventId, use
 		} catch (error) {
 			console.error('QR코드 생성 실패:', error);
 		}
-	};
+	}, [ticketNumbers, eventId, userId, reservationId]);
+
+	// QR코드 생성
+	useEffect(() => {
+		if (isOpen && ticketNumbers.length > 0) {
+			generateQRCode();
+		}
+	}, [isOpen, ticketNumbers, generateQRCode]);
 
 	if (!isOpen) return null;
 
@@ -56,9 +57,11 @@ const TicketQRModal = ({ isOpen, onClose, ticketNumbers, eventName, eventId, use
 				
 				{qrCodeDataUrl && (
 					<div className="flex justify-center">
-						<img 
+						<Image 
 							src={qrCodeDataUrl} 
 							alt="입장 QR코드" 
+							width={200}
+							height={200}
 							className="border-2 border-gray-200 rounded-lg"
 						/>
 					</div>

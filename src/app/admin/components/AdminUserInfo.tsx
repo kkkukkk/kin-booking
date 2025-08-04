@@ -6,17 +6,19 @@ import Button from '@/components/base/Button';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
 import { fadeSlideDownSm } from '@/types/ui/motionVariants';
 import { Theme } from '@/types/ui/theme';
+import { Session } from '@supabase/supabase-js';
+import { UserWithRoles } from '@/types/dto/user';
 
-interface UserDropdownMenuProps {
-  user: any;
-  session: any;
+interface AdminUserInfoProps {
+  user: UserWithRoles | null | undefined;
+  session: Session | null;
   theme: Theme;
   handleLogout: () => void;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function AdminUserInfo({ user, session, theme, handleLogout, isOpen, onClose }: UserDropdownMenuProps) {
+export default function AdminUserInfo({ user, session, theme, handleLogout, isOpen, onClose }: AdminUserInfoProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -38,7 +40,7 @@ export default function AdminUserInfo({ user, session, theme, handleLogout, isOp
             <div className="p-4 border-b border-gray-200">
               <UserInfo
                 name={user?.name || '관리자'}
-                email={user?.email || session?.user?.email}
+                email={user?.email || session?.user?.email || ''}
                 theme={theme}
                 avatarSize="sm"
               />

@@ -24,8 +24,6 @@ import { ReservationStatus, Reservation } from '@/types/model/reservation';
 import dayjs from 'dayjs';
 import { NeonVariant, NEON_VARIANTS } from '@/types/ui/neonVariant';
 
-interface ReservationsTabProps {}
-
 const FILTERS = [
 	{ key: 'all', label: '전체', icon: MenuIcon },
 	{ key: ReservationStatus.Confirmed, label: '확정', icon: CheckCircleIcon, neonColor: 'cyan' as const },
@@ -47,7 +45,7 @@ const getStatusNeonVariant = (status: ReservationStatus): NeonVariant => {
 	}
 };
 
-const ReservationsTab = ({}: ReservationsTabProps) => {
+const ReservationsTab = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const router = useRouter();
 	const searchParams = useSearchParams();

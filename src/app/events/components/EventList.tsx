@@ -60,6 +60,22 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 		setCurrentPage(1);
 	}, [keyword, status, from, to]);
 
+	// 정렬된 이벤트 목록
+	const sortedEvents = useMemo(() => {
+		const events = data?.data ?? [];
+		return sortEvents(events, sortConfig);
+	}, [data?.data, sortConfig]);
+
+	// 페이지네이션 값 가져옴
+	const paginationInfo = useMemo(() => {
+		const events = data?.data ?? [];
+		const totalCount = data?.totalCount ?? 0;
+		return getPaginationResponse(
+			{ page: currentPage, size: pageSize },
+			totalCount
+		);
+	}, [data?.data, data?.totalCount, currentPage, pageSize]);
+
 	if (error) {
 		return (
 			<div className="text-center py-6 md:py-8">
@@ -70,20 +86,6 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 			</div>
 		);
 	}
-
-	const events = data?.data ?? [];
-	const totalCount = data?.totalCount ?? 0;
-	
-	// 정렬된 이벤트 목록
-	const sortedEvents = useMemo(() => {
-		return sortEvents(events, sortConfig);
-	}, [events, sortConfig]);
-	
-	// 페이지네이션 값 가져옴
-	const paginationInfo = getPaginationResponse(
-		{ page: currentPage, size: pageSize },
-		totalCount
-	);
 
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
@@ -117,7 +119,7 @@ const EventList = ({ className, keyword, status, from, to }: EventListProps) => 
 			<div className="flex items-center justify-between mb-6">
 				<div className="flex items-center space-x-1 md:space-x-2">
 					<span className="text-base md:text-lg">
-						공연 목록 ({totalCount}건)
+						공연 목록 ({data?.totalCount ?? 0}건)
 					</span>
 				</div>
 				

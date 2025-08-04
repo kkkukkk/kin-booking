@@ -12,7 +12,7 @@ export const getTicketsByReservationId = async (reservationId: string): Promise<
     .in('status', ['active', 'cancelled', 'used', 'transferred']);
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<Ticket[]>(data ?? []);
 };
 
 // 사용자 ID로 티켓 조회
@@ -25,7 +25,7 @@ export const getTicketsByOwnerId = async (ownerId: string): Promise<Ticket[]> =>
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<Ticket[]>(data ?? []);
 };
 
 // 이벤트 ID로 티켓 조회
@@ -37,7 +37,7 @@ export const getTicketsByEventId = async (eventId: string): Promise<Ticket[]> =>
     .in('status', ['active', 'cancelled', 'used', 'transferred', 'cancel_requested']);
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<Ticket[]>(data ?? []);
 };
 
 // 티켓 ID로 티켓 조회
@@ -49,7 +49,7 @@ export const getTicketById = async (ticketId: string): Promise<Ticket> => {
     .single();
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<Ticket>(data ?? []);
 };
 
 // 티켓 취소 신청 (단일 티켓)
@@ -147,7 +147,7 @@ export const getTicketGroups = async () => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TicketGroupDto[]>(data ?? []);
 };
 
 // 사용자별 티켓 묶음 조회 (event_id + reservation_id + owner_id로 그룹핑)
@@ -167,7 +167,7 @@ export const getTicketGroupsByOwnerId = async (ownerId: string) => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TicketGroupDto[]>(data ?? []);
 }; 
 
 // 티켓 통계 조회 (관리자용) - 단순 데이터 조회로 변경
@@ -184,7 +184,7 @@ export const getAllTicketsForStats = async () => {
     `);
 
   if (error) throw error;
-  return data;
+  return toCamelCaseKeys<TicketGroupDto[]>(data ?? []);
 }; 
 
 // 티켓 양도 (티켓 ID 배열로)

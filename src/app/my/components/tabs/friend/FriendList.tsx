@@ -7,6 +7,7 @@ import Button from '@/components/base/Button';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { useFriends, useDeleteFriendRelation } from '@/hooks/api/useFriends';
 import { FriendStatus } from '@/types/model/friends';
+import { FriendWithUser } from '@/types/dto/friends';
 import { useAlert } from '@/providers/AlertProvider';
 import { UsersIcon } from '@/components/icon/FriendIcons';
 import UserInfo from '@/components/user/UserInfo';
@@ -21,9 +22,9 @@ const FriendList = () => {
   const { mutate: deleteFriendRelation, isPending: isDeleting } = useDeleteFriendRelation();
 
   // UI 상태 관리
-  const [localFriends, setLocalFriends] = useState<any[] | null>(null);
+  const [localFriends, setLocalFriends] = useState<FriendWithUser[] | null>(null);
 
-  // 현재 표시할 친구 목록 (로컬 상태 우선, 없으면 서버 상태)
+  // 현재 표시할 친구 목록
   const currentFriends = localFriends ?? (friends || []);
 
   const handleDeleteFriend = async (friendName: string, friendId: string) => {
