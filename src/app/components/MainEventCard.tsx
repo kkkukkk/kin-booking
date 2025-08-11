@@ -47,7 +47,7 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
 
   return (
     <ThemeDiv
-      className={`p-2 flex flex-col items-center shadow-xl rounded mb-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isHero ? "w-full" : isLarge ? "w-full" : "w-fit"}`}
+      className={`p-2 flex flex-col items-center shadow-md rounded mb-2 transition-all duration-300 hover:scale-105 ${isHero ? "w-full" : isLarge ? "w-full" : "w-fit"}`}
       isChildren
     >
       <div className={`${posterContainerSize} flex justify-center overflow-hidden ${isSmall ? '' : 'py-2'}`}>
@@ -56,16 +56,18 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
           posterData={posterData}
           theme={theme}
           isLoading={isLoading}
+          priority={false}
+          loading="lazy"
           variant={isSmall ? "small" : "hero"}
           smallText={isSmall}
           overlay={
             isSmall
               ? {
                   title: event.eventName,
-                  subtitle: dayjs(event.eventDate).format('MM/DD HH:mm'),
-                  showOverlay: true,
-                }
-              : undefined
+                subtitle: dayjs(event.eventDate).format('MM/DD HH:mm'),
+                showOverlay: true,
+              }
+            : undefined
           }
         />
       </div>

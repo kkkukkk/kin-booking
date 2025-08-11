@@ -18,8 +18,6 @@ import ProgressBar from "@/components/base/ProgressBar";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { ReservationStep } from "@/types/ui/reservationStep";
-import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
-
 
 const EventReservationClient = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -158,9 +156,6 @@ const EventReservationClient = () => {
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
 				>
-					<span className="mr-1">
-						<ArrowLeftIcon />
-					</span>
 					{step === "confirm" ? "이전" : "뒤로가기"}
 				</Button>
 			</div>
@@ -205,7 +200,6 @@ const EventReservationClient = () => {
 					padding={"px-2 py-1.5"}
 					onClick={onNext}
 					reverse={theme === "normal"}
-					light={theme !== "normal"}
 				>
 					{step === "confirm" ? "예매하기" : "다음"}
 				</Button>

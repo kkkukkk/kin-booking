@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Reservation } from "@/types/model/reservation";
 import { CreateReservationDto, FetchReservationDto } from "@/types/dto/reservation";
-import { createReservation, fetchReservation, cancelPendingReservation, approveReservation } from "@/api/reservation";
+import { createReservation, fetchReservation, fetchReservationWithEvent, cancelPendingReservation, approveReservation } from "@/api/reservation";
 import { PaginationParams } from "@/util/pagination/type";
 
 export const useCreateReservation = () => {
@@ -46,11 +46,11 @@ export const useRejectReservation = () => {
 	});
 };
 
-// 사용자별 예매 내역 조회
+// 사용자별 예매 내역 조회 (이벤트 정보 포함)
 export const useReservationsByUserId = (userId: string) => {
 	return useQuery({
 		queryKey: ['reservations', 'user', userId],
-		queryFn: () => fetchReservation({ userId }),
+		queryFn: () => fetchReservationWithEvent({ userId }),
 		enabled: !!userId,
 		retry: 1,
 	});
@@ -73,6 +73,6 @@ export const useReservations = (params?: PaginationParams & FetchReservationDto)
 		queryKey: ['reservations', 'admin', params],
 		queryFn: () => fetchReservation(params),
 		retry: 1,
-		staleTime: 1000 * 60 * 5, // 5분
+		staleTime: 0,
 	});
 };

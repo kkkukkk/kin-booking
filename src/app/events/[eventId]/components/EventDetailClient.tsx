@@ -106,6 +106,8 @@ const EventDetailClient = () => {
 								eventName={event.eventName}
 								theme={theme}
 								isLoading={isLoading}
+								priority={false}
+								loading="lazy"
 								showPlaceholderText
 							/>
 						</div>

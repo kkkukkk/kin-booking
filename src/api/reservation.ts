@@ -2,7 +2,7 @@ import { PaginationParams } from "@/util/pagination/type";
 import { supabase } from "@/lib/supabaseClient";
 import { getPaginationRange } from "@/util/pagination/pagination";
 import {toCamelCaseKeys, toSnakeCaseKeys} from "@/util/case/case";
-import { CreateReservationDto, FetchReservationDto, FetchReservationResponseDto } from "@/types/dto/reservation";
+import { CreateReservationDto, FetchReservationDto, FetchReservationResponseDto, ReservationWithEventDto } from "@/types/dto/reservation";
 import { Reservation } from "@/types/model/reservation";
 import { generateRandomGradient } from "@/util/adminGradientGenerator";
 
@@ -28,8 +28,47 @@ export const fetchReservation = async (params?: PaginationParams & FetchReservat
 	}
 }
 
+// 이벤트 정보와 함께 가져오는 함수 (새로 추가)
+export const fetchReservationWithEvent = async (params?: PaginationParams & FetchReservationDto): Promise<{ data: ReservationWithEventDto[], totalCount: number }> => {
+	let query = supabase
+		.from('reservations')
+		.select(`
+			*,
+			events (
+				event_name,
+				event_date,
+				location
+			)
+		`, { count: 'exact' });
+	
+	if (params) {
+		if (params.id) query = query.eq('id', params.id);
+		if (params.userId) query = query.eq('user_id', params.userId);
+		if (params.eventId) query = query.eq('event_id', params.eventId);
+		if (params.reservedFrom) query = query.gte('event_date', params.reservedTo);
+		if (params.reservedTo) query = query.lte('event_date', params.reservedTo);
+		if (params.status) query = query.eq('status', params.status);
+		if (params.page && params.size) {
+			const range = getPaginationRange(params);
+			query = query.range(range.start, range.end);
+		}
+	}
+	
+	const { data, count, error } = await query;
+	if (error) throw error;
+	
+	return {
+		data: toCamelCaseKeys<ReservationWithEventDto[]>(data ?? []),
+		totalCount: count ?? 0,
+	}
+}
+
 export const createReservation = async (reservation: CreateReservationDto): Promise<Reservation> => {
-	const reservationSnake = toSnakeCaseKeys<CreateReservationDto>(reservation);
+	const reservationWithStatus = {
+		...reservation,
+		status: reservation.status || 'pending'
+	};
+	const reservationSnake = toSnakeCaseKeys<typeof reservationWithStatus>(reservationWithStatus);
 	const { data, error } = await supabase.from('reservations').insert(reservationSnake).select().single();
 	if (error) throw error;
 	return toCamelCaseKeys<Reservation>(data);

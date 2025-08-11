@@ -13,7 +13,7 @@ import {
   transferTicketsByReservation,
 } from '@/api/ticket';
 import { Ticket, TicketStatus } from '@/types/model/ticket';
-import { TicketWithEventDto, TicketGroupDto } from '@/types/dto/ticket';
+import { TicketGroupDto, TicketGroupApiResponse } from '@/types/dto/ticket';
 import { getAllTicketsForStats } from '@/api/ticket';
 
 // 예약 ID로 티켓 조회
@@ -51,7 +51,7 @@ export const useTicketGroupsByOwnerId = (ownerId: string) => {
       // 그룹핑 처리
       const groupedTickets: { [key: string]: TicketGroupDto } = {};
       
-      data.forEach((ticket: TicketGroupDto) => {
+      data.forEach((ticket: TicketGroupApiResponse) => {
         const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
         
         if (!groupedTickets[groupKey]) {
@@ -59,8 +59,8 @@ export const useTicketGroupsByOwnerId = (ownerId: string) => {
             eventId: ticket.eventId,
             reservationId: ticket.reservationId,
             ownerId: ticket.ownerId,
-            eventName: ticket.eventName,
-            userName: ticket.userName,
+            eventName: ticket.event.eventName,
+            userName: ticket.user.name,
             status: ticket.status,
             ticketCount: 0,
             createdAt: ticket.createdAt
@@ -75,7 +75,7 @@ export const useTicketGroupsByOwnerId = (ownerId: string) => {
     enabled: !!ownerId,
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 };
 
@@ -227,7 +227,7 @@ export const useTicketStats = () => {
         ticketCount: number; 
       }} = {};
       
-      data.forEach((ticket: TicketGroupDto) => {
+      data.forEach((ticket: TicketGroupApiResponse) => {
         const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
         
         if (!groupStats[groupKey]) {
@@ -343,7 +343,7 @@ export const useTicketGroups = () => {
       // 그룹핑 처리
       const groupedTickets: { [key: string]: TicketGroupDto } = {};
       
-      data.forEach((ticket: TicketGroupDto) => {
+      data.forEach((ticket: TicketGroupApiResponse) => {
         const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
         
         if (!groupedTickets[groupKey]) {
@@ -351,8 +351,8 @@ export const useTicketGroups = () => {
             eventId: ticket.eventId,
             reservationId: ticket.reservationId,
             ownerId: ticket.ownerId,
-            eventName: ticket.eventName,
-            userName: ticket.userName,
+            eventName: ticket.event.eventName,
+            userName: ticket.user.name,
             status: ticket.status,
             ticketCount: 0,
             createdAt: ticket.createdAt
@@ -366,7 +366,7 @@ export const useTicketGroups = () => {
     },
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 };
 

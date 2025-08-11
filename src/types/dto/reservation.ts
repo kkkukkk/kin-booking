@@ -5,6 +5,7 @@ export interface CreateReservationDto {
 	eventId: string;
 	quantity: number;
 	ticketHolder: string;
+	status?: ReservationStatus;
 }
 
 export interface FetchReservationDto {
@@ -25,13 +26,13 @@ export interface FetchReservationResponseDto {
 
 // 예매 정보와 이벤트 정보를 함께 포함하는 DTO
 export interface ReservationWithEventDto extends Reservation {
-	event?: {
+	events?: {
 		eventId: string;
 		eventName: string;
 		eventDate: string;
 		location?: string;
 		price?: number;
-	};
+	} | null;
 }
 
 export interface FetchReservationWithEventResponseDto {

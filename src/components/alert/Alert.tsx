@@ -47,7 +47,7 @@ const Alert = ({
 					<div className="flex items-center justify-between pb-4 border-b border-gray-200/10">
 						<div className={clsx(
 							"text-lg w-full font-bold text-center md:text-xl relative",
-							theme === "normal" && "text-blue-600",
+							theme === "normal" && "text-green-600",
 							theme === "dark" && "text-gray-100",
 							theme === "neon" && "text-cyan-400"
 						)}>
@@ -86,12 +86,9 @@ const Alert = ({
 							theme={"dark"} 
 							width={"w-1/3"} 
 							padding={"px-3 py-1.5"}
-							reverse={true}
+							reverse={theme === "normal"}
 							className={clsx(
-								"transition-all duration-200",
-								theme === "normal" && "hover:bg-blue-600 hover:border-blue-600",
-								theme === "dark" && "hover:bg-gray-700 hover:border-gray-700",
-								theme === "neon" && "hover:bg-cyan-600 hover:border-cyan-600"
+								"transition-all duration-200"
 							)}
 						>
 							확인
@@ -102,11 +99,9 @@ const Alert = ({
 								theme={"normal"} 
 								width={"w-1/3"} 
 								padding={"px-3 py-1.5"}
+								reverse={theme !== "normal"}
 								className={clsx(
-									"transition-all duration-200",
-									theme === "normal" && "hover:bg-gray-100 hover:border-gray-300",
-									theme === "dark" && "hover:bg-gray-800 hover:border-gray-600",
-									theme === "neon" && "hover:bg-purple-900/20 hover:border-purple-500"
+									"transition-all duration-200"
 								)}
 						>
 							취소

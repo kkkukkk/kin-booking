@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import { Ticket } from '@/types/model/ticket';
-import { TicketWithEventDto, TicketGroupDto } from '@/types/dto/ticket';
+import { TicketWithEventDto, TicketGroupDto, TicketGroupApiResponse } from '@/types/dto/ticket';
 import { toCamelCaseKeys } from '@/util/case/case';
 
 // 예약 ID로 티켓 조회
@@ -147,7 +147,7 @@ export const getTicketGroups = async () => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return toCamelCaseKeys<TicketGroupDto[]>(data ?? []);
+  return toCamelCaseKeys<TicketGroupApiResponse[]>(data ?? []);
 };
 
 // 사용자별 티켓 묶음 조회 (event_id + reservation_id + owner_id로 그룹핑)
@@ -167,7 +167,7 @@ export const getTicketGroupsByOwnerId = async (ownerId: string) => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return toCamelCaseKeys<TicketGroupDto[]>(data ?? []);
+  return toCamelCaseKeys<TicketGroupApiResponse[]>(data ?? []);
 }; 
 
 // 티켓 통계 조회 (관리자용) - 단순 데이터 조회로 변경
@@ -179,12 +179,12 @@ export const getAllTicketsForStats = async () => {
       reservation_id,
       owner_id,
       status,
-      event:event_id(event_name),
-      user:owner_id(name)
+      events:event_id(event_name),
+      users:owner_id(name)
     `);
 
   if (error) throw error;
-  return toCamelCaseKeys<TicketGroupDto[]>(data ?? []);
+  return toCamelCaseKeys<TicketGroupApiResponse[]>(data ?? []);
 }; 
 
 // 티켓 양도 (티켓 ID 배열로)

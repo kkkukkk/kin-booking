@@ -150,7 +150,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 						key === 'Home' && 'home-button',
 						key === 'My' && 'my-page-button',
 						key === 'Logout' && 'logout-button',
-						theme === 'neon' && 'text-[rgb(119,255,153)]/95'
+						theme === 'neon' && 'text-[rgb(119,255,153)]/90'
 					)}
 				>
 					{name}

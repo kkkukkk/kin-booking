@@ -36,7 +36,7 @@ const ConfirmStep = ({
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	
 	return (
-		<div className="relative overflow-hidden">
+		<div className="relative">
 			<motion.div
 				variants={textContainer}
 				initial="hidden"
@@ -74,7 +74,7 @@ const ConfirmStep = ({
 					<div className="space-y-2 text-sm md:text-base">
 						<div className="flex justify-between">
 							<span className="opacity-70">공연명</span>
-							<span className="font-semibold">{event.eventName}</span>
+							<span className="font-medium">{event.eventName}</span>
 						</div>
 						<div className="flex justify-between">
 							<span className="opacity-70">날짜</span>

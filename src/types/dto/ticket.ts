@@ -12,6 +12,20 @@ export interface TicketGroupDto {
   createdAt: string;
 }
 
+export interface TicketGroupApiResponse {
+  eventId: string;
+  reservationId: string;
+  ownerId: string;
+  status: string;
+  createdAt: string;
+  event: {
+    eventName: string;
+  };
+  user: {
+    name: string;
+  };
+}
+
 export interface TicketWithEventDto {
 	id: string;
 	reservationId: string;

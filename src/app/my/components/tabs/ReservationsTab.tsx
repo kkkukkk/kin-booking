@@ -11,7 +11,7 @@ import Button from '@/components/base/Button';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import { calculateReservationStats } from '@/util/reservationStats';
 import clsx from 'clsx';
-import { getStatusInfoColors } from '@/components/status/StatusBadge';
+import { getStatusInfoColors, getStatusTextColors } from '@/components/status/StatusBadge';
 import { useCancelPendingReservation } from '@/hooks/api/useReservations';
 import CheckCircleIcon from '@/components/icon/CheckCircleIcon';
 import ClockIcon from '@/components/icon/ClockIcon';
@@ -20,7 +20,8 @@ import MenuIcon from '@/components/icon/MenuIcon';
 import { useAlert } from '@/providers/AlertProvider';
 import Accordion from '@/components/base/Accordion';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ReservationStatus, Reservation } from '@/types/model/reservation';
+import { ReservationStatus } from '@/types/model/reservation';
+import { ReservationWithEventDto } from '@/types/dto/reservation';
 import dayjs from 'dayjs';
 import { NeonVariant, NEON_VARIANTS } from '@/types/ui/neonVariant';
 
@@ -153,8 +154,8 @@ const ReservationsTab = () => {
 	// 필터링된 리스트 (날짜 내림차순 정렬)
 	const filteredReservations = (activeFilter === 'all'
 		? displayReservations
-		: displayReservations.filter((r: Reservation & { eventName?: string }) => r.status === activeFilter)
-	).sort((a: Reservation & { eventName?: string }, b: Reservation & { eventName?: string }) => new Date(b.reservedAt).getTime() - new Date(a.reservedAt).getTime());
+		: displayReservations.filter((r: ReservationWithEventDto) => r.status === activeFilter)
+	).sort((a: ReservationWithEventDto, b: ReservationWithEventDto) => new Date(b.reservedAt).getTime() - new Date(a.reservedAt).getTime());
 
 	return (
 		<>
@@ -228,10 +229,10 @@ const ReservationsTab = () => {
 				</Accordion>
 			</div>
 			{/* 예매 리스트 */}
-			<div className="space-y-0">
+			<div className="space-y-0 md:space-y-0.5">
 				<AnimatePresence>
 					{filteredReservations.length > 0
-						? filteredReservations.map((reservation: Reservation & { eventName?: string }, index: number) => (
+						? filteredReservations.map((reservation: ReservationWithEventDto, index: number) => (
 							<motion.div
 								key={reservation.id}
 								initial={{ opacity: 0, y: 20 }}
@@ -254,38 +255,95 @@ const ReservationsTab = () => {
 									isChildren
 									neonVariant={getStatusNeonVariant(reservation.status)}
 								>
-									<div className="flex items-start justify-between mb-3">
-										<div className="flex-1">
-											<h4 className="text-lg font-semibold mb-1">{reservation.eventName}</h4>
-											<div className={clsx(
-												"flex items-center gap-4 text-sm",
-												theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
-											)}>
-												<span className="flex items-center gap-1">
-													<span className="w-2 h-2 bg-green-500 rounded-full"></span>
-													{reservation.ticketHolder}
-												</span>
-												<span className="flex items-center gap-1">
-													<span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-													{`${reservation.quantity}매`}
-												</span>
-												<span className="flex items-center gap-1">
-													<span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-													{dayjs(reservation.reservedAt).format('YYYY년 MM월 DD일')}
-												</span>
+									{/* 헤더: 공연명 + 취소버튼 */}
+									<div className="flex items-start justify-between mb-4">
+										<h4 className={clsx(
+											"text-lg md:text-xl font-bold flex-1 pr-4",
+											theme === "normal" ? "text-gray-900" : "text-white"
+										)}>
+											{reservation.events?.eventName || '공연명 없음'}
+										</h4>
+										{reservation.status === ReservationStatus.Pending && (
+											<Button
+												onClick={() => handleCancelReservation(reservation.id)}
+												theme="dark"
+												padding={"px-3 py-1"}
+												disabled={isCancelling}
+												reverse={theme === 'normal'}
+												className="flex-shrink-0 transition-all duration-200 text-xs md:text-sm"
+											>
+												취소
+											</Button>
+										)}
+									</div>
+									
+									<div className={clsx(
+										"mb-4 p-4 rounded-lg",
+										theme === "normal" ? "bg-gray-50 border border-gray-200" : 
+										theme === "dark" ? "bg-gray-800 border border-gray-600" :
+										"bg-gray-900/80 border border-gray-600/80"
+									)}>
+										{/* 정보 그리드 레이아웃 */}
+										<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+											{/* 공연 일시 */}
+											<div className="space-y-1">
+												<div className={clsx(
+													"text-xs font-medium uppercase tracking-wide",
+													theme === "normal" ? "text-gray-500" : 
+													theme === "dark" ? "text-gray-300" :
+													"text-gray-200"
+												)}>
+													공연 일시
+												</div>
+												<div className={clsx(
+													"text-sm",
+													theme === "normal" ? "text-gray-700" : 
+													theme === "dark" ? "text-white" :
+													"text-white"
+												)}>
+													{reservation.events?.eventDate ? dayjs(reservation.events.eventDate).format('YYYY년 MM월 DD일 HH:mm') : '일정 미정'}
+												</div>
 											</div>
-										</div>
-										<div className="flex flex-col items-center gap-2">
-											{reservation.status === ReservationStatus.Pending && (
-												<Button
-													onClick={() => handleCancelReservation(reservation.id)}
-													theme="dark"
-													padding={"px-1.5 py-0.5"}
-													disabled={isCancelling}
-												>
-													취소
-												</Button>
-											)}
+											
+											{/* 예매자 */}
+											<div className="space-y-1">
+												<div className={clsx(
+													"text-xs font-medium uppercase tracking-wide",
+													theme === "normal" ? "text-gray-500" : 
+													theme === "dark" ? "text-gray-300" :
+													"text-gray-200"
+												)}>
+													예매자
+												</div>
+												<div className={clsx(
+													"text-sm font-medium",
+													theme === "normal" ? "text-gray-700" : 
+													theme === "dark" ? "text-white" :
+													"text-white"
+												)}>
+													{reservation.ticketHolder}
+												</div>
+											</div>
+											
+											{/* 매수 */}
+											<div className="space-y-1">
+												<div className={clsx(
+													"text-xs font-medium uppercase tracking-wide",
+													theme === "normal" ? "text-gray-500" : 
+													theme === "dark" ? "text-gray-300" :
+													"text-gray-200"
+												)}>
+													매수
+												</div>
+												<div className={clsx(
+													"text-sm font-medium",
+													theme === "normal" ? "text-gray-700" : 
+													theme === "dark" ? "text-white" :
+													"text-white"
+												)}>
+													{reservation.quantity}매
+												</div>
+											</div>
 										</div>
 									</div>
 									
@@ -320,12 +378,15 @@ const ReservationsTab = () => {
 												className={clsx(
 													"mt-3 p-3 rounded-lg",
 													theme === 'normal' ? config.normalBg : config.darkBg,
-													theme === 'neon' ? '' : 'border-none shadow-none'
+													theme === 'neon' ? '' : 'border-transparent shadow-none'
 												)}
 												neonVariant={getStatusNeonVariant(reservation.status)}
 												isChildren
 											>
-												<div className={clsx("flex items-center gap-2 text-sm", getStatusInfoColors(reservation.status, theme))}>
+												<div className={clsx(
+													"flex items-center gap-2 text-sm",
+													getStatusTextColors(reservation.status, theme)
+												)}>
 													<span className={clsx("w-2 h-2 rounded-full", config.dotColor)}></span>
 													{config.message}
 												</div>

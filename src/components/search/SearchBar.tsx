@@ -13,7 +13,6 @@ import clsx from "clsx";
 import Select from "@/components/base/Select";
 import useDebounce from "@/hooks/useDebounce";
 import { FilterIcon } from "@/components/icon/FilterIcon";
-import { createPortal } from "react-dom";
 
 interface SearchBarProps {
   label?: string;
@@ -52,7 +51,6 @@ const SearchBar = ({
   const [isOpen, setIsOpen] = useState(initialOpen);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef<HTMLButtonElement>(null);
-  const [datePickerPosition, setDatePickerPosition] = useState({ top: 0, left: 0, width: 0 });
 
   const debouncedKeyword = useDebounce(keyword, 300);
 
@@ -77,14 +75,6 @@ const SearchBar = ({
   }, [filters.dateRange?.from, filters.dateRange?.to]);
 
   const handleDatePickerToggle = () => {
-    if (datePickerRef.current) {
-      const rect = datePickerRef.current.getBoundingClientRect();
-      setDatePickerPosition({
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
     setShowDatePicker(!showDatePicker);
   };
 
@@ -172,22 +162,52 @@ const SearchBar = ({
                       "shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)] px-2 py-1 rounded w-full text-left cursor-pointer",
                       theme === "normal" && "bg-white/90 border border-black/20",
                       theme === "dark" && "bg-black/80 border border-white/50",
-                      theme === "neon" && "bg-black/80 border border-white/50"
+                      theme === "neon" && "bg-black/80 border border-[var(--neon-cyan)]/50"
                     )}
                   >
                     {tempFrom && tempTo ? `${tempFrom} ~ ${tempTo}` : '기간'}
                   </button>
+                  
+                  {/* DatePicker - 부모 요소 내에서 직접 렌더링 */}
+                  {showDatePicker && (
+                    <motion.div
+                      variants={fadeSlideDownSm}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{ duration: 0.3 }}
+                      className="absolute z-50 text-sm mt-1"
+                      style={{
+                        top: '100%',
+                        left: 0,
+                        width: '100%',
+                      }}
+                    >
+                      <DatePicker
+                        initialFrom={tempFrom ? dayjs(tempFrom) : undefined}
+                        initialTo={tempTo ? dayjs(tempTo) : undefined}
+                        onChange={(from, to) => {
+                          const f = from.format('YYYY-MM-DD');
+                          const t = to.format('YYYY-MM-DD');
+                          setTempFrom(f);
+                          setTempTo(t);
+                          filters.dateRange!.onChange(f, t);
+                          setShowDatePicker(false);
+                        }}
+                      />
+                    </motion.div>
+                  )}
                 </div>
               )}
 
               <div className="flex gap-2 w-full md:w-1/8">
                 <Button
                   width="w-full"
-                  padding="py-1 md:py-0.5"
+                  padding="py-1.5 md:py-1"
                   theme={theme === "normal" ? "dark" : theme}
                   onClick={handleReset}
                   reverse={theme === "normal"}
-                  className="self-end"
+                  neonVariant='yellow'
                 >
                   리셋
                 </Button>
@@ -197,36 +217,7 @@ const SearchBar = ({
         </AnimatePresence>
       </div>
 
-      {/* Portal for DatePicker */}
-      {showDatePicker && typeof window !== 'undefined' && createPortal(
-        <motion.div
-          variants={fadeSlideDownSm}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: 0.3 }}
-          className="fixed z-[9999] text-sm"
-          style={{
-            top: datePickerPosition.top + 5,
-            left: datePickerPosition.left,
-            width: datePickerPosition.width,
-          }}
-        >
-          <DatePicker
-            initialFrom={tempFrom ? dayjs(tempFrom) : undefined}
-            initialTo={tempTo ? dayjs(tempTo) : undefined}
-            onChange={(from, to) => {
-              const f = from.format('YYYY-MM-DD');
-              const t = to.format('YYYY-MM-DD');
-              setTempFrom(f);
-              setTempTo(t);
-              filters.dateRange!.onChange(f, t);
-              setShowDatePicker(false);
-            }}
-          />
-        </motion.div>,
-        document.body
-      )}
+
     </>
   );
 };

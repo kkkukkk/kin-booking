@@ -63,22 +63,22 @@ const FriendList = () => {
 
   if (isLoading) {
     return (
-      <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
+      <div className="p-8 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
         <p>친구 목록 불러오는 중...</p>
-      </ThemeDiv>
+      </div>
     );
   }
 
   if (error) {
     console.error('FriendList error:', error);
     return (
-      <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
+      <div className="p-8 text-center">
         <p className="text-red-500 mb-4">친구 목록을 불러오는데 실패했어요.</p>
         <Button onClick={() => window.location.reload()} theme="dark">
           다시 시도
         </Button>
-      </ThemeDiv>
+      </div>
     );
   }
 

@@ -25,32 +25,25 @@ const ThemeDiv = ({ children, className, isChildren, lightweight = false, neonVa
 	const getNeonStyles = (variant: NeonVariant) => {
 		const colors = {
 			green: { 
-				border: 'border-[var(--neon-green)]/70', 
-				shadow: 'shadow-[inset_0_1px_0_var(--neon-green-light),0_1px_3px_rgba(0,0,0,0.4)]' 
+				border: 'border-[var(--neon-green)]/50',
 			},
 			cyan: { 
-				border: 'border-[var(--neon-cyan)]/70', 
-				shadow: 'shadow-[inset_0_1px_0_rgba(0,255,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+				border: 'border-[var(--neon-cyan)]/50',
 			},
 			magenta: { 
-				border: 'border-[var(--neon-magenta)]/90', 
-				shadow: 'shadow-[inset_0_1px_0_rgba(255,0,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+				border: 'border-[var(--neon-magenta)]/50',
 			},
 			pink: { 
-				border: 'border-[var(--neon-pink)]/90', 
-				shadow: 'shadow-[inset_0_1px_0_rgba(255,100,200,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+				border: 'border-[var(--neon-pink)]/50', 
 			},
 			blue: { 
-				border: 'border-[var(--neon-blue)]/70', 
-				shadow: 'shadow-[inset_0_1px_0_rgba(0,150,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+				border: 'border-[var(--neon-blue)]/50',
 			},
 			yellow: { 
-				border: 'border-[var(--neon-yellow)]/70', 
-				shadow: 'shadow-[inset_0_1px_0_rgba(255,255,0,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+				border: 'border-[var(--neon-yellow)]/50',
 			},
 			purple: { 
-				border: 'border-[var(--neon-purple)]/70', 
-				shadow: 'shadow-[inset_0_1px_0_rgba(150,0,255,0.3),0_1px_3px_rgba(0,0,0,0.4)]' 
+				border: 'border-[var(--neon-purple)]/50',
 			}
 		};
 		return colors[variant as keyof typeof colors] || colors.green;
@@ -70,7 +63,7 @@ const ThemeDiv = ({ children, className, isChildren, lightweight = false, neonVa
 		},
 		neon: {
 			base: 'bg-[var(--dark-back)] border border-[rgba(255,255,255,0.2)] text-gray-100 shadow-[inset_0_1px_0_var(--neon-green-light),0_2px_4px_rgba(0,0,0,0.3)]',
-			children: `bg-[var(--dark-back)] border ${getNeonStyles(neonVariant).border} text-gray-100 ${getNeonStyles(neonVariant).shadow}`,
+			children: `bg-[var(--dark-back)] border ${getNeonStyles(neonVariant).border} text-gray-100`,
 			lightweight: 'bg-gray-700 border border-[rgba(255,255,255,0.2)] text-gray-100 shadow-[inset_0_1px_0_var(--neon-green-faint),0_1px_2px_rgba(0,0,0,0.2)]'
 		}
 	};

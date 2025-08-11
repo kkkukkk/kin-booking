@@ -41,13 +41,13 @@ const Counter = ({ value, min = 1, max, onChange }: CounterProps) => {
 		
 		switch (theme) {
 			case 'normal':
-				return 'border-gray-600 text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:scale-105 active:scale-95';
+				return 'border-gray-600 text-gray-600 hover:border-gray-800 hover:text-gray-800';
 			case 'dark':
-				return 'border-gray-400 text-gray-400 hover:border-gray-200 hover:text-gray-200 hover:scale-105 active:scale-95';
+				return 'border-gray-400 text-gray-400 hover:border-gray-200 hover:text-gray-200';
 			case 'neon':
-				return 'border-cyan-400 text-cyan-400 hover:border-cyan-300 hover:text-cyan-300 hover:scale-105 active:scale-95';
+				return 'border-cyan-400 text-cyan-400 hover:border-cyan-300 hover:text-cyan-300';
 			default:
-				return 'border-gray-600 text-gray-600 hover:border-gray-800 hover:text-gray-800 hover:scale-105 active:scale-95';
+				return 'border-gray-600 text-gray-600 hover:border-gray-800 hover:text-gray-800';
 		}
 	};
 

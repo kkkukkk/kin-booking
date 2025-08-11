@@ -78,7 +78,7 @@ const Select = ({
 			case "dark":
 				return "text-gray-200 bg-black/90 border border-white/50";
 			case "neon":
-				return "text-gray-200 bg-black/90 border border-[var(--neon-cyan)]/70";
+				return "text-gray-200 bg-black/90 border border-[var(--neon-cyan)]/50";
 			default:
 				return "text-black bg-white border border-black/20";
 		}

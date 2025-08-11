@@ -21,6 +21,36 @@
   --neon-green-light: rgba(0, 255, 119, .3);
   --neon-green-faint: rgba(0, 255, 119, .2);
   
+  --neon-cyan-strong: rgba(0, 255, 255, .7);
+  --neon-cyan-medium: rgba(0, 255, 255, .5);
+  --neon-cyan-light: rgba(0, 255, 255, .3);
+  --neon-cyan-faint: rgba(0, 255, 255, .2);
+  
+  --neon-magenta-strong: rgba(255, 0, 255, .7);
+  --neon-magenta-medium: rgba(255, 0, 255, .5);
+  --neon-magenta-light: rgba(255, 0, 255, .3);
+  --neon-magenta-faint: rgba(255, 0, 255, .2);
+  
+  --neon-pink-strong: rgba(255, 149, 232, .7);
+  --neon-pink-medium: rgba(255, 149, 232, .5);
+  --neon-pink-light: rgba(255, 149, 232, .3);
+  --neon-pink-faint: rgba(255, 149, 232, .2);
+  
+  --neon-blue-strong: rgba(0, 200, 255, .7);
+  --neon-blue-medium: rgba(0, 200, 255, .5);
+  --neon-blue-light: rgba(0, 200, 255, .3);
+  --neon-blue-faint: rgba(0, 200, 255, .2);
+  
+  --neon-yellow-strong: rgba(255, 255, 0, .7);
+  --neon-yellow-medium: rgba(255, 255, 0, .5);
+  --neon-yellow-light: rgba(255, 255, 0, .3);
+  --neon-yellow-faint: rgba(255, 255, 0, .2);
+  
+  --neon-purple-strong: rgba(200, 0, 255, .7);
+  --neon-purple-medium: rgba(200, 0, 255, .5);
+  --neon-purple-light: rgba(200, 0, 255, .3);
+  --neon-purple-faint: rgba(200, 0, 255, .2);
+  
   /* 네온 그라데이션 */
   --neon-cyan-gradient: linear-gradient(135deg, #00ff88, #00cc6a);
   --neon-magenta-gradient: linear-gradient(135deg, #ff0080, #ff6b9d);
@@ -58,6 +88,13 @@
 
 * {
   box-sizing: border-box;
+}
+
+/* 텍스트 렌더링 최적화 */
+* {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {

@@ -2,6 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { ButtonProps } from "@/types/ui/button";
 import { DEFAULT_NEON_VARIANT } from "@/types/ui/neonVariant";
+import { getNeonBorderColor, getNeonShadowColor, getNeonHoverShadowColor } from "@/util/neonStyles";
 
 // 햄버거 버튼 바
 const HamburgerLines = ({ on }: { on: boolean }) => {
@@ -48,18 +49,9 @@ const Button = ({
 	className,
 	...rest
 }: ButtonProps) => {
-	const getNeonBorderColor = () => {
-		const colors = {
-			green: 'border-[var(--neon-green)]/70',
-			cyan: 'border-[var(--neon-cyan)]/70',
-			magenta: 'border-[var(--neon-magenta)]/70',
-			pink: 'border-[var(--neon-pink)]/70',
-			blue: 'border-[var(--neon-blue)]/70',
-			yellow: 'border-[var(--neon-yellow)]/70',
-			purple: 'border-[var(--neon-purple)]/70'
-		};
-		return colors[neonVariant as keyof typeof colors] || colors.green;
-	};
+
+
+
 
 	const getThemeStyles = () => {
 		switch (theme) {
@@ -70,7 +62,7 @@ const Button = ({
 					? "text-[#eee] bg-[rgba(30,30,30,0.95)] border border-white/25"
 					: "text-[#eee] bg-black/80 border border-white/30";
 			case "neon":
-				return `text-[#eee] bg-black/80 border ${getNeonBorderColor()}`;
+				return `text-[#eee] bg-black/80 border ${getNeonBorderColor(neonVariant)}`;
 			default:
 				return "text-black bg-white/90 border border-black/20";
 		}
@@ -79,16 +71,16 @@ const Button = ({
 	const getHoverStyles = () => {
 		if (theme === "normal") {
 			return reverse 
-				? "hover:shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]"
-				: "hover:shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]";
+				? "hover:shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_16px_rgba(255,255,255,0.3)]"
+				: "hover:shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_12px_rgba(0,0,0,0.3),0_0_16px_rgba(0,0,0,0.1)]";
 		}
 		if (theme === "dark") {
 			return reverse
-				? "hover:shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]"
-				: "hover:shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]";
+				? "hover:shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_12px_rgba(0,0,0,0.3),0_0_16px_rgba(0,0,0,0.1)]"
+				: "hover:shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_16px_rgba(255,255,255,0.3)]";
 		}
 		if (theme === "neon") {
-			return "hover:shadow-[0_0_4px_var(--neon-green-strong),0_0_8px_var(--neon-green-medium),0_0_12px_var(--neon-green-light),0_0_20px_var(--neon-green-faint)]";
+			return getNeonHoverShadowColor(neonVariant);
 		}
 		return "";
 	};
@@ -98,16 +90,16 @@ const Button = ({
 		
 		if (theme === "normal") {
 			return reverse 
-				? "shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]"
-				: "shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]";
+				? "shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_16px_rgba(255,255,255,0.3)]"
+				: "shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_12px_rgba(0,0,0,0.3),0_0_16px_rgba(0,0,0,0.1)]";
 		}
 		if (theme === "dark") {
 			return reverse
-				? "shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_8px_rgba(0,0,0,0.3),0_0_20px_rgba(0,0,0,0.1)]"
-				: "shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.5),0_0_12px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.1)]";
+				? "shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_12px_rgba(0,0,0,0.3),0_0_16px_rgba(0,0,0,0.1)]"
+				: "shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_16px_rgba(255,255,255,0.3)]";
 		}
 		if (theme === "neon") {
-			return "shadow-[0_0_4px_var(--neon-green-strong),0_0_8px_var(--neon-green-medium),0_0_12px_var(--neon-green-light),0_0_20px_var(--neon-green-faint)]";
+			return getNeonShadowColor(neonVariant);
 		}
 		return "";
 	};
