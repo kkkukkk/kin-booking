@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fadeSlideDownSm } from '@/types/ui/motionVariants';
 
 export interface Column<T> {
   key: string;
@@ -33,6 +34,8 @@ export interface DataTableProps<T> {
     direction: 'asc' | 'desc';
   };
   onSortChange?: (field: string, direction: 'asc' | 'desc') => void;
+  expandedRows?: Set<string | number>;
+  expandedRowRenderer?: (item: T, index: number) => React.ReactNode;
 }
 
 function DataTable<T>({
@@ -49,6 +52,8 @@ function DataTable<T>({
   mobileCardSections,
   sortConfig,
   onSortChange,
+  expandedRows,
+  expandedRowRenderer,
 }: DataTableProps<T>) {
   const handleRowClick = (item: T, index: number) => {
     if (onRowClick) {
@@ -162,21 +167,39 @@ function DataTable<T>({
               </thead>
               <tbody className={themeStyles.divider}>
                 {data.map((item, index) => (
-                  <motion.tr
-                    key={index}
-                    className={`${themeStyles.row} ${onRowClick ? 'cursor-pointer' : ''}`}
-                    onClick={() => handleRowClick(item, index)}
-                    transition={{ duration: 0.15 }}
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={column.key}
-                        className={`px-4 py-3 text-sm ${themeStyles.bodyText} ${column.className || ''}`}
-                      >
-                        {column.render(item, index)}
-                      </td>
-                    ))}
-                  </motion.tr>
+                  <React.Fragment key={index}>
+                    <motion.tr
+                      className={`${themeStyles.row} ${onRowClick ? 'cursor-pointer' : ''}`}
+                      onClick={() => handleRowClick(item, index)}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {columns.map((column) => (
+                        <td
+                          key={column.key}
+                          className={`px-4 py-3 text-sm ${themeStyles.bodyText} ${column.className || ''}`}
+                        >
+                          {column.render(item, index)}
+                        </td>
+                      ))}
+                    </motion.tr>
+                    {expandedRows && expandedRowRenderer && expandedRows.has(index) && (
+                      <tr>
+                        <td colSpan={columns.length} className="p-0">
+                          <AnimatePresence>
+                            <motion.div
+                              initial={{ opacity: 0, y: -8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -8 }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                              className={`${theme === 'normal' ? 'bg-gray-50' : theme === 'neon' ? 'bg-green-500/5' : 'bg-neutral-800'}`}
+                            >
+                              {expandedRowRenderer(item, index)}
+                            </motion.div>
+                          </AnimatePresence>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

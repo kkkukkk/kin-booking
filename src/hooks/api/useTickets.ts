@@ -11,6 +11,7 @@ import {
   getTicketGroups,
   getTicketGroupsByOwnerId,
   transferTicketsByReservation,
+  updateTicketStatusByReservation,
 } from '@/api/ticket';
 import { Ticket, TicketStatus } from '@/types/model/ticket';
 import { TicketGroupDto, TicketGroupApiResponse } from '@/types/dto/ticket';
@@ -391,6 +392,51 @@ export const useApproveCancelRequest = () => {
     onError: (error: Error) => {
       console.error('취소 신청 승인 실패:', error);
       showToast({ message: '취소 신청 승인에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
+    },
+  });
+}; 
+
+// 티켓 상태 업데이트 훅 (입장확정용)
+export const useUpdateTicketStatusByReservation = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      eventId,
+      reservationId,
+      ownerId,
+      status
+    }: {
+      eventId: string;
+      reservationId: string;
+      ownerId: string;
+      status: string;
+    }) => {
+      return updateTicketStatusByReservation(eventId, reservationId, ownerId, status);
+    },
+    onSuccess: (data, variables) => {
+      const { eventId, ownerId } = variables;
+      
+      // 관련 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', 'withEvent', 'owner', ownerId] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', 'event', eventId] });
+      
+      showToast({ 
+        message: `${data.updated}장의 티켓이 성공적으로 업데이트되었습니다.`, 
+        iconType: 'success', 
+        autoCloseTime: 3000 
+      });
+    },
+    onError: (error: Error) => {
+      console.error('티켓 상태 업데이트 실패:', error);
+      showToast({ 
+        message: '티켓 상태 업데이트에 실패했습니다.', 
+        iconType: 'error', 
+        autoCloseTime: 3000 
+      });
     },
   });
 }; 

@@ -20,7 +20,6 @@ import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
-import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 
 const RegisterClient = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
@@ -294,14 +293,11 @@ const RegisterClient = () => {
 			<div className="flex justify-start mb-4">
 				<Button
 					theme={"dark"}
-					padding={"px-3 py-1.5"}
+					padding={"px-3 py-1.5 md:px-4 md:py-1"}
 					onClick={onBack}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
 				>
-					<span className="mr-1">
-						<ArrowLeftIcon />
-					</span>
 					{step === "consent" ? "뒤로가기" : "이전"}
 				</Button>
 			</div>

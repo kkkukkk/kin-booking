@@ -145,7 +145,7 @@ const TicketStack = ({
 	// QR코드 모달 열기
 	const handleShowQRCode = () => {
 		if (tickets.length > 0) {
-			setShowQRModal(true);
+			setShowQRModal(true); // 모달 열기
 		}
 	};
 
@@ -468,7 +468,7 @@ const TicketStack = ({
 			</div>
 
 			{/* QR코드 모달 */}
-			{tickets.length > 0 && (
+			{showQRModal && tickets.length > 0 && (
 				<TicketQRModal
 					isOpen={showQRModal}
 					onClose={() => setShowQRModal(false)}

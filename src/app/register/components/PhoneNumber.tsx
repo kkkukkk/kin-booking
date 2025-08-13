@@ -118,11 +118,11 @@ const PhoneNumber = ({
 
 	return (
 		<div className="flex flex-col relative overflow-hidden">
-			<div className={"mb-2"}>
-				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"휴대폰 번호를 입력해주세요!"} rightIcon={<PhoneIcon />} />
-			</div>
 			<div className={"mb-4"}>
-				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"숫자만 입력해도 괜찮아요!"} delay={0.8} leftIcon={<BulbIcon />} />
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"휴대폰 번호를 입력해주세요!"} leftIcon={<PhoneIcon />} />
+			</div>
+			<div className={clsx("mb-4", theme === "normal" ? "text-cyan-800" : "text-cyan-400")}>
+				<AnimatedTextWithIcon fontSize={"text-sm"} text={"숫자만 입력해도 괜찮아요!"} delay={0.8} leftIcon={<BulbIcon />} />
 			</div>
 
 			<motion.div

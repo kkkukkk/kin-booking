@@ -91,6 +91,16 @@ export const softDeleteUser = async (userId: string): Promise<User> => {
 	return toCamelCaseKeys<User>(data);
 }
 
+// 사용자 역할 변경 api
+export const updateUserRole = async (userId: string, newRoleId: number): Promise<void> => {
+	const { error } = await supabase
+		.from('user_roles')
+		.update({ role_id: newRoleId })
+		.eq('user_id', userId);
+	
+	if (error) throw error;
+};
+
 // 특정 유저 조회 api
 export const fetchUserById = async (userId: string): Promise<UserWithRoles | null> => {
 	const { data, error } = await supabase

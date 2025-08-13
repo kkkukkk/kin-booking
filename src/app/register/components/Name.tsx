@@ -53,11 +53,11 @@ const Name = ({
 
 	return (
 		<div className="flex flex-col relative overflow-hidden">
-			<div className={"mb-2"}>
-				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"이름이 어떻게 되시나요?"} rightIcon={<SmileIcon />} />
-			</div>
 			<div className={"mb-4"}>
-				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"별명도 좋지만 되도록이면 이름을 입력해 주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"이름이 어떻게 되시나요?"} />
+			</div>
+			<div className={clsx("mb-4", theme === "normal" ? "text-cyan-800" : "text-cyan-400")}>
+				<AnimatedTextWithIcon fontSize={"text-sm"} text={"별명도 좋지만 되도록이면 이름을 입력해 주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
 			</div>
 
 			<motion.div

@@ -7,6 +7,7 @@ import {
 	deleteUser,
 	softDeleteUser,
 	searchUsers,
+	updateUserRole,
 } from '@/api/user';
 import { User } from '@/types/model/user';
 import { UserWithRoles } from '@/types/dto/user';
@@ -140,5 +141,21 @@ export const useSearchUsers = (query: string) => {
 		staleTime: 5 * 60 * 1000, // 5분 캐시
 		retry: 1,
 		retryDelay: 1000,
+	});
+};
+
+// 사용자 역할 변경 hook
+export const useUpdateUserRole = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation<void, Error, { userId: string; newRoleId: number }>({
+		mutationFn: ({ userId, newRoleId }) => updateUserRole(userId, newRoleId),
+		onSuccess: () => {
+			// 사용자 목록 쿼리 무효화하여 변경사항 반영
+			queryClient.invalidateQueries({ queryKey: ['user'] });
+		},
+		onError: (error: Error) => {
+			console.error('사용자 역할 변경 실패:', error.message);
+		},
 	});
 };

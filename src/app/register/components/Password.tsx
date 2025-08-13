@@ -59,11 +59,11 @@ const Password = ({
 
 	return (
 		<div className="flex flex-col relative overflow-hidden">
-			<div className={"mb-2"}>
-				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"사용할 비밀번호를 입력해주세요!"} rightIcon={<KeyIcon />} />
-			</div>
 			<div className={"mb-4"}>
-				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"사용할 비밀번호를 입력해주세요!"} leftIcon={<KeyIcon />} />
+			</div>
+			<div className={clsx("mb-4", theme === "normal" ? "text-cyan-800" : "text-cyan-400")}>
+				<AnimatedTextWithIcon fontSize={"text-sm"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
 			</div>
 
 			<motion.div

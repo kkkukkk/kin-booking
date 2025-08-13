@@ -102,9 +102,9 @@ const FriendList = () => {
           </div>
         </div>
         <h3 className="text-base md:text-xl font-bold mb-3">지금은 친구가 없어요</h3>
-				<p className="text-sm opacity-70 mb-2 leading-relaxed">
-					새로운 친구를 추가해보세요!
-				</p>
+              <p className="text-sm opacity-70 mb-2 leading-relaxed">
+                  새로운 친구를 추가해보세요!
+              </p>
       </div>
     );
   }
@@ -146,7 +146,8 @@ const FriendList = () => {
               <Button
                 onClick={() => handleDeleteFriend(friend.counterpartName, friend.counterpartUserId)}
                 theme="dark"
-                className="px-2 py-1 text-xs bg-red-500 hover:bg-red-600 whitespace-nowrap"
+                fontSize={"text-sm md:text-base"}
+                className="px-2 py-1 bg-red-500 hover:bg-red-600 font-bolder whitespace-nowrap"
                 disabled={isDeleting}
               >
                 끊기

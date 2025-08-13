@@ -110,7 +110,7 @@ const TicketsClient = () => {
   const mobileCardSections = (group: TicketGroupDto, index: number) => ({
     firstRow: (
       <>
-        <span className="font-semibold text-xs truncate">티켓 소유: {group.userName}</span>
+        <span className="font-semibold text-xs truncate">사용자: {group.userName}</span>
         <span className="text-xs truncate">{group.ticketCount}장</span>
         <StatusBadge status={group.status as TicketStatus} theme={theme} variant="badge" size="sm" statusType="ticket" />
       </>
@@ -333,6 +333,7 @@ const TicketsClient = () => {
                 value: size.toString(),
                 label: `${size}개`
               }))}
+              fontSize="text-xs md:text-sm"
             />
           </div>
         </div>

@@ -1,87 +1,80 @@
 import { supabase } from '@/lib/supabaseClient';
-import { toCamelCaseKeys, toSnakeCaseKeys } from '@/util/case/case';
-import { CreateEntrySessionDto, EntrySessionDto, EntrySessionWithDetailsDto } from '@/types/model/entry';
-import dayjs from 'dayjs';
+import { EntrySessionDto, EntrySessionWithDetailsDto } from '@/types/model/entry';
+import { toCamelCaseKeys } from '@/util/case/case';
 
-// 입장 세션 생성
-export const createEntrySession = async (params: {
-    eventId: string;
-    userId: string;
-    reservationId: string;
-  }): Promise<EntrySessionDto> => {
-    const expiresAt = dayjs().add(1, 'hour').toISOString();
+// 입장 세션 처리 RPC 함수
+export const processEntrySession = async (params: {
+  eventId: string;
+  userId: string;
+  reservationId: string;
+}) => {
+  try {
+    console.log('processEntrySession RPC 호출 시작:', params);
     
-    const { data, error } = await supabase
-      .from('entry_sessions')
-      .insert({
-        ...toSnakeCaseKeys<CreateEntrySessionDto>(params),
-        expires_at: expiresAt,
-        status: 'pending'
-      })
-      .select()
-      .single();
-  
-    if (error) throw error;
-    return toCamelCaseKeys<EntrySessionDto>(data);
-  };
+    // RPC 함수 호출
+    const { data, error } = await supabase.rpc('process_entry_session', {
+      p_event_id: params.eventId,
+      p_user_id: params.userId,
+      p_reservation_id: params.reservationId
+    });
 
-// 입장 세션 조회 (상세 정보 포함)
-export const getEntrySession = async (entryId: string): Promise<EntrySessionWithDetailsDto> => {
-    const { data, error } = await supabase
-      .from('entry_sessions')
-      .select(`
-        *,
-        tickets:ticket_id(id, ticket_number, status),
-        events:event_id(event_name, event_date, location),
-        users:user_id(name, email)
-      `)
-      .eq('id', entryId)
-      .gte('expires_at', dayjs().toISOString()) // 현재 시간보다 큰 것만
-      .eq('status', 'pending')
-      .single();
-  
-    if (error) throw error;
-    return toCamelCaseKeys<EntrySessionWithDetailsDto>(data);
-  };
-
-// 입장 처리
-export const markEntryAsUsed = async (entryId: string): Promise<void> => {
-    const now = dayjs().toISOString();
-    
-    // 1. 입장 세션 상태 업데이트
-    const { error: sessionError } = await supabase
-      .from('entry_sessions')
-      .update({
-        status: 'used',
-        used_at: now
-      })
-      .eq('id', entryId);
-  
-    if (sessionError) throw sessionError;
-    
-    // 2. 해당 예매의 모든 활성 티켓을 used로 변경
-    const { data: session } = await supabase
-      .from('entry_sessions')
-      .select('reservation_id, event_id, user_id')
-      .eq('id', entryId)
-      .single();
-      
-    if (session) {
-      const { error: ticketError } = await supabase
-        .from('ticket')
-        .update({ status: 'used' })
-        .eq('reservation_id', session.reservation_id)  // 예매 ID
-        .eq('event_id', session.event_id)               // 이벤트 ID
-        .eq('owner_id', session.user_id)                // 현재 소유자 ID
-        .eq('status', 'active');                        // 활성 상태만
-        
-      if (ticketError) throw ticketError;
+    if (error) {
+      console.error('RPC 함수 호출 실패:', error);
+      throw error;
     }
+
+    console.log('RPC 함수 호출 성공:', data);
+    
+    // RPC 결과를 EntrySessionDto 형태로 변환
+    const sessionData = toCamelCaseKeys<EntrySessionDto>(data.session_data);
+    
+    return {
+      action: data.action,
+      message: data.message,
+      session: sessionData
+    };  
+
+  } catch (error) {
+    console.error('입장 세션 처리 실패:', error);
+    throw error;
+  }
 };
+
+// 입장 세션 조회 함수
+export const getEntrySession = async (sessionId: string): Promise<EntrySessionWithDetailsDto> => {
+  const { data, error } = await supabase
+    .from('entry_sessions')
+    .select(`
+      *,
+      events:event_id (
+        event_name,
+        event_date
+      ),
+      users:user_id (
+        name
+      ),
+      reservations:reservation_id (
+        quantity,
+        ticket_holder
+      )
+    `)
+    .eq('id', sessionId)
+    .single();
+
+  if (error) throw error;
   
-// 만료된 세션 정리
-export const cleanupExpiredSessions = async (): Promise<void> => {
-    const { error } = await supabase
-        .rpc('update_expired_sessions');
-    if (error) throw error;
+  // snake_case를 camelCase로 변환
+  const camelCaseData = toCamelCaseKeys<EntrySessionWithDetailsDto>(data);
+  
+  return camelCaseData;
+};
+
+// 입장 세션 상태 업데이트
+export const updateEntrySessionStatus = async (sessionId: string, status: string): Promise<void> => {
+  const { error } = await supabase
+    .from('entry_sessions')
+    .update({ status })
+    .eq('id', sessionId);
+
+  if (error) throw error;
 };

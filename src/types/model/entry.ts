@@ -1,35 +1,39 @@
+export enum EntrySessionStatus {
+  Pending = 'pending',   // 대기 중 (입장 가능)
+  Used = 'used',         // 사용 완료 (입장 불가)
+  Expired = 'expired'    // 만료됨 (재생성 필요)
+}
+
+export const EntrySessionStatusKo: Record<EntrySessionStatus, string> = {
+  [EntrySessionStatus.Pending]: '대기 중',
+  [EntrySessionStatus.Used]: '사용 완료',
+  [EntrySessionStatus.Expired]: '만료됨',
+};
+
 export interface EntrySessionDto {
-    id: string;
-    ticketId: string;
-    eventId: string;
-    userId: string;
-    reservationId: string;
-    createdAt: string;
-    expiresAt: string;
-    usedAt?: string;
-    status: 'pending' | 'used' | 'expired';
-  }
-  
-  export interface EntrySessionWithDetailsDto extends EntrySessionDto {
-    tickets: {
-      id: string;
-      ticketNumber: number;
-      status: string;
-    };
-    events: {
-      eventName: string;
-      eventDate: string;
-      location?: string;
-    };
-    users: {
-      name: string;
-      email: string;
-    };
-  }
-  
-  export interface CreateEntrySessionDto {
-    ticketId: string;
-    eventId: string;
-    userId: string;
-    reservationId: string;
-  }
+  id: string;
+  ticketId: string;
+  eventId: string;
+  userId: string;
+  reservationId: string;
+  createdAt: string;
+  expiresAt: string;
+  usedAt?: string;
+  status: EntrySessionStatus;
+}
+
+export interface EntrySessionWithDetailsDto extends EntrySessionDto {
+  events: {
+    eventName: string;
+    eventDate: string;
+    location?: string;
+  };
+  users: {
+    name: string;
+    email: string;
+  };
+  reservations: {
+    quantity: number;
+    ticketHolder: string;
+  };
+}

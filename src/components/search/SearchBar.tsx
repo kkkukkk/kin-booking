@@ -34,6 +34,11 @@ interface SearchBarProps {
       onChange: (value: string) => void;
       options: { value: string; label: string }[];
     };
+    role?: {
+      value: string;
+      onChange: (value: string) => void;
+      options: { value: string; label: string }[];
+    };
   };
 }
 
@@ -67,6 +72,7 @@ const SearchBar = ({
     if (filters.dateRange) filters.dateRange.onChange('', '');
     if (filters.keyword) filters.keyword.onChange('');
     if (filters.status) filters.status.onChange('');
+    if (filters.role) filters.role.onChange('');
   };
 
   useEffect(() => {
@@ -126,7 +132,7 @@ const SearchBar = ({
                 },
               }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="flex flex-col md:flex-row gap-2 items-center w-full mt-2"
+              className="flex flex-col md:flex-row gap-3 items-center w-full mt-2"
             >
               {filters.keyword && (
                 <Input
@@ -137,7 +143,7 @@ const SearchBar = ({
                     setKeyword(e.target.value);
                   }}
                   placeholder={filters.keyword.placeholder ?? '검색어 입력'}
-                  className="px-2 py-1 rounded w-full md:w-1/2"
+                  className="px-2 py-1 rounded w-full md:w-2/5"
                 />
               )}
 
@@ -147,7 +153,18 @@ const SearchBar = ({
                   onChange={filters.status.onChange}
                   options={filters.status.options}
                   placeholder="선택"
-                  className="w-full md:w-1/6"
+                  className="w-full md:w-1/5"
+                  theme={theme}
+                />
+              )}
+
+              {filters.role && (
+                <Select
+                  value={filters.role.value}
+                  onChange={filters.role.onChange}
+                  options={filters.role.options}
+                  placeholder="역할 선택"
+                  className="w-full md:w-1/5"
                   theme={theme}
                 />
               )}
@@ -200,7 +217,7 @@ const SearchBar = ({
                 </div>
               )}
 
-              <div className="flex gap-2 w-full md:w-1/8">
+              <div className="flex gap-2 w-full md:w-1/5">
                 <Button
                   width="w-full"
                   padding="py-1.5 md:py-1"

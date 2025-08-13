@@ -292,3 +292,24 @@ export const transferTicketsByReservation = async (
 
   return { transferred: ticketsToTransfer.length };
 }; 
+
+// 티켓 상태 업데이트 (입장확정용)
+export const updateTicketStatusByReservation = async (
+  eventId: string, 
+  reservationId: string, 
+  ownerId: string, 
+  status: string
+): Promise<{ updated: number }> => {
+  // 티켓 상태 업데이트 (active + transferred 상태 모두)
+  const { error } = await supabase
+    .from('ticket')
+    .update({ status })
+    .eq('event_id', eventId)
+    .eq('reservation_id', reservationId)
+    .eq('owner_id', ownerId)
+    .in('status', ['active', 'transferred']); // 활성 + 양도된 티켓 모두
+
+  if (error) throw error;
+  
+  return { updated: 1 }; // 성공 시 1 반환
+}; 

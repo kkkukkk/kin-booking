@@ -17,7 +17,7 @@ const Marketing = ({ onClose, onConfirm }: MarketingProps) => {
 
 			<article className="mb-4">
 				<h3 className="font-semibold text-base md:text-xl">2. 안내 사항</h3>
-				<p className="text-sm md:text-lg">수신 동의는 언제든지 철회할 수 있으며, 수신 거부 시 별도의 절차에 따라 진행할 수 있습니다.</p>
+				<p className="text-sm md:text-lg">수신 동의는 언제든지 철회할 수 있으며(마이페이지), 수신 거부 시 별도의 절차에 따라 진행할 수 있습니다.</p>
 			</article>
 
 			<article>

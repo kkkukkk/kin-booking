@@ -112,11 +112,11 @@ const Email = ({
 
 	return (
 		<div className="flex flex-col relative overflow-hidden">
-			<div className={"mb-2"}>
-				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"사용할 이메일을 입력해주세요!"} rightIcon={<MailIcon />} />
-			</div>
 			<div className={"mb-4"}>
-				<AnimatedTextWithIcon fontSize={"text-sm md:text-base"} text={"입력한 이메일은 로그인에 사용돼요."} delay={0.8} leftIcon={<BulbIcon/>} />
+				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"사용할 이메일을 입력해주세요! "} leftIcon={<MailIcon />} />
+			</div>
+			<div className={clsx("mb-4", theme === "normal" ? "text-cyan-800" : "text-cyan-400")}>
+				<AnimatedTextWithIcon fontSize={"text-sm"} text={"입력한 이메일은 로그인에 사용돼요."} delay={0.8} leftIcon={<BulbIcon/>} />
 			</div>
 
 			<motion.div

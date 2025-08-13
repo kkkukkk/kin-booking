@@ -399,6 +399,7 @@ const ReservationsClient = () => {
                 value: size.toString(),
                 label: `${size}개`
               }))}
+              fontSize="text-xs md:text-sm"
             />
           </div>
         </div>
