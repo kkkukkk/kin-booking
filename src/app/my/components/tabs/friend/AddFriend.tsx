@@ -52,7 +52,7 @@ const AddFriend = () => {
             </div>
           ) : debouncedQuery.length >= 2 && searchResults && searchResults.length > 0 ? (
             <div className="space-y-2">
-              <h4 className="text-sm font-medium p-3 border-b border-gray-200 dark:border-gray-700">
+              <h4 className="text-sm font-medium p-3 border-b border-gray-200">
                 검색 결과 ({searchResults.length}명)
               </h4>
               {searchResults.map((user) => (

@@ -21,7 +21,7 @@ export const useEventsWithCurrentStatus = (params?: PaginationParams & FetchEven
 	return useQuery<FetchEventWithCurrentStatusResponseDto>({
 		queryKey: ['events_with_current_status', params],
 		queryFn: () => fetchEventsWithCurrentStatus(params),
-		staleTime: 1000 * 60 * 10,
+		staleTime: 0,
 		enabled: !!params,
 		retry: 1,
 	});
@@ -35,7 +35,7 @@ export const useEventById = (id: string | undefined) => {
 			return fetchEventById(id);
 		},
 		enabled: !!id,
-		staleTime: 1000 * 60 * 10,
+		staleTime: 0,
 		retry: 1,
 	});
 };

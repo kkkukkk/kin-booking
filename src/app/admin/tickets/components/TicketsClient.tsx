@@ -8,20 +8,19 @@ import { TicketGroupDto } from '@/types/dto/ticket';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import Button from '@/components/base/Button';
-import { useAlert } from '@/providers/AlertProvider';
 import SearchBar from '@/components/search/SearchBar';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { TicketStatus } from '@/types/model/ticket';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
+import RefundInfoModal from './RefundInfoModal';
+import useToast from '@/hooks/useToast';
 import dayjs from 'dayjs';
 
 const TicketsClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
-  const { showAlert } = useAlert();
-  const { data: ticketGroups, isLoading, error, refetch } = useTicketGroups();
-  const approveCancelMutation = useApproveCancelRequest();
+  const { showToast } = useToast();
   
   // 검색/필터 상태
   const [searchParams, setSearchParams] = useState({
@@ -38,6 +37,34 @@ const TicketsClient = () => {
   // 페이지 크기 옵션
   const pageSizeOptions = [10, 20, 50, 100];
 
+  // 정렬 상태
+  const [sortConfig, setSortConfig] = useState<{
+    field: string;
+    direction: 'asc' | 'desc';
+  }>({
+    field: 'createdAt',
+    direction: 'desc'
+  });
+
+  const { data: ticketGroups, isLoading, error, refetch } = useTicketGroups({
+    keyword: searchParams.keyword,
+    status: searchParams.status,
+    dateFrom: searchParams.dateFrom,
+    dateTo: searchParams.dateTo,
+    sortBy: sortConfig.field,
+    sortDirection: sortConfig.direction,
+  });
+  const approveCancelMutation = useApproveCancelRequest();
+
+  // 환불 정보 모달 상태
+  const [refundModalState, setRefundModalState] = useState<{
+    isOpen: boolean;
+    ticketGroup: TicketGroupDto | null;
+  }>({
+    isOpen: false,
+    ticketGroup: null,
+  });
+  
   // 검색 필터링
   const filteredGroups = ticketGroups?.filter((group: TicketGroupDto) => {
     // 키워드 검색
@@ -101,9 +128,43 @@ const TicketsClient = () => {
   };
 
   // 페이지 크기 변경 핸들러
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1); // 페이지 크기 변경 시 첫 페이지로 이동
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  // 정렬 핸들러
+  const handleSortChange = (field: string, direction: 'asc' | 'desc') => {
+    setSortConfig({ field, direction });
+    setCurrentPage(1);
+  };
+
+  // 환불 정보 모달 핸들러
+  const handleRefundModalClose = () => {
+    setRefundModalState({
+      isOpen: false,
+      ticketGroup: null,
+    });
+  };
+
+  const handleRefundSuccess = async () => {
+    if (!refundModalState.ticketGroup) return;
+
+    // 티켓 취소 승인 처리
+    approveCancelMutation.mutate({
+      eventId: refundModalState.ticketGroup.eventId,
+      reservationId: refundModalState.ticketGroup.reservationId,
+      ownerId: refundModalState.ticketGroup.ownerId,
+    }, {
+      onSuccess: () => {
+        showToast({ message: '티켓이 취소되었습니다.', iconType: 'success', autoCloseTime: 3000 });
+        refetch();
+        handleRefundModalClose();
+      },
+      onError: (error) => {
+        showToast({ message: `티켓 취소에 실패했습니다: ${error.message}`, iconType: 'error' });
+      },
+    });
   };
 
   // 모바일 카드 섹션 렌더 함수
@@ -139,33 +200,13 @@ const TicketsClient = () => {
     ),
   });
 
-  // 취소 신청 승인 처리
+  // 취소 승인 핸들러
   const handleApproveCancelRequest = async (group: TicketGroupDto) => {
-    // 1단계: 환불 완료 확인
-    const refundConfirmed = await showAlert({
-      type: 'confirm',
-      title: '환불 완료 확인',
-      message: `다음 티켓의 환불이 완료되었나요?\n\n공연: ${group.eventName}\n사용자: ${group.userName}\n티켓 수량: ${group.ticketCount}장\n\n환불이 완료되지 않았다면 먼저 환불을 진행해주세요.`,
+    // 환불 정보 입력 모달 표시
+    setRefundModalState({
+      isOpen: true,
+      ticketGroup: group,
     });
-
-    if (!refundConfirmed) {
-      return;
-    }
-
-    // 2단계: 최종 취소 승인 확인
-    const confirmed = await showAlert({
-      type: 'confirm',
-      title: '취소 신청 승인',
-      message: `환불이 완료되었으므로 다음 티켓의 취소를 승인하시겠습니까?\n\n공연: ${group.eventName}\n사용자: ${group.userName}\n티켓 수량: ${group.ticketCount}장`,
-    });
-
-    if (confirmed) {
-      approveCancelMutation.mutate({
-        eventId: group.eventId,
-        reservationId: group.reservationId,
-        ownerId: group.ownerId,
-      });
-    }
   };
 
   const columns = [
@@ -352,6 +393,8 @@ const TicketsClient = () => {
             loadingMessage="로딩 중..."
             className="h-full"
             mobileCardSections={mobileCardSections}
+            sortConfig={sortConfig}
+            onSortChange={handleSortChange}
           />
         </div>
 
@@ -372,6 +415,16 @@ const TicketsClient = () => {
           </div>
         )}
       </div>
+
+      {/* 환불 정보 입력 모달 */}
+      {refundModalState.ticketGroup && (
+        <RefundInfoModal
+          isOpen={refundModalState.isOpen}
+          onClose={handleRefundModalClose}
+          ticketGroup={refundModalState.ticketGroup}
+          onSuccess={handleRefundSuccess}
+        />
+      )}
     </ThemeDiv>
   );
 };

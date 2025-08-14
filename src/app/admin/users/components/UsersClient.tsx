@@ -26,13 +26,6 @@ const UsersClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const { showToast } = useToast();
 
-  // 사용자 및 역할 데이터
-  const { data: usersResponse, isLoading, error, refetch } = useUsers();
-  const { data: roles } = useRoles();
-  const updateUserRoleMutation = useUpdateUserRole();
-
-  const users = usersResponse?.data || [];
-
   // 검색/필터 상태
   const [searchParams, setSearchParams] = useState({
     keyword: '',
@@ -60,7 +53,17 @@ const UsersClient = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
 
-  // 검색 필터링
+  // 사용자 및 역할 데이터
+  const { data: usersResponse, isLoading, error, refetch } = useUsers({
+    sortBy: sortConfig.field,
+    sortDirection: sortConfig.direction,
+  });
+  const { data: roles } = useRoles();
+  const updateUserRoleMutation = useUpdateUserRole();
+
+  const users = usersResponse?.data || [];
+
+  // 검색 필터링만 적용 (정렬은 서버에서 처리)
   const filteredUsers = users.filter((user: UserWithRoles) => {
     // 키워드 검색
     if (searchParams.keyword) {
@@ -85,38 +88,15 @@ const UsersClient = () => {
     return true;
   });
 
-  // 정렬 적용
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    const direction = sortConfig.direction === 'asc' ? 1 : -1;
-
-    switch (sortConfig.field) {
-      case 'name':
-        return (a.name || '').localeCompare(b.name || '') * direction;
-      case 'email':
-        return (a.email || '').localeCompare(b.email || '') * direction;
-      case 'phoneNumber':
-        return (a.phoneNumber || '').localeCompare(b.phoneNumber || '') * direction;
-      case 'role':
-        const aRole = a.userRoles?.roles?.roleCode || '';
-        const bRole = b.userRoles?.roles?.roleCode || '';
-        return aRole.localeCompare(bRole) * direction;
-      case 'status':
-        return a.status.localeCompare(b.status) * direction;
-      case 'registerDate':
-        return dayjs(a.registerDate).isBefore(dayjs(b.registerDate)) ? -direction : direction;
-      case 'marketingConsent':
-        return (a.marketingConsent === b.marketingConsent) ? 0 : (a.marketingConsent ? -1 : 1) * direction;
-      default:
-        return 0;
-    }
-  });
+  // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
+  const finalUsers = filteredUsers;
 
   // 페이지네이션 적용
-  const totalCount = sortedUsers.length;
+  const totalCount = finalUsers.length;
   const totalPages = Math.ceil(totalCount / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const paginatedUsers = sortedUsers.slice(startIndex, endIndex);
+  const paginatedUsers = finalUsers.slice(startIndex, endIndex);
 
   // 검색 핸들러
   const handleSearch = (keyword: string) => {
@@ -150,7 +130,7 @@ const UsersClient = () => {
   // 정렬 핸들러
   const handleSortChange = (field: string, direction: 'asc' | 'desc') => {
     setSortConfig({ field, direction });
-    setCurrentPage(1);
+    setCurrentPage(1); // 정렬 변경 시 첫 페이지로 이동
   };
 
   // 사용자 클릭 핸들러
@@ -479,10 +459,12 @@ const UsersClient = () => {
             columns={columns}
             theme={theme}
             isLoading={isLoading}
-            className="w-full"
+            emptyMessage="사용자가 없습니다."
+            loadingMessage="로딩 중..."
+            className="h-full"
+            mobileCardSections={mobileCardSections}
             sortConfig={sortConfig}
             onSortChange={handleSortChange}
-            mobileCardSections={mobileCardSections}
             onRowClick={handleUserClick}
           />
         </div>

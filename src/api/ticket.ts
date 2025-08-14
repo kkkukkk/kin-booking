@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import { Ticket } from '@/types/model/ticket';
-import { TicketWithEventDto, TicketGroupDto, TicketGroupApiResponse } from '@/types/dto/ticket';
+import { TicketWithEventDto, TicketGroupApiResponse, FetchTicketGroupDto } from '@/types/dto/ticket';
 import { toCamelCaseKeys } from '@/util/case/case';
 
 // 예약 ID로 티켓 조회
@@ -132,8 +132,8 @@ export const getTicketsWithEventByOwnerId = async (ownerId: string): Promise<Tic
 };
 
 // 티켓 묶음 조회 (event_id + reservation_id + owner_id로 그룹핑)
-export const getTicketGroups = async () => {
-  const { data, error } = await supabase
+export const getTicketGroups = async (params?: FetchTicketGroupDto) => {
+  let query = supabase
     .from('ticket')
     .select(`
       event_id,
@@ -141,11 +141,44 @@ export const getTicketGroups = async () => {
       owner_id,
       status,
       created_at,
-      event:event_id(event_name),
+      event:event_id(event_name, event_date),
       user:owner_id(name)
-    `)
-    .order('created_at', { ascending: false });
+    `);
 
+  // 정렬 적용
+  if (params?.sortBy) {
+    let sortField: string;
+    let ascending: boolean;
+    
+    switch (params.sortBy) {
+      case 'createdAt':
+        sortField = 'created_at';
+        ascending = params.sortDirection === 'asc';
+        break;
+      case 'userName':
+        sortField = 'user.name';
+        ascending = params.sortDirection === 'asc';
+        break;
+      case 'eventName':
+        sortField = 'event.event_name';
+        ascending = params.sortDirection === 'asc';
+        break;
+      case 'status':
+        sortField = 'status';
+        ascending = params.sortDirection === 'asc';
+        break;
+      default:
+        sortField = 'created_at';
+        ascending = false;
+    }
+    
+    query = query.order(sortField, { ascending });
+  } else {
+    // 기본 정렬: 생성일 최신순
+    query = query.order('created_at', { ascending: false });
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
   return toCamelCaseKeys<TicketGroupApiResponse[]>(data ?? []);
 };
@@ -160,7 +193,8 @@ export const getTicketGroupsByOwnerId = async (ownerId: string) => {
       owner_id,
       status,
       created_at,
-      event:event_id(event_name),
+      updated_at,
+      event:event_id(event_name, event_date),
       user:owner_id(name)
     `)
     .eq('owner_id', ownerId)

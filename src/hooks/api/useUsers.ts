@@ -23,10 +23,11 @@ import { useSession } from '@/hooks/useSession';
 // 유저 검색 hook
 export const useUsers = (params?: PaginationParams & FetchUserDto) => {
 	return useQuery<FetchUserWithRolesResponseDto, Error>({
-		queryKey: ['user', params],
+		queryKey: ['users', params],
 		queryFn: () => fetchUser(params),
 		enabled: true,
 		retry: 1,
+		staleTime: 0, // 정렬 변경 시 즉시 새로고침
 	});
 };
 

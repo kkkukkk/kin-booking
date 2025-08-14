@@ -28,7 +28,7 @@ const EntryCheckPage = () => {
   
   const [entrySessionId, setEntrySessionId] = useState<string>('');
 
-  // Entry Session 조회 훅 (타입 명시)
+  // Entry Session 조회 훅
   const { data: entrySession, isLoading: isLoadingSession, error: sessionError } = useEntrySession(entrySessionId);
   
   // 티켓 상태 업데이트 훅
@@ -201,7 +201,7 @@ const EntryCheckPage = () => {
         <h1 className="text-lg md:text-xl font-bold">입장 확인</h1>
       </div> */}
 
-      {/* 콘텐츠 영역 - 페이지 중앙에 배치 */}
+      {/* 콘텐츠 영역 */}
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="max-w-md w-full mb-8">
 

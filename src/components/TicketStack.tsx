@@ -174,7 +174,7 @@ const TicketStack = ({
 		const confirmed = await showAlert({
 			type: 'confirm',
 			title: '티켓 취소 신청',
-			message: `정말 ${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n취소 신청 후에는 관리자 승인이 필요합니다.`,
+			message: `정말 ${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n관리자 확인 후 환불이 진행됩니다.`,
 		});
 
 		if (confirmed) {
@@ -295,6 +295,28 @@ const TicketStack = ({
 							</div>
 						)}
 					</div>
+
+					{/* 취소 신청중 안내 문구 */}
+					{stackStatus === TicketStatus.CancelRequested && (
+						<div className={clsx(
+							"mt-3 p-3 rounded-lg text-xs",
+							theme === 'normal'
+								? "bg-amber-50 border border-amber-200 text-amber-700"
+								: "bg-amber-900/20 border border-amber-600/50 text-amber-200"
+						)}>
+							<div className="flex items-start gap-2">
+								<div className={clsx(
+									"w-2 h-2 rounded-full mt-1.5 flex-shrink-0",
+									theme === 'normal' ? "bg-amber-400" : "bg-amber-300"
+								)} />
+								<div>
+									<span className="font-medium">취소 신청이 접수되었습니다.</span>
+									<br />
+									<span>관리자 확인 후 환불이 진행됩니다.</span>
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 

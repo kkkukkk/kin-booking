@@ -9,9 +9,11 @@ import { RootState } from "@/redux/store";
 interface ScrollBarProps {
 	targetRef: React.RefObject<HTMLElement | null>;
 	height?: string;
+	className?: string;
+	isThin?: boolean;
 }
 
-const ScrollBar = ({ targetRef }: ScrollBarProps) => {
+const ScrollBar = ({ targetRef, className, isThin = false }: ScrollBarProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const [thumbHeight, setThumbHeight] = useState(0);
 	const [thumbTop, setThumbTop] = useState(0);
@@ -108,11 +110,11 @@ const ScrollBar = ({ targetRef }: ScrollBarProps) => {
 
 	return (
 		<div
-			className={clsx(styles['scrollbarTrack'], 'w-1 md:w-2')}
+			className={clsx(styles['scrollbarTrack'], 'w-1', isThin ? 'md:w-1' : 'md:w-2', className)}
 			style={{
 				position: 'absolute',
 				top: '2.5%',
-				right: 8,
+				right: 6,
 				height: '95%',
 				zIndex: 9999,
 			}}
@@ -124,7 +126,8 @@ const ScrollBar = ({ targetRef }: ScrollBarProps) => {
 						[styles['dragging']]: dragging,
 					},
 					theme && styles[theme],
-					'w-1 md:w-2'
+					'w-1',
+					isThin ? 'md:w-1' : 'md:w-2'
 				)}
 				style={{
 					height: thumbHeight,

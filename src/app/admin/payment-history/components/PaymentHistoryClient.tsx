@@ -1,0 +1,436 @@
+'use client';
+
+import { useState } from 'react';
+import { usePaymentTransactionsWithReservation } from '@/hooks/api/usePaymentTransactions';
+import DataTable from '@/components/base/DataTable';
+import Spinner from '@/components/spinner/Spinner';
+import { PaymentTransactionWithReservationDto } from '@/types/dto/paymentTransaction';
+import { useAppSelector } from '@/redux/hooks';
+import { RootState } from '@/redux/store';
+import { StatusBadge } from '@/components/status/StatusBadge';
+import useToast from '@/hooks/useToast';
+import SearchBar from '@/components/search/SearchBar';
+import ThemeDiv from '@/components/base/ThemeDiv';
+import PaginationButtons from '@/components/pagination/PaginationButtons';
+import Select from '@/components/base/Select';
+import dayjs from 'dayjs';
+
+const PaymentHistoryClient = () => {
+    const theme = useAppSelector((state: RootState) => state.theme.current);
+
+    // 검색/필터 상태
+    const [searchParams, setSearchParams] = useState({
+        keyword: '',
+        paymentType: '',
+        startDate: '',
+        endDate: '',
+    });
+
+    // 정렬 상태
+    const [sortConfig, setSortConfig] = useState<{
+        field: string;
+        direction: 'asc' | 'desc';
+    }>({
+        field: 'operatedAt',
+        direction: 'desc'
+    });
+
+    // 페이지네이션 상태
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+
+    // 페이지 크기 옵션
+    const pageSizeOptions = [20, 50, 100, 200];
+
+    // payment 이력 데이터 (관계 데이터 포함)
+    const { data: transactionsResponse, isLoading, error, refetch } = usePaymentTransactionsWithReservation({
+        sortBy: sortConfig.field,
+        sortDirection: sortConfig.direction,
+    });
+
+    const transactions = transactionsResponse?.data || [];
+
+    // 데이터 로딩 상태 확인
+    console.log('transactionsResponse:', transactionsResponse);
+    console.log('transactions:', transactions);
+    console.log('isLoading:', isLoading);
+    console.log('error:', error);
+
+    // 검색 필터링만 적용 (정렬은 서버에서 처리)
+    const filteredTransactions = transactions.filter((transaction: PaymentTransactionWithReservationDto) => {
+        // 키워드 검색 (사용자명, 공연명, 계좌 정보 포함)
+        if (searchParams.keyword) {
+            const searchLower = searchParams.keyword.toLowerCase();
+            if (!transaction.users?.name?.toLowerCase().includes(searchLower) &&
+                !transaction.events?.eventName?.toLowerCase().includes(searchLower) &&
+                !transaction.accountHolder?.toLowerCase().includes(searchLower) &&
+                !transaction.bankName?.toLowerCase().includes(searchLower)) {
+                return false;
+            }
+        }
+
+        // 거래 유형 필터링
+        if (searchParams.paymentType && transaction.paymentType !== searchParams.paymentType) {
+            return false;
+        }
+
+        // 날짜 범위 필터링
+        if (searchParams.startDate) {
+            const startDate = dayjs(searchParams.startDate);
+            const transactionDate = dayjs(transaction.operatedAt);
+            if (transactionDate.isBefore(startDate, 'day')) {
+                return false;
+            }
+        }
+
+        if (searchParams.endDate) {
+            const endDate = dayjs(searchParams.endDate);
+            const transactionDate = dayjs(transaction.operatedAt);
+            if (transactionDate.isAfter(endDate, 'day')) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
+    const finalTransactions = filteredTransactions;
+
+    // 페이지네이션 적용
+    const totalCount = finalTransactions.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedTransactions = finalTransactions.slice(startIndex, endIndex);
+
+    // 검색 핸들러
+    const handleSearch = (keyword: string) => {
+        setSearchParams(prev => ({ ...prev, keyword }));
+        setCurrentPage(1);
+    };
+
+    // 거래 유형 필터 핸들러
+    const handlePaymentTypeFilter = (paymentType: string) => {
+        setSearchParams(prev => ({ ...prev, paymentType }));
+        setCurrentPage(1);
+    };
+
+    // 시작 날짜 필터 핸들러
+    const handleStartDateFilter = (startDate: string) => {
+        setSearchParams(prev => ({ ...prev, startDate }));
+        setCurrentPage(1);
+    };
+
+    // 종료 날짜 필터 핸들러
+    const handleEndDateFilter = (endDate: string) => {
+        setSearchParams(prev => ({ ...prev, endDate }));
+        setCurrentPage(1);
+    };
+
+    // 페이지 변경 핸들러
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    // 페이지 크기 변경 핸들러
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setCurrentPage(1);
+    };
+
+    // 정렬 핸들러
+    const handleSortChange = (field: string, direction: 'asc' | 'desc') => {
+        setSortConfig({ field, direction });
+        setCurrentPage(1); // 정렬 변경 시 첫 페이지로 이동
+    };
+
+    // 테이블 컬럼 정의
+    const columns = [
+        {
+            key: 'paymentType',
+            header: '거래 유형',
+            render: (transaction: PaymentTransactionWithReservationDto) => (
+                <StatusBadge
+                    status={transaction.paymentType}
+                    theme={theme}
+                    className="text-xs"
+                    statusType="paymentType"
+                    size="sm"
+                />
+            ),
+            width: '10%',
+            sortable: true,
+        },
+        {
+            key: 'amount',
+            header: '금액',
+            render: (transaction: PaymentTransactionWithReservationDto) => (
+                <div className={`font-medium ${transaction.paymentType === 'payment' ? 'text-green-600' : 'text-red-600'}`}>
+                    {transaction.paymentType === 'payment' ? '+' : '-'}{transaction.amount.toLocaleString()}원
+                </div>
+            ),
+            width: '12%',
+            sortable: true,
+        },
+        {
+            key: 'user',
+            header: '사용자',
+            render: (transaction: PaymentTransactionWithReservationDto) => (
+                <div className="text-sm">
+                    <div className="font-medium">{transaction.users?.name || transaction.userId || '-'}</div>
+                </div>
+            ),
+            width: '10%',
+            sortable: true,
+        },
+        {
+            key: 'event',
+            header: '공연',
+            render: (transaction: PaymentTransactionWithReservationDto) => (
+                <div className="text-sm">
+                    <div className="font-medium truncate">{transaction.events?.eventName || transaction.eventId || '-'}</div>
+                </div>
+            ),
+            width: '25%',
+            sortable: true,
+        },
+        {
+            key: 'accountInfo',
+            header: '계좌 정보',
+            render: (transaction: PaymentTransactionWithReservationDto) => (
+                <div className="text-xs">
+                    <div className="font-medium">{transaction.bankName || '-'}</div>
+                    <div className="text-gray-500">{transaction.accountHolder || '-'}</div>
+                    <div className="text-gray-400">{transaction.accountNumber || '-'}</div>
+                </div>
+            ),
+            width: '15%',
+        },
+        {
+            key: 'operatedAt',
+            header: '처리일시',
+            render: (transaction: PaymentTransactionWithReservationDto) => (
+                <div className="text-sm">
+                    {dayjs(transaction.operatedAt).format('YYYY-MM-DD HH:mm')}
+                </div>
+            ),
+            width: '15%',
+            sortable: true,
+        },
+        {
+            key: 'note',
+            header: '메모',
+            render: (transaction: PaymentTransactionWithReservationDto) => (
+                <div className="text-sm text-gray-600 max-w-32 truncate">
+                    {transaction.note || '-'}
+                </div>
+            ),
+            width: '10%',
+        },
+    ];
+
+    // 모바일 카드 섹션 렌더 함수
+    const mobileCardSections = (transaction: PaymentTransactionWithReservationDto, index: number) => ({
+        firstRow: (
+            <>
+                <div className="w-full flex flex-col gap-2">
+                    <div className="flex justify-between items-center">
+                        <StatusBadge
+                            status={transaction.paymentType}
+                            theme={theme}
+                            statusType="paymentType"
+                            size="sm"
+                        />
+                        <div className={`font-bold text-sm ${transaction.paymentType === 'payment' ? 'text-green-600' : 'text-red-600'}`}>
+                            {transaction.paymentType === 'payment' ? '+' : '-'}{transaction.amount.toLocaleString()}원
+                        </div>
+                    </div>
+                    <div className="font-medium text-sm truncate">
+                        {transaction.events?.eventName || `공연: ${transaction.eventId}`}
+                    </div>
+                </div>
+            </>
+        ),
+        secondRow: (
+            <>
+                <div className="w-full flex flex-col gap-1">
+                    <div className={`text-sm space-y-2 ${
+                        theme === 'normal' ? 'text-gray-600' : 'text-gray-400'
+                    }`}>
+                        <div className="flex justify-between items-start">
+                            <span className={`font-medium ${
+                                theme === 'normal' ? 'text-gray-700' : 'text-gray-300'
+                            }`}>예금주</span>
+                            <span className="text-right">{transaction.accountHolder || '-'}</span>
+                        </div>
+                        <div className="flex justify-between items-start">
+                            <span className={`font-medium ${
+                                theme === 'normal' ? 'text-gray-700' : 'text-gray-300'
+                            }`}>은행</span>
+                            <span className="text-right">{transaction.bankName || '-'}</span>
+                        </div>
+                        <div className="flex justify-between items-start">
+                            <span className={`font-medium ${
+                                theme === 'normal' ? 'text-gray-700' : 'text-gray-300'
+                            }`}>계좌번호</span>
+                            <span className="text-right text-xs">{transaction.accountNumber || '-'}</span>
+                        </div>
+                        {transaction.note && (
+                            <div className="flex justify-between items-start">
+                                <span className={`font-medium ${
+                                    theme === 'normal' ? 'text-gray-700' : 'text-gray-300'
+                                }`}>비고</span>
+                                <span className="text-right text-xs max-w-32 truncate">{transaction.note}</span>
+                            </div>
+                        )}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                        {dayjs(transaction.operatedAt).format('MM/DD HH:mm')}
+                    </div>
+                </div>
+            </>
+        ),
+    });
+
+    if (isLoading) {
+        return (
+            <ThemeDiv className="flex flex-col min-h-full">
+                <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
+                    <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
+                        <h1 className="text-lg md:text-xl font-bold mb-2">입/출금 이력 관리</h1>
+                    </div>
+                </div>
+                <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
+                    <div className="flex items-center justify-center h-64">
+                        <Spinner />
+                    </div>
+                </div>
+            </ThemeDiv>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemeDiv className="flex flex-col min-h-full">
+                <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
+                    <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
+                        <h1 className="text-lg md:text-xl font-bold mb-2">입/출금 이력 관리</h1>
+                    </div>
+                </div>
+                <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
+                    <div className="text-center">
+                        <p className="text-red-500 mb-4">입/출금 이력을 불러오는데 실패했습니다.</p>
+                        <button onClick={() => refetch()} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            다시 시도
+                        </button>
+                    </div>
+                </div>
+            </ThemeDiv>
+        );
+    }
+
+    return (
+        <ThemeDiv className="flex flex-col min-h-full">
+            {/* 상단 고정 영역 */}
+            <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
+                <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
+                    <h1 className="text-lg md:text-xl font-bold mb-2">입/출금 이력 관리</h1>
+                </div>
+
+                {/* 검색 및 필터 */}
+                <SearchBar
+                    label="입/출금 이력 검색 및 필터"
+                    initialOpen={false}
+                    filters={{
+                        keyword: {
+                            value: searchParams.keyword,
+                            onChange: handleSearch,
+                            placeholder: "사용자명, 공연명, 은행명, 예금주 검색..."
+                        },
+                        status: {
+                            value: searchParams.paymentType,
+                            onChange: handlePaymentTypeFilter,
+                            options: [
+                                { value: '', label: '전체' },
+                                { value: 'payment', label: '입금' },
+                                { value: 'refund', label: '환불' }
+                            ]
+                        },
+                        dateRange: {
+                            from: searchParams.startDate,
+                            to: searchParams.endDate,
+                            onChange: (from: string, to: string) => {
+                                handleStartDateFilter(from);
+                                handleEndDateFilter(to);
+                            }
+                        }
+                    }}
+                />
+            </div>
+
+            {/* 테이블 상단 정보 영역 */}
+            <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-2">
+                {/* 총 개수 */}
+                <div className="flex-1 md:flex-2/3 flex justify-start mb-2 md:mb-0">
+                    <span className="text-sm text-gray-400">
+                        총 {totalCount}건 중 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)}건 표시
+                    </span>
+                </div>
+
+                {/* 페이지 크기 선택 */}
+                <div className="flex items-center gap-4 flex-1 justify-end shrink-0">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-400 md:w-[80%] whitespace-nowrap">페이지당 표시:</span>
+                        <Select
+                            theme={theme}
+                            value={pageSize.toString()}
+                            onChange={(value) => handlePageSizeChange(Number(value))}
+                            className="min-w-20"
+                            options={pageSizeOptions.map(size => ({
+                                value: size.toString(),
+                                label: `${size}건`
+                            }))}
+                            fontSize="text-xs md:text-sm"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* 테이블 영역 */}
+            <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
+                {/* Payment 이력 테이블 */}
+                <div className="flex-1 min-h-fit md:min-h-0">
+                    <DataTable
+                        data={paginatedTransactions}
+                        columns={columns}
+                        theme={theme}
+                        isLoading={isLoading}
+                        emptyMessage="Payment 이력이 없습니다."
+                        loadingMessage="로딩 중..."
+                        className="h-full"
+                        mobileCardSections={mobileCardSections}
+                        sortConfig={sortConfig}
+                        onSortChange={handleSortChange}
+                    />
+                </div>
+
+                {/* 페이지네이션 */}
+                <div className="mt-6">
+                    <PaginationButtons
+                        paginationInfo={{
+                            page: currentPage,
+                            totalPages,
+                            size: pageSize,
+                            hasPrev: currentPage > 1,
+                            hasNext: currentPage < totalPages
+                        }}
+                        onPageChange={handlePageChange}
+                    />
+                </div>
+            </div>
+        </ThemeDiv>
+    );
+};
+
+export default PaymentHistoryClient;

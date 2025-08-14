@@ -15,6 +15,22 @@ export const fetchReservation = async (params?: PaginationParams & FetchReservat
 		if (params.reservedFrom) query = query.gte('event_date', params.reservedFrom);
 		if (params.reservedTo) query = query.lte('event_date', params.reservedTo);
 		if (params.status) query = query.eq('status', params.status);
+		
+		// 정렬 적용
+		if (params.sortBy) {
+			const sortField = params.sortBy === 'reservedAt' ? 'reserved_at' : 
+							 params.sortBy === 'user' ? 'user_id' :
+							 params.sortBy === 'event' ? 'event_id' :
+							 params.sortBy === 'ticketHolder' ? 'ticket_holder' :
+							 params.sortBy === 'quantity' ? 'quantity' :
+							 params.sortBy === 'status' ? 'status' : 'reserved_at';
+			
+			query = query.order(sortField, { ascending: params.sortDirection === 'asc' });
+		} else {
+			// 기본 정렬: 예매일 최신순
+			query = query.order('reserved_at', { ascending: false });
+		}
+		
 		if (params.page && params.size) {
 			const range = getPaginationRange(params);
 			query = query.range(range.start, range.end);
@@ -37,7 +53,8 @@ export const fetchReservationWithEvent = async (params?: PaginationParams & Fetc
 			events (
 				event_name,
 				event_date,
-				location
+				location,
+				ticket_price
 			)
 		`, { count: 'exact' });
 	

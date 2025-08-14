@@ -11,7 +11,6 @@ import Button from "@/components/base/Button";
 import { motion } from "framer-motion";
 import { fadeSlideLeft, bottomUp } from "@/types/ui/motionVariants";
 import AnimatedTextWithIcon from "@/components/base/AnimatedTextWithIcon";
-import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 import { BulbIcon } from "@/components/icon/BulbIcon";
 import ThemeDiv from "@/components/base/ThemeDiv";
 import EventHeader from "./EventHeader";

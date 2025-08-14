@@ -6,24 +6,23 @@ import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { useSession } from '@/hooks/useSession';
 import { useReservationsByUserId } from '@/hooks/api/useReservations';
+import { useActivePaymentAccounts } from '@/hooks/api/usePaymentAccounts';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import { calculateReservationStats } from '@/util/reservationStats';
 import clsx from 'clsx';
-import { getStatusInfoColors, getStatusTextColors } from '@/components/status/StatusBadge';
 import { useCancelPendingReservation } from '@/hooks/api/useReservations';
 import CheckCircleIcon from '@/components/icon/CheckCircleIcon';
 import ClockIcon from '@/components/icon/ClockIcon';
 import XCircleIcon from '@/components/icon/XCircleIcon';
 import MenuIcon from '@/components/icon/MenuIcon';
 import { useAlert } from '@/providers/AlertProvider';
-import Accordion from '@/components/base/Accordion';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { ReservationStatus } from '@/types/model/reservation';
 import { ReservationWithEventDto } from '@/types/dto/reservation';
-import dayjs from 'dayjs';
-import { NeonVariant, NEON_VARIANTS } from '@/types/ui/neonVariant';
+import ReservationsGuide from './reservation/ReservationsGuide';
+import ReservationCard from './reservation/ReservationCard';
 
 const FILTERS = [
 	{ key: 'all', label: '전체', icon: MenuIcon },
@@ -32,29 +31,17 @@ const FILTERS = [
 	{ key: ReservationStatus.Voided, label: '취소', icon: XCircleIcon, neonColor: 'pink' as const },
 ];
 
-// 상태별 neonVariant 매핑
-const getStatusNeonVariant = (status: ReservationStatus): NeonVariant => {
-	switch (status) {
-		case ReservationStatus.Confirmed:
-			return NEON_VARIANTS.CYAN;
-		case ReservationStatus.Pending:
-			return NEON_VARIANTS.YELLOW;
-		case ReservationStatus.Voided:
-			return NEON_VARIANTS.PINK;
-		default:
-			return NEON_VARIANTS.GREEN;
-	}
-};
-
 const ReservationsTab = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { session } = useSession();
 	const { data: reservations, isLoading: reservationsLoading } = useReservationsByUserId(session?.user?.id || '');
+	const { data: paymentAccounts } = useActivePaymentAccounts();
 	const { mutate: cancelReservation, isPending: isCancelling } = useCancelPendingReservation();
 	const { showAlert } = useAlert();
 	const [activeFilter, setActiveFilter] = useState('all');
+	const [expandedPaymentInfo, setExpandedPaymentInfo] = useState<string | null>(null);
 
 	// URL 파라미터에서 필터 설정
 	useEffect(() => {
@@ -84,36 +71,7 @@ const ReservationsTab = () => {
 		return (
 			<>
 				{/* 예매 안내 */}
-				<Accordion 
-					title=" 예매 안내" 
-					className="rounded shadow-inner mb-4"
-				>
-					<div>
-						<ul className="text-xs md:text-sm space-y-1.5">
-							<li className="flex items-center gap-2">
-								<div className={clsx(
-									"w-1.5 h-1.5 rounded-full flex-shrink-0",
-									theme === "normal" ? "bg-black/60" : "bg-white/60"
-								)}></div>
-								<span>예매 승인 완료 후에 티켓이 발급됩니다.</span>
-							</li>
-							<li className="flex items-center gap-2">
-								<div className={clsx(
-									"w-1.5 h-1.5 rounded-full flex-shrink-0",
-									theme === "normal" ? "bg-black/60" : "bg-white/60"
-								)}></div>
-								<span>예매 취소는 <b>예매 대기</b> 상태일 때만 가능합니다.</span>
-							</li>
-							<li className="flex items-center gap-2">
-								<div className={clsx(
-									"w-1.5 h-1.5 rounded-full flex-shrink-0",
-									theme === "normal" ? "bg-black/60" : "bg-white/60"
-								)}></div>
-								<span>티켓 취소는 <b>티켓 관리 탭</b>을 이용해 주세요.</span>
-							</li>
-						</ul>
-					</div>
-				</Accordion>
+				<ReservationsGuide />
 
 				{/* 빈 상태 */}
 				<ThemeDiv className="p-8 text-center rounded flex flex-col items-center justify-center" isChildren>
@@ -197,204 +155,25 @@ const ReservationsTab = () => {
 				))}
 			</div>
 			<div className="mb-4">
-				<Accordion 
-					title=" 예매 안내" 
-					className="rounded shadow-inner p-1"
-				>
-					<div>
-						<ul className="text-xs md:text-sm space-y-1.5">
-							<li className="flex items-center gap-2">
-								<div className={clsx(
-									"w-1.5 h-1.5 rounded-full flex-shrink-0",
-									theme === "normal" ? "bg-black/60" : "bg-white/60"
-								)}></div>
-								<span>예매 승인 완료 후에 티켓이 발급됩니다.</span>
-							</li>
-							<li className="flex items-center gap-2">
-								<div className={clsx(
-									"w-1.5 h-1.5 rounded-full flex-shrink-0",
-									theme === "normal" ? "bg-black/60" : "bg-white/60"
-								)}></div>
-								<span>예매 취소는 <b>예매 대기</b> 상태일 때만 가능합니다.</span>
-							</li>
-							<li className="flex items-center gap-2">
-								<div className={clsx(
-									"w-1.5 h-1.5 rounded-full flex-shrink-0",
-									theme === "normal" ? "bg-black/60" : "bg-white/60"
-								)}></div>
-								<span>티켓 취소는 <b>티켓 관리 탭</b>을 이용해 주세요.</span>
-							</li>
-						</ul>
-					</div>
-				</Accordion>
+				<ReservationsGuide />
 			</div>
 			{/* 예매 리스트 */}
 			<div className="space-y-0 md:space-y-0.5">
 				<AnimatePresence>
 					{filteredReservations.length > 0
 						? filteredReservations.map((reservation: ReservationWithEventDto, index: number) => (
-							<motion.div
+							<ReservationCard
 								key={reservation.id}
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 20 }}
-								transition={{ duration: 0.25, ease: 'easeInOut' }}
-								className={clsx(
-									"relative",
-									index === 0 && "rounded-t",
-									index === filteredReservations.length - 1 && "rounded-b",
-									index !== filteredReservations.length - 1 && "border-b border-gray-200/20"
-								)}
-							>
-								<ThemeDiv 
-									className={clsx(
-										"p-4 transition-all duration-200",
-										index === 0 && "rounded-t",
-										index === filteredReservations.length - 1 && "rounded-b"
-									)} 
-									isChildren
-									neonVariant={getStatusNeonVariant(reservation.status)}
-								>
-									{/* 헤더: 공연명 + 취소버튼 */}
-									<div className="flex items-start justify-between mb-4">
-										<h4 className={clsx(
-											"text-lg md:text-xl font-bold flex-1 pr-4",
-											theme === "normal" ? "text-gray-900" : "text-white"
-										)}>
-											{reservation.events?.eventName || '공연명 없음'}
-										</h4>
-										{reservation.status === ReservationStatus.Pending && (
-											<Button
-												onClick={() => handleCancelReservation(reservation.id)}
-												theme="dark"
-												padding={"px-3 py-1"}
-												disabled={isCancelling}
-												reverse={theme === 'normal'}
-												className="flex-shrink-0 transition-all duration-200 text-xs md:text-sm"
-											>
-												취소
-											</Button>
-										)}
-									</div>
-									
-									<div className={clsx(
-										"mb-4 p-4 rounded-lg",
-										theme === "normal" ? "bg-gray-50 border border-gray-200" : 
-										theme === "dark" ? "bg-gray-800 border border-gray-600" :
-										"bg-gray-900/80 border border-gray-600/80"
-									)}>
-										{/* 정보 그리드 레이아웃 */}
-										<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-											{/* 공연 일시 */}
-											<div className="space-y-1">
-												<div className={clsx(
-													"text-xs font-medium uppercase tracking-wide",
-													theme === "normal" ? "text-gray-500" : 
-													theme === "dark" ? "text-gray-300" :
-													"text-gray-200"
-												)}>
-													공연 일시
-												</div>
-												<div className={clsx(
-													"text-sm",
-													theme === "normal" ? "text-gray-700" : 
-													theme === "dark" ? "text-white" :
-													"text-white"
-												)}>
-													{reservation.events?.eventDate ? dayjs(reservation.events.eventDate).format('YYYY년 MM월 DD일 HH:mm') : '일정 미정'}
-												</div>
-											</div>
-											
-											{/* 예매자 */}
-											<div className="space-y-1">
-												<div className={clsx(
-													"text-xs font-medium uppercase tracking-wide",
-													theme === "normal" ? "text-gray-500" : 
-													theme === "dark" ? "text-gray-300" :
-													"text-gray-200"
-												)}>
-													예매자
-												</div>
-												<div className={clsx(
-													"text-sm font-medium",
-													theme === "normal" ? "text-gray-700" : 
-													theme === "dark" ? "text-white" :
-													"text-white"
-												)}>
-													{reservation.ticketHolder}
-												</div>
-											</div>
-											
-											{/* 매수 */}
-											<div className="space-y-1">
-												<div className={clsx(
-													"text-xs font-medium uppercase tracking-wide",
-													theme === "normal" ? "text-gray-500" : 
-													theme === "dark" ? "text-gray-300" :
-													"text-gray-200"
-												)}>
-													매수
-												</div>
-												<div className={clsx(
-													"text-sm font-medium",
-													theme === "normal" ? "text-gray-700" : 
-													theme === "dark" ? "text-white" :
-													"text-white"
-												)}>
-													{reservation.quantity}매
-												</div>
-											</div>
-										</div>
-									</div>
-									
-									{/* 상태별 안내 메시지 */}
-									{(() => {
-										const statusConfig = {
-											[ReservationStatus.Confirmed]: {
-												message: "티켓이 발급되었어요!",
-												dotColor: "bg-green-500",
-												normalBg: "bg-green-50",
-												darkBg: "bg-green-900/20"
-											},
-											[ReservationStatus.Pending]: {
-												message: "예매 승인을 기다리고 있어요!",
-												dotColor: "bg-yellow-500",
-												normalBg: "bg-yellow-50",
-												darkBg: "bg-yellow-900/20"
-											},
-											[ReservationStatus.Voided]: {
-												message: "취소된 예매에요!",
-												dotColor: "bg-red-500",
-												normalBg: "bg-red-50",
-												darkBg: "bg-red-900/20"
-											}
-										};
-										
-										const config = statusConfig[reservation.status];
-										if (!config) return null;
-										
-										return (
-											<ThemeDiv
-												className={clsx(
-													"mt-3 p-3 rounded-lg",
-													theme === 'normal' ? config.normalBg : config.darkBg,
-													theme === 'neon' ? '' : 'border-transparent shadow-none'
-												)}
-												neonVariant={getStatusNeonVariant(reservation.status)}
-												isChildren
-											>
-												<div className={clsx(
-													"flex items-center gap-2 text-sm",
-													getStatusTextColors(reservation.status, theme)
-												)}>
-													<span className={clsx("w-2 h-2 rounded-full", config.dotColor)}></span>
-													{config.message}
-												</div>
-											</ThemeDiv>
-										);
-									})()}
-								</ThemeDiv>
-							</motion.div>
+								reservation={reservation}
+								index={index}
+								totalCount={filteredReservations.length}
+								theme={theme}
+								paymentAccounts={paymentAccounts || []}
+								expandedPaymentInfo={expandedPaymentInfo}
+								setExpandedPaymentInfo={setExpandedPaymentInfo}
+								handleCancelReservation={handleCancelReservation}
+								isCancelling={isCancelling}
+							/>
 						))
 						: null}
 				</AnimatePresence>

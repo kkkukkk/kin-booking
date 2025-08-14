@@ -24,7 +24,10 @@ const TicketsTab = () => {
 		return (
 			<ThemeDiv className="p-6 text-center rounded-lg" isChildren>
 				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-				<p className="text-sm text-gray-600 dark:text-gray-300">티켓 정보를 불러오는 중...</p>
+				<p className={clsx(
+					"text-sm",
+					theme === "normal" ? "text-gray-600" : "text-gray-400"
+				)}>티켓 정보를 불러오는 중...</p>
 			</ThemeDiv>
 		);
 	}

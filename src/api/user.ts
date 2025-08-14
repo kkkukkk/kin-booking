@@ -35,6 +35,50 @@ export const fetchUser = async (params?: PaginationParams & FetchUserDto): Promi
 		if (params.email) query = query.ilike('email', `%${params.email}%`);
 		if (params.phoneNumber) query = query.eq('phone_number', params.phoneNumber);
 		if (params.status) query = query.eq('status', params.status);
+		
+		// 정렬 적용
+		if (params.sortBy) {
+			let sortField: string;
+			let ascending: boolean;
+			
+			switch (params.sortBy) {
+				case 'name':
+					sortField = 'name';
+					ascending = params.sortDirection === 'asc';
+					break;
+				case 'email':
+					sortField = 'email';
+					ascending = params.sortDirection === 'asc';
+					break;
+				case 'phoneNumber':
+					sortField = 'phone_number';
+					ascending = params.sortDirection === 'asc';
+					break;
+				case 'status':
+					sortField = 'status';
+					ascending = params.sortDirection === 'asc';
+					break;
+				case 'registerDate':
+					// User 모델의 registerDate 필드에 맞춰 수정
+					sortField = 'register_date';
+					ascending = params.sortDirection === 'asc';
+					break;
+				case 'marketingConsent':
+					sortField = 'marketing_consent';
+					ascending = params.sortDirection === 'asc';
+					break;
+				default:
+					// 기본 정렬 필드명 확인 필요
+					sortField = 'id';
+					ascending = false;
+			}
+			
+			query = query.order(sortField, { ascending });
+		} else {
+			// 기본 정렬: ID 기준 최신순 (안전한 필드)
+			query = query.order('id', { ascending: false });
+		}
+		
 		if (params.page && params.size) {
 			const range = getPaginationRange(params);
 			query = query.range(range.start, range.end);

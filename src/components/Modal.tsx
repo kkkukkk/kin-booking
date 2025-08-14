@@ -1,11 +1,14 @@
 'use client'
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import ThemeDiv from "@/components/base/ThemeDiv";
+import ThemeRefDiv from "@/components/base/ThemeRefDiv";
 import clsx from "clsx";
 import { fadeSlideY } from "@/types/ui/motionVariants";
 import { motion } from "framer-motion";
+import ScrollBar from "@/components/base/ScrollBar";
+import useNeedScrollBar from "@/hooks/useNeedScrollBar";
+import useRehydrated from "@/hooks/useIsRehydrated";
 
 interface ModalProps {
 	children: React.ReactNode;
@@ -13,6 +16,19 @@ interface ModalProps {
 }
 
 const Modal = ({ children, onClose }: ModalProps) => {
+	const modalContentRef = useRef<HTMLDivElement>(null);
+	const rehydrated = useRehydrated();
+	const [refReady, setRefReady] = useState(false);
+	
+	// ref가 설정되면 refReady를 true로
+	useEffect(() => {
+		if (rehydrated && modalContentRef.current) {
+			setRefReady(true);
+		}
+	}, [rehydrated]);
+	
+	const needScrollBar = useNeedScrollBar(modalContentRef, rehydrated && refReady);
+	
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
@@ -49,7 +65,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 				className="relative"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<ThemeDiv className={clsx("p-4 rounded shadow-lg min-w-[300px] max-w-lg md:max-w-xl max-h-[90vh] overflow-y-auto")} isChildren>
+				<ThemeRefDiv ref={modalContentRef} className={clsx("p-4 rounded shadow-lg min-w-[400px] max-w-2xl md:max-w-4xl max-h-[90vh] overflow-y-auto pr-4 scrollbar-none")} isChildren>
 					<button
 						className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
 						onClick={onClose}
@@ -62,7 +78,12 @@ const Modal = ({ children, onClose }: ModalProps) => {
 						</svg>
 					</button>
 					{children}
-				</ThemeDiv>
+				</ThemeRefDiv>
+				
+				{/* 커스텀 스크롤바 */}
+				{needScrollBar && (
+					<ScrollBar targetRef={modalContentRef} isThin={true} />
+				)}
 			</motion.div>
 		</motion.div>
 	);

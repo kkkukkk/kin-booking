@@ -19,6 +19,7 @@ import ThemeDiv from '@/components/base/ThemeDiv';
 import { Reservation } from '@/types/model/reservation';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
+import PaymentInfoModal from './PaymentInfoModal';
 
 const ReservationsClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -40,7 +41,7 @@ const ReservationsClient = () => {
     direction: 'asc' | 'desc';
   }>({
     field: 'reservedAt',
-    direction: 'desc'
+    direction: 'desc' // 최신순 (최근 예매가 먼저)
   });
 
   // 페이지네이션 상태
@@ -50,13 +51,15 @@ const ReservationsClient = () => {
   // 페이지 크기 옵션
   const pageSizeOptions = [10, 20, 50, 100];
 
-  // API 호출 (서버 사이드 필터링 활용)
+  // API 호출 (서버 사이드 필터링 및 정렬 활용)
   const { data: reservationsResponse, isLoading, refetch } = useReservations({
     page: currentPage,
     size: pageSize,
     status: searchParams.status || undefined,
     reservedFrom: searchParams.dateFrom || undefined,
     reservedTo: searchParams.dateTo || undefined,
+    sortBy: sortConfig.field,
+    sortDirection: sortConfig.direction,
   });
 
   const { data: usersResponse } = useUsers();
@@ -65,6 +68,15 @@ const ReservationsClient = () => {
   // 예매 승인/취소 뮤테이션
   const approveMutation = useApproveReservation();
   const rejectMutation = useRejectReservation();
+
+  // 입금 정보 모달 상태
+  const [paymentModalState, setPaymentModalState] = useState<{
+    isOpen: boolean;
+    reservation: Reservation | null;
+  }>({
+    isOpen: false,
+    reservation: null,
+  });
 
   // 사용자 이름 조회
   const getUserName = (userId: string) => {
@@ -78,7 +90,7 @@ const ReservationsClient = () => {
     return event?.eventName || '알 수 없음';
   };
 
-  // 클라이언트 키워드 필터링
+  // 클라이언트 키워드 필터링만 적용 (정렬은 서버에서 처리)
   const filteredReservations = (reservationsResponse?.data || []).filter((reservation: Reservation) => {
     // 키워드 검색만 클라이언트에서 처리
     if (searchParams.keyword) {
@@ -94,30 +106,8 @@ const ReservationsClient = () => {
     return true;
   });
 
-  // 정렬 적용
-  const sortedReservations = [...filteredReservations].sort((a, b) => {
-    const direction = sortConfig.direction === 'asc' ? 1 : -1;
-    
-    switch (sortConfig.field) {
-      case 'reservedAt':
-        return dayjs(a.reservedAt).isBefore(dayjs(b.reservedAt)) ? -direction : direction;
-      case 'user':
-        return getUserName(a.userId).localeCompare(getUserName(b.userId)) * direction;
-      case 'event':
-        return getEventName(a.eventId).localeCompare(getEventName(b.eventId)) * direction;
-      case 'ticketHolder':
-        return a.ticketHolder.localeCompare(b.ticketHolder) * direction;
-      case 'quantity':
-        return (a.quantity - b.quantity) * direction;
-      case 'status':
-        return a.status.localeCompare(b.status) * direction;
-      default:
-        return 0;
-    }
-  });
-
-  // 서버 사이드 필터링을 사용하므로 클라이언트 페이지네이션 불필요
-  const finalReservations = sortedReservations;
+  // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
+  const finalReservations = filteredReservations;
   const finalTotalCount = reservationsResponse?.totalCount || 0;
 
   // 검색/필터 핸들러
@@ -147,26 +137,46 @@ const ReservationsClient = () => {
     setCurrentPage(1);
   };
 
+  // 입금 정보 모달 핸들러
+  const handlePaymentModalClose = () => {
+    setPaymentModalState({
+      isOpen: false,
+      reservation: null,
+    });
+  };
+
+  const handlePaymentSuccess = async () => {
+    if (!paymentModalState.reservation) return;
+
+    // 예매 상태를 확정으로 변경
+    showSpinner();
+    approveMutation.mutate(paymentModalState.reservation.id, {
+      onSuccess: () => {
+        hideSpinner();
+        showToast({ message: '예매가 확정되었습니다.', iconType: 'success', autoCloseTime: 3000 });
+        refetch();
+        handlePaymentModalClose();
+      },
+      onError: (error) => {
+        hideSpinner();
+        showToast({ message: `예매 확정에 실패했습니다: ${error.message}`, iconType: 'error'});
+      },
+    });
+  };
+
   // 예매 확정
   const handleConfirm = async (reservation: Reservation) => {
     const confirmed = await showAlert({
       type: 'confirm',
       title: '예매 확정',
-      message: `다음 예매를 확정하시겠습니까?\n\n사용자: ${getUserName(reservation.userId)}\n공연: ${getEventName(reservation.eventId)}\n수량: ${reservation.quantity}매\n티켓 소유자: ${reservation.ticketHolder}`,
+      message: `다음 예매를 확정하시겠습니까?\n\n사용자: ${getUserName(reservation.userId)}\n수량: ${reservation.quantity}매\n티켓 소유자: ${reservation.ticketHolder}`,
     });
 
     if (confirmed) {
-      showSpinner();
-      approveMutation.mutate(reservation.id, {
-        onSuccess: () => {
-          hideSpinner();
-          showToast({ message: '예매가 확정되었습니다.', iconType: 'success', autoCloseTime: 3000 });
-          refetch();
-        },
-        onError: (error) => {
-          hideSpinner();
-          showToast({ message: `예매 확정에 실패했습니다: ${error.message}`, iconType: 'error'});
-        },
+      // 입금 정보 입력 모달 표시
+      setPaymentModalState({
+        isOpen: true,
+        reservation,
       });
     }
   };
@@ -361,9 +371,9 @@ const ReservationsClient = () => {
               onChange: handleStatusFilter,
               options: [
                 { value: '', label: '전체' },
-                { value: ReservationStatus.Pending, label: '대기' },
-                { value: ReservationStatus.Confirmed, label: '확정' },
-                { value: ReservationStatus.Voided, label: '취소' },
+                { value: ReservationStatus.Pending, label: '입금 대기' },
+                { value: ReservationStatus.Confirmed, label: '승인 완료' },
+                { value: ReservationStatus.Voided, label: '취소됨' },
               ],
             },
             dateRange: {
@@ -406,9 +416,9 @@ const ReservationsClient = () => {
       </div>
 
       {/* 테이블 영역 */}
-      <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
+      <div className="px-6 flex-1 flex flex-col min-h-0">
         {/* 예매 목록 테이블 */}
-        <div className="flex-1 min-h-fit md:min-h-0">
+        <div className="flex-1 overflow-hidden">
           <DataTable
             data={finalReservations}
             columns={columns}
@@ -422,18 +432,33 @@ const ReservationsClient = () => {
             onSortChange={handleSortChange}
           />
         </div>
+      </div>
 
-        {/* 페이지네이션 하단 중앙 */}
-        {finalTotalCount > 0 && (
-          <div className="w-full flex justify-center mt-4 flex-shrink-0">
+      {/* 페이지네이션 */}
+      {finalTotalCount > 0 && (
+        <div className="px-6 py-4 flex-shrink-0">
+          <div className="w-full flex justify-center">
             <PaginationButtons
               paginationInfo={paginationInfo}
               onPageChange={setCurrentPage}
-              showFirstLast
+              showFirstLast={false}
             />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* 입금 정보 입력 모달 */}
+      {paymentModalState.reservation && (
+        <PaymentInfoModal
+          isOpen={paymentModalState.isOpen}
+          onClose={handlePaymentModalClose}
+          reservation={paymentModalState.reservation}
+          onSuccess={handlePaymentSuccess}
+          getUserName={getUserName}
+          getEventName={getEventName}
+          ticketPrice={eventsResponse?.data?.find(e => e.id === paymentModalState.reservation?.eventId)?.ticketPrice || 0}
+        />
+      )}
     </ThemeDiv>
   );
 };

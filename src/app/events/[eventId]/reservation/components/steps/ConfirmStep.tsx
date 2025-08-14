@@ -112,6 +112,22 @@ const ConfirmStep = ({
 									max={event.remainingQuantity}
 								/>
 							</div>
+							{event.remainingQuantity < quantity && (
+								<p className={clsx(
+									"text-xs md:text-sm opacity-90 mt-1",
+									theme === "normal" ? "text-red-600" : "text-red-400"
+								)}>
+									잔여 좌석이 부족합니다. 수량을 조정해주세요.
+								</p>
+							)}
+							{event.remainingQuantity <= 5 && event.remainingQuantity > 0 && (
+								<p className={clsx(
+									"text-xs md:text-sm opacity-90 mt-1",
+									theme === "normal" ? "text-orange-600" : "text-orange-400"
+								)}>
+									잔여 좌석이 적습니다. 실시간으로 매진될 수 있어요.
+								</p>
+							)}
 						</div>
 						<div>
 							<label className="block text-sm md:text-base font-medium opacity-70 mb-2">

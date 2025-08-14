@@ -1,1 +1,1 @@
-export type ReservationStep = 'consent' | 'confirm';
+export type ReservationStep = 'consent' | 'confirm' | 'payment';

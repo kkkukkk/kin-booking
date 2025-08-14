@@ -16,6 +16,7 @@ import {
 import { Ticket, TicketStatus } from '@/types/model/ticket';
 import { TicketGroupDto, TicketGroupApiResponse } from '@/types/dto/ticket';
 import { getAllTicketsForStats } from '@/api/ticket';
+import { FetchTicketGroupDto } from '@/types/dto/ticket';
 
 // 예약 ID로 티켓 조회
 export const useTicketsByReservationId = (reservationId: string) => {
@@ -61,10 +62,12 @@ export const useTicketGroupsByOwnerId = (ownerId: string) => {
             reservationId: ticket.reservationId,
             ownerId: ticket.ownerId,
             eventName: ticket.event.eventName,
+            eventDate: ticket.event.eventDate,
             userName: ticket.user.name,
             status: ticket.status,
             ticketCount: 0,
-            createdAt: ticket.createdAt
+            createdAt: ticket.createdAt,
+            updatedAt: ticket.updatedAt
           };
         }
         
@@ -207,7 +210,7 @@ export const useTicketsWithEventByOwnerId = (ownerId: string) => {
     enabled: !!ownerId,
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 };
 
@@ -334,37 +337,39 @@ export const useTicketStats = () => {
 };
 
 // 티켓 그룹 조회 훅
-export const useTicketGroups = () => {
-  return useQuery({
-    queryKey: ['ticketGroups'],
-    queryFn: () => getTicketGroups(),
-    select: (data) => {
-      if (!data) return [];
+export const useTicketGroups = (params?: FetchTicketGroupDto) => {
+        return useQuery({
+        queryKey: ['ticketGroups', params],
+        queryFn: () => getTicketGroups(params),
+        select: (data) => {
+          if (!data) return [];
 
-      // 그룹핑 처리
-      const groupedTickets: { [key: string]: TicketGroupDto } = {};
-      
-      data.forEach((ticket: TicketGroupApiResponse) => {
-        const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
-        
-        if (!groupedTickets[groupKey]) {
-          groupedTickets[groupKey] = {
-            eventId: ticket.eventId,
-            reservationId: ticket.reservationId,
-            ownerId: ticket.ownerId,
-            eventName: ticket.event.eventName,
-            userName: ticket.user.name,
-            status: ticket.status,
-            ticketCount: 0,
-            createdAt: ticket.createdAt
-          };
-        }
-        
-        groupedTickets[groupKey].ticketCount++;
-      });
+          // 그룹핑 처리
+          const groupedTickets: { [key: string]: TicketGroupDto } = {};
+          
+          data.forEach((ticket: TicketGroupApiResponse) => {
+            const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
+            
+            if (!groupedTickets[groupKey]) {
+              groupedTickets[groupKey] = {
+                eventId: ticket.eventId,
+                reservationId: ticket.reservationId,
+                ownerId: ticket.ownerId,
+                eventName: ticket.event.eventName,
+                eventDate: ticket.event.eventDate,
+                userName: ticket.user.name,
+                status: ticket.status,
+                ticketCount: 0,
+                createdAt: ticket.createdAt,
+                updatedAt: ticket.updatedAt
+              };
+            }
+            
+            groupedTickets[groupKey].ticketCount++;
+          });
 
-      return Object.values(groupedTickets);
-    },
+          return Object.values(groupedTickets);
+        },
     retry: 1,
     retryDelay: 1000,
     staleTime: 0,

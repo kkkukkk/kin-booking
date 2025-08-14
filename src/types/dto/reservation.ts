@@ -17,6 +17,8 @@ export interface FetchReservationDto {
 	status?: ReservationStatus;
 	ticketHolder?: string;
 	keyword?: string;
+	sortBy?: string;
+	sortDirection?: 'asc' | 'desc';
 }
 
 export interface FetchReservationResponseDto {
@@ -31,7 +33,7 @@ export interface ReservationWithEventDto extends Reservation {
 		eventName: string;
 		eventDate: string;
 		location?: string;
-		price?: number;
+		ticketPrice?: number;
 	} | null;
 }
 
