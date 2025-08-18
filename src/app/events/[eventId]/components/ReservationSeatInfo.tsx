@@ -69,7 +69,7 @@ const ReservationSeatInfo = ({
               ></div>
             </div>
             <p className="text-xs text-center mt-1 opacity-70">
-              예약률 {Math.round((reservedQuantity / seatCapacity) * 100)}%
+              예매율 {Math.round((reservedQuantity / seatCapacity) * 100)}%
             </p>
           </div>
         )}

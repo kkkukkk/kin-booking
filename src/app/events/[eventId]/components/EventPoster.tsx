@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
-import { getStorageUrl } from "@/util/storage";
+import { getStorageUrl, getEventPosterUrl } from "@/util/storage";
 import clsx from "clsx";
 import Skeleton from "@/components/base/Skeleton";
 import Image from "next/image";
@@ -42,7 +42,7 @@ const EventPoster = ({
 			) : posterData && posterData.length > 0 ? (
 				<div className="relative w-full h-full">
 					<Image
-						src={getStorageUrl(posterData[0].url)}
+						src={getEventPosterUrl(String(posterData[0].eventId), posterData[0].version, 'poster', posterData[0].extension)} // extension 포함
 						alt={`${eventName} 포스터`}
 						width={400}
 						height={500}

@@ -65,7 +65,7 @@ const Modal = ({ children, onClose }: ModalProps) => {
 				className="relative"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<ThemeRefDiv ref={modalContentRef} className={clsx("p-4 rounded shadow-lg min-w-[400px] max-w-2xl md:max-w-4xl max-h-[90vh] overflow-y-auto pr-4 scrollbar-none")} isChildren>
+				<ThemeRefDiv ref={modalContentRef} className={clsx("p-4 rounded shadow-lg max-w-2xl md:max-w-3xl max-h-[90vh] overflow-y-auto pr-4 scrollbar-none")} isChildren>
 					<button
 						className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
 						onClick={onClose}

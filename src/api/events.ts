@@ -1,6 +1,7 @@
 import { PaginationParams } from "@/util/pagination/type";
 import {
 	CreateEventDto,
+	UpdateEventDto,
 	EventWithCurrentStatus,
 	FetchEventDto,
 	FetchEventResponseDto,
@@ -81,10 +82,66 @@ export const fetchEventById = async (id: string): Promise<EventWithCurrentStatus
 	return data[0];
 };
 
+// events 테이블에서 직접 공연 조회 (수정용)
+export const fetchEventFromEventsTable = async (id: string): Promise<Events> => {
+	const { data, error } = await supabase
+		.from('events')
+		.select('*')
+		.eq('id', id)
+		.single();
+
+	if (error) throw error;
+	return toCamelCaseKeys<Events>(data);
+};
+
 // 공연 생성
 export const createEvent = async (event: CreateEventDto): Promise<Events> => {
 	const eventSnake = toSnakeCaseKeys<CreateEventDto>(event);
-	const { data, error } = await supabase.from('events').insert(eventSnake).single();
+	const { data, error } = await supabase.from('events').insert(eventSnake).select().single();
 	if (error) throw error;
 	return toCamelCaseKeys<Events>(data);
-}
+};
+
+export const updateEvent = async (id: string, event: UpdateEventDto): Promise<Events> => {
+	const eventSnake = toSnakeCaseKeys<UpdateEventDto>(event);
+	const { data, error } = await supabase
+		.from('events')
+		.update(eventSnake)
+		.eq('id', id)
+		.select()
+		.single();
+
+	if (error) throw error;
+	return toCamelCaseKeys<Events>(data);
+};
+
+export const deleteEvent = async (id: string): Promise<void> => {
+	// 1. 먼저 관련 포스터 파일을 Storage에서 삭제
+	const { data: existingMedia } = await supabase
+		.from('event_media')
+		.select('url')
+		.eq('event_id', id)
+		.eq('media_type', 'image')
+		.single();
+
+	if (existingMedia) {
+		// Storage에서 파일 삭제
+		const filePath = existingMedia.url.replace(/^.*\/kin\//, ''); // /kin/ 경로 제거
+		const { error: storageError } = await supabase.storage
+			.from('kin')
+			.remove([filePath]);
+
+		if (storageError) {
+			console.error('Storage 파일 삭제 에러:', storageError.message);
+			// Storage 삭제 실패해도 공연 삭제는 진행
+		}
+	}
+
+	// 2. 공연 삭제 (event_media는 cascade로 자동 삭제)
+	const { error } = await supabase
+		.from('events')
+		.delete()
+		.eq('id', id);
+
+	if (error) throw error;
+};

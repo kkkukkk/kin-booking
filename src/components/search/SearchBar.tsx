@@ -69,6 +69,7 @@ const SearchBar = ({
     setTempFrom('');
     setTempTo('');
     setKeyword('');
+    setShowDatePicker(false); // datepicker 창 닫기
     if (filters.dateRange) filters.dateRange.onChange('', '');
     if (filters.keyword) filters.keyword.onChange('');
     if (filters.status) filters.status.onChange('');

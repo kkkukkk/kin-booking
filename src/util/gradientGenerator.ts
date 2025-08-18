@@ -50,7 +50,7 @@ const generateStripeGradient = (): string => {
 // ----------------------------
 // 🌈 메인 그라데이션 생성기
 export const generateRandomGradient = (): string => {
-  const types = ['linear', 'radial', 'stripe'] as const
+  const types = ['linear', 'radial'] as const
   const type = types[Math.floor(Math.random() * types.length)]
 
   const color1 = getVividColor()

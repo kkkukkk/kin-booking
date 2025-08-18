@@ -9,8 +9,12 @@ import Button from "@/components/base/Button";
 import CheckCircleIcon from "@/components/icon/CheckCircleIcon";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import useToast from "@/hooks/useToast";
+import { useEventById } from "@/hooks/api/useEvents";
+import { EventStatus } from "@/types/model/events";
 import clsx from "clsx";
 import dayjs from "dayjs";
+import { useState } from "react";
 
 interface PaymentStepProps {
 	event: EventWithCurrentStatus;
@@ -30,8 +34,38 @@ const PaymentStep = ({
 	eventId
 }: PaymentStepProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
+	const { showToast } = useToast();
+	
+	// 공연 상태 확인 관련 상태
+	const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+	const [hasCheckedStatus, setHasCheckedStatus] = useState(false);
+	
+	// 실시간 공연 상태 조회
+	const { data: currentEvent, refetch: refetchEvent } = useEventById(eventId);
 	
 	const totalAmount = event.ticketPrice * quantity;
+	
+	// 현재 공연 상태 (초기 상태 또는 최신 상태)
+	const currentEventStatus = currentEvent?.status;
+	const finalEventStatus = currentEventStatus || event.status;
+	const isEventSoldOut = finalEventStatus === EventStatus.SoldOut;
+	
+	// 공연 상태 확인
+	const checkEventStatus = async () => {
+		setIsCheckingStatus(true);
+		try {
+			await refetchEvent();
+			setHasCheckedStatus(true);
+		} catch (error) {
+			showToast({
+				message: '공연 상태 확인 중 오류가 발생했습니다',
+				iconType: 'error',
+				autoCloseTime: 3000
+			});
+		} finally {
+			setIsCheckingStatus(false);
+		}
+	};
 	
 	// 마이페이지로 이동 시 localStorage 정리
 	const handleGoToMyPage = () => {
@@ -174,6 +208,62 @@ const PaymentStep = ({
 							</div>
 						</div>
 					))}
+				</ThemeDiv>
+
+				{/* 입금 전 공연 상태 확인 */}
+				<ThemeDiv isChildren className="rounded-lg p-4">
+					<div className="flex items-center justify-between mb-3">
+						<h3 className="text-base font-semibold">
+							입금 전 공연 상태 확인
+						</h3>
+						<Button
+							onClick={checkEventStatus}
+							theme={theme === "normal" ? "dark" : theme}
+							padding="px-3 py-2"
+							fontSize="text-sm"
+							reverse={theme === "normal"}
+							disabled={isCheckingStatus}
+						>
+							{isCheckingStatus ? '확인 중...' : '공연 상태 확인'}
+						</Button>
+					</div>
+					
+					{/* 상태 확인 결과 메시지 */}
+					{hasCheckedStatus && (
+						<div className={clsx(
+							"p-3 rounded-lg text-sm font-medium",
+							isEventSoldOut
+								? theme === "normal"
+									? "bg-red-50 border border-red-200 text-red-700"
+									: theme === "dark"
+									? "bg-red-950/30 border border-red-600/50 text-red-300"
+									: "bg-red-950/20 border border-red-500/50 text-red-300"
+								: theme === "normal"
+								? "bg-green-50 border border-green-200 text-green-700"
+								: theme === "dark"
+								? "bg-green-950/30 border border-green-600/50 text-green-300"
+								: "bg-green-950/20 border border-green-500/50 text-green-300"
+						)}>
+							{isEventSoldOut 
+								? '공연이 매진되었습니다. 입금을 중단해주세요!' 
+								: '공연이 매진되지 않았어요! 입금을 진행해주세요!'
+							}
+						</div>
+					)}
+					
+					{/* 기본 안내 메시지 */}
+					{!hasCheckedStatus && (
+						<div className={clsx(
+							"p-3 rounded-lg text-sm",
+							theme === "normal"
+								? "bg-amber-50 border border-amber-200 text-amber-700"
+								: theme === "dark"
+								? "bg-amber-950/30 border border-amber-600/50 text-amber-300"
+								: "bg-amber-950/20 border border-amber-500/50 text-amber-300"
+						)}>
+							입금 전에 공연 상태를 다시 한번 확인해주세요
+						</div>
+					)}
 				</ThemeDiv>
 
 				{/* 주의사항 */}

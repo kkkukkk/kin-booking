@@ -1,4 +1,5 @@
 import { Reservation, ReservationStatus } from "@/types/model/reservation";
+import { EventStatus } from "@/types/model/events";
 
 export interface CreateReservationDto {
 	userId: string;
@@ -34,6 +35,7 @@ export interface ReservationWithEventDto extends Reservation {
 		eventDate: string;
 		location?: string;
 		ticketPrice?: number;
+		status: EventStatus; // 공연 상태 추가
 	} | null;
 }
 

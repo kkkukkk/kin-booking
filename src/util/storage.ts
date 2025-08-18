@@ -7,6 +7,7 @@ export const getStorageUrl = (path: string): string => {
 	return `${storageUrl}/${path}`;
 };
 
-export const getEventPosterUrl = (eventId: string, filename: string = 'poster.jpg'): string => {
-	return getStorageUrl(`media/${eventId}/${filename}`);
+export const getEventPosterUrl = (eventId: string, version: number = 1, filename: string = 'poster', extension: string = 'jpg'): string => {
+    const baseUrl = getStorageUrl(`kin/events/${eventId}/${filename}_v${version}.${extension}`);
+    return baseUrl;
 }; 

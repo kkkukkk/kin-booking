@@ -6,8 +6,10 @@ export interface CreateEventDto {
 	eventDate: string;
 	location: string;
 	description?: string | null;
-	setCapacity: number;
+	seatCapacity: number;
 	ticketPrice: number;
+	status: EventStatus;
+	ticketColor: string;
 }
 
 export interface UpdateEventDto {
@@ -15,9 +17,10 @@ export interface UpdateEventDto {
 	eventDate?: string;
 	location?: string;
 	description?: string | null;
-	setCapacity?: number;
+	seatCapacity?: number;
 	status?: EventStatus;
 	ticketPrice?: number;
+	ticketColor?: string;
 }
 
 export interface FetchEventDto {

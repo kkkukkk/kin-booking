@@ -8,7 +8,6 @@ import { PaymentTransactionWithReservationDto } from '@/types/dto/paymentTransac
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { StatusBadge } from '@/components/status/StatusBadge';
-import useToast from '@/hooks/useToast';
 import SearchBar from '@/components/search/SearchBar';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
@@ -50,12 +49,6 @@ const PaymentHistoryClient = () => {
 
     const transactions = transactionsResponse?.data || [];
 
-    // 데이터 로딩 상태 확인
-    console.log('transactionsResponse:', transactionsResponse);
-    console.log('transactions:', transactions);
-    console.log('isLoading:', isLoading);
-    console.log('error:', error);
-
     // 검색 필터링만 적용 (정렬은 서버에서 처리)
     const filteredTransactions = transactions.filter((transaction: PaymentTransactionWithReservationDto) => {
         // 키워드 검색 (사용자명, 공연명, 계좌 정보 포함)
@@ -93,6 +86,18 @@ const PaymentHistoryClient = () => {
 
         return true;
     });
+
+    // 검색/필터 적용된 데이터 기준으로 통계 계산
+    const paymentStats = filteredTransactions.reduce((acc, transaction: PaymentTransactionWithReservationDto) => {
+        if (transaction.paymentType === 'payment') {
+            acc.totalPayment += transaction.amount;
+        } else if (transaction.paymentType === 'refund') {
+            acc.totalRefund += transaction.amount;
+        }
+        return acc;
+    }, { totalPayment: 0, totalRefund: 0 });
+
+    const netAmount = paymentStats.totalPayment - paymentStats.totalRefund;
 
     // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
     const finalTransactions = filteredTransactions;
@@ -338,6 +343,39 @@ const PaymentHistoryClient = () => {
                     <h1 className="text-lg md:text-xl font-bold mb-2">입/출금 이력 관리</h1>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className={`p-4 rounded-lg border ${
+                        theme === 'normal' 
+                            ? 'bg-green-50 border-green-200 text-green-800'
+                            : 'bg-green-900/20 border-green-500/30 text-green-400' 
+                    }`}>
+                        <h3 className="text-sm font-medium mb-1">총 입금</h3>
+                        <p className="text-xl font-bold">
+                            {paymentStats.totalPayment.toLocaleString()}원
+                        </p>
+                    </div>
+                    <div className={`p-4 rounded-lg border ${
+                        theme === 'normal' 
+                            ? 'bg-red-50 border-red-200 text-red-800'
+                            : 'bg-red-900/20 border-red-500/30 text-red-400' 
+                    }`}>
+                        <h3 className="text-sm font-medium mb-1">총 환불</h3>
+                        <p className="text-xl font-bold">
+                            {paymentStats.totalRefund.toLocaleString()}원
+                        </p>
+                    </div>
+                    <div className={`p-4 rounded-lg border ${
+                        theme === 'normal' 
+                            ? 'bg-blue-50 border-blue-200 text-blue-800'
+                            : 'bg-blue-900/20 border-blue-500/30 text-blue-400' 
+                    }`}>
+                        <h3 className="text-sm font-medium mb-1">순액</h3>
+                        <p className="text-xl font-bold">
+                            {netAmount.toLocaleString()}원
+                        </p>
+                    </div>
+                </div>
+
                 {/* 검색 및 필터 */}
                 <SearchBar
                     label="입/출금 이력 검색 및 필터"
@@ -406,7 +444,7 @@ const PaymentHistoryClient = () => {
                         columns={columns}
                         theme={theme}
                         isLoading={isLoading}
-                        emptyMessage="Payment 이력이 없습니다."
+                        emptyMessage="입/출금 이력이 없습니다."
                         loadingMessage="로딩 중..."
                         className="h-full"
                         mobileCardSections={mobileCardSections}

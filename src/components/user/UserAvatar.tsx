@@ -1,4 +1,4 @@
-import { generateRandomGradient } from '@/util/adminGradientGenerator';
+import { generateRandomGradient } from '@/util/gradientGenerator';
 
 interface UserAvatarProps {
   name: string;

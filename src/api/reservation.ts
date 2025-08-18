@@ -4,7 +4,7 @@ import { getPaginationRange } from "@/util/pagination/pagination";
 import {toCamelCaseKeys, toSnakeCaseKeys} from "@/util/case/case";
 import { CreateReservationDto, FetchReservationDto, FetchReservationResponseDto, ReservationWithEventDto } from "@/types/dto/reservation";
 import { Reservation } from "@/types/model/reservation";
-import { generateRandomGradient } from "@/util/adminGradientGenerator";
+import { generateRandomGradient } from "@/util/gradientGenerator";
 
 export const fetchReservation = async (params?: PaginationParams & FetchReservationDto): Promise<FetchReservationResponseDto> => {
 	let query = supabase.from('reservations').select('*', { count: 'exact' });
@@ -54,7 +54,8 @@ export const fetchReservationWithEvent = async (params?: PaginationParams & Fetc
 				event_name,
 				event_date,
 				location,
-				ticket_price
+				ticket_price,
+				status
 			)
 		`, { count: 'exact' });
 	

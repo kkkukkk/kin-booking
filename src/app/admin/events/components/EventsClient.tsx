@@ -12,6 +12,8 @@ import ThemeDiv from '@/components/base/ThemeDiv';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
 import { StatusBadge } from '@/components/status/StatusBadge';
+import Button from '@/components/base/Button';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 
 const EventsClient = () => {
@@ -35,6 +37,8 @@ const EventsClient = () => {
     field: 'eventDate',
     direction: 'desc' as 'asc' | 'desc',
   });
+
+  const router = useRouter();
 
   // 공연 데이터 조회
   const { data: eventsResponse, isLoading, error, refetch } = useEvents({
@@ -86,11 +90,14 @@ const EventsClient = () => {
     setCurrentPage(page);
   };
 
-  // 공연 디테일 페이지로 이동
-  const handleEventClick = (eventId: string) => {
-    // TODO: 공연 디테일/수정 페이지로 이동
-    console.log('공연 클릭됨:', eventId);
-    // router.push(`/admin/events/${eventId}`);
+  // 공연 상세 페이지로 이동
+  const handleEventClick = (event: any) => {
+    router.push(`/admin/events/${event.id}`);
+  };
+
+  // 공연 생성 페이지로 이동
+  const handleCreateEvent = () => {
+    router.push('/admin/events/create');
   };
 
   // 필터링된 공연 목록
@@ -131,7 +138,7 @@ const EventsClient = () => {
         <div className="text-sm">
           <div 
             className="font-medium truncate cursor-pointer hover:text-blue-600 transition-colors"
-            onClick={() => handleEventClick(event.id)}
+            onClick={() => handleEventClick(event)}
           >
             {event.eventName}
           </div>
@@ -203,9 +210,19 @@ const EventsClient = () => {
   const mobileCardSections = (event: any) => ({
     firstRow: (
       <>
-        <div className="w-full flex flex-col gap-2">
-          <div className="font-medium text-sm truncate">{event.eventName}</div>
-          <div className="text-xs text-gray-500 truncate">{event.description || '설명 없음'}</div>
+        <div className="w-full flex justify-between items-center">
+          <div className="font-semibold text-sm truncate">
+            {event.eventName}
+          </div>
+          <div>
+            <StatusBadge
+              status={event.status}
+              theme={theme}
+              statusType="event"
+              variant="badge"
+              size="sm"
+            />
+          </div>
         </div>
       </>
     ),
@@ -215,16 +232,6 @@ const EventsClient = () => {
           <div className="flex justify-between">
             <span>공연일</span>
             <span>{dayjs(event.eventDate).format('MM/DD HH:mm')}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>상태</span>
-            <StatusBadge
-              status={event.status}
-              theme={theme}
-              statusType="event"
-              variant="badge"
-              size="sm"
-            />
           </div>
           <div className="flex justify-between">
             <span>티켓 가격</span>
@@ -283,8 +290,17 @@ const EventsClient = () => {
     <ThemeDiv className="flex flex-col min-h-full">
       {/* 상단 고정 영역 */}
       <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-        <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-          <h1 className="text-lg md:text-xl font-bold mb-2">공연 관리</h1>
+        <div className="flex justify-between items-center">
+          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
+            <h1 className="text-lg md:text-xl font-bold mb-2">공연 관리</h1>
+          </div>
+          <Button
+            theme={theme}
+            onClick={handleCreateEvent}
+            className="px-3 py-1"
+          >
+            공연 추가
+          </Button>
         </div>
 
         {/* 검색 및 필터 */}
@@ -363,6 +379,7 @@ const EventsClient = () => {
             mobileCardSections={mobileCardSections}
             sortConfig={sortConfig}
             onSortChange={handleSortChange}
+            onRowClick={(event) => router.push(`/admin/events/${event.id}`)}
           />
         </div>
 
@@ -382,6 +399,7 @@ const EventsClient = () => {
           </div>
         )}
       </div>
+
     </ThemeDiv>
   );
 };
