@@ -82,7 +82,7 @@ const AdminClient = () => {
     }
   };
 
-  if (!isLoading) {
+  if (isLoading) {
     return (
       <ThemeDiv className="space-y-6 p-6">
         {/* 전체 요약 통계 스켈레톤 - 1x5 레이아웃 */}
