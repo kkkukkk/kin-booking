@@ -21,10 +21,18 @@ import Select from '@/components/base/Select';
 import { formatPhoneNumber } from '@/util/phoneNumber';
 import dayjs from 'dayjs';
 import UserRoleChangeModal from './UserRoleChangeModal';
+import { useSession } from '@/hooks/useSession';
+import { getUserHighestRole } from '@/util/userRole';
 
 const UsersClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const { showToast } = useToast();
+  const { session } = useSession();
+
+  // 현재 로그인한 사용자 정보 조회
+  const { data: currentUser } = useUsers({ id: session?.user?.id });
+  const currentUserRole = getUserHighestRole(currentUser?.data?.[0] || null);
+  const isMaster = currentUserRole === UserRoleStatus.Master;
 
   // 검색/필터 상태
   const [searchParams, setSearchParams] = useState({
@@ -135,6 +143,15 @@ const UsersClient = () => {
 
   // 사용자 클릭 핸들러
   const handleUserClick = (user: UserWithRoles) => {
+    if (!isMaster) {
+      showToast({ 
+        message: '권한이 없습니다.', 
+        iconType: 'error',
+        autoCloseTime: 3000
+      });
+      return;
+    }
+    
     setSelectedUser(user);
     setIsModalOpen(true);
   };
@@ -384,6 +401,11 @@ const UsersClient = () => {
       <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
         <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
           <h1 className="text-lg md:text-xl font-bold mb-2">사용자 관리</h1>
+          {!isMaster && (
+            <p className="text-sm text-gray-500 mb-2">
+              MASTER 권한만 사용자 권한을 변경할 수 있습니다.
+            </p>
+          )}
         </div>
 
         {/* 검색 및 필터 */}
@@ -465,7 +487,7 @@ const UsersClient = () => {
             mobileCardSections={mobileCardSections}
             sortConfig={sortConfig}
             onSortChange={handleSortChange}
-            onRowClick={handleUserClick}
+            onRowClick={isMaster ? handleUserClick : undefined}
           />
         </div>
 

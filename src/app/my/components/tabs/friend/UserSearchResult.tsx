@@ -120,6 +120,7 @@ const UserSearchResult = ({ user }: UserSearchResultProps) => {
         theme="dark"
         padding="px-2 py-1.5"
         fontSize="text-xs"
+        className="font-semibold"
         disabled={isSending}
       >
         친구 신청

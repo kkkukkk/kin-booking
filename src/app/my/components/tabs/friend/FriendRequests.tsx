@@ -179,7 +179,8 @@ const FriendRequests = () => {
           theme={theme === "normal" ? "dark" : theme}
           light={activeTab !== 'received'}
           padding="py-0.5"
-          className="flex-1 text-xs sm:text-sm"
+          fontSize='text-xs sm:text-sm'
+          className="flex-1 font-semibold"
           on={activeTab === 'received'}
           neonVariant={NEON_VARIANTS.BLUE}
         >
@@ -190,7 +191,8 @@ const FriendRequests = () => {
           theme={theme === "normal" ? "dark" : theme}
           light={activeTab !== 'sent'}
           padding="py-0.5"
-          className="flex-1 text-xs sm:text-sm"
+          fontSize='text-xs sm:text-sm'
+          className="flex-1 font-semibold"
           on={activeTab === 'sent'}
           neonVariant={NEON_VARIANTS.BLUE}
         >
@@ -271,7 +273,9 @@ const FriendRequests = () => {
                       <Button
                         onClick={() => handleRespond(request.id, FriendStatus.Accepted)}
                         theme="dark"
-                        className="px-2 py-1 text-xs bg-green-500 hover:bg-green-600 whitespace-nowrap"
+                        fontSize='text-xs'
+                        padding="px-2 py-1"
+                        className="bg-green-500 hover:bg-green-600 whitespace-nowrap font-semibold"
                         disabled={isResponding}
                       >
                         수락
@@ -279,7 +283,9 @@ const FriendRequests = () => {
                       <Button
                         onClick={() => handleRespond(request.id, FriendStatus.Rejected)}
                         theme="dark"
-                        className="px-2 py-1 text-xs bg-red-500 hover:bg-red-600 whitespace-nowrap"
+                        fontSize='text-xs'
+                        padding="px-2 py-1"
+                        className="bg-red-500 hover:bg-red-600 whitespace-nowrap font-semibold"
                         disabled={isResponding}
                       >
                         거절
@@ -291,7 +297,9 @@ const FriendRequests = () => {
                       <Button
                         onClick={() => handleCancel(request.id, request.status)}
                         theme="dark"
-                        className="px-2 py-1 text-xs bg-gray-500 hover:bg-gray-600 whitespace-nowrap"
+                        fontSize='text-xs'
+                        padding="px-2 py-1"
+                        className="bg-gray-500 hover:bg-gray-600 whitespace-nowrap font-semibold"
                         disabled={isDeleting}
                       >
                         취소
@@ -300,7 +308,9 @@ const FriendRequests = () => {
                       <Button
                         onClick={() => handleCancel(request.id, request.status)}
                         theme="dark"
-                        className="px-2 py-1 text-xs bg-red-500 hover:bg-red-600 whitespace-nowrap"
+                        fontSize='text-xs'
+                        padding="px-2 py-1"
+                        className="bg-red-500 hover:bg-red-600 whitespace-nowrap font-semibold"
                         disabled={isDeleting}
                       >
                         삭제

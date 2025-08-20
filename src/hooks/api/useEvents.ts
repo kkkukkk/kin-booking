@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchEventById, fetchEvents, fetchEventsWithCurrentStatus, fetchEventFromEventsTable, createEvent, updateEvent, deleteEvent } from "@/api/events";
+import { fetchEventById, fetchEvents, fetchEventsWithCurrentStatus, fetchEventFromEventsTable, createEvent, updateEvent, deleteEvent, completeEvent } from "@/api/events";
 import {
 	EventWithCurrentStatus,
 	FetchEventDto,
@@ -109,4 +109,26 @@ export const useDeleteEvent = () => {
 			queryClient.invalidateQueries({ queryKey: ['events_with_current_status'] });
 		},
 	});
+};
+
+// 공연 완료 처리 훅
+export const useCompleteEvent = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: completeEvent,
+        onSuccess: (_, eventId) => {
+            // 개별 공연 쿼리 무효화
+            queryClient.invalidateQueries({ queryKey: ['event_by_id', eventId] });
+            queryClient.invalidateQueries({ queryKey: ['event_from_events_table', eventId] });
+            // 공연 목록 쿼리들 무효화
+            queryClient.invalidateQueries({ queryKey: ['events'] });
+            queryClient.invalidateQueries({ queryKey: ['events_with_current_status'] });
+            // 예매 관련 쿼리들도 무효화 (상태 변경으로 인해)
+            queryClient.invalidateQueries({ queryKey: ['reservations'] });
+            queryClient.invalidateQueries({ queryKey: ['reservations_with_event'] });
+            // 입장 세션 관련 쿼리들도 무효화 (삭제로 인해)
+            queryClient.invalidateQueries({ queryKey: ['entry_sessions'] });
+        },
+    });
 };

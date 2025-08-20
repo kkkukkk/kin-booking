@@ -16,16 +16,19 @@ import dayjs from 'dayjs';
 import { EventStatus, EventStatusKo } from '@/types/model/events';
 import { useEventFromEventsTable } from '@/hooks/api/useEvents';
 import { useEventMediaByType, useUploadEventPoster } from '@/hooks/api/useEventMedia';
-import { useUpdateEvent, useDeleteEvent } from '@/hooks/api/useEvents';
+import { useUpdateEvent, useDeleteEvent, useCompleteEvent } from '@/hooks/api/useEvents';
 import useToast from '@/hooks/useToast';
 import { useAlert } from '@/providers/AlertProvider';
 import EventPoster from '@/app/events/[eventId]/components/EventPoster';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useSession } from '@/hooks/useSession';
 
 const EditEventPage = () => {
     const router = useRouter();
     const params = useParams();
     const eventId = params.eventId as string;
     const theme = useAppSelector((state: RootState) => state.theme.current);
+    const { session } = useSession();
 
     const [isEditing, setIsEditing] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,11 +60,49 @@ const EditEventPage = () => {
     // 공연 삭제
     const deleteEventMutation = useDeleteEvent();
 
+    // 공연 완료
+    const completeEventMutation = useCompleteEvent();
+
     // Toast 알림
     const { showToast } = useToast();
 
     // Alert 확인
     const { showAlert } = useAlert();
+
+    // 관리자 권한 체크
+    const { canManageEvents } = useAdminAuth();
+
+    // 공연 완료 처리
+    const handleCompleteEvent = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const confirmed = await showAlert({
+            title: '공연 종료 확인',
+            message: `"${event?.eventName}" 공연을 종료하시겠습니까?\n\n• 대기중인 예매가 모두 취소됩니다\n• 이 작업은 되돌릴 수 없습니다`,
+            type: 'confirm'
+        });
+        
+        if (confirmed) {
+            completeEventMutation.mutate(eventId, {
+                onSuccess: () => {
+                    showToast({
+                        message: `"${event?.eventName}" 공연이 종료되었습니다.`,
+                        iconType: 'success',
+                        autoCloseTime: 3000,
+                    });
+                },
+                onError: (error) => {
+                    console.error('공연 완료 실패:', error);
+                    showToast({
+                        message: '공연 완료에 실패했습니다.',
+                        iconType: 'error',
+                        autoCloseTime: 3000,
+                    });
+                }
+            });
+        }
+    };
 
     useEffect(() => {
         if (event) {
@@ -153,7 +194,6 @@ const EditEventPage = () => {
             });
         } catch (error) {
             console.error('저장 실패:', error);
-            // 에러 발생 시 React Query가 자동으로 롤백
             showToast({
                 message: '공연 정보 저장에 실패했습니다.',
                 iconType: 'error',
@@ -281,10 +321,25 @@ const EditEventPage = () => {
                     <div className="flex gap-2">
                         {!isEditing ? (
                             <>
+                                {event?.status === EventStatus.Ongoing && canManageEvents && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => handleCompleteEvent(e)}
+                                        className={`px-3 py-1 rounded font-semibold transition-colors ${
+                                            theme === 'normal' 
+                                                ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white' 
+                                                : theme === 'dark' 
+                                                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white' 
+                                                    : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
+                                        }`}
+                                    >
+                                        공연 종료
+                                    </button>
+                                )}
                                 <button
                                     type="button"
                                     onClick={handleDelete}
-                                    className={`px-3 py-1 rounded-lg font-medium transition-colors ${
+                                    className={`px-3 py-1 rounded font-semibold transition-colors ${
                                         theme === 'normal' 
                                             ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white' 
                                             : theme === 'dark' 
@@ -294,19 +349,21 @@ const EditEventPage = () => {
                                 >
                                     삭제
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setIsEditing(true)}
-                                    className={`px-3 py-1 rounded-lg font-medium transition-colors ${
-                                        theme === 'normal' 
-                                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white' 
-                                            : theme === 'dark' 
-                                                ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white' 
-                                                : 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white'
-                                    }`}
-                                >
-                                    편집
-                                </button>
+                                {canManageEvents && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditing(true)}
+                                        className={`px-3 py-1 rounded font-semibold transition-colors ${
+                                            theme === 'normal' 
+                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white' 
+                                                : theme === 'dark' 
+                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white' 
+                                                    : 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white'
+                                        }`}
+                                    >
+                                        편집
+                                    </button>
+                                )}
                             </>
                         ) : (
                             <>
@@ -314,7 +371,7 @@ const EditEventPage = () => {
                                     type="button"
                                     onClick={handleSave}
                                     disabled={isSubmitting}
-                                    className={`px-3 py-1 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                    className={`px-3 py-1 rounded font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                                         theme === 'normal' 
                                             ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white' 
                                             : theme === 'dark' 
@@ -327,7 +384,7 @@ const EditEventPage = () => {
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className={`px-3 py-1 rounded-lg font-medium transition-colors ${
+                                    className={`px-3 py-1 rounded font-semibold transition-colors ${
                                         theme === 'normal' 
                                             ? 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white' 
                                             : theme === 'dark' 
@@ -349,7 +406,7 @@ const EditEventPage = () => {
                     <ThemeDiv className="flex items-center gap-4 p-4 rounded-lg h-[60px]">
                         <span className="text-sm font-medium whitespace-nowrap">현재 상태:</span>
                         <div className="min-w-0 flex-1">
-                            {isEditing ? (
+                            {isEditing && canManageEvents ? (
                                 <Select
                                     theme={theme}
                                     value={formData.status}
@@ -358,7 +415,6 @@ const EditEventPage = () => {
                                         { value: EventStatus.Pending, label: EventStatusKo[EventStatus.Pending] },
                                         { value: EventStatus.Ongoing, label: EventStatusKo[EventStatus.Ongoing] },
                                         { value: EventStatus.SoldOut, label: EventStatusKo[EventStatus.SoldOut] },
-                                        { value: EventStatus.Completed, label: EventStatusKo[EventStatus.Completed] },
                                     ]}
                                 />
                             ) : (
@@ -427,7 +483,7 @@ const EditEventPage = () => {
                                                     <svg className="mx-auto h-16 w-16 mb-4 opacity-60" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                                                     </svg>
-                                                    <p className="text-lg font-medium mb-2">포스터 이미지 업로드</p>
+                                                    <p className="text-lg font-medium mb-2">포스터 이미지 변경</p>
                                                     <input
                                                         id="poster-file-input"
                                                         type="file"

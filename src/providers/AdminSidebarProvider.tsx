@@ -15,7 +15,7 @@ export function useAdminSidebar() {
 }
 
 export function AdminSidebarProvider({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   return (
     <AdminSidebarContext.Provider value={{ open, setOpen }}>
       {children}

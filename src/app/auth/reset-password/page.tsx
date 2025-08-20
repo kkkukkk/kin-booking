@@ -60,9 +60,9 @@ const ResetPassword = () => {
 
 			if (!error) {
 				showToast({
-					message: '비밀번호가 성공적으로 변경됐어요!',
+					message: '비밀번호가 성공적으로 변경됐어요!\n\n새 비밀번호로 다시 로그인해주세요.',
 					iconType: 'success',
-					autoCloseTime: 3000,
+					autoCloseTime: 5000,
 				});
 				setIsPasswordChanged(true);
 				await supabase.auth.signOut();
@@ -190,7 +190,7 @@ const ResetPassword = () => {
 					theme={"dark"}
 					fontSize="text-base"
 					padding="p-2"
-					className={"mt-6"}
+					className={"mt-6 font-semibold"}
 					onClick={handleClick}
 					disabled={isLoading}
 				>

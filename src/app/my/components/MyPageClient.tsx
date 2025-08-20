@@ -19,6 +19,7 @@ import { SingleTicketIcon, ProfileIcon, UsersIcon, TeamIcon } from '@/components
 import { CalendarIcon } from '@/components/icon/CalendarIcon';
 import { LogoutIcon } from '@/components/icon/LogoutIcon';
 import { getUserHighestRole } from '@/util/userRole';
+import { UserRoleStatus } from '@/types/model/userRole';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import ProfileTab from '@/app/my/components/tabs/ProfileTab';
 import ReservationsTab from '@/app/my/components/tabs/ReservationsTab';
@@ -119,10 +120,23 @@ const MyPageClient = () => {
 				<div className="flex items-center justify-between mb-4">
 					<h1 className="text-2xl md:text-3xl font-bold">마이페이지</h1>
 					<div className="flex gap-2">
+						{userRole !== UserRoleStatus.User && (
+							<Button
+								onClick={() => router.push('/admin')}
+								theme="dark"
+								padding="px-2 py-1"
+								fontSize='text-sm'
+								className="font-semibold bg-purple-600 hover:bg-purple-700"
+							>
+								관리자
+							</Button>
+						)}
 						<Button
 							onClick={() => router.push('/')}
 							theme="dark"
-							className="px-2 py-1 text-sm"
+							padding="px-2 py-1"
+							fontSize='text-sm'
+							className="font-semibold"
 						>
 							<HomeIcon className="w-4 h-4 mr-1" />
 							홈
@@ -130,7 +144,9 @@ const MyPageClient = () => {
 						<Button
 							onClick={handleLogout}
 							theme="dark"
-							className="px-2 py-1 text-sm"
+							padding="px-2 py-1"
+							fontSize='text-sm'
+							className="font-semibold"
 						>
 							<LogoutIcon className="w-4 h-4 mr-1" />
 							로그아웃
@@ -206,7 +222,8 @@ const MyPageClient = () => {
 								}}
 								theme={theme}
 								padding={'py-2 md:py-1.5'}
-								className={`gap-3 md:gap-3.5 font-semibold text-sm md:text-base`}
+								fontSize='text-sm md:text-base'
+								className={`gap-3 md:gap-3.5 font-semibold`}
 								style={{ minWidth: 'auto', width: '100%' }}
 								reverse={theme === 'normal'}
 								light={true}

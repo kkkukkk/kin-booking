@@ -206,6 +206,7 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 					theme="dark"
 					padding="px-3 py-1"
 					fontSize="text-sm"
+					className="font-semibold"
 					onClick={() => setEditMode(true)}>
 					수정
 				</Button>

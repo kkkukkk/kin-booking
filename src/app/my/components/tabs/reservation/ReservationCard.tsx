@@ -44,19 +44,19 @@ const ReservationCard = ({
 	const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 	const [hasCheckedStatus, setHasCheckedStatus] = useState(false); // 상태 확인 여부
 
-		// 실시간 공연 상태 조회
+	// 실시간 공연 상태 조회
 	const { data: currentEvent, refetch: refetchEvent } = useEventById(
 		reservation.events?.eventId || reservation.eventId || ''
 	);
 
 	// 공연 매진 상태를 이중으로 관리
-	// 1. 기본 조회된 상태 (마이페이지 접근 시)
+	// 1. 기본 조회 (마이페이지 접근)
 	const initialEventStatus = reservation.events?.status;
-	
-	// 2. 실시간 조회된 상태 (사용자 버튼 클릭 시)
+
+	// 2. 실시간 조회 (사용자 버튼 클릭)
 	const currentEventStatus = currentEvent?.status;
-	
-	// 3. 최종 상태 (실시간 > 기본 순서)
+
+	// 3. 최종 (실시간 > 기본 순서)
 	const finalEventStatus = currentEventStatus || initialEventStatus;
 	const isEventSoldOut = finalEventStatus === EventStatus.SoldOut;
 
@@ -64,20 +64,16 @@ const ReservationCard = ({
 
 	const checkEventStatus = async () => {
 		const targetEventId = reservation.events?.eventId || reservation.eventId;
-		
+
 		if (!targetEventId) return;
 
 		setIsCheckingStatus(true);
-		
+
 		try {
-			// 실제 API 호출로 최신 공연 상태 조회
 			const result = await refetchEvent();
-			
+
 			if (result.data) {
-				// 최신 공연 상태로 업데이트
-				const currentStatus = result.data.status;
-				console.log('최신 공연 상태:', currentStatus);
-				setHasCheckedStatus(true); // 상태 확인 완료
+				setHasCheckedStatus(true);
 			}
 		} catch (error) {
 			console.error('공연 상태 확인 실패:', error);
@@ -134,9 +130,9 @@ const ReservationCard = ({
 						{isEventSoldOut && reservation.status === ReservationStatus.Pending && (
 							<div className={clsx(
 								"text-sm font-medium mt-1",
-								theme === "normal" ? "text-red-600" : 
-								theme === "dark" ? "text-red-400" :
-								"text-red-300"
+								theme === "normal" ? "text-red-600" :
+									theme === "dark" ? "text-red-400" :
+										"text-red-300"
 							)}>
 								매진된 공연입니다
 							</div>
@@ -149,7 +145,8 @@ const ReservationCard = ({
 							padding={"px-3 py-1"}
 							disabled={isCancelling}
 							reverse={theme === 'normal'}
-							className="flex-shrink-0 transition-all duration-200 text-xs md:text-sm"
+							fontSize='text-xs md:text-sm'
+							className="flex-shrink-0 transition-all duration-200 font-semibold"
 						>
 							취소
 						</Button>
@@ -270,10 +267,10 @@ const ReservationCard = ({
 									<span className={clsx("w-2 h-2 rounded-full", config.dotColor)}></span>
 									{config.message}
 								</div>
-														</ThemeDiv>
-							
+							</ThemeDiv>
 
-							
+
+
 							{/* 대기중인 예매의 경우 입금 정보 표시 */}
 							{reservation.status === ReservationStatus.Pending && paymentAccounts && paymentAccounts.length > 0 && (
 								<div className="mt-3">
@@ -323,18 +320,18 @@ const ReservationCard = ({
 														theme === "dark" ? "bg-orange-900/20 border border-orange-700/50 text-orange-200" :
 															"bg-orange-950/20 border border-orange-600/50 text-orange-200"
 												)}>
-													<div className="flex items-center justify-between">
-														<span>입금 전에 공연 상태를 다시 한번 확인해주세요</span>
+													<div className="flex items-center justify-between text-xs md:text-sm">
+														<span>입금 전 공연 상태를 다시 한번 확인해주세요!</span>
 														<Button
 															onClick={checkEventStatus}
 															theme={theme === 'normal' ? 'dark' : theme}
-															padding="px-3 py-2"
-															fontSize='text-sm'
+															padding="px-3 py-1"
+															fontSize='text-xs md:text-sm'
 															reverse={theme === 'normal'}
-															className="font-semibold"
+															className="font-semibold whitespace-nowrap ml-2"
 															disabled={isCheckingStatus}
 														>
-															{isCheckingStatus ? '확인 중...' : '공연 상태 확인'}
+															{isCheckingStatus ? '확인 중...' : '확인'}
 														</Button>
 													</div>
 												</div>

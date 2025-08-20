@@ -241,7 +241,6 @@ const EventReservationClient = () => {
 	return (
 		<div>
 			<div className="flex justify-start mb-4">
-				{/* payment 단계에서는 뒤로가기 버튼을 표시하지 않음 */}
 				{step !== 'payment' && !isReservationCompleted && (
 					<Button
 						theme={"dark"}
@@ -249,6 +248,7 @@ const EventReservationClient = () => {
 						onClick={onBack}
 						reverse={theme === "normal"}
 						light={theme !== "normal"}
+						className="font-semibold"
 					>
 						{step === "confirm" ? "이전" : "뒤로가기"}
 					</Button>
@@ -297,6 +297,7 @@ const EventReservationClient = () => {
 						padding={"px-2 py-1.5"}
 						onClick={onNext}
 						reverse={theme === "normal"}
+						className="font-semibold"
 					>
 						{step === "confirm" ? "예매하기" : "다음"}
 					</Button>

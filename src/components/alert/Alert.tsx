@@ -63,7 +63,12 @@ const Alert = ({
 
 					{/* 바디 영역 */}
 					<div className="py-6">
-						<div className="whitespace-pre-line text-sm md:text-base">
+						<div className={clsx(
+							"whitespace-pre-line text-sm md:text-base leading-relaxed rounded p-4 shadow-sm",
+							theme === "normal" && "bg-gray-50/50 border border-gray-200/20",
+							theme === "dark" && "bg-gray-700/50 border border-gray-600/40",
+							theme === "neon" && "bg-gray-700/50 border border-gray-600/40"
+						)}>
 							{message}
 						</div>
 

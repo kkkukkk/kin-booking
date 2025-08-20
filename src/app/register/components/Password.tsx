@@ -59,18 +59,27 @@ const Password = ({
 
 	return (
 		<div className="flex flex-col relative overflow-hidden">
-			<div className={"mb-4"}>
-				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"사용할 비밀번호를 입력해주세요!"} leftIcon={<KeyIcon />} />
-			</div>
-			<div className={clsx("mb-4", theme === "normal" ? "text-cyan-800" : "text-cyan-400")}>
-				<AnimatedTextWithIcon fontSize={"text-sm"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
-			</div>
-
 			<motion.div
 				variants={fadeSlideLeft}
 				initial="hidden"
 				animate="visible"
-				className={"flex flex-col gap-2"}
+				className="p-2 rounded mt-3 mb-6 backdrop-blur-sm bg-white/10 border border-white/10 shadow-lg"
+			>
+				<div className="mb-3">
+					<AnimatedTextWithIcon fontSize={"text-base"} text={"사용할 비밀번호를 입력해주세요!"} rightIcon={<KeyIcon />} />
+				</div>
+				<div className="text-sm text-gray-600">
+					<AnimatedTextWithIcon fontSize={"text-sm"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8} leftIcon={<BulbIcon />} />
+				</div>
+			</motion.div>
+
+			{/* 입력 필드 */}
+			<motion.div
+				variants={fadeSlideLeft}
+				initial="hidden"
+				animate="visible"
+				exit="exit"
+				className="flex flex-col items-center space-y-3"
 			>
 				<InputWithPasswordToggle
 					type={"password"}
@@ -85,14 +94,14 @@ const Password = ({
 					type={"password"}
 					name={"confirmPassword"}
 					placeholder={"동일한 비밀번호를 입력해주세요."}
-					theme={theme}
 					className={"font text-md md:text-lg"}
+					theme={theme}
 					value={confirmPassword}
 					onChange={handleConfirmChange}
 				/>
 			</motion.div>
 
-
+			{/* 에러 메시지 */}
 			<div
 				className={clsx(
 					"text-right text-sm min-h-[20px] mt-1 transition-all duration-300 ease-in-out",

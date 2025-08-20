@@ -70,7 +70,7 @@ const PhoneNumber = ({
 	const checkDuplicatePhone = async () => {
 		if (value === "") {
 			showToast({
-				message: "휴대폰 번호를 입력해주세요.",
+				message: "핸드폰 번호를 입력해주세요.",
 				autoCloseTime: 3000,
 				iconType: "warning",
 			});
@@ -78,7 +78,7 @@ const PhoneNumber = ({
 		}
 		if (!isValid) {
 			showToast({
-				message: "올바른 휴대폰 번호을 입력해주세요.",
+				message: "올바른 핸드폰 번호을 입력해주세요.",
 				autoCloseTime: 3000,
 				iconType: "warning",
 			});
@@ -93,9 +93,8 @@ const PhoneNumber = ({
 		setChecking(false);
 
 		if (error) {
-			console.error("휴대폰 번호 중복 체크 실패:", error.message);
 			showToast({
-				message: "휴대폰 번호 중복 확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
+				message: "핸드폰 번호 중복 확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
 				autoCloseTime: 3000,
 				iconType: "error",
 			});
@@ -118,52 +117,65 @@ const PhoneNumber = ({
 
 	return (
 		<div className="flex flex-col relative overflow-hidden">
-			<div className={"mb-4"}>
-				<AnimatedTextWithIcon fontSize={"text-base md:text-xl"} text={"휴대폰 번호를 입력해주세요!"} leftIcon={<PhoneIcon />} />
-			</div>
-			<div className={clsx("mb-4", theme === "normal" ? "text-cyan-800" : "text-cyan-400")}>
-				<AnimatedTextWithIcon fontSize={"text-sm"} text={"숫자만 입력해도 괜찮아요!"} delay={0.8} leftIcon={<BulbIcon />} />
-			</div>
+			{/* 제목과 안내 문구를 컨테이너로 감싸기 */}
+			<motion.div
+				variants={fadeSlideLeft}
+				initial="hidden"
+				animate="visible"
+				className="p-2 rounded mt-3 mb-6 backdrop-blur-sm bg-white/10 border border-white/10 shadow-lg"
+			>
+				<div className="mb-3">
+					<AnimatedTextWithIcon fontSize={"text-base"} text={"핸드폰 번호를 입력해주세요!"} leftIcon={<PhoneIcon />} />
+				</div>
+				<div className="text-sm text-gray-600">
+					<AnimatedTextWithIcon fontSize={"text-sm"} text={"숫자만 입력해도 괜찮아요!"} delay={0.8} leftIcon={<BulbIcon />} />
+				</div>
+			</motion.div>
 
+			{/* 입력 필드와 버튼 */}
 			<motion.div
 				variants={fadeSlideLeft}
 				initial="hidden"
 				animate="visible"
 				exit="exit"
-				className={"flex gap-2"}
+				className="flex flex-col items-center space-y-4"
 			>
-				<Input
-					type={"tel"}
-					name={"phoneNumber"}
-					placeholder={"휴대폰 번호를 입력해주세요."}
-					theme={theme}
-					className={"font text-md md:text-lg"}
-					value={value}
-					onChange={handleChange}
-					maxLength={13}
-				/>
-				<Button
-					theme={"dark"}
-					width={"w-1/5"}
-					fontSize={"text-sm md:text-base"}
-					padding={"px-2 py-1.5"}
-					onClick={checkDuplicatePhone}
-					reverse={theme === "normal"}
-					light={theme !== "normal"}
-					disabled={checking || isDuplicatePhone === false}
-				>
-					{checking ? (
-						<div className="animate-spin w-5 h-5 border-t-2 border-white rounded-full mx-auto" />
-					) : isDuplicatePhone === false ? (
-						<div className="flex items-center justify-center">
-							<ThumbUpIcon />
-						</div>
-					) : (
-						"확인"
-					)}
-				</Button>
+				<div className="flex items-center space-x-3 w-full">
+					<Input
+						type={"tel"}
+						name={"phoneNumber"}
+						placeholder={"핸드폰 번호를 입력해주세요."}
+						theme={theme}
+						className={"font text-md md:text-lg flex-1"}
+						value={value}
+						onChange={handleChange}
+						maxLength={13}
+					/>
+					<Button
+						theme={"dark"}
+						width={"w-24"}
+						fontSize={"text-sm"}
+						padding={"py-1.5"}
+						onClick={checkDuplicatePhone}
+						reverse={theme === "normal"}
+						light={theme !== "normal"}
+						disabled={checking || isDuplicatePhone === false}
+						className="font-semibold"
+					>
+						{checking ? (
+							<div className="animate-spin w-4 h-4 border-t-2 border-white rounded-full mx-auto" />
+						) : isDuplicatePhone === false ? (
+							<div className="flex items-center justify-center">
+								<ThumbUpIcon />
+							</div>
+						) : (
+							"중복확인"
+						)}
+					</Button>
+				</div>
 			</motion.div>
 
+			{/* 에러 메시지 */}
 			<div
 				className={clsx(
 					"text-right text-sm min-h-[20px] mt-1 transition-all duration-300 ease-in-out",
@@ -171,7 +183,7 @@ const PhoneNumber = ({
 					!touched || isValid ? "opacity-0 translate-y-[-4px]" : "opacity-100 translate-y-0"
 				)}
 			>
-				{touched && !isValid && "유효한 휴대폰 번호를 입력해주세요."}
+				{touched && !isValid && "유효한 핸드폰 번호를 입력해주세요."}
 			</div>
 		</div>
 	)

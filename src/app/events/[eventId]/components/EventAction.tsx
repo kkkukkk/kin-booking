@@ -48,6 +48,7 @@ const EventAction = ({
 					onClick={onReservationClick}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
+					className="font-semibold"
 				>
 					예매하기
 				</Button>

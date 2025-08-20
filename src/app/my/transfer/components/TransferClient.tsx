@@ -4,15 +4,18 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSession } from '@/hooks/useSession';
 import { useTransferTicketsByReservation, useTicketsWithEventByOwnerId } from '@/hooks/api/useTickets';
+import { useEventById } from '@/hooks/api/useEvents';
 import { useFriends } from '@/hooks/api/useFriends';
 import ThemeDiv from '@/components/base/ThemeDiv';
-import { ArrowLeftIcon } from '@/components/icon/ArrowIcons';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
-import clsx from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
 import FriendSelectionStep from './steps/FriendSelectionStep';
 import CountSelectionStep from './steps/CountSelectionStep';
 import ConfirmationStep from './steps/ConfirmationStep';
+import TransferProgress from './TransferProgress';
+import TransferTicketInfo from './TransferTicketInfo';
+import Button from '@/components/base/Button';
 
 const TransferClient = () => {
   const searchParams = useSearchParams();
@@ -27,11 +30,13 @@ const TransferClient = () => {
   // 상태
   const [selectedFriendId, setSelectedFriendId] = useState<string>('');
   const [transferCount, setTransferCount] = useState<number>(1);
+  const [transferReason, setTransferReason] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<'friend' | 'count' | 'confirm'>('friend');
 
   // 데이터 조회
   const { data: friends, isLoading: friendsLoading } = useFriends();
   const { data: userTickets, isLoading: ticketsLoading } = useTicketsWithEventByOwnerId(session?.user?.id || '');
+  const { data: eventData } = useEventById(eventId || '');
   const { mutate: transferTickets, isPending: isTransferring } = useTransferTicketsByReservation();
 
   // 실제 보유 매수에 맞게 transferCount 초기화
@@ -72,7 +77,7 @@ const TransferClient = () => {
     if (!session?.user?.id || !selectedFriendId || !reservationId || !eventId) return;
 
     // 실제 양도할 티켓 수 확인
-    const actualTransferCount = Math.min(transferCount, actualTicketCount);
+    const actualTransferCount = Math.min(transferCount, targetTickets.length);
     if (actualTransferCount === 0) {
       return;
     }
@@ -82,11 +87,14 @@ const TransferClient = () => {
       eventId,
       toUserId: selectedFriendId,
       fromUserId: session.user.id,
-      transferCount: actualTransferCount
+      transferCount: actualTransferCount,
+      reason: transferReason || null
     }, {
       onSuccess: () => {
-        // 양도 성공 후 마이페이지로 이동
-        router.push('/my');
+        // 양도 성공 후 잠시 대기 후 마이페이지로 이동
+        setTimeout(() => {
+          router.push('/my?tab=tickets');
+        }, 1500); // 1.5초 후 이동
       }
     });
   };
@@ -147,85 +155,91 @@ const TransferClient = () => {
   	return (
 		<div className="p-4 md:p-6 space-y-6">
 			{/* 헤더 */}
-			<div className="flex items-center gap-3">
-				<button
-					onClick={handleBack}
-					className={clsx(
-						"p-2 rounded-lg transition-colors",
-						theme === 'normal'
-							? "hover:bg-gray-100"
-							: "hover:bg-gray-700"
-					)}
-				>
-					<ArrowLeftIcon className="w-5 h-5" />
-				</button>
-				<h1 className="text-lg font-semibold">티켓 양도</h1>
-			</div>
+      <Button
+        onClick={handleBack}
+        theme="dark"
+        padding="px-3 py-1.5"
+        reverse={theme === 'normal'}
+        light={theme !== 'normal'}
+        className='font-semibold'
+      >
+        {currentStep === 'friend' 
+          ? '뒤로가기' 
+          : '이전'
+        }
+      </Button>
 
 			<div className="space-y-6">
         {/* 단계 표시 */}
-        <div className="flex items-center justify-center gap-2">
-          <div className={clsx(
-            "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-            currentStep === 'friend' 
-              ? "bg-blue-500 text-white" 
-              : "bg-gray-200 text-gray-600"
-          )}>
-            1
-          </div>
-          <div className="w-8 h-1 bg-gray-200 rounded"></div>
-          <div className={clsx(
-            "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-            currentStep === 'count' 
-              ? "bg-blue-500 text-white" 
-              : currentStep === 'confirm'
-                ? "bg-green-500 text-white"
-                : "bg-gray-200 text-gray-600"
-          )}>
-            2
-          </div>
-          <div className="w-8 h-1 bg-gray-200 rounded"></div>
-          <div className={clsx(
-            "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-            currentStep === 'confirm' 
-              ? "bg-blue-500 text-white" 
-              : "bg-gray-200 text-gray-600"
-          )}>
-            3
-          </div>
-        </div>
+        <TransferProgress currentStep={currentStep} theme={theme} />
+
+        {/* 양도할 티켓 정보 */}
+        <TransferTicketInfo
+          tickets={targetTickets}
+          eventInfo={eventData}
+          theme={theme}
+        />
 
         {/* 단계별 컴포넌트 */}
-        {currentStep === 'friend' && (
-          <FriendSelectionStep
-            friends={friends}
-            onFriendSelect={handleFriendSelect}
-            theme={theme}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {currentStep === 'friend' && (
+            <motion.div
+              key="friend"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+              <FriendSelectionStep
+                friends={friends}
+                onFriendSelect={handleFriendSelect}
+                theme={theme}
+              />
+            </motion.div>
+          )}
 
-        {currentStep === 'count' && (
-          <CountSelectionStep
-            selectedFriend={selectedFriend}
-            transferCount={transferCount}
-            setTransferCount={setTransferCount}
-            actualTicketCount={actualTicketCount}
-            onConfirm={handleCountConfirm}
-            theme={theme}
-          />
-        )}
+          {currentStep === 'count' && (
+            <motion.div
+              key="count"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+              <CountSelectionStep
+                selectedFriend={selectedFriend}
+                transferCount={transferCount}
+                setTransferCount={setTransferCount}
+                transferReason={transferReason}
+                setTransferReason={setTransferReason}
+                actualTicketCount={actualTicketCount}
+                onConfirm={handleCountConfirm}
+                theme={theme}
+              />
+            </motion.div>
+          )}
 
-        {currentStep === 'confirm' && (
-          <ConfirmationStep
-            selectedFriend={selectedFriend}
-            transferCount={transferCount}
-            targetTickets={targetTickets}
-            onTransfer={handleTransfer}
-            onBack={handleBack}
-            isTransferring={isTransferring}
-            theme={theme}
-          />
-        )}
+          {currentStep === 'confirm' && (
+            <motion.div
+              key="confirm"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+              <ConfirmationStep
+                selectedFriend={selectedFriend}
+                transferCount={transferCount}
+                transferReason={transferReason}
+                targetTickets={targetTickets}
+                onTransfer={handleTransfer}
+                onBack={handleBack}
+                isTransferring={isTransferring}
+                theme={theme}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

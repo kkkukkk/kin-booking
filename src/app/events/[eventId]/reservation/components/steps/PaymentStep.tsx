@@ -35,21 +35,21 @@ const PaymentStep = ({
 }: PaymentStepProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { showToast } = useToast();
-	
+
 	// 공연 상태 확인 관련 상태
 	const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 	const [hasCheckedStatus, setHasCheckedStatus] = useState(false);
-	
+
 	// 실시간 공연 상태 조회
 	const { data: currentEvent, refetch: refetchEvent } = useEventById(eventId);
-	
+
 	const totalAmount = event.ticketPrice * quantity;
-	
+
 	// 현재 공연 상태 (초기 상태 또는 최신 상태)
 	const currentEventStatus = currentEvent?.status;
 	const finalEventStatus = currentEventStatus || event.status;
 	const isEventSoldOut = finalEventStatus === EventStatus.SoldOut;
-	
+
 	// 공연 상태 확인
 	const checkEventStatus = async () => {
 		setIsCheckingStatus(true);
@@ -66,7 +66,7 @@ const PaymentStep = ({
 			setIsCheckingStatus(false);
 		}
 	};
-	
+
 	// 마이페이지로 이동 시 localStorage 정리
 	const handleGoToMyPage = () => {
 		// 예매 완료 상태 제거
@@ -74,7 +74,7 @@ const PaymentStep = ({
 		// 마이페이지로 이동
 		onGoToMyPage();
 	};
-	
+
 	return (
 		<div className="relative">
 			{/* 성공 메시지 */}
@@ -84,11 +84,11 @@ const PaymentStep = ({
 				animate="visible"
 				className={clsx(
 					"flex flex-col items-center text-center p-6 rounded-xl border-2 mb-6 mt-4",
-					theme === "normal" 
-						? "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-sm" 
+					theme === "normal"
+						? "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-sm"
 						: theme === "dark"
-						? "bg-gradient-to-br from-blue-950/30 to-indigo-950/30 border-blue-600/50 shadow-lg"
-						: "bg-gradient-to-br from-blue-950/20 to-indigo-950/20 border-blue-500/50 shadow-lg"
+							? "bg-gradient-to-br from-blue-950/30 to-indigo-950/30 border-blue-600/50 shadow-lg"
+							: "bg-gradient-to-br from-blue-950/20 to-indigo-950/20 border-blue-500/50 shadow-lg"
 				)}
 			>
 				<motion.div
@@ -102,7 +102,7 @@ const PaymentStep = ({
 				>
 					<CheckCircleIcon className="w-8 h-8 text-white" />
 				</motion.div>
-				
+
 				<motion.h2
 					variants={textContainerItem}
 					className={clsx(
@@ -112,7 +112,7 @@ const PaymentStep = ({
 				>
 					예매 완료!
 				</motion.h2>
-				
+
 				<motion.p
 					variants={textContainerItem}
 					className={clsx(
@@ -123,6 +123,63 @@ const PaymentStep = ({
 					아래 정보 확인 후 이체해주세요!
 				</motion.p>
 			</motion.div>
+
+			{/* 입금 전 공연 상태 확인 */}
+			<ThemeDiv isChildren className="rounded-lg p-4 mb-6">
+				<div className="flex items-center justify-between mb-3">
+					<h3 className="text-base font-semibold">
+						입금 전 공연 상태 확인
+					</h3>
+					<Button
+						onClick={checkEventStatus}
+						theme={theme === "normal" ? "dark" : theme}
+						padding="px-3 py-2"
+						fontSize="text-xs md:text-sm"
+						reverse={theme === "normal"}
+						disabled={isCheckingStatus}
+						className="font-semibold"
+					>
+						{isCheckingStatus ? '확인 중...' : '공연 상태 확인'}
+					</Button>
+				</div>
+
+				{/* 상태 확인 결과 메시지 */}
+				{hasCheckedStatus && (
+					<div className={clsx(
+						"p-3 rounded-lg text-sm font-medium",
+						isEventSoldOut
+							? theme === "normal"
+								? "bg-red-50 border border-red-200 text-red-700"
+								: theme === "dark"
+									? "bg-red-950/30 border border-red-600/50 text-red-300"
+									: "bg-red-950/20 border border-red-500/50 text-red-300"
+							: theme === "normal"
+								? "bg-green-50 border border-green-200 text-green-700"
+								: theme === "dark"
+									? "bg-green-950/30 border border-green-600/50 text-green-300"
+									: "bg-green-950/20 border border-green-500/50 text-green-300"
+					)}>
+						{isEventSoldOut
+							? '공연이 매진되었습니다. 입금을 중단해주세요!'
+							: '공연이 매진되지 않았어요! 입금을 진행해주세요!'
+						}
+					</div>
+				)}
+
+				{/* 기본 안내 메시지 */}
+				{!hasCheckedStatus && (
+					<div className={clsx(
+						"p-3 rounded-lg text-sm",
+						theme === "normal"
+							? "bg-amber-50 border border-amber-200 text-amber-700"
+							: theme === "dark"
+								? "bg-amber-950/30 border border-amber-600/50 text-amber-300"
+								: "bg-amber-950/20 border border-amber-500/50 text-amber-300"
+					)}>
+						입금 전에 공연 상태를 다시 한번 확인해주세요
+					</div>
+				)}
+			</ThemeDiv>
 
 			<div className="space-y-5">
 				{/* 예매 정보 요약 */}
@@ -187,20 +244,18 @@ const PaymentStep = ({
 									<span className="font-medium text-sm">{account.accountHolder}</span>
 								</div>
 								{account.description && (
-									<div className={`mt-3 p-3 rounded-lg ${
-										theme === 'normal' 
-											? 'bg-amber-50 border border-amber-200' 
+									<div className={`mt-3 p-3 rounded-lg ${theme === 'normal'
+											? 'bg-amber-50 border border-amber-200'
 											: theme === 'neon'
-											? 'bg-amber-950/20 border border-amber-400/50'
-											: 'bg-amber-950/30 border border-amber-800/50'
-									}`}>
-										<p className={`text-xs ${
-											theme === 'normal'
+												? 'bg-amber-950/20 border border-amber-400/50'
+												: 'bg-amber-950/30 border border-amber-800/50'
+										}`}>
+										<p className={`text-xs ${theme === 'normal'
 												? 'text-amber-800'
 												: theme === 'neon'
-												? 'text-amber-200'
-												: 'text-amber-200'
-										}`}>
+													? 'text-amber-200'
+													: 'text-amber-200'
+											}`}>
 											{account.description}
 										</p>
 									</div>
@@ -208,62 +263,6 @@ const PaymentStep = ({
 							</div>
 						</div>
 					))}
-				</ThemeDiv>
-
-				{/* 입금 전 공연 상태 확인 */}
-				<ThemeDiv isChildren className="rounded-lg p-4">
-					<div className="flex items-center justify-between mb-3">
-						<h3 className="text-base font-semibold">
-							입금 전 공연 상태 확인
-						</h3>
-						<Button
-							onClick={checkEventStatus}
-							theme={theme === "normal" ? "dark" : theme}
-							padding="px-3 py-2"
-							fontSize="text-sm"
-							reverse={theme === "normal"}
-							disabled={isCheckingStatus}
-						>
-							{isCheckingStatus ? '확인 중...' : '공연 상태 확인'}
-						</Button>
-					</div>
-					
-					{/* 상태 확인 결과 메시지 */}
-					{hasCheckedStatus && (
-						<div className={clsx(
-							"p-3 rounded-lg text-sm font-medium",
-							isEventSoldOut
-								? theme === "normal"
-									? "bg-red-50 border border-red-200 text-red-700"
-									: theme === "dark"
-									? "bg-red-950/30 border border-red-600/50 text-red-300"
-									: "bg-red-950/20 border border-red-500/50 text-red-300"
-								: theme === "normal"
-								? "bg-green-50 border border-green-200 text-green-700"
-								: theme === "dark"
-								? "bg-green-950/30 border border-green-600/50 text-green-300"
-								: "bg-green-950/20 border border-green-500/50 text-green-300"
-						)}>
-							{isEventSoldOut 
-								? '공연이 매진되었습니다. 입금을 중단해주세요!' 
-								: '공연이 매진되지 않았어요! 입금을 진행해주세요!'
-							}
-						</div>
-					)}
-					
-					{/* 기본 안내 메시지 */}
-					{!hasCheckedStatus && (
-						<div className={clsx(
-							"p-3 rounded-lg text-sm",
-							theme === "normal"
-								? "bg-amber-50 border border-amber-200 text-amber-700"
-								: theme === "dark"
-								? "bg-amber-950/30 border border-amber-600/50 text-amber-300"
-								: "bg-amber-950/20 border border-amber-500/50 text-amber-300"
-						)}>
-							입금 전에 공연 상태를 다시 한번 확인해주세요
-						</div>
-					)}
 				</ThemeDiv>
 
 				{/* 주의사항 */}
@@ -306,6 +305,7 @@ const PaymentStep = ({
 					padding="px-2 py-1.5"
 					onClick={handleGoToMyPage}
 					reverse={theme === "normal"}
+					className="font-semibold"
 				>
 					마이페이지로 이동
 				</Button>

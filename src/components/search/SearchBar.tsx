@@ -98,7 +98,7 @@ const SearchBar = ({
             width="w-24"
             padding="py-1 md:py-0.5"
             reverse={theme === "normal"}
-            className="self-end"
+            className="self-end font-semibold"
             onClick={() => {
               setIsOpen(prev => !prev);
               setShowDatePicker(false);
@@ -226,6 +226,7 @@ const SearchBar = ({
                   onClick={handleReset}
                   reverse={theme === "normal"}
                   neonVariant='yellow'
+                  className="font-semibold"
                 >
                   리셋
                 </Button>

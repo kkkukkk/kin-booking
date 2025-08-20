@@ -39,13 +39,13 @@ const ReservationNotice = ({ onClose, onConfirm }: NoticeProps) => {
 					<Button
 						width={"w-1/2"}
 						padding={"p-1"}
-						className={"text-sm md:text-lg"}
+						className={"text-sm md:text-lg font-semibold"}
 						onClick={onClose}
 					>취소</Button>
 					<Button
 						width={"w-1/2"}
 						padding={"p-1"}
-						className={"text-sm md:text-lg"}
+						className={"text-sm md:text-lg font-semibold"}
 						onClick={onConfirm}
 						theme={"dark"}
 						reverse

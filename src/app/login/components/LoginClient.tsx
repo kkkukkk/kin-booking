@@ -123,6 +123,7 @@ const LoginClient = () => {
 						onClick={() => handleLogin()}
 						reverse={theme === "normal"}
 						light={theme === "dark"}
+						className="font-semibold"
 					>
 						{"로그인"}
 					</Button>
@@ -134,6 +135,7 @@ const LoginClient = () => {
 						onClick={() => router.push('/register')}
 						reverse={theme === "normal"}
 						light={theme === "dark"}
+						className="font-semibold"
 					>
 						{"회원가입"}
 					</Button>

@@ -6,8 +6,9 @@ import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { useTicketsWithEventByOwnerId } from '@/hooks/api/useTickets';
 import { TicketWithEventDto } from '@/types/dto/ticket';
-import TicketStack from '@/components/TicketStack';
+import TicketStack from '@/app/my/components/tabs/ticket/TicketStack';
 import { TicketIcon } from '@/components/icon/TicketIcon';
+import TicketsGuide from '@/app/my/components/tabs/ticket/TicketsGuide';
 import clsx from 'clsx';
 
 const TicketsTab = () => {
@@ -61,11 +62,14 @@ const TicketsTab = () => {
 		);
 	}
 
-	// 그룹화: eventId + reservationId 조합으로 그룹 키 생성
+	// 그룹화: eventId + reservationId + transferred_at 유무로 그룹 키 생성
 	const groupMap = new Map<string, TicketWithEventDto[]>();
 	
 	safeTickets.forEach(ticket => {
-		const groupKey = `${ticket.eventId}-${ticket.reservationId}`;
+		// transferred_at이 있으면 양도받은 티켓, 없으면 일반 티켓
+		const transferStatus = ticket.transferredAt ? 'transferred' : 'normal';
+		const groupKey = `${ticket.eventId}-${ticket.reservationId}-${transferStatus}`;
+		
 		if (!groupMap.has(groupKey)) {
 			groupMap.set(groupKey, []);
 		}
@@ -95,6 +99,9 @@ const TicketsTab = () => {
 
 	return (
 		<div className="space-y-6">
+			{/* 티켓 안내 */}
+			<TicketsGuide />
+
 			{/* 이벤트 + 예매별로 그룹화 */}
 			{sortedGroups.map(([groupKey, groupTickets]) => {
 				const firstTicket = groupTickets[0];

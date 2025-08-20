@@ -49,10 +49,6 @@ const Button = ({
 	className,
 	...rest
 }: ButtonProps) => {
-
-
-
-
 	const getThemeStyles = () => {
 		switch (theme) {
 			case "normal":
@@ -76,7 +72,7 @@ const Button = ({
 		}
 		if (theme === "dark") {
 			return reverse
-				? "hover:shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_12px_rgba(0,0,0,0.3),0_0_16px_rgba(0,0,0,0.1)]"
+				? "hover:shadow-[0_0_4px_rgba(0,0,0,0.3),0_0_12px_rgba(0,0,0,0.2),0_0_16px_rgba(0,0,0,0.1)]"
 				: "hover:shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_16px_rgba(255,255,255,0.3)]";
 		}
 		if (theme === "neon") {
@@ -95,7 +91,7 @@ const Button = ({
 		}
 		if (theme === "dark") {
 			return reverse
-				? "shadow-[0_0_4px_rgba(0,0,0,0.5),0_0_12px_rgba(0,0,0,0.3),0_0_16px_rgba(0,0,0,0.1)]"
+				? "shadow-[0_0_4px_rgba(0,0,0,0.3),0_0_12px_rgba(0,0,0,0.2),0_0_16px_rgba(0,0,0,0.1)]"
 				: "shadow-[0_0_4px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_16px_rgba(255,255,255,0.3)]";
 		}
 		if (theme === "neon") {

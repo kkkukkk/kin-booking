@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useCreatePaymentTransaction, usePaymentTransactionsByReservationId } from '@/hooks/api/usePaymentTransactions';
 import { useReservations } from '@/hooks/api/useReservations';
 import { useEvents } from '@/hooks/api/useEvents';
+import { useRefundRequestMappingByReservation } from '@/hooks/api/useRefundRequestMapping';
+import { useRefundAccountByUserId } from '@/hooks/api/useRefundAccounts';
 import { TicketGroupDto } from '@/types/dto/ticket';
 import Modal from '@/components/Modal';
 import Button from '@/components/base/Button';
@@ -61,10 +63,55 @@ const RefundInfoModal = ({
 
     const reservationInfo = reservationData?.data?.[0];
 
+    // 양도된 티켓의 환불계좌 정보 조회
+    const { data: refundRequestMapping } = useRefundRequestMappingByReservation(
+        ticketGroup.reservationId,
+        ticketGroup.ownerId,
+        ticketGroup.eventId
+    );
+    
+    // 환불계좌 정보 조회 (refundRequestMapping이 있으면 양도된 티켓)
+    const { data: refundAccounts } = useRefundAccountByUserId(ticketGroup.ownerId);
+    const refundAccount = refundAccounts?.find(account => account.id === refundRequestMapping?.refundAccountId);
+
     // 입금 정보 (가장 최근 payment 타입)
     const paymentInfo = paymentTransactions?.find(t => t.paymentType === 'payment');
 
-        // 환불 정책에 따른 환불 금액 계산 (취소 신청 시점 기준)
+    // 양도된 티켓인지 확인 (refundRequestMapping이 있으면 양도된 티켓)
+    const isTransferredTicket = !!refundRequestMapping;
+
+    // 기본값 설정 (양도된 티켓이면 환불계좌 정보, 아니면 입금 정보)
+    const getDefaultValues = () => {
+        if (isTransferredTicket && refundAccount) {
+            // 양도된 티켓: 환불계좌 정보 사용
+            return {
+                refundAmount: defaultRefundAmount,
+                refundBank: refundAccount.bankName,
+                refundAccount: refundAccount.accountNumber,
+                refundHolder: refundAccount.accountHolder,
+                note: '',
+            };
+        } else if (paymentInfo) {
+            // 일반 티켓: 입금 정보 사용
+            return {
+                refundAmount: defaultRefundAmount,
+                refundBank: paymentInfo.bankName,
+                refundAccount: paymentInfo.accountNumber,
+                refundHolder: paymentInfo.accountHolder,
+                note: '',
+            };
+        } else {
+            return {
+                refundAmount: 0,
+                refundBank: '',
+                refundAccount: '',
+                refundHolder: '',
+                note: '',
+            };
+        }
+    };
+
+    // 환불 정책에 따른 환불 금액 계산 (취소 신청 시점 기준)
     const calculateRefundAmount = () => {
         if (!paymentInfo) return 0; // 입금 정보가 없으면 환불 불가
         
@@ -99,30 +146,13 @@ const RefundInfoModal = ({
     // 환불 가능 여부 확인
     const isRefundable = defaultRefundAmount > 0;
 
-    // 기본값 설정 (입금 정보가 있을 때만)
-    const defaultValues = paymentInfo ? {
-        refundAmount: defaultRefundAmount,
-        refundBank: paymentInfo.bankName,
-        refundAccount: paymentInfo.accountNumber,
-        refundHolder: paymentInfo.accountHolder,
-        note: '',
-    } : {
-        refundAmount: 0,
-        refundBank: '',
-        refundAccount: '',
-        refundHolder: '',
-        note: '',
-    };
-
     // 환불 정보 상태
-    const [refundInfo, setRefundInfo] = useState(defaultValues);
+    const [refundInfo, setRefundInfo] = useState(getDefaultValues());
 
-
-
-    // paymentInfo나 defaultRefundAmount가 변경되면 기본값 업데이트
+    // 기본값 업데이트 (양도된 티켓의 환불계좌 정보나 입금 정보가 변경되면)
     useEffect(() => {
-        setRefundInfo(defaultValues);
-    }, [paymentInfo, defaultRefundAmount]);
+        setRefundInfo(getDefaultValues());
+    }, [refundRequestMapping, refundAccount, paymentInfo, defaultRefundAmount]);
 
     // 입력 핸들러
     const handleInputChange = (field: string, value: string | number) => {
@@ -293,6 +323,40 @@ const RefundInfoModal = ({
                                 <span className={`${theme === 'neon' ? 'text-blue-400' : theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} text-xs`}>메모: {paymentInfo.note}</span>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* 양도된 티켓 환불계좌 정보 표시 */}
+                {isTransferredTicket && refundAccount && (
+                    <div className={`${theme === 'neon' ? 'bg-green-950/20' : theme === 'dark' ? 'bg-green-950/20' : 'bg-green-50'} border ${theme === 'neon' ? 'border-green-400/50' : theme === 'dark' ? 'border-green-400/50' : 'border-green-200'} rounded-lg p-4 space-y-2`}>
+                        <h3 className={`font-semibold text-sm ${theme === 'neon' ? 'text-green-200' : theme === 'dark' ? 'text-green-200' : 'text-green-800'} mb-2`}>
+                            양도 티켓 환불 계좌
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-green-400' : theme === 'dark' ? 'text-green-400' : 'text-green-600'} text-xs mb-1`}>환불 받는 사람</span>
+                                <span className={`font-medium break-words`}>{refundAccount.accountHolder}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-green-400' : theme === 'dark' ? 'text-green-400' : 'text-green-600'} text-xs mb-1`}>환불 은행</span>
+                                <span className={`font-medium break-words`}>{refundAccount.bankName}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-green-400' : theme === 'dark' ? 'text-green-400' : 'text-green-600'} text-xs mb-1`}>환불 계좌</span>
+                                <span className={`font-medium break-words`}>{refundAccount.accountNumber}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-green-400' : theme === 'dark' ? 'text-green-400' : 'text-green-600'} text-xs mb-1`}>입력 일시</span>
+                                <span className={`font-medium`}>
+                                    {dayjs(refundAccount.createdAt).format('YYYY년 M월 D일 HH:mm')}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-green-200 dark:border-green-600">
+                            <span className={`${theme === 'neon' ? 'text-green-400' : theme === 'dark' ? 'text-green-400' : 'text-green-600'} text-xs`}>
+                                * 양도된 티켓의 환불계좌 정보가 자동으로 입력되었습니다.
+                            </span>
+                        </div>
                     </div>
                 )}
 

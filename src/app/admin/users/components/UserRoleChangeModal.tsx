@@ -17,7 +17,7 @@ interface UserRoleChangeModalProps {
 const UserRoleChangeModal = ({ user, theme, onRoleChange, onClose }: UserRoleChangeModalProps) => {
   return (
     <Modal onClose={onClose}>
-      <div className="w-full max-w-sm">
+      <div className='min-w-xs max-w-sm'>
         <div className="mb-4">
           <h2 className="text-lg font-bold">사용자 권한 변경</h2>
         </div>

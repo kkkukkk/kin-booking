@@ -145,3 +145,43 @@ export const deleteEvent = async (id: string): Promise<void> => {
 
 	if (error) throw error;
 };
+
+// 공연 완료 처리
+export const completeEvent = async (id: string): Promise<void> => {
+    // 1. 공연 상태를 'completed'로 변경
+    const { error: updateError } = await supabase
+        .from('events')
+        .update({ status: 'completed' })
+        .eq('id', id);
+
+    if (updateError) throw updateError;
+
+    // 2. 해당 공연의 대기중인 예매 모두 취소
+    const { data: pendingReservations, error: fetchError } = await supabase
+        .from('reservations')
+        .select('id')
+        .eq('event_id', id)
+        .eq('status', 'pending');
+
+    if (fetchError) throw fetchError;
+
+    // 3. 대기중인 예매가 있으면 모두 취소 처리
+    if (pendingReservations && pendingReservations.length > 0) {
+        const reservationIds = pendingReservations.map(r => r.id);
+        
+        const { error: cancelError } = await supabase
+            .from('reservations')
+            .update({ status: 'voided' })
+            .in('id', reservationIds);
+
+        if (cancelError) throw cancelError;
+    }
+
+    // 4. 해당 공연의 모든 입장 세션 삭제
+    const { error: deleteEntryError } = await supabase
+        .from('entry_sessions')
+        .delete()
+        .eq('event_id', id);
+
+    if (deleteEntryError) throw deleteEntryError;
+};

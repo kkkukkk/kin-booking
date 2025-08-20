@@ -12,10 +12,11 @@ import useRehydrated from "@/hooks/useIsRehydrated";
 
 interface ModalProps {
 	children: React.ReactNode;
+	isOpen?: boolean;
 	onClose: () => void;
 }
 
-const Modal = ({ children, onClose }: ModalProps) => {
+const Modal = ({ children, isOpen = true, onClose }: ModalProps) => {
 	const modalContentRef = useRef<HTMLDivElement>(null);
 	const rehydrated = useRehydrated();
 	const [refReady, setRefReady] = useState(false);
@@ -47,6 +48,9 @@ const Modal = ({ children, onClose }: ModalProps) => {
 			document.body.style.overflow = originalStyle;
 		};
 	}, []);
+
+	// isOpen이 false면 렌더링하지 않음
+	if (!isOpen) return null;
 
 	const modalContent = (
 		<motion.div

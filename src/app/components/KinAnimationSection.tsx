@@ -28,7 +28,6 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
     container: scrollContainerRef?.current ? scrollContainerRef : undefined,
     target: containerRef,
     offset: ["start start", "end end"],
-    layoutEffect: false,
   });
 
   // 애니메이션 완료 상태 감지
@@ -78,7 +77,7 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
   const nKoreanY = useTransform(scrollYProgress, [0.65, 0.68, 0.82, 0.85, 1.0], [30, 0, 0, -30, -30]);
 
   return (
-    <div className="relative h-[600vh]" ref={containerRef}>
+    <div className="relative h-[600vh]" ref={containerRef} data-scroll-container="true">
       {/* 고정 영역 */}
       <div 
         className="fixed inset-0 flex items-center justify-center pointer-events-none transition-all duration-500"

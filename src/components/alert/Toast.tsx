@@ -116,7 +116,7 @@ const Toast = () => {
 					{iconType && getIcon(iconType)}
 				</div>
 
-				<div className="break-words whitespace-normal break-normal pl-1 pr-3 text-sm">
+				<div className="break-words whitespace-pre-line break-normal pl-1 pr-3 text-sm">
 					{message}
 				</div>
 

@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabaseClient';
 import { Ticket } from '@/types/model/ticket';
-import { TicketWithEventDto, TicketGroupApiResponse, FetchTicketGroupDto } from '@/types/dto/ticket';
+import { TicketWithEventDto, TicketGroupApiResponse, FetchTicketGroupDto, TransferTicketsRequestDto } from '@/types/dto/ticket';
 import { toCamelCaseKeys } from '@/util/case/case';
+import dayjs from 'dayjs';
 
 // 예약 ID로 티켓 조회
 export const getTicketsByReservationId = async (reservationId: string): Promise<Ticket[]> => {
@@ -234,7 +235,7 @@ export const transferTickets = async (
   // 1. 양도할 티켓들이 현재 사용자 소유인지 확인
   const { data: ticketsToTransfer, error: checkError } = await supabase
     .from('ticket')
-    .select('id, event_id, reservation_id')
+    .select('id, event_id, reservation_id, owner_id')
     .in('id', ticketIds)
     .eq('owner_id', fromUserId)
     .eq('status', 'active');
@@ -248,10 +249,13 @@ export const transferTickets = async (
     throw new Error('일부 티켓을 양도할 수 없습니다.');
   }
 
-  // 2. 티켓 소유자 변경 (status는 active 유지)
+  // 2. 티켓 소유자 변경 (status는 active 유지, transferred_at 설정)
   const { error: updateError } = await supabase
     .from('ticket')
-    .update({ owner_id: toUserId })
+    .update({ 
+      owner_id: toUserId,
+      transferred_at: dayjs().toISOString()
+    })
     .in('id', ticketIds);
 
   if (updateError) throw updateError;
@@ -261,7 +265,7 @@ export const transferTickets = async (
     ticket_id: ticket.id,
     from_user_id: fromUserId,
     to_user_id: toUserId,
-    transferred_at: new Date().toISOString()
+    reason: null
   }));
 
   const { error: historyError } = await supabase
@@ -275,16 +279,14 @@ export const transferTickets = async (
 
 // 티켓 양도 (예매 ID로)
 export const transferTicketsByReservation = async (
-  reservationId: string,
-  eventId: string,
-  toUserId: string,
-  fromUserId: string,
-  transferCount: number
+  request: TransferTicketsRequestDto
 ): Promise<{ transferred: number }> => {
+  const { reservationId, eventId, toUserId, fromUserId, transferCount, reason } = request;
+  
   // 1. 해당 예매의 활성 티켓들 조회
   const { data: ticketsToTransfer, error: checkError } = await supabase
     .from('ticket')
-    .select('id, event_id, reservation_id')
+    .select('id, event_id, reservation_id, owner_id')
     .eq('reservation_id', reservationId)
     .eq('event_id', eventId)
     .eq('owner_id', fromUserId)
@@ -292,6 +294,7 @@ export const transferTicketsByReservation = async (
     .limit(transferCount);
 
   if (checkError) throw checkError;
+  
   if (!ticketsToTransfer || ticketsToTransfer.length === 0) {
     throw new Error('양도할 수 있는 티켓이 없습니다.');
   }
@@ -301,29 +304,36 @@ export const transferTicketsByReservation = async (
   }
 
   const ticketIds = ticketsToTransfer.map(ticket => ticket.id);
-
-  // 2. 티켓 소유자 변경 (status는 active 유지)
+  
+  // 2. 티켓 소유자 변경 (status는 active 유지, transferred_at 설정)
   const { error: updateError } = await supabase
     .from('ticket')
-    .update({ owner_id: toUserId })
+    .update({ 
+      owner_id: toUserId,
+      transferred_at: dayjs().toISOString()
+    })
     .in('id', ticketIds);
 
-  if (updateError) throw updateError;
+  if (updateError) {
+    throw updateError;
+  }
 
   // 3. 양도 이력 기록
   const transferHistoryData = ticketsToTransfer.map(ticket => ({
     ticket_id: ticket.id,
     from_user_id: fromUserId,
     to_user_id: toUserId,
-    transferred_at: new Date().toISOString()
+    reason: reason || null
   }));
 
   const { error: historyError } = await supabase
     .from('ticket_transfer_history')
     .insert(transferHistoryData);
 
-  if (historyError) throw historyError;
-
+  if (historyError) {
+    throw historyError;
+  }
+  
   return { transferred: ticketsToTransfer.length };
 }; 
 

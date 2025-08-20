@@ -146,8 +146,8 @@ const FriendList = () => {
               <Button
                 onClick={() => handleDeleteFriend(friend.counterpartName, friend.counterpartUserId)}
                 theme="dark"
-                fontSize={"text-sm md:text-base"}
-                className="px-2 py-1 bg-red-500 hover:bg-red-600 font-bolder whitespace-nowrap"
+                fontSize={"text-sm"}
+                className="px-2 py-1 bg-red-500 hover:bg-red-600 font-semibold whitespace-nowrap"
                 disabled={isDeleting}
               >
                 끊기

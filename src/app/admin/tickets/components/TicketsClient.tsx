@@ -192,6 +192,7 @@ const TicketsClient = () => {
             reverse={theme === 'normal'}
             onClick={() => handleApproveCancelRequest(group)}
             disabled={approveCancelMutation.isPending}
+            className="font-semibold"
           >
             {approveCancelMutation.isPending ? '처리 중...' : '취소 승인'}
           </Button>
@@ -270,6 +271,7 @@ const TicketsClient = () => {
               reverse={theme === 'normal'}
               onClick={() => handleApproveCancelRequest(item)}
               disabled={approveCancelMutation.isPending}
+              className="font-semibold"
             >
               {approveCancelMutation.isPending ? '처리 중...' : '취소 승인'}
             </Button>

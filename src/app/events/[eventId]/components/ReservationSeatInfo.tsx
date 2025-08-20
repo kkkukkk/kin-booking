@@ -31,7 +31,7 @@ const ReservationSeatInfo = ({
           <span className="text-sm">예약된 좌석</span>
           <span className="font-semibold">{reservedQuantity}석</span>
         </div>
-        <div className="border-t pt-2">
+        <div className={clsx("border-t pt-2", theme === "normal" ? "border-gray-200" : "border-gray-700")}>
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium">잔여 좌석</span>
             {!isSoldOut ? (

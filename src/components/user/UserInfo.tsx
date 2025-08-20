@@ -52,7 +52,7 @@ const UserInfo = ({
           {rightElement && <span className="flex-shrink-0">{rightElement}</span>}
         </div>
         <p className={clsx(
-          "text-xs md:text-sm truncate",
+          "text-xs truncate",
           theme === 'normal' ? 'text-gray-600' : 'text-gray-300'
         )}>
           {shouldMaskEmail ? maskEmail(email) : email}

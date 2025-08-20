@@ -79,6 +79,7 @@ const EventDetailClient = () => {
 					onClick={() => router.push("/events")}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
+					className="font-semibold"
 				>
 					목록으로
 				</Button>

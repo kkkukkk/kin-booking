@@ -53,3 +53,12 @@ export interface TicketWithEventDto {
 	ticketNumber: number;
 	event: Events;
 }
+
+export interface TransferTicketsRequestDto {
+  reservationId: string;
+  eventId: string;
+  toUserId: string;
+  fromUserId: string;
+  transferCount: number;
+  reason?: string | null;
+}

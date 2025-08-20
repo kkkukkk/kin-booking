@@ -18,7 +18,7 @@ const ConsentItem = ({ checked, label, onClickDetail, required }: ConsentItemPro
 			isChildren
 		>
 			<CheckBoxWithLabel checked={checked} label={label} required={required} />
-			<Button theme="dark" fontSize="text-xs md:text-sm" padding="p-2" reverse>
+			<Button theme="dark" fontSize="text-xs md:text-sm" padding="p-2" reverse className="font-semibold">
 				자세히 보기
 			</Button>
 		</ThemeDiv>

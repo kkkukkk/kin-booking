@@ -107,7 +107,7 @@ const Card = ({
 							<div className="flex-1" />
 						</div>
 					)}
-					<div className="flex-1 flex flex-col">{children}</div>
+					<div className={clsx("flex-1 flex flex-col", center && "justify-center items-center")}>{children}</div>
 					{/* Footer */}
 					{hasFooter && <Footer theme={theme} />}
 				</ThemeRefDiv>

@@ -88,8 +88,20 @@ export const useLogout = () => {
 			await new Promise((resolve) => setTimeout(resolve, 200));
 			return logout();
 		},
+		onSuccess: () => {
+			// 로그아웃 완료 후 플래그 정리
+			if (typeof window !== 'undefined') {
+				setTimeout(() => {
+					localStorage.removeItem('isLoggingOut');
+				}, 1000); // 1초 후 플래그 제거
+			}
+		},
 		onError: (error: Error) => {
 			console.error('Logout error:', error);
+			// 에러 발생 시에도 플래그 정리
+			if (typeof window !== 'undefined') {
+				localStorage.removeItem('isLoggingOut');
+			}
 			showToast({
 				message: "로그아웃 중 오류가 발생했습니다.",
 				iconType: "error",

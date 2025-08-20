@@ -87,7 +87,7 @@ const FriendsTab = () => {
 								}}
 								theme={theme}
 								padding={'py-1.5 px-3 md:py-2 md:px-4'}
-								className={`gap-1.5 md:gap-2 font-semibold relative text-sm md:text-base`}
+								className={`gap-1.5 md:gap-2 font-semibold relative text-sm`}
 								style={{ minWidth: 'auto' }}
 								reverse={theme === 'normal'}
 								light={true}

@@ -13,10 +13,17 @@ import {
   transferTicketsByReservation,
   updateTicketStatusByReservation,
 } from '@/api/ticket';
-import { Ticket, TicketStatus } from '@/types/model/ticket';
-import { TicketGroupDto, TicketGroupApiResponse } from '@/types/dto/ticket';
+import { 
+  Ticket, 
+  TicketStatus 
+} from '@/types/model/ticket';
+import { 
+  TicketGroupApiResponse, 
+  FetchTicketGroupDto,
+  TransferTicketsRequestDto,
+  TicketGroupDto
+} from '@/types/dto/ticket';
 import { getAllTicketsForStats } from '@/api/ticket';
-import { FetchTicketGroupDto } from '@/types/dto/ticket';
 
 // 예약 ID로 티켓 조회
 export const useTicketsByReservationId = (reservationId: string) => {
@@ -135,25 +142,14 @@ export const useTransferTicketsByReservation = () => {
   const { showToast } = useToast();
 
   return useMutation({
-    mutationFn: async ({
-      reservationId,
-      eventId,
-      toUserId,
-      fromUserId,
-      transferCount
-    }: {
-      reservationId: string;
-      eventId: string;
-      toUserId: string;
-      fromUserId: string;
-      transferCount: number;
-    }) => {
-      return transferTicketsByReservation(reservationId, eventId, toUserId, fromUserId, transferCount);
+    mutationFn: async (request: TransferTicketsRequestDto) => {
+      return transferTicketsByReservation(request);
     },
     onSuccess: (data) => {
       showToast({
         message: `${data.transferred}장의 티켓이 성공적으로 양도되었습니다.`,
-        iconType: 'success'
+        iconType: 'success',
+        autoCloseTime: 3000
       });
       
       // 관련 쿼리 무효화

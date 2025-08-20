@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useCreatePaymentTransaction } from '@/hooks/api/usePaymentTransactions';
+import { useEventById } from '@/hooks/api/useEvents';
 import { Reservation } from '@/types/model/reservation';
 import Modal from '@/components/Modal';
 import Button from '@/components/base/Button';
@@ -14,6 +15,7 @@ import { useSession } from '@/hooks/useSession';
 // 분리된 컴포넌트들
 import ReservationInfo from './ReservationInfo';
 import PaymentForm from './PaymentForm';
+import ReservationSeatInfo from '@/app/events/[eventId]/components/ReservationSeatInfo';
 
 interface PaymentInfoModalProps {
   isOpen: boolean;
@@ -38,6 +40,9 @@ const PaymentInfoModal = ({
   const { showToast } = useToast();
   const { showSpinner, hideSpinner } = useSpinner();
   const { session } = useSession();
+
+  // 이벤트 정보 조회 (좌석 정보 포함)
+  const { data: eventData } = useEventById(reservation.eventId);
 
   // 입금 받은 정보 상태
   const [paymentInfo, setPaymentInfo] = useState({
@@ -134,6 +139,18 @@ const PaymentInfoModal = ({
             getEventName={getEventName}
             ticketPrice={ticketPrice}
         />
+
+        {/* 좌석 현황 정보 */}
+        {eventData && (
+          <div className="space-y-3">
+            <ReservationSeatInfo
+              seatCapacity={eventData.seatCapacity}
+              reservedQuantity={eventData.reservedQuantity}
+              remainingQuantity={eventData.remainingQuantity}
+              theme={theme}
+            />
+          </div>
+        )}
 
         {/* 입금 받은 정보 입력 폼 */}
         <PaymentForm

@@ -3,8 +3,8 @@
 import { useState, useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
-import { useEvents } from '@/hooks/api/useEvents';
-import { EventStatus } from '@/types/model/events';
+import { useEvents, useCompleteEvent } from '@/hooks/api/useEvents';
+import { EventStatus, Events } from '@/types/model/events';
 import { EventStatusKo } from '@/types/model/events';
 import DataTable from '@/components/base/DataTable';
 import SearchBar from '@/components/search/SearchBar';
@@ -15,10 +15,18 @@ import { StatusBadge } from '@/components/status/StatusBadge';
 import Button from '@/components/base/Button';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
+import { useAlert } from '@/providers/AlertProvider';
+import useToast from '@/hooks/useToast';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const EventsClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
-
+  const { showAlert } = useAlert();
+  const { showToast } = useToast();
+  const router = useRouter();
+  const { mutate: completeEventMutate } = useCompleteEvent();
+  const { canManageEvents } = useAdminAuth();
+  
   // 검색/필터 상태
   const [searchParams, setSearchParams] = useState({
     keyword: '',
@@ -37,8 +45,6 @@ const EventsClient = () => {
     field: 'eventDate',
     direction: 'desc' as 'asc' | 'desc',
   });
-
-  const router = useRouter();
 
   // 공연 데이터 조회
   const { data: eventsResponse, isLoading, error, refetch } = useEvents({
@@ -91,13 +97,45 @@ const EventsClient = () => {
   };
 
   // 공연 상세 페이지로 이동
-  const handleEventClick = (event: any) => {
+  const handleEventClick = (event: Events) => {
     router.push(`/admin/events/${event.id}`);
   };
 
   // 공연 생성 페이지로 이동
   const handleCreateEvent = () => {
     router.push('/admin/events/create');
+  };
+
+  // 공연 완료 처리
+  const handleEventCompletion = async (event: React.MouseEvent, eventData: Events) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const confirmed = await showAlert({
+      title: '공연 종료 확인',
+      message: `"${eventData.eventName}" 공연을 종료하시겠습니까?\n\n• 대기중인 예매가 모두 취소됩니다\n• 이 작업은 되돌릴 수 없습니다`,
+      type: 'confirm'
+    });
+    
+    if (confirmed) {
+      completeEventMutate(eventData.id, {
+        onSuccess: () => {
+          showToast({
+            message: `"${eventData.eventName}" 공연이 종료되었습니다.`,
+            iconType: 'success',
+            autoCloseTime: 3000,
+          });
+          refetch();
+        },
+        onError: (error) => {
+          showToast({
+            message: `공연 종료 중 오류가 발생했습니다: ${error.message}`,
+            iconType: 'error',
+            autoCloseTime: 3000,
+          });
+        },
+      });
+    }
   };
 
   // 필터링된 공연 목록
@@ -134,35 +172,65 @@ const EventsClient = () => {
     {
       key: 'title',
       header: '공연명',
-      render: (event: any) => (
+      render: (event: Events) => (
         <div className="text-sm">
           <div 
-            className="font-medium truncate cursor-pointer hover:text-blue-600 transition-colors"
+            className="font-medium truncate cursor-pointer"
             onClick={() => handleEventClick(event)}
           >
             {event.eventName}
           </div>
         </div>
       ),
-      width: '15%',
+      width: '20%',
       sortable: true,
     },
     {
       key: 'eventDate',
       header: '공연일',
-      render: (event: any) => (
+      render: (event: Events) => (
         <div className="text-sm">
           <div className="font-medium">{dayjs(event.eventDate).format('YYYY-MM-DD')}</div>
           <div className="text-xs text-gray-500">{dayjs(event.eventDate).format('HH:mm')}</div>
         </div>
       ),
-      width: '15%',
+      width: '10%',
+      sortable: true,
+    },
+    {
+      key: 'ticketPrice',
+      header: '티켓 가격',
+      render: (event: Events) => (
+        <div className="text-sm font-medium">
+          {event.ticketPrice?.toLocaleString() || 0}원
+        </div>
+      ),
+      width: '11%',
+      sortable: true,
+    },
+    {
+      key: 'location',
+      header: '장소',
+      render: (event: Events) => (
+        <div className="text-sm truncate">{event.location || '장소 미정'}</div>
+      ),
+      width: '28%',
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      render: (event: Events) => (
+        <div className="text-sm">
+          {dayjs(event.createdAt).format('YYYY-MM-DD')}
+        </div>
+      ),
+      width: '12%',
       sortable: true,
     },
     {
       key: 'status',
       header: '상태',
-      render: (event: any) => (
+      render: (event: Events) => (
         <StatusBadge
           status={event.status}
           theme={theme}
@@ -171,43 +239,33 @@ const EventsClient = () => {
           size="sm"
         />
       ),
-      width: '12%',
+      width: '8%',
       sortable: true,
     },
     {
-      key: 'ticketPrice',
-      header: '티켓 가격',
-      render: (event: any) => (
-        <div className="text-sm font-medium">
-          {event.ticketPrice?.toLocaleString() || 0}원
+      key: 'actions',
+      header: '액션',
+      render: (event: Events) => (
+        <div>
+          {event.status === EventStatus.Ongoing && canManageEvents && (
+            <Button
+              theme="dark"
+              onClick={(e) => handleEventCompletion(e, event)}
+              className="bg-green-600 hover:bg-green-700 font-semibold"
+              padding="px-2 py-1"
+              fontSize='text-sm'
+            >
+              공연종료
+            </Button>
+          )}
         </div>
       ),
-      width: '12%',
-      sortable: true,
-    },
-    {
-      key: 'location',
-      header: '장소',
-      render: (event: any) => (
-        <div className="text-sm truncate">{event.location || '장소 미정'}</div>
-      ),
-      width: '25%',
-    },
-    {
-      key: 'createdAt',
-      header: '생성일',
-      render: (event: any) => (
-        <div className="text-sm">
-          {dayjs(event.createdAt).format('YYYY-MM-DD')}
-        </div>
-      ),
-      width: '12%',
-      sortable: true,
+      width: '11%',
     },
   ];
 
   // 모바일 카드 섹션 렌더 함수
-  const mobileCardSections = (event: any) => ({
+  const mobileCardSections = (event: Events) => ({
     firstRow: (
       <>
         <div className="w-full flex justify-between items-center">
@@ -404,4 +462,4 @@ const EventsClient = () => {
   );
 };
 
-export default EventsClient; 
+export default EventsClient;
