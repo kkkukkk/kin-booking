@@ -1,19 +1,20 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEvents, useCompleteEvent } from '@/hooks/api/useEvents';
+import { useEventMediaByType } from '@/hooks/api/useEventMedia';
+import { EventStatus, EventStatusKo, Events } from '@/types/model/events';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
-import { useEvents, useCompleteEvent } from '@/hooks/api/useEvents';
-import { EventStatus, Events } from '@/types/model/events';
-import { EventStatusKo } from '@/types/model/events';
-import DataTable from '@/components/base/DataTable';
-import SearchBar from '@/components/search/SearchBar';
 import ThemeDiv from '@/components/base/ThemeDiv';
+import Button from '@/components/base/Button';
+import SearchBar from '@/components/search/SearchBar';
+import EventCard from '@/app/events/components/EventCard';
+import Spinner from '@/components/spinner/Spinner';
+import DataTable from '@/components/base/DataTable';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
-import { StatusBadge } from '@/components/status/StatusBadge';
-import Button from '@/components/base/Button';
-import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { useAlert } from '@/providers/AlertProvider';
 import useToast from '@/hooks/useToast';
@@ -139,7 +140,7 @@ const EventsClient = () => {
   };
 
   // 필터링된 공연 목록
-  const filteredEvents = useMemo(() => {
+  const filteredEvents = React.useMemo(() => {
     return events.filter((event) => {
       // 키워드 검색
       if (searchParams.keyword) {
@@ -231,13 +232,11 @@ const EventsClient = () => {
       key: 'status',
       header: '상태',
       render: (event: Events) => (
-        <StatusBadge
-          status={event.status}
-          theme={theme}
-          statusType="event"
-          variant="badge"
-          size="sm"
-        />
+        <div className="text-sm">
+          <div className="font-medium">
+            {EventStatusKo[event.status]}
+          </div>
+        </div>
       ),
       width: '8%',
       sortable: true,
@@ -273,13 +272,9 @@ const EventsClient = () => {
             {event.eventName}
           </div>
           <div>
-            <StatusBadge
-              status={event.status}
-              theme={theme}
-              statusType="event"
-              variant="badge"
-              size="sm"
-            />
+            <div className="font-medium">
+              {EventStatusKo[event.status]}
+            </div>
           </div>
         </div>
       </>
@@ -314,10 +309,7 @@ const EventsClient = () => {
         </div>
         <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
           <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p>로딩 중...</p>
-            </div>
+            <Spinner />
           </div>
         </div>
       </ThemeDiv>

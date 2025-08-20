@@ -13,6 +13,7 @@ import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import CheckCircleIcon from '@/components/icon/CheckCircleIcon';
 import XCircleIcon from '@/components/icon/XCircleIcon';
+import Spinner from '@/components/spinner/Spinner';
 import { useEntrySession, useUpdateEntrySessionStatus } from '@/hooks/api/useEntry';
 import { useUpdateTicketStatusByReservation } from '@/hooks/api/useTickets';
 import { TicketStatus } from '@/types/model/ticket';
@@ -230,7 +231,7 @@ const EntryCheckPage = () => {
             {isLoadingSession && (
               <ThemeDiv className="rounded-lg p-6 shadow-lg" isChildren>
                 <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                  <Spinner size={48} />
                   <p className={getTextColor('description')}>입장 세션 정보를 불러오는 중...</p>
                   <p className={`text-sm ${getTextColor('secondary')} mt-2`}>Session ID: {entrySessionId}</p>
                 </div>

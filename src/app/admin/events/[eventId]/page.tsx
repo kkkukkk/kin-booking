@@ -321,48 +321,50 @@ const EditEventPage = () => {
                     <div className="flex gap-2">
                         {!isEditing ? (
                             <>
-                                {event?.status === EventStatus.Ongoing && canManageEvents && (
-                                    <button
-                                        type="button"
-                                        onClick={(e) => handleCompleteEvent(e)}
-                                        className={`px-3 py-1 rounded font-semibold transition-colors ${
-                                            theme === 'normal' 
-                                                ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white' 
-                                                : theme === 'dark' 
-                                                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white' 
-                                                    : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
-                                        }`}
-                                    >
-                                        공연 종료
-                                    </button>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={handleDelete}
-                                    className={`px-3 py-1 rounded font-semibold transition-colors ${
-                                        theme === 'normal' 
-                                            ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white' 
-                                            : theme === 'dark' 
-                                                ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white' 
-                                                : 'bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white'
-                                    }`}
-                                >
-                                    삭제
-                                </button>
                                 {canManageEvents && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsEditing(true)}
-                                        className={`px-3 py-1 rounded font-semibold transition-colors ${
-                                            theme === 'normal' 
-                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white' 
-                                                : theme === 'dark' 
-                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white' 
-                                                    : 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white'
-                                        }`}
-                                    >
-                                        편집
-                                    </button>
+                                    <>
+                                        {event?.status === EventStatus.Ongoing && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => handleCompleteEvent(e)}
+                                                className={`px-3 py-1 rounded font-semibold transition-colors ${
+                                                    theme === 'normal' 
+                                                        ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white' 
+                                                        : theme === 'dark' 
+                                                            ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white' 
+                                                            : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
+                                                }`}
+                                            >
+                                                공연 종료
+                                            </button>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={handleDelete}
+                                            className={`px-3 py-1 rounded font-semibold transition-colors ${
+                                                theme === 'normal' 
+                                                    ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white' 
+                                                    : theme === 'dark' 
+                                                        ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white' 
+                                                        : 'bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white'
+                                            }`}
+                                        >
+                                            삭제
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsEditing(true)}
+                                            className={`px-3 py-1 rounded font-semibold transition-colors ${
+                                                theme === 'normal' 
+                                                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white' 
+                                                    : theme === 'dark' 
+                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white' 
+                                                        : 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white'
+                                            }`}
+                                        >
+                                            편집
+                                        </button>
+                                    </>
                                 )}
                             </>
                         ) : (

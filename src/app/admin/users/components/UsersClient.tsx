@@ -401,11 +401,6 @@ const UsersClient = () => {
       <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
         <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
           <h1 className="text-lg md:text-xl font-bold mb-2">사용자 관리</h1>
-          {!isMaster && (
-            <p className="text-sm text-gray-500 mb-2">
-              MASTER 권한만 사용자 권한을 변경할 수 있습니다.
-            </p>
-          )}
         </div>
 
         {/* 검색 및 필터 */}

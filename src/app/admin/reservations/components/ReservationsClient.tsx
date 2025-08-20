@@ -20,6 +20,7 @@ import { Reservation } from '@/types/model/reservation';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
 import PaymentInfoModal from './PaymentInfoModal';
+import Spinner from '@/components/spinner/Spinner';
 
 const ReservationsClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -109,6 +110,24 @@ const ReservationsClient = () => {
   // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
   const finalReservations = filteredReservations;
   const finalTotalCount = reservationsResponse?.totalCount || 0;
+
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <ThemeDiv className="flex flex-col min-h-full">
+        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
+          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
+            <h1 className="text-lg md:text-xl font-bold mb-2">예매 관리</h1>
+          </div>
+        </div>
+        <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
+          <div className="flex items-center justify-center h-64">
+            <Spinner size={64} />
+          </div>
+        </div>
+      </ThemeDiv>
+    );
+  }
 
   // 검색/필터 핸들러
   const handleSearch = (keyword: string) => {
