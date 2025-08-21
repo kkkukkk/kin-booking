@@ -39,37 +39,39 @@ const OverallSummarySection: React.FC<OverallSummarySectionProps> = ({
         전체 통계
       </h2>
       
-      <div className="grid grid-cols-6 gap-4">
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`text-2xl font-bold mb-1 ${getBlockColor('events')}`}>
+      {/* 모바일: 2열, 태블릿: 3열, 태블릿: 6열 */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`text-xl sm:text-2xl font-bold mb-1 ${getBlockColor('events')}`}>
             {dashboardStats.events.length}
           </div>
           <div className={`text-xs ${getLightTextColor()}`}>전체 공연</div>
         </ThemeDiv>
         
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`text-2xl font-bold mb-1 ${getBlockColor('users')}`}>
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`text-xl sm:text-2xl font-bold mb-1 ${getBlockColor('users')}`}>
             {dashboardStats.users.totalUsers.toLocaleString()}
           </div>
           <div className={`text-xs ${getLightTextColor()}`}>전체 사용자</div>
         </ThemeDiv>
         
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`text-2xl font-bold mb-1 ${getBlockColor('reservations')}`}>
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`text-xl sm:text-2xl font-bold mb-1 ${getBlockColor('reservations')}`}>
             {dashboardStats.totalReservations.toLocaleString()}
           </div>
           <div className={`text-xs ${getLightTextColor()}`}>총 예매</div>
         </ThemeDiv>
         
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`text-2xl font-bold mb-1 ${getBlockColor('tickets')}`}>
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`text-xl sm:text-2xl font-bold mb-1 ${getBlockColor('tickets')}`}>
             {dashboardStats.totalTickets?.toLocaleString() || 0}
           </div>
           <div className={`text-xs ${getLightTextColor()}`}>전체 티켓</div>
         </ThemeDiv>
         
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-2" isChildren>
-          <div className={`text-2xl font-bold mb-1 ${getBlockColor('revenue')}`}>
+        {/* 모바일에서는 전체 너비, 태블릿에서는 1열 */}
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center col-span-2 sm:col-span-1 md:col-span-2" isChildren>
+          <div className={`text-xl sm:text-2xl font-bold mb-1 ${getBlockColor('revenue')}`}>
             {dashboardStats.totalRevenue.toLocaleString()}원
           </div>
           <div className={`text-xs ${getLightTextColor()}`}>총 수익</div>
@@ -94,34 +96,35 @@ export const OverallSummarySectionSkeleton = ({
         전체 통계
       </h2>
       
-      <div className="grid grid-cols-6 gap-4">
-        {/* 전체 공연 - col-span-1 */}
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`h-8 rounded w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
+      {/* 모바일: 2열, 태블릿: 3열, 태블릿: 6열 */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+        {/* 전체 공연 */}
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`h-6 sm:h-8 rounded w-12 sm:w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
           <div className={`text-xs ${getSkeletonTextColor()}`}>전체 공연</div>
         </ThemeDiv>
         
-        {/* 전체 사용자 - col-span-1 */}
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`h-8 rounded w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
+        {/* 전체 사용자 */}
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`h-6 sm:h-8 rounded w-12 sm:w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
           <div className={`text-xs ${getSkeletonTextColor()}`}>전체 사용자</div>
         </ThemeDiv>
         
-        {/* 총 예매 - col-span-1 */}
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`h-8 rounded w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
+        {/* 총 예매 */}
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`h-6 sm:h-8 rounded w-12 sm:w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
           <div className={`text-xs ${getSkeletonTextColor()}`}>총 예매</div>
         </ThemeDiv>
         
-        {/* 전체 티켓 - col-span-1 */}
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-1" isChildren>
-          <div className={`h-8 rounded w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
+        {/* 전체 티켓 */}
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center" isChildren>
+          <div className={`h-6 sm:h-8 rounded w-12 sm:w-16 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
           <div className={`text-xs ${getSkeletonTextColor()}`}>전체 티켓</div>
         </ThemeDiv>
         
-        {/* 총 수익 - col-span-2 (2배 크기) */}
-        <ThemeDiv className="p-4 rounded-lg text-center col-span-2" isChildren>
-          <div className={`h-8 rounded w-24 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
+        {/* 총 수익 - 모바일에서는 전체 너비 */}
+        <ThemeDiv className="p-3 sm:p-4 rounded-lg text-center col-span-2 sm:col-span-1 md:col-span-2" isChildren>
+          <div className={`h-6 sm:h-8 rounded w-20 sm:w-24 mx-auto mb-2 animate-pulse ${getSkeletonBgColor()}`}></div>
           <div className={`text-xs ${getSkeletonTextColor()}`}>총 수익</div>
         </ThemeDiv>
       </div>

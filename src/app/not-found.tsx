@@ -7,7 +7,6 @@ import Button from '@/components/base/Button';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { motion } from 'framer-motion';
 import { HomeIcon } from '@/components/icon/HomeIcon';
-import { SearchIcon } from '@/components/icon/FriendIcons';
 import clsx from 'clsx';
 
 const NotFound = () => {
@@ -95,7 +94,6 @@ const NotFound = () => {
 							fontSize="text-base"
 							fontWeight="font-medium"
 						>
-							<SearchIcon className="w-5 h-5" />
 							이전 페이지로
 						</Button>
 					</motion.div>
