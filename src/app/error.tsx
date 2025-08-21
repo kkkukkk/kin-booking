@@ -23,7 +23,7 @@ const ErrorPage = () => {
 	};
 
 	return (
-		<main className="main-center center p-4">
+		<main className="main-center flex flex-col justify-center items-center p-4">
 			<ThemeDiv className="w-full max-w-md p-8 rounded-lg text-center" isChildren>
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}

@@ -29,6 +29,7 @@ interface EventStatsChartProps {
 }
 
 const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
+  
   // 테마별 색상 설정
   const getThemeColors = () => {
     switch (theme) {
@@ -59,7 +60,7 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
   const colors = getThemeColors();
 
   // 차트 데이터 준비
-  const chartData = {
+  const baseChartData = {
     labels: events.map(event => event.eventName),
     datasets: [
       {
@@ -68,7 +69,6 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
         backgroundColor: 'rgba(34, 197, 94, 0.8)', // 초록색
         borderColor: 'rgba(34, 197, 94, 1)',
         borderWidth: 1,
-        yAxisID: 'y',
         order: 1,
       },
       {
@@ -77,7 +77,6 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
         backgroundColor: 'rgba(59, 130, 246, 0.8)', // 파란색
         borderColor: 'rgba(59, 130, 246, 1)',
         borderWidth: 1,
-        yAxisID: 'y1',
         order: 2,
       },
       {
@@ -86,16 +85,19 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
         backgroundColor: 'rgba(168, 85, 247, 0.8)', // 보라색
         borderColor: 'rgba(168, 85, 247, 1)',
         borderWidth: 1,
-        yAxisID: 'y2',
         order: 3,
       },
     ],
   };
 
-  // 차트 옵션
-  const options = {
+  // 세로 차트 옵션 (데스크톱용)
+  const verticalOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 800,
+      easing: 'easeOutQuart' as const,
+    },
     plugins: {
       legend: {
         position: 'top' as const,
@@ -104,6 +106,8 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
           font: {
             size: 12,
           },
+          boxWidth: 16,
+          padding: 12,
         },
       },
       title: {
@@ -117,6 +121,12 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
         bodyColor: colors.text,
         borderColor: colors.border,
         borderWidth: 1,
+        titleFont: {
+          size: 13,
+        },
+        bodyFont: {
+          size: 12,
+        },
         callbacks: {
           label: function (context: { dataset: { label?: string }; datasetIndex: number; parsed: { y: number } }) {
             let label = context.dataset.label || '';
@@ -241,6 +251,139 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
     },
   };
 
+  // 가로 차트 옵션 (모바일용)
+  const horizontalOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y' as const,
+    animation: {
+      duration: 800,
+      easing: 'easeOutQuart' as const,
+    },
+    plugins: {
+      legend: {
+        position: 'top' as const,
+        labels: {
+          color: colors.text,
+          font: {
+            size: 10,
+          },
+          boxWidth: 12,
+          padding: 8,
+        },
+      },
+      title: {
+        display: false,
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false,
+        backgroundColor: theme === 'dark' ? 'rgba(31, 41, 55, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+        titleColor: colors.text,
+        bodyColor: colors.text,
+        borderColor: colors.border,
+        borderWidth: 1,
+        titleFont: {
+          size: 11,
+        },
+        bodyFont: {
+          size: 10,
+        },
+        callbacks: {
+          label: function (context: { dataset: { label?: string }; datasetIndex: number; parsed: { x: number } }) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.datasetIndex === 0) {
+              // 판매율은 퍼센트
+              label += context.parsed.x + '%';
+            } else if (context.datasetIndex === 1) {
+              // 순수익은 만원 단위
+              label += context.parsed.x + '만원';
+            } else {
+              // 판매된 티켓은 장 단위
+              label += context.parsed.x + '장';
+            }
+            return label;
+          }
+        }
+      },
+    },
+    scales: {
+      y: {
+        type: 'category' as const,
+        ticks: {
+          color: colors.text,
+          font: {
+            size: 9,
+          },
+          maxRotation: 0,
+          minRotation: 0,
+        },
+        grid: {
+          display: false,
+        },
+        border: {
+          color: colors.border,
+        },
+      },
+      x: {
+        type: 'linear' as const,
+        display: true,
+        position: 'bottom' as const,
+        title: {
+          display: true,
+          text: '수치',
+          color: colors.text,
+          font: {
+            size: 10,
+            weight: 'bold' as const,
+          },
+        },
+        ticks: {
+          color: colors.lightText,
+          font: {
+            size: 9,
+          },
+          display: true,
+        },
+        grid: {
+          color: colors.grid,
+          display: true,
+        },
+        border: {
+          color: colors.border,
+        },
+      },
+    },
+    interaction: {
+      mode: 'nearest' as const,
+      axis: 'y' as const,
+      intersect: false,
+    },
+  };
+
+  // 가로 차트용 데이터 (yAxisID 설정)
+  const horizontalChartData = {
+    ...baseChartData,
+    datasets: baseChartData.datasets.map(dataset => ({
+      ...dataset,
+      yAxisID: 'y',
+      xAxisID: 'x',
+    })),
+  };
+
+  // 세로 차트용 데이터 (yAxisID 설정)
+  const verticalChartData = {
+    ...baseChartData,
+    datasets: baseChartData.datasets.map((dataset, index) => ({
+      ...dataset,
+      yAxisID: index === 0 ? 'y' : index === 1 ? 'y1' : 'y2',
+      xAxisID: 'x',
+    })),
+  };
+
   if (!events || events.length === 0) {
     return (
       <div className={`flex items-center justify-center h-64 ${theme === 'dark' ? 'text-gray-400' : theme === 'neon' ? 'text-gray-300' : 'text-gray-500'}`}>
@@ -250,8 +393,16 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
   }
 
   return (
-    <div className="w-full h-80">
-      <Bar data={chartData} options={options} />
+    <div className="w-full h-full">
+      {/* 세로 차트 (데스크톱에서만 표시) */}
+      <div className="hidden sm:block w-full h-full">
+        <Bar data={verticalChartData} options={verticalOptions} />
+      </div>
+      
+      {/* 가로 차트 (모바일에서만 표시) */}
+      <div className="block sm:hidden w-full h-full">
+        <Bar data={horizontalChartData} options={horizontalOptions} />
+      </div>
     </div>
   );
 };
