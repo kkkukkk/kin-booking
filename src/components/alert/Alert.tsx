@@ -54,7 +54,7 @@ const Alert = ({
 							<span className="relative z-10">{title}</span>
 						</div>
 						<button
-							className="absolute top-0 right-0 p-2 hover:bg-gray-100/20 dark:hover:bg-gray-800/20 rounded transition-colors"
+							className="absolute top-0 right-0 p-2 hover:bg-gray-100/20 rounded transition-colors"
 							onClick={onCancel}
 						>
 							<CloseIcon />

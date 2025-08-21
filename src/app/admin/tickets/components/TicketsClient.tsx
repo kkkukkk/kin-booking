@@ -305,8 +305,8 @@ const TicketsClient = () => {
           </div>
         </div>
         <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 dark:bg-red-900/20 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400">티켓 데이터를 불러오는 중 오류가 발생했습니다.</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <p className="text-red-600">티켓 데이터를 불러오는 중 오류가 발생했습니다.</p>
           </div>
         </div>
       </ThemeDiv>

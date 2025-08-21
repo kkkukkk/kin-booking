@@ -319,7 +319,7 @@ const RefundInfoModal = ({
                             </div>
                         </div>
                         {paymentInfo.note && (
-                            <div className="mt-2 pt-2 border-t border-blue-200 dark:border-blue-600">
+                            <div className="mt-2 pt-2 border-t border-blue-200">
                                 <span className={`${theme === 'neon' ? 'text-blue-400' : theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} text-xs`}>메모: {paymentInfo.note}</span>
                             </div>
                         )}
@@ -352,7 +352,7 @@ const RefundInfoModal = ({
                                 </span>
                             </div>
                         </div>
-                        <div className="mt-2 pt-2 border-t border-green-200 dark:border-green-600">
+                        <div className="mt-2 pt-2 border-t border-green-200">
                             <span className={`${theme === 'neon' ? 'text-green-400' : theme === 'dark' ? 'text-green-400' : 'text-green-600'} text-xs`}>
                                 * 양도된 티켓의 환불계좌 정보가 자동으로 입력되었습니다.
                             </span>

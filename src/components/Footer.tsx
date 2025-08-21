@@ -41,7 +41,7 @@ const Footer = ({ theme = 'normal' }: FooterProps) => {
         return 'text-gray-300';
       case 'normal':
       default:
-        return 'text-gray-600 dark:text-gray-400';
+        return 'text-gray-600';
     }
   };
 

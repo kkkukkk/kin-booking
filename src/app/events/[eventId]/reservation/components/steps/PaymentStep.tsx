@@ -226,7 +226,7 @@ const PaymentStep = ({
 					{paymentAccounts.map((account, index) => (
 						<div key={account.id} className="space-y-3">
 							{index > 0 && (
-								<div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+								<div className="border-t border-gray-200 pt-3 mt-3">
 									<p className="text-xs opacity-50 text-center">또는</p>
 								</div>
 							)}
