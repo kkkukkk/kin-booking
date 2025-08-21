@@ -11,9 +11,18 @@ import {
   getTicketGroups,
   getTicketGroupsByOwnerId,
   transferTicketsByReservation,
+  updateTicketStatusByReservation,
 } from '@/api/ticket';
-import { Ticket, TicketStatus } from '@/types/model/ticket';
-import { TicketWithEventDto, TicketGroupDto } from '@/types/dto/ticket';
+import {
+  Ticket,
+  TicketStatus
+} from '@/types/model/ticket';
+import {
+  TicketGroupApiResponse,
+  FetchTicketGroupDto,
+  TransferTicketsRequestDto,
+  TicketGroupDto
+} from '@/types/dto/ticket';
 import { getAllTicketsForStats } from '@/api/ticket';
 
 // 예약 ID로 티켓 조회
@@ -50,23 +59,25 @@ export const useTicketGroupsByOwnerId = (ownerId: string) => {
 
       // 그룹핑 처리
       const groupedTickets: { [key: string]: TicketGroupDto } = {};
-      
-      data.forEach((ticket: TicketGroupDto) => {
+
+      data.forEach((ticket: TicketGroupApiResponse) => {
         const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
-        
+
         if (!groupedTickets[groupKey]) {
           groupedTickets[groupKey] = {
             eventId: ticket.eventId,
             reservationId: ticket.reservationId,
             ownerId: ticket.ownerId,
-            eventName: ticket.eventName,
-            userName: ticket.userName,
+            eventName: ticket.event.eventName,
+            eventDate: ticket.event.eventDate,
+            userName: ticket.user.name,
             status: ticket.status,
             ticketCount: 0,
-            createdAt: ticket.createdAt
+            createdAt: ticket.createdAt,
+            updatedAt: ticket.updatedAt
           };
         }
-        
+
         groupedTickets[groupKey].ticketCount++;
       });
 
@@ -75,7 +86,7 @@ export const useTicketGroupsByOwnerId = (ownerId: string) => {
     enabled: !!ownerId,
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 };
 
@@ -131,27 +142,16 @@ export const useTransferTicketsByReservation = () => {
   const { showToast } = useToast();
 
   return useMutation({
-    mutationFn: async ({
-      reservationId,
-      eventId,
-      toUserId,
-      fromUserId,
-      transferCount
-    }: {
-      reservationId: string;
-      eventId: string;
-      toUserId: string;
-      fromUserId: string;
-      transferCount: number;
-    }) => {
-      return transferTicketsByReservation(reservationId, eventId, toUserId, fromUserId, transferCount);
+    mutationFn: async (request: TransferTicketsRequestDto) => {
+      return transferTicketsByReservation(request);
     },
     onSuccess: (data) => {
       showToast({
         message: `${data.transferred}장의 티켓이 성공적으로 양도되었습니다.`,
-        iconType: 'success'
+        iconType: 'success',
+        autoCloseTime: 3000
       });
-      
+
       // 관련 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
@@ -172,11 +172,11 @@ export const useRequestCancelAllTicketsByEvent = () => {
   const { showToast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ eventId, userId, reservationId, tickets }: { 
-      eventId: string; 
-      userId: string; 
+    mutationFn: async ({ eventId, userId, reservationId, tickets }: {
+      eventId: string;
+      userId: string;
       reservationId: string;
-      tickets: Ticket[]; 
+      tickets: Ticket[];
     }) => {
       // 활성 상태의 티켓만 필터링
       const activeTickets = tickets.filter(t => t.status === TicketStatus.Active);
@@ -206,7 +206,7 @@ export const useTicketsWithEventByOwnerId = (ownerId: string) => {
     enabled: !!ownerId,
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 };
 
@@ -219,17 +219,19 @@ export const useTicketStats = () => {
       if (!data) return null;
 
       // 그룹별 통계 계산
-      const groupStats: { [key: string]: { 
-        eventId: string; 
-        reservationId: string; 
-        ownerId: string; 
-        statuses: string[]; 
-        ticketCount: number; 
-      }} = {};
-      
-      data.forEach((ticket: TicketGroupDto) => {
+      const groupStats: {
+        [key: string]: {
+          eventId: string;
+          reservationId: string;
+          ownerId: string;
+          statuses: string[];
+          ticketCount: number;
+        }
+      } = {};
+
+      data.forEach((ticket: TicketGroupApiResponse) => {
         const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
-        
+
         if (!groupStats[groupKey]) {
           groupStats[groupKey] = {
             eventId: ticket.eventId,
@@ -239,7 +241,7 @@ export const useTicketStats = () => {
             ticketCount: 0
           };
         }
-        
+
         groupStats[groupKey].statuses.push(ticket.status);
         groupStats[groupKey].ticketCount++;
       });
@@ -333,32 +335,34 @@ export const useTicketStats = () => {
 };
 
 // 티켓 그룹 조회 훅
-export const useTicketGroups = () => {
+export const useTicketGroups = (params?: FetchTicketGroupDto) => {
   return useQuery({
-    queryKey: ['ticketGroups'],
-    queryFn: () => getTicketGroups(),
+    queryKey: ['ticketGroups', params],
+    queryFn: () => getTicketGroups(params),
     select: (data) => {
       if (!data) return [];
 
       // 그룹핑 처리
       const groupedTickets: { [key: string]: TicketGroupDto } = {};
-      
-      data.forEach((ticket: TicketGroupDto) => {
+
+      data.forEach((ticket: TicketGroupApiResponse) => {
         const groupKey = `${ticket.eventId}_${ticket.reservationId}_${ticket.ownerId}`;
-        
+
         if (!groupedTickets[groupKey]) {
           groupedTickets[groupKey] = {
             eventId: ticket.eventId,
             reservationId: ticket.reservationId,
             ownerId: ticket.ownerId,
-            eventName: ticket.eventName,
-            userName: ticket.userName,
+            eventName: ticket.event.eventName,
+            eventDate: ticket.event.eventDate,
+            userName: ticket.user.name,
             status: ticket.status,
             ticketCount: 0,
-            createdAt: ticket.createdAt
+            createdAt: ticket.createdAt,
+            updatedAt: ticket.updatedAt
           };
         }
-        
+
         groupedTickets[groupKey].ticketCount++;
       });
 
@@ -366,7 +370,7 @@ export const useTicketGroups = () => {
     },
     retry: 1,
     retryDelay: 1000,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 };
 
@@ -376,10 +380,10 @@ export const useApproveCancelRequest = () => {
   const { showToast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ eventId, reservationId, ownerId }: { 
-      eventId: string; 
-      reservationId: string; 
-      ownerId: string; 
+    mutationFn: async ({ eventId, reservationId, ownerId }: {
+      eventId: string;
+      reservationId: string;
+      ownerId: string;
     }) => {
       return approveCancelRequest(eventId, reservationId, ownerId);
     },
@@ -391,6 +395,51 @@ export const useApproveCancelRequest = () => {
     onError: (error: Error) => {
       console.error('취소 신청 승인 실패:', error);
       showToast({ message: '취소 신청 승인에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
+    },
+  });
+};
+
+// 티켓 상태 업데이트 훅 (입장확정용)
+export const useUpdateTicketStatusByReservation = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      eventId,
+      reservationId,
+      ownerId,
+      status
+    }: {
+      eventId: string;
+      reservationId: string;
+      ownerId: string;
+      status: string;
+    }) => {
+      return updateTicketStatusByReservation(eventId, reservationId, ownerId, status);
+    },
+    onSuccess: (data, variables) => {
+      const { eventId, ownerId } = variables;
+
+      // 관련 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['ticketGroups'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', 'withEvent', 'owner', ownerId] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', 'event', eventId] });
+
+      showToast({
+        message: `${data.updated}장의 티켓이 성공적으로 업데이트되었습니다.`,
+        iconType: 'success',
+        autoCloseTime: 3000
+      });
+    },
+    onError: (error: Error) => {
+      console.error('티켓 상태 업데이트 실패:', error);
+      showToast({
+        message: '티켓 상태 업데이트에 실패했습니다.',
+        iconType: 'error',
+        autoCloseTime: 3000
+      });
     },
   });
 }; 

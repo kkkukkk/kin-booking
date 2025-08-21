@@ -26,8 +26,11 @@ const AdminSidebar = ({ variant = 'sidebar', onClose }: AdminSidebarProps) => {
     { href: '/admin/events', label: '공연 관리' },
     { href: '/admin/reservations', label: '예매 관리' },
     { href: '/admin/tickets', label: '티켓 관리' },
+    { href: '/admin/payment-accounts', label: '계좌 관리' },
+    { href: '/admin/payment-history', label: '입/출금 이력' },
+    // { href: '/admin/notifications', label: '알림 관리' },
     { href: '/admin/entry-check', label: '입장 확인' },
-    { href: '/admin/qr-scanner', label: 'QR 스캔' },
+    { href: '/admin/qr-scanner', label: 'QR 스캔 (테스트)' },
   ];
 
   return (
@@ -62,7 +65,7 @@ const AdminSidebar = ({ variant = 'sidebar', onClose }: AdminSidebarProps) => {
                   className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
                     pathname === item.href
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                      : 'hover:bg-green-500/10 hover:text-green-400'
+                      : 'hover:bg-green-500/10 hover:text-green-400 border border-transparent'
                   }`}
                 >
                   {item.label}

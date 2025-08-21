@@ -55,22 +55,22 @@ const WithdrawPage = () => {
 
   return (
     <Card>
-        <h2 className="text-2xl font-bold mb-10 text-center">회원 탈퇴 안내</h2>
-        <div className="mb-2">
-            <AnimatedText fontSize="text-base md:text-lg" text="더 이상 함께하지 못해 아쉽지만" />
-        </div>
-        <div className="mb-2">
-            <AnimatedText fontSize="text-base md:text-lg" text="탈퇴 전 확인할 사항이 있어요!" delay={0.8} />
-        </div>
-        <WithdrawConsent checked={checked} setChecked={setChecked} />
-        <div className="flex gap-2">
-            <Button theme="normal" className="flex-1" padding="px-2 py-1.5" fontSize="text-sm md:text-base" onClick={handleBack}>
-            돌아가기
-            </Button>
-            <Button theme="dark" className="flex-1" padding="px-2 py-1.5" fontSize="text-sm md:text-base" onClick={handleWithdraw} disabled={isDeleting}>
-            {isDeleting ? '처리 중...' : '탈퇴하기'}
-            </Button>
-        </div>
+      <h2 className="text-2xl font-bold mb-10 text-center">회원 탈퇴 안내</h2>
+      <div className="mb-2">
+        <AnimatedText fontSize="text-base md:text-lg" text="더 이상 함께하지 못해 아쉽지만" />
+      </div>
+      <div className="mb-2">
+        <AnimatedText fontSize="text-base md:text-lg" text="탈퇴 전 확인할 사항이 있어요!" delay={0.8} />
+      </div>
+      <WithdrawConsent checked={checked} setChecked={setChecked} />
+      <div className="flex gap-2">
+        <Button theme="normal" className="flex-1" padding="px-2 py-1.5" fontSize="text-sm md:text-base" onClick={handleBack}>
+          돌아가기
+        </Button>
+        <Button theme="dark" className="flex-1" padding="px-2 py-1.5" fontSize="text-sm md:text-base" onClick={handleWithdraw} disabled={isDeleting}>
+          {isDeleting ? '처리 중...' : '탈퇴하기'}
+        </Button>
+      </div>
     </Card>
   );
 };

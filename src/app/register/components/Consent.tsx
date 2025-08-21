@@ -24,7 +24,7 @@ type DetailType = 'personal' | 'terms' | 'marketing';
 const messages = [
 	"안녕하세요!",
 	"저희는 공연팀 KIN 입니다.",
-	"함께하시기 전 확인할 내용이 있어요! ✅",
+	"함께하시기 전 확인할 내용이 있어요!",
 ];
 
 const Consent = ({
@@ -71,17 +71,20 @@ const Consent = ({
 
 	return (
 		<div className={"relative overflow-hidden"}>
+			{/* 환영 문구 컨테이너 */}
 			<motion.div
 				variants={textContainer}
 				initial="hidden"
 				animate="visible"
-				className="flex flex-col space-y-2 text-base md:text-xl"
+				className="p-2 rounded mt-3 mb-6 backdrop-blur-sm bg-white/10 border border-white/10 shadow-lg"
 			>
-				{messages.map((msg, idx) => (
-					<motion.p key={idx} variants={textContainerItem}>
-						{msg}
-					</motion.p>
-				))}
+				<div className="flex flex-col space-y-1 text-sm md:text-base">
+					{messages.map((msg, idx) => (
+						<motion.p key={idx} variants={textContainerItem}>
+							{msg}
+						</motion.p>
+					))}
+				</div>
 			</motion.div>
 
 			<motion.div

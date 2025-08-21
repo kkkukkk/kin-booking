@@ -19,7 +19,7 @@ export const useSession = () => {
 				// 기존 세션을 잠깐 유지한 채 일정 시간 후 제거
 				timeoutRef.current = setTimeout(() => {
 					setSession(null);
-				}, 300); // 300ms 버퍼
+				}, 800); // 800ms 버퍼
 			} else {
 				// 로그인 or 세션 갱신
 				if (timeoutRef.current) clearTimeout(timeoutRef.current);

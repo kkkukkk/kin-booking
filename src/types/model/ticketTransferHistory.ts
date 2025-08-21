@@ -3,11 +3,8 @@ export interface TicketTransferHistory {
   ticketId: string;
   fromUserId: string;
   toUserId: string;
-  transferredAt: string;
   reason: string | null;
   createdAt: string;
-  fromUserName: string;
-  toUserName: string;
 }
 
 export interface CreateTransferHistoryRequest {
@@ -15,8 +12,6 @@ export interface CreateTransferHistoryRequest {
   fromUserId: string;
   toUserId: string;
   reason?: string;
-  fromUserName: string;
-  toUserName: string;
 }
 
 export interface TransferHistoryWithDetails extends TicketTransferHistory {

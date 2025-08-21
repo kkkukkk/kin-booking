@@ -1,8 +1,8 @@
 'use client'
 
-import {motion} from "framer-motion";
-import {textContainer, textContainerItem} from "@/types/ui/motionVariants";
-import {EventWithCurrentStatus} from "@/types/dto/events";
+import { motion } from "framer-motion";
+import { textContainer, textContainerItem } from "@/types/ui/motionVariants";
+import { EventWithCurrentStatus } from "@/types/dto/events";
 import Counter from "@/components/base/Counter";
 import Input from "@/components/base/Input";
 import ThemeDiv from "@/components/base/ThemeDiv";
@@ -34,20 +34,20 @@ const ConfirmStep = ({
 	onTicketHolderChange
 }: ConfirmStepProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
-	
+
 	return (
-		<div className="relative overflow-hidden">
+		<div className="relative">
 			<motion.div
 				variants={textContainer}
 				initial="hidden"
 				animate="visible"
 				className={clsx(
 					"flex flex-col text-sm md:text-base p-4 rounded-lg border mt-4",
-					theme === "normal" 
-						? "bg-gray-50 border-gray-200" 
+					theme === "normal"
+						? "bg-gray-50 border-gray-200"
 						: theme === "dark"
-						? "bg-gray-800 border-gray-700"
-						: "bg-gray-800 border-gray-700"
+							? "bg-gray-800 border-gray-700"
+							: "bg-gray-800 border-gray-700"
 				)}
 			>
 				{messages.map((msg, idx) => (
@@ -62,9 +62,9 @@ const ConfirmStep = ({
 			</motion.div>
 
 			<motion.div
-				initial={{opacity: 0, y: 20}}
-				animate={{opacity: 1, y: 0}}
-				transition={{delay: 0.3, duration: 0.6}}
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.3, duration: 0.6 }}
 				className="mt-6 space-y-6"
 			>
 				<ThemeDiv isChildren className="rounded-lg p-4 md:p-6">
@@ -74,7 +74,7 @@ const ConfirmStep = ({
 					<div className="space-y-2 text-sm md:text-base">
 						<div className="flex justify-between">
 							<span className="opacity-70">공연명</span>
-							<span className="font-semibold">{event.eventName}</span>
+							<span className="font-medium">{event.eventName}</span>
 						</div>
 						<div className="flex justify-between">
 							<span className="opacity-70">날짜</span>
@@ -112,6 +112,22 @@ const ConfirmStep = ({
 									max={event.remainingQuantity}
 								/>
 							</div>
+							{event.remainingQuantity < quantity && (
+								<p className={clsx(
+									"text-xs md:text-sm opacity-90 mt-1",
+									theme === "normal" ? "text-red-600" : "text-red-400"
+								)}>
+									잔여 좌석이 부족합니다. 수량을 조정해주세요.
+								</p>
+							)}
+							{event.remainingQuantity <= 5 && event.remainingQuantity > 0 && (
+								<p className={clsx(
+									"text-xs md:text-sm opacity-90 mt-1",
+									theme === "normal" ? "text-orange-600" : "text-orange-400"
+								)}>
+									잔여 좌석이 적습니다. 실시간으로 매진될 수 있어요.
+								</p>
+							)}
 						</div>
 						<div>
 							<label className="block text-sm md:text-base font-medium opacity-70 mb-2">

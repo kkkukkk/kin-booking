@@ -1,6 +1,6 @@
 import AdminHeader from './components/AdminHeader';
 import React from 'react';
-import styles from '@/css/admin-layout.module.css';
+import styles from '@/css/module/admin-layout.module.css';
 import { AdminSidebarProvider } from '@/providers/AdminSidebarProvider';
 import AdminSidebar from './components/AdminSidebar';
 

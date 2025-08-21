@@ -1,155 +1,209 @@
 'use client';
 
-import { useUsers } from '@/hooks/api/useUsers';
-import { useEvents } from '@/hooks/api/useEvents';
-import { useReservationsByUserId } from '@/hooks/api/useReservations';
-import { useTicketsByOwnerId } from '@/hooks/api/useTickets';
-import { useTicketStats } from '@/hooks/api/useTickets';
-import { useSession } from '@/hooks/useSession';
-import ThemeDiv from '@/components/base/ThemeDiv';
+import React from 'react';
+import { useDashboardStats } from '@/hooks/api/useAdmin';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
+import ThemeDiv from '@/components/base/ThemeDiv';
+import UserStatsSection, { UserStatsSectionSkeleton } from './dashboard/UserStatsSection';
+import ReservationStatsSection, { ReservationStatsSectionSkeleton } from './dashboard/ReservationStatsSection';
+import TicketStatsSection, { TicketStatsSectionSkeleton } from './dashboard/TicketStatsSection';
+import EventStatsSection, { EventStatsSectionSkeleton } from './dashboard/EventStatsSection';
+import TrendStatsSection, { TrendStatsSectionSkeleton } from './dashboard/TrendStatsSection';
+import OverallSummarySection, { OverallSummarySectionSkeleton } from './dashboard/OverallSummarySection';
 
 const AdminClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
-  const { session } = useSession();
-  const { data: usersResponse } = useUsers();
-  const { data: eventsResponse } = useEvents();
-  const { data: reservations } = useReservationsByUserId(session?.user?.id || '');
-  const { data: tickets } = useTicketsByOwnerId(session?.user?.id || '');
-  const { data: ticketStats, isLoading: statsLoading } = useTicketStats();
+  const { data: dashboardStats, isLoading, error } = useDashboardStats();
 
-  const stats = [
-    {
-      title: '전체 사용자',
-      value: usersResponse?.data?.length || 0,
-      color: 'bg-blue-500',
-      icon: '👥'
-    },
-    {
-      title: '전체 이벤트',
-      value: eventsResponse?.data?.length || 0,
-      color: 'bg-green-500',
-      icon: '🎭'
-    },
-    {
-      title: '내 예매',
-      value: reservations?.data?.length || 0,
-      color: 'bg-yellow-500',
-      icon: '🎫'
-    },
-    {
-      title: '내 티켓',
-      value: tickets?.length || 0,
-      color: 'bg-purple-500',
-      icon: '🎪'
+  // 테마별 연한 글씨
+  const getLightTextColor = () => {
+    switch (theme) {
+      case 'dark':
+        return 'text-gray-400';
+      case 'neon':
+        return 'text-gray-300';
+      default:
+        return 'text-gray-600';
     }
-  ];
+  };
+
+  // 테마별 더 연한 글씨
+  const getLighterTextColor = () => {
+    switch (theme) {
+      case 'dark':
+        return 'text-gray-500';
+      case 'neon':
+        return 'text-gray-400';
+      default:
+        return 'text-gray-500';
+    }
+  };
+
+  // 테마별 중간 글씨
+  const getMediumTextColor = () => {
+    switch (theme) {
+      case 'dark':
+        return 'text-gray-300';
+      case 'neon':
+        return 'text-gray-200';
+      default:
+        return 'text-gray-700';
+    }
+  };
+
+  // 테마별 내부 블럭 배경색
+  const getInnerBlockBgColor = () => {
+    switch (theme) {
+      case 'dark':
+        return 'bg-gray-800 border-gray-700';
+      case 'neon':
+        return 'bg-gray-800/50 border-gray-600';
+      default:
+        return 'bg-gray-50 border-gray-200';
+    }
+  };
+
+  // 테마별 스켈레톤 배경색
+  const getSkeletonBgColor = () => {
+    switch (theme) {
+      case 'dark': return 'bg-gray-700';
+      case 'neon': return 'bg-gray-600';
+      default: return 'bg-gray-200';
+    }
+  };
+
+  // 테마별 스켈레톤 텍스트
+  const getSkeletonTextColor = () => {
+    switch (theme) {
+      case 'dark': return 'text-gray-400';
+      case 'neon': return 'text-gray-300';
+      default: return 'text-gray-600';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <ThemeDiv className="space-y-6 p-6">
+        <OverallSummarySectionSkeleton 
+          getSkeletonBgColor={getSkeletonBgColor}
+          getSkeletonTextColor={getSkeletonTextColor}
+          getMediumTextColor={getMediumTextColor}
+        />
+        
+        {/* 3열 균등 배치 */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* 사용자 현황 스켈레톤 */}
+          <UserStatsSectionSkeleton
+            getSkeletonBgColor={getSkeletonBgColor}
+            getSkeletonTextColor={getSkeletonTextColor}
+            getMediumTextColor={getMediumTextColor}
+          />
+          
+          {/* 예매 현황 스켈레톤 */}
+          <ReservationStatsSectionSkeleton 
+            getSkeletonBgColor={getSkeletonBgColor}
+            getSkeletonTextColor={getSkeletonTextColor}
+            getMediumTextColor={getMediumTextColor}
+          />
+          
+          {/* 티켓 현황 스켈레톤 */}
+          <TicketStatsSectionSkeleton
+            getSkeletonBgColor={getSkeletonBgColor}
+            getSkeletonTextColor={getSkeletonTextColor}
+            getMediumTextColor={getMediumTextColor}
+          />
+        </div>
+        
+        {/* 공연 통계 스켈레톤 */}
+        <EventStatsSectionSkeleton
+          getSkeletonBgColor={getSkeletonBgColor}
+          getSkeletonTextColor={getSkeletonTextColor}
+          getMediumTextColor={getMediumTextColor}
+          getInnerBlockBgColor={getInnerBlockBgColor}
+        />
+        
+        {/* 시간별 증감 현황 스켈레톤 */}
+        <TrendStatsSectionSkeleton 
+          theme={theme}
+          getSkeletonBgColor={getSkeletonBgColor}
+          getSkeletonTextColor={getSkeletonTextColor}
+          getMediumTextColor={getMediumTextColor}
+        />
+      </ThemeDiv>
+    );
+  }
+
+  if (error) {
+    return (
+      <ThemeDiv className="h-full p-6">
+        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+          <div className="text-center">
+            <h2 className="text-xl font-bold mb-2 text-red-700">데이터 로딩 실패</h2>
+            <p className="text-red-600 mb-4">통계 데이터를 불러올 수 없습니다.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </ThemeDiv>
+    );
+  }
+
+  if (!dashboardStats) return null;
 
   return (
-    <ThemeDiv className="space-y-6 p-4">
-      <div>
-        <h1 className={`text-3xl font-bold mb-2 ${theme === 'neon' ? 'text-green-400' : ''}`}>
-          관리자 대시보드
-        </h1>
-        <p className="text-gray-400">시스템 현황을 한눈에 확인하세요</p>
+    <ThemeDiv className="space-y-6 p-6">
+      {/* 전체 요약 통계 */}
+      <OverallSummarySection 
+        dashboardStats={dashboardStats}
+        theme={theme}
+        getLightTextColor={getLightTextColor}
+      />
+
+      <div className="grid md:grid-cols-3 gap-6">
+        {/* 사용자 현황 */}
+        <UserStatsSection 
+          dashboardStats={dashboardStats}
+          theme={theme}
+          getLightTextColor={getLightTextColor}
+        />
+
+        {/* 예매 현황 */}
+        <ReservationStatsSection 
+          dashboardStats={dashboardStats}
+          theme={theme}
+          getLightTextColor={getLightTextColor}
+        />
+
+        {/* 티켓 현황 */}
+        <TicketStatsSection 
+          dashboardStats={dashboardStats}
+          theme={theme}
+          getLightTextColor={getLightTextColor}
+        />
       </div>
 
-      {/* 기본 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => (
-          <ThemeDiv key={index} className="p-6 rounded-lg" isChildren>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{stat.title}</p>
-                <p className="text-2xl font-bold">{stat.value}</p>
-              </div>
-              <div className={`text-3xl ${stat.color} rounded-full p-3`}>
-                {stat.icon}
-              </div>
-            </div>
-          </ThemeDiv>
-        ))}
-      </div>
+      {/* 공연 통계 차트 */}
+      <EventStatsSection 
+        dashboardStats={dashboardStats}
+        theme={theme}
+        getLightTextColor={getLightTextColor}
+        getLighterTextColor={getLighterTextColor}
+        getMediumTextColor={getMediumTextColor}
+        getInnerBlockBgColor={getInnerBlockBgColor}
+      />
 
-      {/* 티켓 상세 통계 */}
-      <div className="space-y-4">
-        <h2 className={`text-xl font-semibold ${theme === 'neon' ? 'text-green-400' : ''}`}>
-          티켓 현황
-        </h2>
-        
-        {/* 티켓 기본 통계 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-blue-600 font-bold text-lg dark:text-blue-400">
-              {statsLoading ? '-' : ticketStats?.totalGroups || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">총 묶음</div>
-          </ThemeDiv>
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-green-600 font-bold text-lg dark:text-green-400">
-              {statsLoading ? '-' : ticketStats?.totalTickets || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">총 티켓</div>
-          </ThemeDiv>
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-emerald-600 font-bold text-lg dark:text-emerald-400">
-              {statsLoading ? '-' : ticketStats?.activeGroups || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">활성</div>
-          </ThemeDiv>
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-yellow-600 font-bold text-lg dark:text-yellow-400">
-              {statsLoading ? '-' : ticketStats?.cancelRequestedGroups || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">취소 신청</div>
-          </ThemeDiv>
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-red-600 font-bold text-lg dark:text-red-400">
-              {statsLoading ? '-' : ticketStats?.cancelledGroups || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">취소됨</div>
-          </ThemeDiv>
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-purple-600 font-bold text-lg dark:text-purple-400">
-              {statsLoading ? '-' : ticketStats?.usedGroups || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">사용됨</div>
-          </ThemeDiv>
-        </div>
-
-        {/* 티켓 상세 통계 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-cyan-600 font-bold text-lg dark:text-cyan-400">
-              {statsLoading ? '-' : ticketStats?.transferredGroups || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">양도됨</div>
-          </ThemeDiv>
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-orange-600 font-bold text-lg dark:text-orange-400">
-              {statsLoading ? '-' : ticketStats?.cancelRequestedTickets || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">취소 신청 티켓</div>
-          </ThemeDiv>
-          <ThemeDiv className="p-4 rounded" isChildren>
-            <div className="text-indigo-600 font-bold text-lg dark:text-indigo-400">
-              {statsLoading ? '-' : ticketStats?.averageTicketsPerGroup || 0}
-            </div>
-            <div className="text-gray-600 text-sm dark:text-gray-400">평균 티켓/묶음</div>
-          </ThemeDiv>
-        </div>
-      </div>
-
-      {/* 최근 활동 */}
-      <div>
-        <h2 className={`text-xl font-semibold mb-4 ${theme === 'neon' ? 'text-green-400' : ''}`}>
-          최근 활동
-        </h2>
-        <ThemeDiv className="p-6 rounded-lg" isChildren>
-          <p className="text-gray-600 dark:text-gray-400">최근 활동 내역이 여기에 표시됩니다.</p>
-        </ThemeDiv>
-      </div>
+      {/* 시간별 증감 현황 */}
+      <TrendStatsSection 
+        dashboardStats={dashboardStats}
+        theme={theme}
+        getLightTextColor={getLightTextColor}
+        getLighterTextColor={getLighterTextColor}
+      />
     </ThemeDiv>
   );
 };

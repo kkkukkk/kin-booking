@@ -27,24 +27,24 @@ const Input = ({
 		}
 	};
 
-	// 테마별
+	// 테마별 (CSS 변수 포함)
 	const getThemeStyles = () => {
 		switch (theme) {
 			case "normal":
-				return "text-black bg-white/90 border border-black/20 placeholder:text-black/50";
+				return "text-black bg-white/90 border border-black/20 placeholder:text-black/50 [--input-bg:white] [--input-text:black]";
 			case "dark":
-				return "text-gray-200 bg-black/80 border border-white/50 placeholder:text-white/50";
+				return "text-gray-200 bg-black/80 border border-white/50 placeholder:text-white/50 [--input-bg:rgba(0,0,0,0.8)] [--input-text:#e5e5e5]";
 			case "neon":
-				return "text-gray-200 bg-black/80 border border-[var(--neon-cyan)]/70 placeholder:text-white/50";
+				return "text-gray-200 bg-black/80 border border-[var(--neon-cyan)]/50 placeholder:text-white/50 [--input-bg:rgba(0,0,0,0.8)] [--input-text:#e5e5e5]";
 			default:
-				return "text-black bg-white/90 border border-black/20 placeholder:text-black/50";
+				return "text-black bg-white/90 border border-black/20 placeholder:text-black/50 [--input-bg:white] [--input-text:black]";
 		}
 	};
 
 	// underline variant + 테마 조합
 	const getUnderlineThemeStyles = () => {
 		if (variant !== "underline") return "";
-		
+
 		switch (theme) {
 			case "normal":
 				return "rounded-t-[5px] bg-white/50 border-b-2 border-black/70";

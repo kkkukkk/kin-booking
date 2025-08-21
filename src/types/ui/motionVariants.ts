@@ -68,7 +68,7 @@ export const bottomUp = {
 
 export const bottomUpDelay = {
 	initial: { opacity: 0, y: 50 },
-	animate: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 2.4} },
+	animate: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 2.4 } },
 	exit: { opacity: 0, y: 50, transition: { duration: 0.5 } },
 }
 
@@ -99,7 +99,7 @@ export const tabs = {
 }
 
 export const fadeOverlay = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.18 } },
+	hidden: { opacity: 0 },
+	visible: { opacity: 1, transition: { duration: 0.18 } },
+	exit: { opacity: 0, transition: { duration: 0.18 } },
 };

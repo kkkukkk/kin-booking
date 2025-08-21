@@ -41,7 +41,7 @@ const Footer = ({ theme = 'normal' }: FooterProps) => {
         return 'text-gray-300';
       case 'normal':
       default:
-        return 'text-gray-600 dark:text-gray-400';
+        return 'text-gray-600';
     }
   };
 
@@ -50,15 +50,15 @@ const Footer = ({ theme = 'normal' }: FooterProps) => {
       <div className="flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0 text-xs md:text-sm">
         {/* About & Terms 버튼 */}
         <div className="flex space-x-4 md:space-x-6">
-          <Link 
-            href="/about" 
+          <Link
+            href="/about"
             className={`hover:opacity-70 transition-opacity ${getTextColor()}`}
           >
             About
           </Link>
           <span className={`${getTextColor()}`}>•</span>
-          <Link 
-            href="/terms" 
+          <Link
+            href="/terms"
             className={`hover:opacity-70 transition-opacity ${getTextColor()}`}
           >
             Terms
@@ -89,8 +89,8 @@ const Footer = ({ theme = 'normal' }: FooterProps) => {
 
         {/* Contact & Copyright */}
         <div className="flex flex-col items-center md:items-end space-y-1">
-          <a 
-            href="mailto:gfjg12@naver.com" 
+          <a
+            href="mailto:gfjg12@naver.com"
             className={`hover:opacity-70 transition-opacity ${getTextColor()}`}
           >
             Contact: gfjg12@naver.com

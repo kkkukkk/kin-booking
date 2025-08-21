@@ -8,20 +8,19 @@ import { TicketGroupDto } from '@/types/dto/ticket';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import Button from '@/components/base/Button';
-import { useAlert } from '@/providers/AlertProvider';
 import SearchBar from '@/components/search/SearchBar';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { TicketStatus } from '@/types/model/ticket';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
+import RefundInfoModal from './RefundInfoModal';
+import useToast from '@/hooks/useToast';
 import dayjs from 'dayjs';
 
 const TicketsClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
-  const { showAlert } = useAlert();
-  const { data: ticketGroups, isLoading, error, refetch } = useTicketGroups();
-  const approveCancelMutation = useApproveCancelRequest();
+  const { showToast } = useToast();
   
   // 검색/필터 상태
   const [searchParams, setSearchParams] = useState({
@@ -38,6 +37,34 @@ const TicketsClient = () => {
   // 페이지 크기 옵션
   const pageSizeOptions = [10, 20, 50, 100];
 
+  // 정렬 상태
+  const [sortConfig, setSortConfig] = useState<{
+    field: string;
+    direction: 'asc' | 'desc';
+  }>({
+    field: 'createdAt',
+    direction: 'desc'
+  });
+
+  const { data: ticketGroups, isLoading, error, refetch } = useTicketGroups({
+    keyword: searchParams.keyword,
+    status: searchParams.status,
+    dateFrom: searchParams.dateFrom,
+    dateTo: searchParams.dateTo,
+    sortBy: sortConfig.field,
+    sortDirection: sortConfig.direction,
+  });
+  const approveCancelMutation = useApproveCancelRequest();
+
+  // 환불 정보 모달 상태
+  const [refundModalState, setRefundModalState] = useState<{
+    isOpen: boolean;
+    ticketGroup: TicketGroupDto | null;
+  }>({
+    isOpen: false,
+    ticketGroup: null,
+  });
+  
   // 검색 필터링
   const filteredGroups = ticketGroups?.filter((group: TicketGroupDto) => {
     // 키워드 검색
@@ -101,16 +128,50 @@ const TicketsClient = () => {
   };
 
   // 페이지 크기 변경 핸들러
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1); // 페이지 크기 변경 시 첫 페이지로 이동
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  // 정렬 핸들러
+  const handleSortChange = (field: string, direction: 'asc' | 'desc') => {
+    setSortConfig({ field, direction });
+    setCurrentPage(1);
+  };
+
+  // 환불 정보 모달 핸들러
+  const handleRefundModalClose = () => {
+    setRefundModalState({
+      isOpen: false,
+      ticketGroup: null,
+    });
+  };
+
+  const handleRefundSuccess = async () => {
+    if (!refundModalState.ticketGroup) return;
+
+    // 티켓 취소 승인 처리
+    approveCancelMutation.mutate({
+      eventId: refundModalState.ticketGroup.eventId,
+      reservationId: refundModalState.ticketGroup.reservationId,
+      ownerId: refundModalState.ticketGroup.ownerId,
+    }, {
+      onSuccess: () => {
+        showToast({ message: '티켓이 취소되었습니다.', iconType: 'success', autoCloseTime: 3000 });
+        refetch();
+        handleRefundModalClose();
+      },
+      onError: (error) => {
+        showToast({ message: `티켓 취소에 실패했습니다: ${error.message}`, iconType: 'error' });
+      },
+    });
   };
 
   // 모바일 카드 섹션 렌더 함수
   const mobileCardSections = (group: TicketGroupDto, index: number) => ({
     firstRow: (
       <>
-        <span className="font-semibold text-xs truncate">티켓 소유: {group.userName}</span>
+        <span className="font-semibold text-xs truncate">사용자: {group.userName}</span>
         <span className="text-xs truncate">{group.ticketCount}장</span>
         <StatusBadge status={group.status as TicketStatus} theme={theme} variant="badge" size="sm" statusType="ticket" />
       </>
@@ -131,6 +192,7 @@ const TicketsClient = () => {
             reverse={theme === 'normal'}
             onClick={() => handleApproveCancelRequest(group)}
             disabled={approveCancelMutation.isPending}
+            className="font-semibold"
           >
             {approveCancelMutation.isPending ? '처리 중...' : '취소 승인'}
           </Button>
@@ -139,33 +201,13 @@ const TicketsClient = () => {
     ),
   });
 
-  // 취소 신청 승인 처리
+  // 취소 승인 핸들러
   const handleApproveCancelRequest = async (group: TicketGroupDto) => {
-    // 1단계: 환불 완료 확인
-    const refundConfirmed = await showAlert({
-      type: 'confirm',
-      title: '환불 완료 확인',
-      message: `다음 티켓의 환불이 완료되었나요?\n\n공연: ${group.eventName}\n사용자: ${group.userName}\n티켓 수량: ${group.ticketCount}장\n\n환불이 완료되지 않았다면 먼저 환불을 진행해주세요.`,
+    // 환불 정보 입력 모달 표시
+    setRefundModalState({
+      isOpen: true,
+      ticketGroup: group,
     });
-
-    if (!refundConfirmed) {
-      return;
-    }
-
-    // 2단계: 최종 취소 승인 확인
-    const confirmed = await showAlert({
-      type: 'confirm',
-      title: '취소 신청 승인',
-      message: `환불이 완료되었으므로 다음 티켓의 취소를 승인하시겠습니까?\n\n공연: ${group.eventName}\n사용자: ${group.userName}\n티켓 수량: ${group.ticketCount}장`,
-    });
-
-    if (confirmed) {
-      approveCancelMutation.mutate({
-        eventId: group.eventId,
-        reservationId: group.reservationId,
-        ownerId: group.ownerId,
-      });
-    }
   };
 
   const columns = [
@@ -229,6 +271,7 @@ const TicketsClient = () => {
               reverse={theme === 'normal'}
               onClick={() => handleApproveCancelRequest(item)}
               disabled={approveCancelMutation.isPending}
+              className="font-semibold"
             >
               {approveCancelMutation.isPending ? '처리 중...' : '취소 승인'}
             </Button>
@@ -262,8 +305,8 @@ const TicketsClient = () => {
           </div>
         </div>
         <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 dark:bg-red-900/20 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400">티켓 데이터를 불러오는 중 오류가 발생했습니다.</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <p className="text-red-600">티켓 데이터를 불러오는 중 오류가 발생했습니다.</p>
           </div>
         </div>
       </ThemeDiv>
@@ -309,7 +352,6 @@ const TicketsClient = () => {
         />
       </div>
 
-      {/* 테이블 상단 정보 영역 */}
       <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-2">
         {/* 총 개수 */}
         <div className="flex-1 md:flex-2/3 flex justify-start mb-2 md:mb-0">
@@ -320,8 +362,6 @@ const TicketsClient = () => {
         
         {/* 정렬 및 페이지 크기 선택 */}
         <div className="flex items-center gap-4 flex-1 justify-end shrink-0">
-          
-          {/* 페이지 크기 선택 */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-400 md:w-[80%] whitespace-nowrap">페이지당 표시:</span>
             <Select
@@ -333,6 +373,7 @@ const TicketsClient = () => {
                 value: size.toString(),
                 label: `${size}개`
               }))}
+              fontSize="text-xs md:text-sm"
             />
           </div>
         </div>
@@ -340,7 +381,6 @@ const TicketsClient = () => {
 
       {/* 테이블 영역 */}
       <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-        {/* 티켓 목록 테이블 */}
         <div className="flex-1 min-h-fit md:min-h-0">
           <DataTable
             data={paginatedGroups}
@@ -351,6 +391,8 @@ const TicketsClient = () => {
             loadingMessage="로딩 중..."
             className="h-full"
             mobileCardSections={mobileCardSections}
+            sortConfig={sortConfig}
+            onSortChange={handleSortChange}
           />
         </div>
 
@@ -371,6 +413,16 @@ const TicketsClient = () => {
           </div>
         )}
       </div>
+
+      {/* 환불 정보 입력 모달 */}
+      {refundModalState.ticketGroup && (
+        <RefundInfoModal
+          isOpen={refundModalState.isOpen}
+          onClose={handleRefundModalClose}
+          ticketGroup={refundModalState.ticketGroup}
+          onSuccess={handleRefundSuccess}
+        />
+      )}
     </ThemeDiv>
   );
 };

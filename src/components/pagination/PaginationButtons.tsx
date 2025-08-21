@@ -105,7 +105,7 @@ const PaginationButtons = ({ paginationInfo, onPageChange, className = '', showF
       {pageNumbers.map((page, index) => (
         <div key={index}>
           {page === '...' ? (
-            <span className="px-2 py-1 text-gray-500 dark:text-gray-400">
+            <span className="px-2 py-1 text-gray-500">
               ...
             </span>
           ) : (

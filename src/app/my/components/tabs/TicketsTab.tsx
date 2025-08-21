@@ -6,8 +6,9 @@ import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { useTicketsWithEventByOwnerId } from '@/hooks/api/useTickets';
 import { TicketWithEventDto } from '@/types/dto/ticket';
-import TicketStack from '@/components/TicketStack';
+import TicketStack from '@/app/my/components/tabs/ticket/TicketStack';
 import { TicketIcon } from '@/components/icon/TicketIcon';
+import TicketsGuide from '@/app/my/components/tabs/ticket/TicketsGuide';
 import clsx from 'clsx';
 
 const TicketsTab = () => {
@@ -24,7 +25,10 @@ const TicketsTab = () => {
 		return (
 			<ThemeDiv className="p-6 text-center rounded-lg" isChildren>
 				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-				<p className="text-sm text-gray-600 dark:text-gray-300">티켓 정보를 불러오는 중...</p>
+				<p className={clsx(
+					"text-sm",
+					theme === "normal" ? "text-gray-600" : "text-gray-400"
+				)}>티켓 정보를 불러오는 중...</p>
 			</ThemeDiv>
 		);
 	}
@@ -58,11 +62,14 @@ const TicketsTab = () => {
 		);
 	}
 
-	// 그룹화: eventId + reservationId 조합으로 그룹 키 생성
+	// 그룹화: eventId + reservationId + transferred_at 유무로 그룹 키 생성
 	const groupMap = new Map<string, TicketWithEventDto[]>();
-	
+
 	safeTickets.forEach(ticket => {
-		const groupKey = `${ticket.eventId}-${ticket.reservationId}`;
+		// transferred_at이 있으면 양도받은 티켓, 없으면 일반 티켓
+		const transferStatus = ticket.transferredAt ? 'transferred' : 'normal';
+		const groupKey = `${ticket.eventId}-${ticket.reservationId}-${transferStatus}`;
+
 		if (!groupMap.has(groupKey)) {
 			groupMap.set(groupKey, []);
 		}
@@ -77,7 +84,7 @@ const TicketsTab = () => {
 				acc[ticket.status] = (acc[ticket.status] || 0) + 1;
 				return acc;
 			}, {} as Record<string, number>);
-			
+
 			// 우선순위: Active > CancelRequested > Used > Transferred > Cancelled
 			if (statusCounts['active'] > 0) return 0;
 			if (statusCounts['cancel_requested'] > 0) return 1;
@@ -86,21 +93,24 @@ const TicketsTab = () => {
 			if (statusCounts['cancelled'] > 0) return 4;
 			return 5;
 		};
-		
+
 		return getGroupStatus(ticketsA) - getGroupStatus(ticketsB);
 	});
 
 	return (
 		<div className="space-y-6">
+			{/* 티켓 안내 */}
+			<TicketsGuide />
+
 			{/* 이벤트 + 예매별로 그룹화 */}
 			{sortedGroups.map(([groupKey, groupTickets]) => {
 				const firstTicket = groupTickets[0];
-				
+
 				// 안전성 검사
 				if (!firstTicket || !firstTicket.event) {
 					return null;
 				}
-				
+
 				return (
 					<TicketStack
 						key={groupKey}

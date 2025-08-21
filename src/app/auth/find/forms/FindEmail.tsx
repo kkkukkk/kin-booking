@@ -85,7 +85,7 @@ const FindEmail = () => {
 				animate="animate"
 				exit="exit"
 			>
-				<AnimatedText text={"가입에 사용한 휴대폰 번호를 입력해주세요."}/>
+				<AnimatedText text={"가입에 사용한 휴대폰 번호를 입력해주세요."} />
 				<motion.div
 					variants={fadeSlideLeft}
 					initial="hidden"
@@ -107,7 +107,7 @@ const FindEmail = () => {
 					<Button
 						theme={"dark"}
 						width={"w-1/5"}
-						fontSize={"text-sm md:text-base"}
+						fontSize={"text-sm md:text-base font-semibold"}
 						padding={"px-2 py-1.5"}
 						onClick={handleFindEmail}
 						disabled={checking || phoneNumber.trim() === ""}

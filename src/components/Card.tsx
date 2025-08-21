@@ -63,7 +63,7 @@ const Card = ({
 				initial="enter"
 				animate="center"
 				exit="exit"
-				transition={{duration: 0.3}}
+				transition={{ duration: 0.3 }}
 				className={clsx(
 					"rounded-none md:rounded-[10px] max-w-7xl mx-auto",
 					theme === "dark"
@@ -107,7 +107,7 @@ const Card = ({
 							<div className="flex-1" />
 						</div>
 					)}
-					<div className="flex-1 flex flex-col">{children}</div>
+					<div className={clsx("flex-1 flex flex-col", center && "justify-center items-center")}>{children}</div>
 					{/* Footer */}
 					{hasFooter && <Footer theme={theme} />}
 				</ThemeRefDiv>

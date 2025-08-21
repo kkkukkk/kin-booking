@@ -12,12 +12,12 @@ interface EventSeatInfoProps {
 	theme: string;
 }
 
-const EventSeatInfo = ({ 
-	status, 
-	seatCapacity, 
-	reservedQuantity, 
+const EventSeatInfo = ({
+	status,
+	seatCapacity,
+	reservedQuantity,
 	remainingQuantity,
-	theme 
+	theme
 }: EventSeatInfoProps) => {
 	if (status === EventStatus.Completed) {
 		return null;

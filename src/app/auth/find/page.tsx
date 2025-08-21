@@ -49,7 +49,7 @@ const FindPage = () => {
 					onClick={() => handlePageChange("FindEmail")}
 					theme={"dark"}
 					on={currentPage === "FindEmail"}
-					className={"z-1"}
+					className={"z-1 font-semibold"}
 				>이메일 찾기</Button>
 				<Button
 					width={"w-[50%]"}
@@ -57,7 +57,7 @@ const FindPage = () => {
 					onClick={() => handlePageChange("FindPassword")}
 					theme={"dark"}
 					on={currentPage === "FindPassword"}
-					className={"z-1"}
+					className={"z-1 font-semibold"}
 				>비밀번호 찾기</Button>
 			</div>
 			<div

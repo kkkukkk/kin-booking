@@ -35,7 +35,7 @@ const WithdrawNotice = ({ onConfirm }: WithdrawNoticeProps) => (
         <Button
           width="w-full"
           padding="p-2"
-          className="text-sm md:text-lg"
+          className="text-sm md:text-lg font-semibold"
           onClick={onConfirm}
           theme="dark"
           reverse

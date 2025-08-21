@@ -20,6 +20,8 @@ export interface FetchUserDto {
 	phoneNumber?: string;
 	status?: string;
 	marketingConsent?: boolean;
+	sortBy?: string;
+	sortDirection?: 'asc' | 'desc';
 }
 
 export interface FetchUserResponseDto {

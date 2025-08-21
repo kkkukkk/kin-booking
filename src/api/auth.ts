@@ -7,8 +7,6 @@ export const login = async (email: string, password: string) => {
 
 	if (statusError) throw statusError;
 
-	console.log('status', status);
-
 	if (!status) {
 		throw new Error('Invalid login credentials');
 	}

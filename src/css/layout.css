@@ -4,9 +4,9 @@
     grid-template-rows: 4% 92% 4%;
     grid-template-columns: 8% 84% 8%;
     grid-template-areas:
-    "header-left header-center header-right"
-    "main-left main-center main-right"
-    "footer-left footer-center footer-right";
+        "header-left header-center header-right"
+        "main-left main-center main-right"
+        "footer-left footer-center footer-right";
 }
 
 .bg-image {
@@ -19,9 +19,11 @@
 .header-left {
     grid-area: header-left;
 }
+
 .header-center {
     grid-area: header-center;
 }
+
 .header-right {
     grid-area: header-right;
 }
@@ -29,16 +31,19 @@
 .main-left {
     grid-area: main-left;
 }
+
 .main-center {
     grid-area: main-center;
     height: 100%;
     min-height: 0;
 }
+
 .main-center.center {
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
 .main-right {
     grid-area: main-right;
 }
@@ -46,9 +51,11 @@
 .footer-left {
     grid-area: footer-left;
 }
+
 .footer-center {
     grid-area: footer-center;
 }
+
 .footer-right {
     grid-area: footer-right;
 }
@@ -61,6 +68,7 @@
 
 /* 모바일 세로 (<=768px, portrait) */
 @media (max-width: 768px) and (orientation: portrait) {
+
     /* 모바일 세로용 스타일 */
     .layout-grid {
         grid-template-rows: minmax(5vh, 5%) minmax(80vh, 90%) minmax(5vh, 5%);
@@ -70,13 +78,15 @@
             "main-center"
             "footer-center";
     }
-    .layout-grid > .card {
+
+    .layout-grid>.card {
         border-radius: 0;
     }
 }
 
 /* 모바일 가로 (<=768px, landscape) */
 @media (max-width: 1024px) and (orientation: landscape) {
+
     /* 모바일 가로용 스타일 */
     .layout-grid {
         grid-template-rows: 1fr;
@@ -85,7 +95,7 @@
             "main-left main-center main-right"
     }
 
-    .layout-grid > .card {
+    .layout-grid>.card {
         border-radius: unset;
     }
 }

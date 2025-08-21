@@ -24,17 +24,17 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 	const startCamera = async () => {
 		try {
 			setError('');
-			
+
 			// 브라우저 호환성 확인
 			if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
 				throw new Error('이 브라우저는 카메라 접근을 지원하지 않습니다.');
 			}
 
 			// getUserMedia API 호환성 처리
-			const getUserMedia = navigator.mediaDevices.getUserMedia || 
-				(navigator as Navigator & { getUserMedia?: typeof navigator.mediaDevices.getUserMedia }).getUserMedia || 
-				(navigator as Navigator & { webkitGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).webkitGetUserMedia || 
-				(navigator as Navigator & { mozGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).mozGetUserMedia || 
+			const getUserMedia = navigator.mediaDevices.getUserMedia ||
+				(navigator as Navigator & { getUserMedia?: typeof navigator.mediaDevices.getUserMedia }).getUserMedia ||
+				(navigator as Navigator & { webkitGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).webkitGetUserMedia ||
+				(navigator as Navigator & { mozGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).mozGetUserMedia ||
 				(navigator as Navigator & { msGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).msGetUserMedia;
 
 			if (!getUserMedia) {
@@ -56,7 +56,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 			}
 		} catch (err: unknown) {
 			console.error('카메라 접근 실패:', err);
-			
+
 			// 구체적인 에러 메시지 제공
 			const error = err as Error;
 			if (error.name === 'NotAllowedError') {
@@ -94,7 +94,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 
 		// 캔버스에서 이미지 데이터 추출
 		const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-		
+
 		// jsQR로 QR 코드 검출
 		const code = jsQR(imageData.data, imageData.width, imageData.height);
 
@@ -171,7 +171,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 						<div className="text-red-500 text-sm p-4 bg-red-50 rounded-lg">
 							{error}
 						</div>
-						
+
 						{/* 대체 방법 안내 */}
 						<div className="text-sm text-gray-600">
 							<p className="font-semibold mb-2">대체 방법:</p>
@@ -182,7 +182,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 								<li>• 스캔 후 링크를 복사하여 접속</li>
 							</ul>
 						</div>
-						
+
 						<div className="flex gap-2 justify-center">
 							<Button
 								theme="normal"
@@ -213,7 +213,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 								muted
 								className="w-full max-w-md mx-auto rounded-lg border-2 border-gray-300"
 							/>
-							
+
 							{/* 스캔 영역 표시 */}
 							<div className="absolute inset-0 max-w-md mx-auto flex items-center justify-center pointer-events-none">
 								<div className="w-48 h-48 border-2 border-blue-500 rounded-lg relative">
@@ -224,7 +224,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 									<div className="absolute bottom-0 right-0 w-6 h-6 border-r-4 border-b-4 border-blue-500"></div>
 								</div>
 							</div>
-							
+
 							{/* 숨겨진 캔버스 */}
 							<canvas
 								ref={canvasRef}

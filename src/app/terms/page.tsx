@@ -10,4 +10,4 @@ const TermsPage = () => {
   )
 };
 
-export default TermsPage; 
+export default TermsPage;

@@ -3,8 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import { Ticket } from '@/types/model/ticket';
 import { TicketStatus } from '@/types/model/ticket';
-import { Events } from '@/types/model/events';
-import TicketCard from '@/components/Ticket';
+import { Events, EventStatus } from '@/types/model/events';
+import TicketCard from '@/app/my/components/tabs/ticket/Ticket';
 import Button from '@/components/base/Button';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -13,6 +13,8 @@ import { RootState } from '@/redux/store';
 import clsx from 'clsx';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { useRequestCancelAllTicketsByEvent } from '@/hooks/api/useTickets';
+import { useRefundAccountByUserId, useCreateRefundAccount } from '@/hooks/api/useRefundAccounts';
+import { useCreateRefundRequestMapping } from '@/hooks/api/useRefundRequestMapping';
 import { useAlert } from '@/providers/AlertProvider';
 import { useSession } from '@/hooks/useSession';
 import { useRouter } from 'next/navigation';
@@ -21,7 +23,8 @@ import { CalendarIcon } from '@/components/icon/CalendarIcon';
 import { LocationIcon } from '@/components/icon/LocationIcon';
 import { TicketIcon } from '@/components/icon/TicketIcon';
 import { MapIcon } from '@/components/icon/MapIcon';
-import TicketQRModal from '@/components/TicketQRModal';
+import TicketQRModal from '@/app/my/components/tabs/ticket/TicketQRModal';
+import RefundAccountModal from '@/app/my/components/tabs/ticket/RefundAccountModal';
 
 interface TicketStackProps {
 	eventId: string;
@@ -40,17 +43,30 @@ const TicketStack = ({
 }: TicketStackProps) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [showQRModal, setShowQRModal] = useState(false);
+	const [showRefundAccountModal, setShowRefundAccountModal] = useState(false);
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { mutate: requestCancelAllTickets, isPending: isCancelling } = useRequestCancelAllTicketsByEvent();
+	const { mutate: createRefundAccount, isPending: isCreatingAccount } = useCreateRefundAccount();
+	const { mutate: createRefundRequestMapping, isPending: isCreatingMapping } = useCreateRefundRequestMapping();
 	const { showAlert } = useAlert();
 	const { session } = useSession();
 	const router = useRouter();
+
+	// 기존 환불계좌 조회
+	const { data: existingRefundAccounts } = useRefundAccountByUserId(session?.user?.id || '');
 
 	// 티켓 스택의 통합 상태 (첫 번째 티켓의 상태를 기준으로 함)
 	const stackStatus = useMemo(() => {
 		if (tickets.length === 0) return TicketStatus.Active;
 		return tickets[0].status;
 	}, [tickets]);
+
+	// 양도 받은 티켓인지 확인
+	const isReceivedTicket = useMemo(() => {
+		if (tickets.length === 0 || !session?.user?.id) return false;
+		const firstTicket = tickets[0];
+		return firstTicket.transferredAt && firstTicket.ownerId === session.user.id;
+	}, [tickets, session?.user?.id]);
 
 	// 상태별 스타일 클래스
 	const getStatusStyle = () => {
@@ -145,7 +161,7 @@ const TicketStack = ({
 	// QR코드 모달 열기
 	const handleShowQRCode = () => {
 		if (tickets.length > 0) {
-			setShowQRModal(true);
+			setShowQRModal(true); // 모달 열기
 		}
 	};
 
@@ -168,21 +184,143 @@ const TicketStack = ({
 		const activeTickets = tickets.filter(ticket => ticket.status === TicketStatus.Active);
 		if (activeTickets.length === 0) return;
 
-		// 첫 번째 티켓의 reservationId 사용 (모든 티켓이 같은 예매 그룹)
-		const reservationId = activeTickets[0].reservationId;
+		// 양도받은 티켓인지 확인
+		if (isReceivedTicket) {
+			// 양도받은 티켓은 환불계좌 입력 모달 표시
+			setShowRefundAccountModal(true);
+			return;
+		}
 
+		// 일반 티켓은 바로 취소 신청
 		const confirmed = await showAlert({
 			type: 'confirm',
 			title: '티켓 취소 신청',
-			message: `정말 ${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n취소 신청 후에는 관리자 승인이 필요합니다.`,
+			message: `정말 ${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n관리자 확인 후 환불이 진행됩니다.`,
 		});
 
 		if (confirmed) {
 			requestCancelAllTickets({
 				eventId,
 				userId: session.user.id,
-				reservationId,
-				tickets,
+				reservationId: activeTickets[0].reservationId,
+				tickets: activeTickets,
+			});
+		}
+	};
+
+	// 환불계좌 입력 후 취소 신청 처리
+	const handleRefundAccountSubmit = async (accountInfo: { bankName: string; accountNumber: string; accountHolder: string; id?: string }) => {
+		if (!session?.user?.id) return;
+
+		const activeTickets = tickets.filter(ticket => ticket.status === TicketStatus.Active);
+		if (activeTickets.length === 0) return;
+
+		// 모달 먼저 닫기
+		setShowRefundAccountModal(false);
+
+		try {
+			let refundAccountId: string;
+
+			if (accountInfo.id) {
+				// 기존 계좌 사용 - 새로 생성하지 않음
+				refundAccountId = accountInfo.id;
+			} else {
+				// 새 계좌 생성
+				createRefundAccount({
+					userId: session.user.id,
+					bankName: accountInfo.bankName,
+					accountNumber: accountInfo.accountNumber,
+					accountHolder: accountInfo.accountHolder
+				}, {
+					onSuccess: (newAccount) => {
+						refundAccountId = newAccount.id;
+						// 취소 신청 확인 후 환불 요청 매핑 생성
+						showAlert({
+							type: 'confirm',
+							title: '티켓 취소 신청',
+							message: `양도받은 티켓 ${activeTickets.length}장을 취소 신청하시겠습니까?\n\n입력하신 계좌로 환불이 진행됩니다.`,
+						}).then((confirmed) => {
+							if (confirmed) {
+								// 환불 요청 매핑 생성
+								createRefundRequestMapping({
+									userId: session.user.id,
+									refundAccountId: newAccount.id,
+									reservationId: activeTickets[0].reservationId,
+									eventId: activeTickets[0].eventId
+								}, {
+									onSuccess: () => {
+										// 매핑 생성 성공 후 취소 신청
+										requestCancelAllTickets({
+											eventId,
+											userId: session.user.id,
+											reservationId: activeTickets[0].reservationId,
+											tickets: activeTickets,
+										});
+									},
+									onError: (error) => {
+										console.error('환불 요청 매핑 생성 실패:', error);
+										showAlert({
+											type: 'confirm',
+											title: '오류',
+											message: '환불 요청 매핑 생성 중 오류가 발생했습니다.',
+										});
+									}
+								});
+							}
+						});
+					},
+					onError: (error) => {
+						console.error('환불계좌 생성 실패:', error);
+						showAlert({
+							type: 'confirm',
+							title: '오류',
+							message: '환불계좌 생성 중 오류가 발생했습니다.',
+						});
+					}
+				});
+				return; // 비동기 처리이므로 여기서 종료
+			}
+
+			// 기존 계좌 사용 시 - 취소 신청 확인 후 환불 요청 매핑 생성
+			showAlert({
+				type: 'confirm',
+				title: '티켓 취소 신청',
+				message: `양도받은 티켓 ${activeTickets.length}장을 취소 신청하시겠습니까?\n\n입력하신 계좌로 환불이 진행됩니다.`,
+			}).then((confirmed) => {
+				if (confirmed) {
+					// 환불 요청 매핑 생성
+					createRefundRequestMapping({
+						userId: session.user.id,
+						refundAccountId,
+						reservationId: activeTickets[0].reservationId,
+						eventId: activeTickets[0].eventId
+					}, {
+						onSuccess: () => {
+							// 매핑 생성 성공 후 취소 신청
+							requestCancelAllTickets({
+								eventId,
+								userId: session.user.id,
+								reservationId: activeTickets[0].reservationId,
+								tickets: activeTickets,
+							});
+						},
+						onError: (error) => {
+							console.error('환불 요청 매핑 생성 실패:', error);
+							showAlert({
+								type: 'confirm',
+								title: '오류',
+								message: '환불 요청 매핑 생성 중 오류가 발생했습니다.',
+							});
+						}
+					});
+				}
+			});
+		} catch (error) {
+			console.error('환불계좌 처리 실패:', error);
+			showAlert({
+				type: 'confirm',
+				title: '오류',
+				message: '환불계좌 정보 처리 중 오류가 발생했습니다.',
 			});
 		}
 	};
@@ -248,7 +386,19 @@ const TicketStack = ({
 				<div className="space-y-3">
 					{/* 공연명 + 상태뱃지 */}
 					<div className="flex justify-between items-center">
-						<h3 className="text-lg md:text-xl font-bold">{eventName}</h3>
+						<div className="flex items-center gap-3">
+							<h3 className="text-lg md:text-xl font-bold">{eventName}</h3>
+							{eventInfo?.status === EventStatus.Completed && (
+								<div className={clsx(
+									"px-2 py-1 rounded text-xs font-semibold",
+									theme === 'normal'
+										? 'bg-gray-100 border border-gray-300 text-gray-700'
+										: 'bg-gray-600 text-white'
+								)}>
+									공연 완료
+								</div>
+							)}
+						</div>
 						<StatusBadge 
 							status={stackStatus} 
 							theme={theme} 
@@ -295,10 +445,54 @@ const TicketStack = ({
 							</div>
 						)}
 					</div>
+
+					{/* 양도 받은 티켓 정보 */}
+					{isReceivedTicket && (
+						<div className={clsx(
+							"p-3 rounded-lg text-sm",
+							theme === 'normal'
+								? "bg-blue-50 border border-blue-200 text-blue-800"
+								: theme === 'dark'
+									? "bg-blue-900/20 border border-blue-600 text-blue-200"
+									: "bg-blue-900/20 border border-blue-500 text-blue-200"
+						)}>
+							<div className="flex items-center gap-2">
+								<span className="font-medium">양도 받은 티켓</span>
+								{/* TODO: 양도한 사람 정보 표시 */}
+							</div>
+							{tickets[0].transferredAt && (
+								<div className="text-xs opacity-70 mt-1">
+									양도일: {dayjs(tickets[0].transferredAt).format('YYYY년 M월 D일')}
+								</div>
+							)}
+						</div>
+					)}
+
+					{/* 취소 신청중 안내 문구 */}
+					{stackStatus === TicketStatus.CancelRequested && (
+						<div className={clsx(
+							"mt-3 p-3 rounded-lg text-xs",
+							theme === 'normal'
+								? "bg-amber-50 border border-amber-200 text-amber-700"
+								: "bg-amber-900/20 border border-amber-600/50 text-amber-200"
+						)}>
+							<div className="flex items-start gap-2">
+								<div className={clsx(
+									"w-2 h-2 rounded-full mt-1.5 flex-shrink-0",
+									theme === 'normal' ? "bg-amber-400" : "bg-amber-300"
+								)} />
+								<div>
+									<span className="font-medium">취소 신청이 접수되었습니다.</span>
+									<br />
+									<span>관리자 확인 후 입금하신 계좌로 환불이 진행됩니다.</span>
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 
-			{(canEnter || canTransfer || canCancel) && (
+			{(canEnter || canTransfer || canCancel) && eventInfo?.status !== EventStatus.Completed && (
 				<div className={clsx(
 					"px-6 py-4 border-b",
 					theme === 'normal'
@@ -310,7 +504,7 @@ const TicketStack = ({
 						{(canEnter || isWaitingForEntry) && (
 							<button
 								onClick={handleShowQRCode}
-								className={`flex-1 md:flex-none px-6 py-3 rounded font-medium text-sm transition-all cursor-pointer ${
+								className={`flex-1 md:flex-none px-6 py-3 rounded font-semibold text-sm transition-all cursor-pointer ${
 									canEnter 
 										? theme === 'normal'
 											? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-[0_2px_8px_rgba(34,197,94,0.3)]'
@@ -329,10 +523,10 @@ const TicketStack = ({
 						{canTransfer && (
 							<button
 								onClick={() => handleTicketAction('transfer')}
-								className={`flex-1 md:flex-none px-6 py-3 rounded font-medium text-sm transition-all cursor-pointer ${
+								className={`flex-1 md:flex-none px-6 py-3 rounded font-semibold text-sm transition-all cursor-pointer ${
 									theme === 'normal'
 										? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-[0_2px_8px_rgba(59,130,246,0.3)]'
-										: 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-[0_2px_8px_rgba(59,130,246,0.4)]'
+										: 'bg-gray-700 text-gray-400 cursor-not-allowed border border-gray-600'
 								}`}
 							>
 								양도하기
@@ -344,10 +538,10 @@ const TicketStack = ({
 							<button
 								onClick={handleCancelRequest}
 								disabled={isCancelling}
-								className={`flex-1 md:flex-none px-6 py-3 rounded font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
+								className={`flex-1 md:flex-none px-6 py-3 rounded font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
 									theme === 'normal'
 										? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-[0_2px_8px_rgba(239,68,68,0.3)]'
-										: 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white shadow-[0_2px_8px_rgba(239,68,68,0.4)]'
+										: 'bg-gray-700 text-gray-400 cursor-not-allowed border border-gray-600'
 								}`}
 							>
 								{isCancelling ? '처리 중...' : '취소 신청'}
@@ -386,12 +580,9 @@ const TicketStack = ({
 											<TicketCard
 												eventName={eventName}
 												status={stackStatus}
-												latestCreatedAt={ticket.createdAt}
-												eventId={ticket.eventId}
 												ticketColor={ticket.color || undefined}
 												isRare={ticket.isRare}
 												eventDate={eventInfo?.eventDate}
-												ticketId={ticket.id}
 												ticketNumber={ticket.ticketNumber}
 												ticketPrice={eventInfo?.ticketPrice}
 											/>
@@ -429,12 +620,9 @@ const TicketStack = ({
 													<TicketCard
 														eventName={eventName}
 														status={stackStatus}
-														latestCreatedAt={ticket.createdAt}
-														eventId={ticket.eventId}
 														ticketColor={ticket.color || undefined}
 														isRare={ticket.isRare}
 														eventDate={eventInfo?.eventDate}
-														ticketId={ticket.id}
 														ticketNumber={ticket.ticketNumber}
 														ticketPrice={eventInfo?.ticketPrice}
 													/>
@@ -452,7 +640,7 @@ const TicketStack = ({
 								<Button
 									theme="dark"
 									fontWeight="font-semibold"
-									fontSize="text-sm md:text-base"
+									fontSize="text-sm"
 									padding="px-4 py-2"
 									reverse={theme === 'normal'}
 									onClick={toggleExpanded}
@@ -468,7 +656,7 @@ const TicketStack = ({
 			</div>
 
 			{/* QR코드 모달 */}
-			{tickets.length > 0 && (
+			{showQRModal && tickets.length > 0 && (
 				<TicketQRModal
 					isOpen={showQRModal}
 					onClose={() => setShowQRModal(false)}
@@ -479,8 +667,20 @@ const TicketStack = ({
 					reservationId={tickets[0].reservationId}
 				/>
 			)}
+
+			{/* 환불계좌 입력 모달 */}
+			{showRefundAccountModal && (
+				<RefundAccountModal
+					isOpen={showRefundAccountModal}
+					onClose={() => setShowRefundAccountModal(false)}
+					onSubmit={handleRefundAccountSubmit}
+					existingAccounts={existingRefundAccounts}
+					isSubmitting={isCreatingAccount || isCreatingMapping}
+					theme={theme}
+				/>
+			)}
 		</ThemeDiv>
 	);
 };
 
-export default TicketStack; 
+export default TicketStack;

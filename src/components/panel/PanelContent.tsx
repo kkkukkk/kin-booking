@@ -15,6 +15,9 @@ import { useSession } from "@/hooks/useSession";
 import useToast from "@/hooks/useToast";
 import { useAlert } from "@/providers/AlertProvider";
 import MusicNoteIcon from "@/components/icon/MusicNoteIcon";
+import { useUserById } from "@/hooks/api/useUsers";
+import { getUserHighestRole } from "@/util/userRole";
+import { UserRoleStatus } from '@/types/model/userRole';
 
 type PanelContentProps = {
 	isOpen: boolean,
@@ -37,6 +40,11 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 	const { session } = useSession();
 	const { showToast } = useToast();
 	const { showAlert } = useAlert();
+
+	// 사용자 정보 조회
+	const { data: user } = useUserById(session?.user?.id || '');
+	// 사용자 권한 정보
+	const userRole = getUserHighestRole(user || null);
 
 	const toggleButton = useCallback((key: string) => {
 		const skipKeys = ["Home", "Login", "Logout", "My", "Events"];
@@ -106,6 +114,13 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 					onClick: () => router.push("/my"),
 					name: <ProfileIcon />
 				},
+				// 관리자 권한이 있는 경우 Admin 버튼 추가
+				...(userRole !== UserRoleStatus.User ? [{
+					key: 'Admin',
+					order: 1.5,
+					onClick: () => router.push("/admin"),
+					name: 'Admin',
+				}] : []),
 				{
 					key: 'Logout',
 					order: 5,
@@ -121,7 +136,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 					name: 'Login',
 				},
 			]),
-	].sort((a, b) => a.order - b.order), [session, router, handleLogout]);
+	].sort((a, b) => a.order - b.order), [session, router, handleLogout, userRole]);
 
 	const buttonTheme = theme !== "normal" ? theme : "dark";
 	const buttonReverse = theme === "normal";
@@ -150,7 +165,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 						key === 'Home' && 'home-button',
 						key === 'My' && 'my-page-button',
 						key === 'Logout' && 'logout-button',
-						theme === 'neon' && 'text-[rgb(119,255,153)]/95'
+						theme === 'neon' && 'text-[rgb(119,255,153)]/90'
 					)}
 				>
 					{name}

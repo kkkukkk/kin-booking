@@ -2,9 +2,10 @@ import { PaginationParams } from "@/util/pagination/type";
 import { supabase } from "@/lib/supabaseClient";
 import { getPaginationRange } from "@/util/pagination/pagination";
 import {toCamelCaseKeys, toSnakeCaseKeys} from "@/util/case/case";
-import { CreateReservationDto, FetchReservationDto, FetchReservationResponseDto } from "@/types/dto/reservation";
+import { CreateReservationDto, FetchReservationDto, FetchReservationResponseDto, ReservationWithEventDto } from "@/types/dto/reservation";
 import { Reservation } from "@/types/model/reservation";
-import { generateRandomGradient } from "@/util/adminGradientGenerator";
+import { generateRandomGradient } from "@/util/gradientGenerator";
+import { EventStatus } from "@/types/model/events";
 
 export const fetchReservation = async (params?: PaginationParams & FetchReservationDto): Promise<FetchReservationResponseDto> => {
 	let query = supabase.from('reservations').select('*', { count: 'exact' });
@@ -15,6 +16,22 @@ export const fetchReservation = async (params?: PaginationParams & FetchReservat
 		if (params.reservedFrom) query = query.gte('event_date', params.reservedFrom);
 		if (params.reservedTo) query = query.lte('event_date', params.reservedTo);
 		if (params.status) query = query.eq('status', params.status);
+		
+		// 정렬 적용
+		if (params.sortBy) {
+			const sortField = params.sortBy === 'reservedAt' ? 'reserved_at' : 
+							 params.sortBy === 'user' ? 'user_id' :
+							 params.sortBy === 'event' ? 'event_id' :
+							 params.sortBy === 'ticketHolder' ? 'ticket_holder' :
+							 params.sortBy === 'quantity' ? 'quantity' :
+							 params.sortBy === 'status' ? 'status' : 'reserved_at';
+			
+			query = query.order(sortField, { ascending: params.sortDirection === 'asc' });
+		} else {
+			// 기본 정렬: 예매일 최신순
+			query = query.order('reserved_at', { ascending: false });
+		}
+		
 		if (params.page && params.size) {
 			const range = getPaginationRange(params);
 			query = query.range(range.start, range.end);
@@ -28,8 +45,49 @@ export const fetchReservation = async (params?: PaginationParams & FetchReservat
 	}
 }
 
+// 이벤트 정보와 함께 가져오는 함수 (새로 추가)
+export const fetchReservationWithEvent = async (params?: PaginationParams & FetchReservationDto): Promise<{ data: ReservationWithEventDto[], totalCount: number }> => {
+	let query = supabase
+		.from('reservations')
+		.select(`
+			*,
+			events (
+				event_name,
+				event_date,
+				location,
+				ticket_price,
+				status
+			)
+		`, { count: 'exact' });
+	
+	if (params) {
+		if (params.id) query = query.eq('id', params.id);
+		if (params.userId) query = query.eq('user_id', params.userId);
+		if (params.eventId) query = query.eq('event_id', params.eventId);
+		if (params.reservedFrom) query = query.gte('event_date', params.reservedTo);
+		if (params.reservedTo) query = query.lte('event_date', params.reservedTo);
+		if (params.status) query = query.eq('status', params.status);
+		if (params.page && params.size) {
+			const range = getPaginationRange(params);
+			query = query.range(range.start, range.end);
+		}
+	}
+	
+	const { data, count, error } = await query;
+	if (error) throw error;
+	
+	return {
+		data: toCamelCaseKeys<ReservationWithEventDto[]>(data ?? []),
+		totalCount: count ?? 0,
+	}
+}
+
 export const createReservation = async (reservation: CreateReservationDto): Promise<Reservation> => {
-	const reservationSnake = toSnakeCaseKeys<CreateReservationDto>(reservation);
+	const reservationWithStatus = {
+		...reservation,
+		status: reservation.status || 'pending'
+	};
+	const reservationSnake = toSnakeCaseKeys<typeof reservationWithStatus>(reservationWithStatus);
 	const { data, error } = await supabase.from('reservations').insert(reservationSnake).select().single();
 	if (error) throw error;
 	return toCamelCaseKeys<Reservation>(data);
@@ -102,6 +160,30 @@ export const approveReservation = async (reservationId: string): Promise<void> =
 	});
 
 	if (transactionError) throw transactionError;
+	
+	// 6. 매진 체크 및 공연 상태 업데이트
+	const { data: updatedTickets, error: countUpdatedError } = await supabase
+		.from('ticket')
+		.select('id', { count: 'exact' })
+		.eq('event_id', reservation.event_id)
+		.in('status', ['active', 'cancel_requested']);
+		
+	if (countUpdatedError) throw countUpdatedError;
+	
+	const totalTicketCount = updatedTickets?.length || 0;
+	
+	// 매진인 경우 공연 상태를 SoldOut으로 변경
+	if (totalTicketCount >= event.seat_capacity) {
+		const { error: updateEventError } = await supabase
+			.from('events')
+			.update({ status: EventStatus.SoldOut })
+			.eq('id', reservation.event_id);
+			
+		if (updateEventError) {
+			console.error('공연 상태 업데이트 실패:', updateEventError);
+			// 공연 상태 업데이트 실패는 티켓 생성 성공을 막지 않음
+		}
+	}
 };
 
 // 예매 취소 (대기중인 예매만)

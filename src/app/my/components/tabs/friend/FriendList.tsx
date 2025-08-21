@@ -63,22 +63,22 @@ const FriendList = () => {
 
   if (isLoading) {
     return (
-      <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
+      <div className="p-8 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
         <p>친구 목록 불러오는 중...</p>
-      </ThemeDiv>
+      </div>
     );
   }
 
   if (error) {
     console.error('FriendList error:', error);
     return (
-      <ThemeDiv className="p-8 text-center rounded-lg" isChildren>
+      <div className="p-8 text-center">
         <p className="text-red-500 mb-4">친구 목록을 불러오는데 실패했어요.</p>
         <Button onClick={() => window.location.reload()} theme="dark">
           다시 시도
         </Button>
-      </ThemeDiv>
+      </div>
     );
   }
 
@@ -102,9 +102,9 @@ const FriendList = () => {
           </div>
         </div>
         <h3 className="text-base md:text-xl font-bold mb-3">지금은 친구가 없어요</h3>
-				<p className="text-sm opacity-70 mb-2 leading-relaxed">
-					새로운 친구를 추가해보세요!
-				</p>
+        <p className="text-sm opacity-70 mb-2 leading-relaxed">
+          새로운 친구를 추가해보세요!
+        </p>
       </div>
     );
   }
@@ -115,16 +115,16 @@ const FriendList = () => {
         <h3>친구({currentFriends.length}명)</h3>
       </div>
       {currentFriends.map((friend) => (
-        <ThemeDiv 
-          key={friend.id} 
+        <ThemeDiv
+          key={friend.id}
           className={clsx(
             "px-4 py-3 rounded-lg border transition-all duration-200",
-          )} 
+          )}
           isChildren
         >
           <div className="flex items-center justify-between gap-3">
             {/* 사용자 정보 (아바타+이름+뱃지) */}
-            <UserInfo 
+            <UserInfo
               name={friend.counterpartName}
               email={friend.counterpartEmail}
               subtitle={`${dayjs(friend.updatedAt || friend.createdAt).format('YYYY.MM.DD')} 친구됨`}
@@ -132,21 +132,22 @@ const FriendList = () => {
               avatarSize="md"
               rightElement={
                 <StatusBadge
-                  status={FriendStatus.Accepted} 
-                  theme={theme} 
-                  variant="badge" 
+                  status={FriendStatus.Accepted}
+                  theme={theme}
+                  variant="badge"
                   size="sm"
                   statusType="friend"
                 />
               }
             />
-            
+
             {/* 액션 버튼 */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <Button
                 onClick={() => handleDeleteFriend(friend.counterpartName, friend.counterpartUserId)}
                 theme="dark"
-                className="px-2 py-1 text-xs bg-red-500 hover:bg-red-600 whitespace-nowrap"
+                fontSize={"text-sm"}
+                className="px-2 py-1 bg-red-500 hover:bg-red-600 font-semibold whitespace-nowrap"
                 disabled={isDeleting}
               >
                 끊기

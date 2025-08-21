@@ -1,6 +1,7 @@
 import { PaginationParams } from "@/util/pagination/type";
 import {
 	CreateEventDto,
+	UpdateEventDto,
 	EventWithCurrentStatus,
 	FetchEventDto,
 	FetchEventResponseDto,
@@ -81,10 +82,106 @@ export const fetchEventById = async (id: string): Promise<EventWithCurrentStatus
 	return data[0];
 };
 
+// events 테이블에서 직접 공연 조회 (수정용)
+export const fetchEventFromEventsTable = async (id: string): Promise<Events> => {
+	const { data, error } = await supabase
+		.from('events')
+		.select('*')
+		.eq('id', id)
+		.single();
+
+	if (error) throw error;
+	return toCamelCaseKeys<Events>(data);
+};
+
 // 공연 생성
 export const createEvent = async (event: CreateEventDto): Promise<Events> => {
 	const eventSnake = toSnakeCaseKeys<CreateEventDto>(event);
-	const { data, error } = await supabase.from('events').insert(eventSnake).single();
+	const { data, error } = await supabase.from('events').insert(eventSnake).select().single();
 	if (error) throw error;
 	return toCamelCaseKeys<Events>(data);
-}
+};
+
+export const updateEvent = async (id: string, event: UpdateEventDto): Promise<Events> => {
+	const eventSnake = toSnakeCaseKeys<UpdateEventDto>(event);
+	const { data, error } = await supabase
+		.from('events')
+		.update(eventSnake)
+		.eq('id', id)
+		.select()
+		.single();
+
+	if (error) throw error;
+	return toCamelCaseKeys<Events>(data);
+};
+
+export const deleteEvent = async (id: string): Promise<void> => {
+	// 1. 먼저 관련 포스터 파일을 Storage에서 삭제
+	const { data: existingMedia } = await supabase
+		.from('event_media')
+		.select('url')
+		.eq('event_id', id)
+		.eq('media_type', 'image')
+		.single();
+
+	if (existingMedia) {
+		// Storage에서 파일 삭제
+		const filePath = existingMedia.url.replace(/^.*\/kin\//, ''); // /kin/ 경로 제거
+		const { error: storageError } = await supabase.storage
+			.from('kin')
+			.remove([filePath]);
+
+		if (storageError) {
+			console.error('Storage 파일 삭제 에러:', storageError.message);
+			// Storage 삭제 실패해도 공연 삭제는 진행
+		}
+	}
+
+	// 2. 공연 삭제 (event_media는 cascade로 자동 삭제)
+	const { error } = await supabase
+		.from('events')
+		.delete()
+		.eq('id', id);
+
+	if (error) throw error;
+};
+
+// 공연 완료 처리
+export const completeEvent = async (id: string): Promise<void> => {
+    // 1. 공연 상태를 'completed'로 변경
+    const { error: updateError } = await supabase
+        .from('events')
+        .update({ status: 'completed' })
+        .eq('id', id);
+
+    if (updateError) throw updateError;
+
+    // 2. 해당 공연의 대기중인 예매 모두 취소
+    const { data: pendingReservations, error: fetchError } = await supabase
+        .from('reservations')
+        .select('id')
+        .eq('event_id', id)
+        .eq('status', 'pending');
+
+    if (fetchError) throw fetchError;
+
+    // 3. 대기중인 예매가 있으면 모두 취소 처리
+    if (pendingReservations && pendingReservations.length > 0) {
+        const reservationIds = pendingReservations.map(r => r.id);
+        
+        const { error: cancelError } = await supabase
+            .from('reservations')
+            .update({ status: 'voided' })
+            .in('id', reservationIds);
+
+        if (cancelError) throw cancelError;
+    }
+
+    // 4. 해당 공연의 모든 입장 세션 삭제
+    const { error: deleteEntryError } = await supabase
+        .from('entry_sessions')
+        .delete()
+        .eq('event_id', id);
+
+    if (deleteEntryError) throw deleteEntryError;
+};

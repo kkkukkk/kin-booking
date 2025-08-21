@@ -1,10 +1,12 @@
 import { Reservation, ReservationStatus } from "@/types/model/reservation";
+import { EventStatus } from "@/types/model/events";
 
 export interface CreateReservationDto {
 	userId: string;
 	eventId: string;
 	quantity: number;
 	ticketHolder: string;
+	status?: ReservationStatus;
 }
 
 export interface FetchReservationDto {
@@ -16,6 +18,8 @@ export interface FetchReservationDto {
 	status?: ReservationStatus;
 	ticketHolder?: string;
 	keyword?: string;
+	sortBy?: string;
+	sortDirection?: 'asc' | 'desc';
 }
 
 export interface FetchReservationResponseDto {
@@ -25,13 +29,14 @@ export interface FetchReservationResponseDto {
 
 // 예매 정보와 이벤트 정보를 함께 포함하는 DTO
 export interface ReservationWithEventDto extends Reservation {
-	event?: {
+	events?: {
 		eventId: string;
 		eventName: string;
 		eventDate: string;
 		location?: string;
-		price?: number;
-	};
+		ticketPrice?: number;
+		status: EventStatus; // 공연 상태 추가
+	} | null;
 }
 
 export interface FetchReservationWithEventResponseDto {

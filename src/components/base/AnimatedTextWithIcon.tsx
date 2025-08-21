@@ -30,7 +30,7 @@ const AnimatedTextWithIcons = ({
 					initial="hidden"
 					animate="visible"
 					variants={iconItem(delay)}
-					className="inline-flex mr-1"
+					className="inline-flex mr-2"
 					aria-hidden="true"
 				>
 					{leftIcon}
@@ -58,7 +58,7 @@ const AnimatedTextWithIcons = ({
 					initial="hidden"
 					animate="visible"
 					variants={iconItem(textAnimDuration + delay)}
-					className="inline-flex ml-1"
+					className="inline-flex ml-2"
 					aria-hidden="true"
 				>
 					{rightIcon}

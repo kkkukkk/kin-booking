@@ -1,20 +1,20 @@
 import React from "react";
 
 interface SpinnerProps {
-	size?: number;
-	color?: string;
+  size?: number;
+  color?: string;
 }
 
 const Spinner = ({ size = 64, color = "var(--neon-green)" }: SpinnerProps) => (
-	<svg
-		width={size}
-		height={size}
-		viewBox="0 0 24 24"
-		xmlns="http://www.w3.org/2000/svg"
-		style={{ display: "block", color }}
-	>
-		<style>
-			{`
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ display: "block", color }}
+  >
+    <style>
+      {`
         .spinner_9y7u {
           animation: spinner_fUkk 2.4s linear infinite;
           animation-delay: -2.4s;
@@ -35,11 +35,11 @@ const Spinner = ({ size = 64, color = "var(--neon-green)" }: SpinnerProps) => (
           83.33% { x: 1px; y: 1px; }
         }
       `}
-		</style>
-		<rect className="spinner_9y7u" x="1" y="1" rx="1" width="10" height="10" fill="currentColor" />
-		<rect className="spinner_9y7u spinner_DF2s" x="1" y="1" rx="1" width="10" height="10" fill="currentColor" />
-		<rect className="spinner_9y7u spinner_q27e" x="1" y="1" rx="1" width="10" height="10" fill="currentColor" />
-	</svg>
+    </style>
+    <rect className="spinner_9y7u" x="1" y="1" rx="1" width="10" height="10" fill="currentColor" />
+    <rect className="spinner_9y7u spinner_DF2s" x="1" y="1" rx="1" width="10" height="10" fill="currentColor" />
+    <rect className="spinner_9y7u spinner_q27e" x="1" y="1" rx="1" width="10" height="10" fill="currentColor" />
+  </svg>
 );
 
 export default Spinner;

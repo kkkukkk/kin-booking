@@ -4,7 +4,7 @@ import ThemeDiv from "@/components/base/ThemeDiv";
 import { motion } from "framer-motion";
 import { fadeSlideLeft, tabs } from "@/types/ui/motionVariants";
 import AnimatedText from "@/components/base/AnimatedText";
-import React, { useState} from "react";
+import React, { useState } from "react";
 import Input from "@/components/base/Input";
 import Button from "@/components/base/Button";
 import { useAppSelector } from "@/redux/hooks";
@@ -59,7 +59,7 @@ const FindPassword = () => {
 			setHasResult(null);
 			return;
 		} else {
-			if (data)  {
+			if (data) {
 				// 인증 후 패스워드 변경 페이지로 이동
 				const { error } = await supabase.auth.resetPasswordForEmail(email, {
 					redirectTo: 'https://kin-booking.vercel.app/auth/reset-password?source=password',
@@ -73,7 +73,7 @@ const FindPassword = () => {
 						iconType: "error",
 					});
 					setHasResult(null);
-				} else  {
+				} else {
 					showToast({
 						message: "비밀번호 재 설정 메일을 보냈어요. 변경 후 이용해주세요!",
 						autoCloseTime: 3000,
@@ -106,7 +106,7 @@ const FindPassword = () => {
 					{ maxHeight: "100%", height: "100%", overflow: "hidden" }
 				}
 			>
-				<AnimatedText text={"가입에 사용한 정보를 입력해주세요."}/>
+				<AnimatedText text={"가입에 사용한 정보를 입력해주세요."} />
 				<motion.div
 					variants={fadeSlideLeft}
 					initial="hidden"
@@ -140,14 +140,14 @@ const FindPassword = () => {
 					<Button
 						theme={"dark"}
 						width={"w-1/5"}
-						fontSize={"text-sm md:text-base"}
+						fontSize={"text-sm md:text-base font-semibold"}
 						padding={"px-2 py-1.5"}
 						onClick={handleFindPassword}
 						disabled={checking || email.trim() === "" || phoneNumber.trim() === ""}
 					>
 						{
 							checking ? (
-								<div className="animate-spin w-5 h-5 border-t-2 border-white rounded-full mx-auto"/>
+								<div className="animate-spin w-5 h-5 border-t-2 border-white rounded-full mx-auto" />
 							) : (
 								"찾기"
 							)

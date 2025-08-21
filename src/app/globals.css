@@ -7,30 +7,67 @@
   --background: #ffffff;
   --foreground: #171717;
   /* 형광 네온 색상 팔레트 (검정 배경 대비 개선) */
-  --neon-green: rgb(0, 255, 119);      /* 선명한 형광 초록 */
-  --neon-cyan: rgb(0, 255, 255);       /* 선명한 형광 청록 */
-  --neon-magenta: rgb(255, 0, 255);    /* 선명한 형광 마젠타 */
-  --neon-pink: rgb(255, 149, 232);      /* 더 선명한 형광 핑크 */
-  --neon-blue: rgb(0, 200, 255);       /* 더 선명한 형광 파랑 */
-  --neon-yellow: rgb(255, 255, 0);     /* 선명한 형광 노랑 */
-  --neon-purple: rgb(200, 0, 255);     /* 더 선명한 형광 보라 */
-  
+  --neon-green: rgb(0, 255, 119);
+  /* 선명한 형광 초록 */
+  --neon-cyan: rgb(0, 255, 255);
+  /* 선명한 형광 청록 */
+  --neon-magenta: rgb(255, 0, 255);
+  /* 선명한 형광 마젠타 */
+  --neon-pink: rgb(255, 149, 232);
+  /* 더 선명한 형광 핑크 */
+  --neon-blue: rgb(0, 200, 255);
+  /* 더 선명한 형광 파랑 */
+  --neon-yellow: rgb(255, 255, 0);
+  /* 선명한 형광 노랑 */
+  --neon-purple: rgb(200, 0, 255);
+  /* 더 선명한 형광 보라 */
+
   /* 네온 색상 투명도 변형 */
   --neon-green-strong: rgba(0, 255, 119, .7);
   --neon-green-medium: rgba(0, 255, 119, .5);
   --neon-green-light: rgba(0, 255, 119, .3);
   --neon-green-faint: rgba(0, 255, 119, .2);
-  
+
+  --neon-cyan-strong: rgba(0, 255, 255, .7);
+  --neon-cyan-medium: rgba(0, 255, 255, .5);
+  --neon-cyan-light: rgba(0, 255, 255, .3);
+  --neon-cyan-faint: rgba(0, 255, 255, .2);
+
+  --neon-magenta-strong: rgba(255, 0, 255, .7);
+  --neon-magenta-medium: rgba(255, 0, 255, .5);
+  --neon-magenta-light: rgba(255, 0, 255, .3);
+  --neon-magenta-faint: rgba(255, 0, 255, .2);
+
+  --neon-pink-strong: rgba(255, 149, 232, .7);
+  --neon-pink-medium: rgba(255, 149, 232, .5);
+  --neon-pink-light: rgba(255, 149, 232, .3);
+  --neon-pink-faint: rgba(255, 149, 232, .2);
+
+  --neon-blue-strong: rgba(0, 200, 255, .7);
+  --neon-blue-medium: rgba(0, 200, 255, .5);
+  --neon-blue-light: rgba(0, 200, 255, .3);
+  --neon-blue-faint: rgba(0, 200, 255, .2);
+
+  --neon-yellow-strong: rgba(255, 255, 0, .7);
+  --neon-yellow-medium: rgba(255, 255, 0, .5);
+  --neon-yellow-light: rgba(255, 255, 0, .3);
+  --neon-yellow-faint: rgba(255, 255, 0, .2);
+
+  --neon-purple-strong: rgba(200, 0, 255, .7);
+  --neon-purple-medium: rgba(200, 0, 255, .5);
+  --neon-purple-light: rgba(200, 0, 255, .3);
+  --neon-purple-faint: rgba(200, 0, 255, .2);
+
   /* 네온 그라데이션 */
   --neon-cyan-gradient: linear-gradient(135deg, #00ff88, #00cc6a);
   --neon-magenta-gradient: linear-gradient(135deg, #ff0080, #ff6b9d);
   --neon-blue-gradient: linear-gradient(135deg, #0080ff, #0066cc);
-  
+
   /* 네온 그림자 */
   --neon-cyan-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
   --neon-magenta-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
   --neon-blue-shadow: 0 0 20px rgba(0, 128, 255, 0.6);
-  
+
   --black_10: rgba(0, 0, 0, .1);
   --black_30: rgba(0, 0, 0, .3);
   --black_50: rgba(0, 0, 0, .5);
@@ -40,13 +77,14 @@
   --white_50: rgba(255, 255, 255, .5);
   --white_70: rgba(255, 255, 255, .7);
   --white: rgb(255, 255, 255);
-  --black: rgb(0,0,0);
+  --black: rgb(0, 0, 0);
   --normal-back: rgba(255, 255, 255, .9);
   --dark-back: rgba(0, 0, 0, .8);
   --check: rgb(55, 176, 83);
-  
+
   /* 카드 배경색 변수들 */
-  --card-bg-dark: rgba(30, 41, 59, 0.9); /* 군청색 계열 */
+  --card-bg-dark: rgba(30, 41, 59, 0.9);
+  /* 군청색 계열 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -60,33 +98,59 @@
   box-sizing: border-box;
 }
 
+/* 텍스트 렌더링 최적화 */
+* {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI",
-  Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   min-height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: hidden; /* 스크롤바 숨김 */
+  overflow-y: hidden;
+  /* 스크롤바 숨김 */
 }
 
-html, #__next {
+html,
+#__next {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: hidden; /* 스크롤바 숨김 */
+  overflow-y: hidden;
+  /* 스크롤바 숨김 */
 }
 
 .scrollbar-none {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE, Edge */
 }
 
 .scrollbar-none::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
+  /* Chrome, Safari */
+}
+
+@layer base {
+  input:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+    -webkit-text-fill-color: var(--input-text) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input:-webkit-autofill:focus {
+    box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+    -webkit-text-fill-color: var(--input-text) !important;
+  }
 }
 
 /*@media (min-width: 768px) {

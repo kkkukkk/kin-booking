@@ -35,19 +35,19 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
       <div className={styles.gridAreasTeamCard}>
         {/* 아바타 */}
         <div className={styles.gridAreaAvatar}>
-          <UserAvatar 
-            name={member.name || 'Unknown'} 
-            size="sm md:md" 
+          <UserAvatar
+            name={member.name || 'Unknown'}
+            size="sm md:md"
           />
         </div>
-        
+
         {/* 이름 */}
         <div className={styles.gridAreaName}>
           <h3 className="text-base md:text-lg font-semibold text-white truncate">
             {member.displayName || 'Unknown'}
           </h3>
         </div>
-        
+
         {/* 역할 */}
         <div className={styles.gridAreaRole}>
           <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getRoleColor(member.teamRole)}`}>

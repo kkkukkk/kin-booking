@@ -4,7 +4,7 @@ import useToast from '@/hooks/useToast';
 
 export const useLogin = () => {
 	const { showToast } = useToast();
-	
+
 	return useMutation({
 		mutationFn: ({ email, password }: { email: string; password: string }) => login(email, password),
 		onError: (error: Error) => {
@@ -41,12 +41,12 @@ export const useLogin = () => {
 
 export const useRegister = () => {
 	const { showToast } = useToast();
-	
+
 	const mutation = useMutation({
 		mutationFn: register,
 		onError: (error: Error) => {
 			console.error('Register error:', error);
-			
+
 			// 에러 메시지에 따른 적절한 토스트 메시지 표시
 			if (error.message.includes("already registered")) {
 				showToast({
@@ -78,7 +78,7 @@ export const useRegister = () => {
 
 export const useLogout = () => {
 	const { showToast } = useToast();
-	
+
 	return useMutation({
 		mutationFn: async () => {
 			if (typeof window !== 'undefined') {
@@ -88,8 +88,20 @@ export const useLogout = () => {
 			await new Promise((resolve) => setTimeout(resolve, 200));
 			return logout();
 		},
+		onSuccess: () => {
+			// 로그아웃 완료 후 플래그 정리
+			if (typeof window !== 'undefined') {
+				setTimeout(() => {
+					localStorage.removeItem('isLoggingOut');
+				}, 1000); // 1초 후 플래그 제거
+			}
+		},
 		onError: (error: Error) => {
 			console.error('Logout error:', error);
+			// 에러 발생 시에도 플래그 정리
+			if (typeof window !== 'undefined') {
+				localStorage.removeItem('isLoggingOut');
+			}
 			showToast({
 				message: "로그아웃 중 오류가 발생했습니다.",
 				iconType: "error",

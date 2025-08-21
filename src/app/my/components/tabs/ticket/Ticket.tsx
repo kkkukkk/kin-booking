@@ -9,13 +9,9 @@ import dayjs from 'dayjs';
 interface TicketCardProps {
   eventName: string
   status: TicketStatus
-  latestCreatedAt?: string
-  eventId?: string
   ticketColor?: string
   isRare?: boolean
   eventDate?: string
-  location?: string
-  ticketId?: string
   ticketNumber?: number
   ticketPrice?: number
 }
@@ -23,18 +19,14 @@ interface TicketCardProps {
 const TicketCard = ({
   eventName,
   status,
-  latestCreatedAt,
-  eventId,
   ticketColor,
   isRare,
   eventDate,
-  location,
-  ticketId,
   ticketNumber,
   ticketPrice,
 }: TicketCardProps) => {
   const theme = useAppSelector((state: RootState) => state.theme.current)
-  
+
   // 테마별 그림자 스타일 결정
   const getShadowStyle = () => {
     switch (theme) {
@@ -58,7 +50,7 @@ const TicketCard = ({
     if (resizeTimeoutRef.current) {
       clearTimeout(resizeTimeoutRef.current)
     }
-    
+
     resizeTimeoutRef.current = setTimeout(() => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect
@@ -70,14 +62,14 @@ const TicketCard = ({
 
   useEffect(() => {
     if (!contentRef.current) return
-    
+
     // 초기 크기 설정
     const rect = contentRef.current.getBoundingClientRect()
     if (rect.width > 0 && rect.height > 0) {
       setMaskSize({ width: Math.round(rect.width), height: Math.round(rect.height) })
       setIsReady(true)
     }
-    
+
     const ro = new ResizeObserver(handleResize)
     ro.observe(contentRef.current)
     return () => {
@@ -94,8 +86,6 @@ const TicketCard = ({
   const notchCyBottom = maskSize.height
   const rightWidth = maskSize.width - notchCx - 1
 
-
-
   // 공연 날짜 포맷팅
   const formatDate = (date: string) => {
     return dayjs(date).format('YYYY년 MM월 DD일');
@@ -109,7 +99,7 @@ const TicketCard = ({
   const maskElements = useMemo(() => {
     const elements = []
     const notchCount = Math.floor(maskSize.height / 10)
-    
+
     for (let i = 0; i < notchCount; i++) {
       const cy = 7 + i * 14
       elements.push(
@@ -120,18 +110,18 @@ const TicketCard = ({
         </React.Fragment>
       )
     }
-    
+
     return elements
   }, [maskSize.height, maskSize.width, notchCx])
 
   // 크기 측정이 완료되지 않았으면 로딩 표시
   if (!isReady) {
-      return (
-    <div
-      ref={contentRef}
-      className="relative max-w-md mx-auto my-6"
-      style={{ filter: getShadowStyle() }}
-    >
+    return (
+      <div
+        ref={contentRef}
+        className="relative max-w-md mx-auto my-6"
+        style={{ filter: getShadowStyle() }}
+      >
         <div className="relative flex">
           <div className="p-4 bg-gray-100 rounded-lg animate-pulse">
             <div className="h-6 bg-gray-200 rounded mb-3"></div>
@@ -187,7 +177,7 @@ const TicketCard = ({
               </div>
             )}
           </div>
-          
+
           {/* 티켓 정보 */}
           <div className="space-y-2">
             {eventDate && (
@@ -201,16 +191,9 @@ const TicketCard = ({
                 </div>
               </div>
             )}
-            
+
             {/* 공연 장소와 가격 */}
             <div className="space-y-2">
-              {location && (
-                <div className="bg-white bg-opacity-40 rounded p-2">
-                  <div className="text-xs text-slate-500 font-medium mb-1">공연장</div>
-                  <div className="text-sm text-slate-700 font-semibold leading-tight">{location}</div>
-                </div>
-              )}
-              
               {ticketPrice && (
                 <div className="bg-white bg-opacity-50 rounded p-2 border border-slate-200 flex items-center justify-between md:flex-col md:items-start">
                   <div className="text-xs text-slate-500 font-medium">가격</div>
@@ -237,9 +220,30 @@ const TicketCard = ({
           {/* 배경 패턴 */}
           {status !== TicketStatus.Used && (
             <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-2 right-2 w-8 h-8 border-2 border-white rounded-full"></div>
-              <div className="absolute bottom-2 right-2 w-6 h-6 border-2 border-white rounded-full"></div>
-              <div className="absolute top-1/2 right-4 w-4 h-4 border-2 border-white rounded-full"></div>
+              {isRare ? (
+                // 희귀 티켓 전용 패턴 - 별 모양과 다이아몬드
+                <>
+                  <div className="absolute top-2 right-2 w-8 h-8">
+                    <div className="w-full h-full bg-white rounded-full opacity-60"></div>
+                    <div className="absolute inset-1 bg-transparent border-2 border-white rounded-full"></div>
+                  </div>
+                  <div className="absolute bottom-2 right-2 w-6 h-6 transform rotate-45 bg-white opacity-60"></div>
+                  <div className="absolute top-1/2 right-4 w-4 h-4">
+                    <div className="w-full h-full bg-white rounded-full opacity-60"></div>
+                    <div className="absolute inset-0.5 bg-transparent border border-white rounded-full"></div>
+                  </div>
+                  {/* 추가 별 모양들 */}
+                  <div className="absolute top-4 right-6 w-3 h-3 bg-white opacity-40 rounded-full"></div>
+                  <div className="absolute bottom-4 right-8 w-2 h-2 bg-white opacity-50 rounded-full"></div>
+                </>
+              ) : (
+                // 일반 티켓 패턴
+                <>
+                  <div className="absolute top-2 right-2 w-8 h-8 border-2 border-white rounded-full"></div>
+                  <div className="absolute bottom-2 right-2 w-6 h-6 border-2 border-white rounded-full"></div>
+                  <div className="absolute top-1/2 right-4 w-4 h-4 border-2 border-white rounded-full"></div>
+                </>
+              )}
             </div>
           )}
         </div>

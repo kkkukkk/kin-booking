@@ -20,7 +20,6 @@ import Button from "@/components/base/Button";
 import ProgressBar from "@/components/base/ProgressBar";
 import clsx from "clsx";
 import useToast from "@/hooks/useToast";
-import { ArrowLeftIcon } from "@/components/icon/ArrowIcons";
 
 const RegisterClient = () => {
 	const steps: RegisterStep[] = ['consent', 'name', 'email', 'password', 'phoneNumber'];
@@ -129,7 +128,12 @@ const RegisterClient = () => {
 			const confirmed = await showAlert({
 				type: 'confirm',
 				title: '가입 완료!',
-				message: '인증 이메일이 발송되었습니다. 메일을 확인해 주세요.',
+				message: `인증 이메일이 발송되었습니다. 메일을 확인해 주세요.
+
+인증 메일을 찾을 수 없다면:
+• 스팸 메일함을 확인해주세요
+• Gmail의 경우 '카테고리 - 프로모션' 탭도 확인해주세요
+• 메일함의 다른 폴더도 확인해주세요`,
 				noCancel: true,
 			});
 
@@ -210,7 +214,7 @@ const RegisterClient = () => {
 	};
 
 	const renderStep = () => {
-		switch(step) {
+		switch (step) {
 			case 'consent':
 				return (
 					<Consent
@@ -294,14 +298,12 @@ const RegisterClient = () => {
 			<div className="flex justify-start mb-4">
 				<Button
 					theme={"dark"}
-					padding={"px-3 py-1.5"}
+					padding={"px-3 py-1.5 md:px-4 md:py-1"}
 					onClick={onBack}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
+					className="font-semibold"
 				>
-					<span className="mr-1">
-						<ArrowLeftIcon />
-					</span>
 					{step === "consent" ? "뒤로가기" : "이전"}
 				</Button>
 			</div>
@@ -316,9 +318,9 @@ const RegisterClient = () => {
 				<motion.div
 					key={`${step}Motion`}
 					variants={{
-						initial: {opacity: 1},
-						animate: {opacity: 1},
-						exit   : {opacity: 0, transition: {duration: 0.1}}
+						initial: { opacity: 1 },
+						animate: { opacity: 1 },
+						exit: { opacity: 0, transition: { duration: 0.1 } }
 					}}
 					initial="initial"
 					animate="animate"
@@ -336,17 +338,18 @@ const RegisterClient = () => {
 				animate="animate"
 				className={clsx(
 					"flex justify-end",
-					step === "phoneNumber" ? "mt-4 md:mt-6" : "mt-8 md:mt-10"
+					["phoneNumber", "email"].includes(step) ? "mt-4 md:mt-6" : "mt-8 md:mt-10"
 				)}
 			>
 				<Button
 					theme={"dark"}
-					width={"w-full"}
-					fontSize={"text-md md:text-xl"}
-					padding={"px-2 py-1.5"}
+					fontSize={"text-md md:text-lg"}
+					padding={"py-1.5"}
+					width={"w-[50%]"}
 					onClick={onNext}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
+					className="font-semibold"
 				>
 					{step === "phoneNumber" ? "가입하기" : "다음"}
 				</Button>

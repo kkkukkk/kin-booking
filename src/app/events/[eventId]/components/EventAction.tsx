@@ -14,11 +14,11 @@ interface EventActionProps {
 }
 
 // 공연 상세 하단
-const EventAction = ({ 
-	status, 
-	isSoldOut, 
-	theme, 
-	onReservationClick 
+const EventAction = ({
+	status,
+	isSoldOut,
+	theme,
+	onReservationClick
 }: EventActionProps) => {
 	return (
 		<motion.div
@@ -48,6 +48,7 @@ const EventAction = ({
 					onClick={onReservationClick}
 					reverse={theme === "normal"}
 					light={theme !== "normal"}
+					className="font-semibold"
 				>
 					예매하기
 				</Button>

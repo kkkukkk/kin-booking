@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import { CheckIcon } from "@/components/icon/CheckIcon";
-import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeSlideDownSm } from "@/types/ui/motionVariants";
 
@@ -14,6 +13,7 @@ interface SelectProps {
 	placeholder?: string;
 	className?: string;
 	theme?: string;
+	fontSize?: string;
 }
 
 const Select = ({
@@ -23,24 +23,16 @@ const Select = ({
 	placeholder = "선택",
 	className = "",
 	theme = "normal",
+	fontSize = "text-base",
 }: SelectProps) => {
 	const selectedLabel = options.find(opt => opt.value === value)?.label ?? placeholder;
 
 	const [isOpen, setIsOpen] = useState(false);
-	const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
 
 	const buttonRef = useRef<HTMLButtonElement>(null);
 	const dropdownRef = useRef<HTMLUListElement>(null);
 
 	const handleToggle = () => {
-		if (!buttonRef.current) return;
-
-		const rect = buttonRef.current.getBoundingClientRect();
-		setPosition({
-			top: rect.bottom + window.scrollY,
-			left: rect.left + window.scrollX,
-			width: rect.width,
-		});
 		setIsOpen(prev => !prev);
 	};
 
@@ -65,6 +57,7 @@ const Select = ({
 		if (isOpen) {
 			document.addEventListener('mousedown', handleClickOutside);
 		}
+		
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
@@ -78,7 +71,7 @@ const Select = ({
 			case "dark":
 				return "text-gray-200 bg-black/90 border border-white/50";
 			case "neon":
-				return "text-gray-200 bg-black/90 border border-[var(--neon-cyan)]/70";
+				return "text-gray-200 bg-black/90 border border-[var(--neon-cyan)]/50";
 			default:
 				return "text-black bg-white border border-black/20";
 		}
@@ -99,24 +92,23 @@ const Select = ({
 	};
 
 	return (
-		<>
-			<div className={clsx("relative w-full", className)}>
-				<button
-					ref={buttonRef}
-					type="button"
-					onClick={handleToggle}
-					className={clsx(
-						"w-full px-2 py-1 rounded flex justify-between items-center shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)]",
-						getThemeStyles()
-					)}
-				>
-					<span>{selectedLabel}</span>
-					<span className={clsx("text-xs text-gray-600", isOpen && "rotate-180")}>▾</span>
-				</button>
-			</div>
+		<div className={clsx("relative w-full", className)}>
+			<button
+				ref={buttonRef}
+				type="button"
+				onClick={handleToggle}
+				className={clsx(
+					"w-full px-2 py-1 rounded flex justify-between items-center shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)]",
+					fontSize,
+					getThemeStyles()
+				)}
+			>
+				<span>{selectedLabel}</span>
+				<span className={clsx("text-xs text-gray-600", isOpen && "rotate-180")}>▾</span>
+			</button>
 
-			{isOpen && typeof window !== "undefined" && createPortal(
-				<AnimatePresence>
+			<AnimatePresence>
+				{isOpen && (
 					<motion.ul
 						ref={dropdownRef}
 						variants={fadeSlideDownSm}
@@ -125,14 +117,9 @@ const Select = ({
 						exit="exit"
 						transition={{ duration: 0.2 }}
 						className={clsx(
-							"fixed z-[9999] rounded max-h-60 overflow-y-auto mt-1",
+							"absolute top-full left-0 w-full rounded max-h-60 overflow-y-auto mt-1 z-10",
 							getThemeStyles()
 						)}
-						style={{
-							top: position.top,
-							left: position.left,
-							width: position.width,
-						}}
 					>
 						{options.map((opt, index) => (
 							<li
@@ -140,6 +127,7 @@ const Select = ({
 								onClick={() => handleSelect(opt.value)}
 								className={clsx(
 									"px-2 py-1.5 cursor-pointer flex justify-between items-center opacity-80 hover:opacity-100 focus:opacity-100",
+									fontSize,
 									getListItemThemeStyles(),
 									index === options.length - 1 && "border-b-0"
 								)}
@@ -149,10 +137,9 @@ const Select = ({
 							</li>
 						))}
 					</motion.ul>
-				</AnimatePresence>,
-				document.body
-			)}
-		</>
+				)}
+			</AnimatePresence>
+		</div>
 	);
 };
 

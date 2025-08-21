@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export interface Column<T> {
   key: string;
@@ -33,6 +33,8 @@ export interface DataTableProps<T> {
     direction: 'asc' | 'desc';
   };
   onSortChange?: (field: string, direction: 'asc' | 'desc') => void;
+  expandedRows?: Set<string | number>;
+  expandedRowRenderer?: (item: T, index: number) => React.ReactNode;
 }
 
 function DataTable<T>({
@@ -49,6 +51,8 @@ function DataTable<T>({
   mobileCardSections,
   sortConfig,
   onSortChange,
+  expandedRows,
+  expandedRowRenderer,
 }: DataTableProps<T>) {
   const handleRowClick = (item: T, index: number) => {
     if (onRowClick) {
@@ -80,7 +84,7 @@ function DataTable<T>({
     } else if (theme === 'neon') {
       return {
         container: 'bg-black/50 border border-green-500/20 shadow-[0_0_16px_0_rgba(34,197,94,0.25)]',
-        header: headerClassName ||'bg-green-500/10',
+        header: headerClassName || 'bg-green-500/10',
         row: rowClassName || 'hover:bg-green-500/5',
         headerText: 'text-green-400',
         bodyText: 'text-gray-300',
@@ -142,9 +146,8 @@ function DataTable<T>({
                   {columns.map((column) => (
                     <th
                       key={column.key}
-                      className={`px-4 py-3 text-left text-sm font-medium ${themeStyles.headerText} ${column.className || ''} ${
-                        column.sortable ? 'cursor-pointer hover:opacity-80' : ''
-                      }`}
+                      className={`px-4 py-3 text-left text-sm font-medium ${themeStyles.headerText} ${column.className || ''} ${column.sortable ? 'cursor-pointer hover:opacity-80' : ''
+                        }`}
                       style={{ width: column.width }}
                       onClick={() => handleHeaderClick(column)}
                     >
@@ -162,21 +165,39 @@ function DataTable<T>({
               </thead>
               <tbody className={themeStyles.divider}>
                 {data.map((item, index) => (
-                  <motion.tr
-                    key={index}
-                    className={`${themeStyles.row} ${onRowClick ? 'cursor-pointer' : ''}`}
-                    onClick={() => handleRowClick(item, index)}
-                    transition={{ duration: 0.15 }}
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={column.key}
-                        className={`px-4 py-3 text-sm ${themeStyles.bodyText} ${column.className || ''}`}
-                      >
-                        {column.render(item, index)}
-                      </td>
-                    ))}
-                  </motion.tr>
+                  <React.Fragment key={index}>
+                    <motion.tr
+                      className={`${themeStyles.row} ${onRowClick ? 'cursor-pointer' : ''}`}
+                      onClick={() => handleRowClick(item, index)}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {columns.map((column) => (
+                        <td
+                          key={column.key}
+                          className={`px-4 py-3 text-sm ${themeStyles.bodyText} ${column.className || ''}`}
+                        >
+                          {column.render(item, index)}
+                        </td>
+                      ))}
+                    </motion.tr>
+                    {expandedRows && expandedRowRenderer && expandedRows.has(index) && (
+                      <tr>
+                        <td colSpan={columns.length} className="p-0">
+                          <AnimatePresence>
+                            <motion.div
+                              initial={{ opacity: 0, y: -8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -8 }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                              className={`${theme === 'normal' ? 'bg-gray-50' : theme === 'neon' ? 'bg-green-500/5' : 'bg-neutral-800'}`}
+                            >
+                              {expandedRowRenderer(item, index)}
+                            </motion.div>
+                          </AnimatePresence>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -188,38 +209,38 @@ function DataTable<T>({
       <div className="lg:hidden space-y-4 p-4 overflow-y-auto max-h-full">
         {mobileCardSections
           ? data.map((item, index) => {
-              const { firstRow, secondRow, actionButton } = mobileCardSections(item, index);
-              return (
-                <div
-                  key={index}
-                  className={`${themeStyles.card} rounded p-3 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3 ${onRowClick ? 'cursor-pointer' : ''}`}
-                  onClick={() => handleRowClick(item, index)}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-2">{firstRow}</div>
-                  <div className="flex items-center justify-between gap-2 text-xs mb-2">{secondRow}</div>
-                  {actionButton && <div className="flex gap-2 justify-end">{actionButton}</div>}
-                </div>
-              );
-            })
-          : data.map((item, index) => (
-              <motion.div
+            const { firstRow, secondRow, actionButton } = mobileCardSections(item, index);
+            return (
+              <div
                 key={index}
-                className={`${themeStyles.card} rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`${themeStyles.card} rounded p-3 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3 ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => handleRowClick(item, index)}
-                transition={{ duration: 0.15 }}
               >
-                {columns.map((column, colIndex) => (
-                  <div key={column.key} className={`flex flex-col ${colIndex < columns.length - 1 ? 'mb-4' : ''}`}>
-                    <div className={`text-xs font-semibold uppercase tracking-wide ${themeStyles.cardBody} mb-2 opacity-70`}>
-                      {column.header}
-                    </div>
-                    <div className={`text-sm ${themeStyles.cardBody} ${column.className || ''}`}>
-                      {column.render(item, index)}
-                    </div>
+                <div className="flex items-center justify-between gap-2 mb-2">{firstRow}</div>
+                <div className="flex items-center justify-between gap-2 text-xs mb-2">{secondRow}</div>
+                {actionButton && <div className="flex gap-2 justify-end">{actionButton}</div>}
+              </div>
+            );
+          })
+          : data.map((item, index) => (
+            <motion.div
+              key={index}
+              className={`${themeStyles.card} rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 ${onRowClick ? 'cursor-pointer' : ''}`}
+              onClick={() => handleRowClick(item, index)}
+              transition={{ duration: 0.15 }}
+            >
+              {columns.map((column, colIndex) => (
+                <div key={column.key} className={`flex flex-col ${colIndex < columns.length - 1 ? 'mb-4' : ''}`}>
+                  <div className={`text-xs font-semibold uppercase tracking-wide ${themeStyles.cardBody} mb-2 opacity-70`}>
+                    {column.header}
                   </div>
-                ))}
-              </motion.div>
-            ))}
+                  <div className={`text-sm ${themeStyles.cardBody} ${column.className || ''}`}>
+                    {column.render(item, index)}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          ))}
       </div>
     </div>
   );

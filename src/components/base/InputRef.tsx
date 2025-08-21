@@ -28,7 +28,7 @@ const InputRef = React.forwardRef<HTMLInputElement, InputProps>(
 				case "dark":
 					return "text-gray-200 bg-black/80 border border-white/50 placeholder:text-white/50";
 				case "neon":
-					return "text-gray-200 bg-black/80 border border-[var(--neon-cyan)]/70 placeholder:text-white/50";
+					return "text-gray-200 bg-black/80 border border-[var(--neon-cyan)]/50 placeholder:text-white/50";
 				default:
 					return "text-black bg-white/90 border border-black/20 placeholder:text-black/50";
 			}

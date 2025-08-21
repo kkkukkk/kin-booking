@@ -47,18 +47,18 @@
         gap: 1.5rem;
         align-items: center;
     }
-    
+
     .gridAreaName {
         justify-content: center;
     }
-    
+
     .gridAreaRole {
         justify-content: flex-end;
     }
-    
+
     .gridAreaSocial {
         justify-content: center;
         padding-top: 1rem;
         border-top: 1px solid #4b5563;
     }
-} 
+}

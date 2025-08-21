@@ -36,12 +36,12 @@ const EventPosterWrapper = ({
 	const containerSize = variant === "small"
 		? "w-full h-full" // small은 부모 컨테이너에 맞춤
 		: variant === "card"
-		? "w-full min-h-[200px] md:min-h-[240px] aspect-[602/852]" // card는 실제 포스터 비율
-		: variant === "hero"
-		? "w-full h-full" // hero도 부모 컨테이너에 맞춤
-		: variant === "detail"
-		? "w-full h-full" // detail은 부모 컨테이너에 맞춤 (부모에서 aspect ratio 설정)
-		: "w-full h-full";
+			? "w-full min-h-[200px] md:min-h-[240px] aspect-[602/852]" // card는 실제 포스터 비율
+			: variant === "hero"
+				? "w-full h-full" // hero도 부모 컨테이너에 맞춤
+				: variant === "detail"
+					? "w-full h-full" // detail은 부모 컨테이너에 맞춤 (부모에서 aspect ratio 설정)
+					: "w-full h-full";
 
 	return (
 		<div className={`relative ${containerSize}`}>

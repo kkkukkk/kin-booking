@@ -7,6 +7,7 @@ import {
 	deleteUser,
 	softDeleteUser,
 	searchUsers,
+	updateUserRole,
 } from '@/api/user';
 import { User } from '@/types/model/user';
 import { UserWithRoles } from '@/types/dto/user';
@@ -22,10 +23,11 @@ import { useSession } from '@/hooks/useSession';
 // 유저 검색 hook
 export const useUsers = (params?: PaginationParams & FetchUserDto) => {
 	return useQuery<FetchUserWithRolesResponseDto, Error>({
-		queryKey: ['user', params],
+		queryKey: ['users', params],
 		queryFn: () => fetchUser(params),
 		enabled: true,
 		retry: 1,
+		staleTime: 0, // 정렬 변경 시 즉시 새로고침
 	});
 };
 
@@ -80,7 +82,7 @@ export const useUpdateUser = () => {
 		},
 		onError: (error: Error, variables, context) => {
 			console.error('사용자 수정 실패:', error.message);
-			
+
 			// 실패 시 이전 데이터로 롤백
 			if (context?.previousUser) {
 				queryClient.setQueryData(['user', variables.userId], context.previousUser);
@@ -132,7 +134,7 @@ export const useUserById = (userId: string) => {
 // 사용자 검색 (친구 추가 등)
 export const useSearchUsers = (query: string) => {
 	const { session } = useSession();
-	
+
 	return useQuery({
 		queryKey: ['users', 'search', query],
 		queryFn: () => searchUsers(query, session?.user?.id || ''),
@@ -140,5 +142,21 @@ export const useSearchUsers = (query: string) => {
 		staleTime: 5 * 60 * 1000, // 5분 캐시
 		retry: 1,
 		retryDelay: 1000,
+	});
+};
+
+// 사용자 역할 변경 hook
+export const useUpdateUserRole = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation<void, Error, { userId: string; newRoleId: number }>({
+		mutationFn: ({ userId, newRoleId }) => updateUserRole(userId, newRoleId),
+		onSuccess: () => {
+			// 사용자 목록 쿼리 무효화하여 변경사항 반영
+			queryClient.invalidateQueries({ queryKey: ['user'] });
+		},
+		onError: (error: Error) => {
+			console.error('사용자 역할 변경 실패:', error.message);
+		},
 	});
 };

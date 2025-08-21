@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Reservation } from "@/types/model/reservation";
 import { CreateReservationDto, FetchReservationDto } from "@/types/dto/reservation";
-import { createReservation, fetchReservation, cancelPendingReservation, approveReservation } from "@/api/reservation";
+import { createReservation, fetchReservation, fetchReservationWithEvent, cancelPendingReservation, approveReservation } from "@/api/reservation";
 import { PaginationParams } from "@/util/pagination/type";
 
 export const useCreateReservation = () => {
@@ -10,7 +10,7 @@ export const useCreateReservation = () => {
 	return useMutation<Reservation, Error, CreateReservationDto>({
 		mutationFn: createReservation,
 		onSuccess: () => {
-			queryClient.invalidateQueries({queryKey: ['reservations']});
+			queryClient.invalidateQueries({ queryKey: ['reservations'] });
 		},
 		onError: (error: Error) => {
 			console.error('reservations 생성 실패:', error.message);
@@ -21,13 +21,13 @@ export const useCreateReservation = () => {
 // 예매 승인
 export const useApproveReservation = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: approveReservation,
 		onSuccess: () => {
 			// 예매 관련 쿼리들 무효화
-			queryClient.invalidateQueries({queryKey: ['reservations']});
-			queryClient.invalidateQueries({queryKey: ['tickets']});
+			queryClient.invalidateQueries({ queryKey: ['reservations'] });
+			queryClient.invalidateQueries({ queryKey: ['tickets'] });
 		},
 	});
 };
@@ -35,22 +35,22 @@ export const useApproveReservation = () => {
 // 예매 거절
 export const useRejectReservation = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: cancelPendingReservation,
 		onSuccess: () => {
 			// 예매 관련 쿼리들 무효화
-			queryClient.invalidateQueries({queryKey: ['reservations']});
-			queryClient.invalidateQueries({queryKey: ['tickets']});
+			queryClient.invalidateQueries({ queryKey: ['reservations'] });
+			queryClient.invalidateQueries({ queryKey: ['tickets'] });
 		},
 	});
 };
 
-// 사용자별 예매 내역 조회
+// 사용자별 예매 내역 조회 (이벤트 정보 포함)
 export const useReservationsByUserId = (userId: string) => {
 	return useQuery({
 		queryKey: ['reservations', 'user', userId],
-		queryFn: () => fetchReservation({ userId }),
+		queryFn: () => fetchReservationWithEvent({ userId }),
 		enabled: !!userId,
 		retry: 1,
 	});
@@ -73,6 +73,6 @@ export const useReservations = (params?: PaginationParams & FetchReservationDto)
 		queryKey: ['reservations', 'admin', params],
 		queryFn: () => fetchReservation(params),
 		retry: 1,
-		staleTime: 1000 * 60 * 5, // 5분
+		staleTime: 0,
 	});
 };

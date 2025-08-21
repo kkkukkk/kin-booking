@@ -1,85 +1,158 @@
 'use client'
 
+import { useRouter } from 'next/navigation';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
-import clsx from 'clsx';
+import UserInfo from '@/components/user/UserInfo';
 import { FriendWithUser } from '@/types/dto/friends';
 import { TicketWithEventDto } from '@/types/dto/ticket';
+import { Theme } from '@/types/ui/theme';
+import dayjs from 'dayjs';
+import clsx from 'clsx';
+import { useAlert } from '@/providers/AlertProvider';
 
 interface ConfirmationStepProps {
   selectedFriend: FriendWithUser | undefined;
   transferCount: number;
+  transferReason: string;
   targetTickets: TicketWithEventDto[];
   onTransfer: () => void;
   onBack: () => void;
   isTransferring: boolean;
-  theme: string;
+  theme: Theme;
 }
 
-const ConfirmationStep = ({ 
-  selectedFriend, 
-  transferCount, 
-  targetTickets, 
-  onTransfer, 
-  onBack, 
-  isTransferring, 
-  theme 
+const ConfirmationStep = ({
+  selectedFriend,
+  transferCount,
+  transferReason,
+  targetTickets,
+  onTransfer,
+  onBack,
+  isTransferring,
+  theme
 }: ConfirmationStepProps) => {
+  const router = useRouter();
+  const { showAlert } = useAlert();
+  const eventInfo = targetTickets[0]?.event;
+
+  const formatEventDate = (dateString: string) => {
+    const date = dayjs(dateString);
+    return {
+      full: date.format('YYYY년 M월 D일 dddd'),
+      time: date.format('HH:mm'),
+      short: date.format('M월 D일'),
+      detailed: date.format('YYYY년 M월 D일'),
+      weekday: date.format('ddd')
+    };
+  };
+
+  const handleCancel = () => {
+    router.push('/my?tab=tickets');
+  };
+
+  const handleTransfer = async () => {
+    const confirmed = await showAlert({
+      type: 'confirm',
+      title: '티켓 양도 확인',
+      message: `티켓 양도 시 소유권이 상실됩니다.\n\n양도하시겠습니까?`,
+    });
+
+    if (confirmed) {
+      onTransfer();
+    }
+  };
+
   return (
     <ThemeDiv className="p-6 rounded-lg" isChildren>
-      <h2 className="text-xl font-bold mb-4">양도 정보 확인</h2>
-      
+      <h2 className="text-base md:text-lg font-bold mb-4">양도 정보 확인</h2>
+
       <div className="space-y-4 mb-6">
-        <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-          <h3 className="font-medium mb-2">양도 대상</h3>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-              {selectedFriend?.counterpartName?.charAt(0)}
-            </div>
-            <div>
-              <p className="font-medium">{selectedFriend?.counterpartName}</p>
-              <p className="text-sm text-gray-500">{selectedFriend?.counterpartEmail}</p>
-            </div>
-          </div>
+        {/* 양도 대상 */}
+        <div className={`p-3 rounded-lg border ${theme === 'normal'
+            ? 'border-gray-200'
+            : theme === 'dark'
+              ? 'border-gray-600'
+              : 'border-gray-600'
+          }`}>
+          <h3 className="text-sm font-semibold mb-3 opacity-70">양도 대상</h3>
+          <UserInfo
+            name={selectedFriend?.counterpartName || '이름 없음'}
+            email={selectedFriend?.counterpartEmail || ''}
+            theme={theme}
+            avatarSize="sm"
+            className="min-w-0"
+          />
         </div>
 
-        <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-          <h3 className="font-medium mb-2">양도 정보</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>양도 매수:</span>
-              <span className="font-medium">{transferCount}장</span>
+        {/* 양도 정보 */}
+        <div className={`p-3 rounded-lg border ${theme === 'normal'
+            ? 'border-gray-200'
+            : theme === 'dark'
+              ? 'border-gray-600'
+              : 'border-gray-600'
+          }`}>
+          <h3 className="text-sm font-semibold mb-3 opacity-70">양도 정보</h3>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="opacity-70">공연명:</span>
+              <span className="font-medium text-right max-w-[200px] line-clamp-2">
+                {eventInfo?.eventName || '공연명 없음'}
+              </span>
             </div>
-            <div className="flex justify-between">
-              <span>공연명:</span>
-              <span className="font-medium">{targetTickets[0]?.event?.eventName || '공연명 없음'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>공연일:</span>
-              <span className="font-medium">
-                {targetTickets[0]?.event?.eventDate ? 
-                  new Date(targetTickets[0].event.eventDate).toLocaleDateString('ko-KR') : 
+            <div className="flex justify-between items-center">
+              <span className="opacity-70">공연일시:</span>
+              <span className="font-medium text-right">
+                {eventInfo?.eventDate ?
+                  `${formatEventDate(eventInfo.eventDate).detailed} ${formatEventDate(eventInfo.eventDate).time}` :
                   '미정'
                 }
               </span>
             </div>
+            <div className="flex justify-between items-center">
+              <span className="opacity-70">양도 매수:</span>
+              <span className="font-semibold text-base">{transferCount}장</span>
+            </div>
           </div>
         </div>
+
+        {/* 양도 사유 */}
+        {transferReason && (
+          <div className={`p-3 rounded-lg border ${theme === 'normal'
+              ? 'border-gray-200'
+              : theme === 'dark'
+                ? 'border-gray-600'
+                : 'border-gray-600'
+            }`}>
+            <h3 className="text-sm font-semibold mb-3 opacity-70">양도 사유</h3>
+            <p className={clsx("text-sm", theme === 'normal' ? 'text-gray-700' : 'text-gray-300')}>
+              {transferReason}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">
         <Button
-          onClick={onTransfer}
+          onClick={handleTransfer}
           disabled={isTransferring}
-          className="w-full bg-blue-500 hover:bg-blue-600"
+          theme={theme === "normal" ? "dark" : theme}
+          padding="py-3"
+          fontSize='text-sm'
+          className="font-semibold w-full"
+          reverse={theme === 'normal'}
         >
-          {isTransferring ? '양도 중...' : '양도 실행'}
+          {isTransferring ? '양도 중...' : '양도하기'}
         </Button>
         <Button
-          onClick={onBack}
-          className="w-full"
+          onClick={handleCancel}
+          theme={theme === "normal" ? "dark" : theme}
+          padding="py-3"
+          fontSize='text-sm'
+          className="font-semibold w-full"
+          reverse={theme === 'normal'}
         >
-          뒤로가기
+          취소
         </Button>
       </div>
     </ThemeDiv>

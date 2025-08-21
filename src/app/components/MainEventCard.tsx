@@ -21,25 +21,25 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
   const isLarge = variant === "large";
   const isHero = variant === "hero";
   const isSmall = variant === "small";
-  
+
   // 포스터 컨테이너 크기
-  const posterContainerSize = isHero 
-    ? "w-full max-w-xs md:max-w-sm aspect-[602/852]" 
-    : isLarge 
-    ? "w-36 h-440 md:w-56 md:h-80"
-    : "w-32 h-40 md:w-36 md:h-44 relative";
-  
-  const titleSize = isHero 
-    ? "text-xl font-bold" 
-    : isLarge 
-    ? "text-lg md:text-2xl font-bold"
-    : "text-sm font-semibold";
-  
-  const dateSize = isHero 
-    ? "text-base" 
-    : isLarge 
-    ? "text-sm md:text-base"
-    : "text-xs";
+  const posterContainerSize = isHero
+    ? "w-full max-w-xs md:max-w-sm aspect-[602/852]"
+    : isLarge
+      ? "w-36 h-440 md:w-56 md:h-80"
+      : "w-32 h-40 md:w-36 md:h-44 relative";
+
+  const titleSize = isHero
+    ? "text-xl font-bold"
+    : isLarge
+      ? "text-lg md:text-2xl font-bold"
+      : "text-sm font-semibold";
+
+  const dateSize = isHero
+    ? "text-base"
+    : isLarge
+      ? "text-sm md:text-base"
+      : "text-xs";
 
   const handleDetailClick = () => {
     router.push(`/events/${event.eventId}`);
@@ -47,7 +47,7 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
 
   return (
     <ThemeDiv
-      className={`p-2 flex flex-col items-center shadow-xl rounded mb-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isHero ? "w-full" : isLarge ? "w-full" : "w-fit"}`}
+      className={`p-2 flex flex-col items-center shadow-md rounded mb-2 transition-all duration-300 hover:scale-105 ${isHero ? "w-full" : isLarge ? "w-full" : "w-fit"}`}
       isChildren
     >
       <div className={`${posterContainerSize} flex justify-center overflow-hidden ${isSmall ? '' : 'py-2'}`}>
@@ -56,15 +56,17 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
           posterData={posterData}
           theme={theme}
           isLoading={isLoading}
+          priority={false}
+          loading="lazy"
           variant={isSmall ? "small" : "hero"}
           smallText={isSmall}
           overlay={
             isSmall
               ? {
-                  title: event.eventName,
-                  subtitle: dayjs(event.eventDate).format('MM/DD HH:mm'),
-                  showOverlay: true,
-                }
+                title: event.eventName,
+                subtitle: dayjs(event.eventDate).format('MM/DD HH:mm'),
+                showOverlay: true,
+              }
               : undefined
           }
         />

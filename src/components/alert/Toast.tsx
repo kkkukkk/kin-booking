@@ -33,13 +33,13 @@ const Toast = () => {
 		const now = Date.now();
 		const elapsed = elapsedTimeRef.current + (now - startTimeRef.current);
 		const remaining = Math.max(autoCloseTime - elapsed, 0);
-		const progress  = remaining / autoCloseTime;
+		const progress = remaining / autoCloseTime;
 
 		if (progressBarRef.current) {
 			progressBarRef.current.style.width = `${progress * 100}%`;
 		}
 
-		if (progress  <= 0) {
+		if (progress <= 0) {
 			hideToast();
 			startTimeRef.current = null;
 			elapsedTimeRef.current = 0;
@@ -106,7 +106,7 @@ const Toast = () => {
 			onTouchEnd={() => setIsHovered(false)}
 			className={clsx(
 				"fixed bottom-12 left-1/2 -translate-x-1/2 px-4 py-3 rounded shadow-lg w-[300px] z-50 md:w-[400px]",
-				isOpen  ? styles["toast-enter-active"] : styles["toast-enter"]
+				isOpen ? styles["toast-enter-active"] : styles["toast-enter"]
 			)}
 			tabIndex={-1}
 			isChildren
@@ -116,7 +116,7 @@ const Toast = () => {
 					{iconType && getIcon(iconType)}
 				</div>
 
-				<div className="break-words whitespace-normal break-normal pl-1 pr-3 text-sm">
+				<div className="break-words whitespace-pre-line break-normal pl-1 pr-3 text-sm">
 					{message}
 				</div>
 
@@ -134,7 +134,7 @@ const Toast = () => {
 					<div
 						ref={progressBarRef}
 						className={clsx(styles["toast-progress-bar"], "rounded h-full")}
-						style={{width: '100%'}} // 기본 100%
+						style={{ width: '100%' }} // 기본 100%
 					/>
 				</div>
 			}

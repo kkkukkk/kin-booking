@@ -82,10 +82,10 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 		const confirmed = await showAlert({
 			type: 'confirm',
 			title: '비밀번호 변경',
-			message: '비밀번호를 변경하시겠습니까?\n자동으로 로그아웃 됩니다.',
+			message: '비밀번호를 변경하시겠습니까?',
 		});
 		if (confirmed) {
-			router.push('/auth/reset-password?source=password&logout=true');
+			router.push('/auth/reset-password?source=password&logout=false');
 		}
 	};
 
@@ -101,7 +101,7 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 					<Button
 						theme="dark"
 						padding="px-2 py-1.5"
-						className="text-xs md:text-sm"
+						className="text-xs md:text-sm font-semibold"
 						reverse={true}
 						onClick={handleWithdraw}
 					>
@@ -110,7 +110,7 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 					<Button
 						theme="dark"
 						padding="px-2 py-1.5"
-						className="text-xs md:text-sm"
+						className="text-xs md:text-sm font-semibold"
 						reverse={true}
 						onClick={handlePasswordChange}
 					>
@@ -138,7 +138,7 @@ const ProfileTab = ({ user }: ProfileTabProps) => {
 				<div className="flex justify-between items-center py-2">
 					<span className="font-medium opacity-70">공연정보 수신</span>
 					<button
-						className={`px-3 py-1 rounded transition-colors duration-200 flex items-center gap-2 ${user.marketingConsent ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700'} ${isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
+						className={`px-3 py-1 rounded transition-all duration-200 font-semibold flex items-center gap-2 cursor-pointer shadow-sm ${user.marketingConsent ? 'bg-green-500 text-white hover:bg-green-600 hover:shadow-md' : 'bg-gray-300 text-gray-700 hover:bg-gray-400 hover:shadow-md'} ${isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
 						onClick={handleToggle}
 						disabled={isPending}
 					>
