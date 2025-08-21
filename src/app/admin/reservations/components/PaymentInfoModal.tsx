@@ -53,7 +53,7 @@ const PaymentInfoModal = ({
     note: '',
   });
 
-  // 거래 이력 생성 뮤테이션
+  // 거래 이력 생성
   const createTransactionMutation = useCreatePaymentTransaction();
 
   // 입력 핸들러
@@ -166,6 +166,7 @@ const PaymentInfoModal = ({
           theme={theme === 'neon' ? 'neon' : theme === 'dark' ? 'dark' : 'normal'}
           onClick={handleClose}
           disabled={createTransactionMutation.isPending}
+          className="font-semibold"
         >
           취소
         </Button>
@@ -175,6 +176,7 @@ const PaymentInfoModal = ({
           onClick={handleSubmit}
           disabled={createTransactionMutation.isPending}
           reverse={theme === 'normal'}
+          className="font-semibold"
         >
           {createTransactionMutation.isPending ? '저장 중...' : '저장'}
         </Button>

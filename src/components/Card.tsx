@@ -63,7 +63,7 @@ const Card = ({
 				initial="enter"
 				animate="center"
 				exit="exit"
-				transition={{duration: 0.3}}
+				transition={{ duration: 0.3 }}
 				className={clsx(
 					"rounded-none md:rounded-[10px] max-w-7xl mx-auto",
 					theme === "dark"

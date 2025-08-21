@@ -1,8 +1,8 @@
 'use client'
 
-import {motion} from "framer-motion";
-import {textContainer, textContainerItem} from "@/types/ui/motionVariants";
-import {EventWithCurrentStatus} from "@/types/dto/events";
+import { motion } from "framer-motion";
+import { textContainer, textContainerItem } from "@/types/ui/motionVariants";
+import { EventWithCurrentStatus } from "@/types/dto/events";
 import Counter from "@/components/base/Counter";
 import Input from "@/components/base/Input";
 import ThemeDiv from "@/components/base/ThemeDiv";
@@ -34,7 +34,7 @@ const ConfirmStep = ({
 	onTicketHolderChange
 }: ConfirmStepProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
-	
+
 	return (
 		<div className="relative">
 			<motion.div
@@ -43,11 +43,11 @@ const ConfirmStep = ({
 				animate="visible"
 				className={clsx(
 					"flex flex-col text-sm md:text-base p-4 rounded-lg border mt-4",
-					theme === "normal" 
-						? "bg-gray-50 border-gray-200" 
+					theme === "normal"
+						? "bg-gray-50 border-gray-200"
 						: theme === "dark"
-						? "bg-gray-800 border-gray-700"
-						: "bg-gray-800 border-gray-700"
+							? "bg-gray-800 border-gray-700"
+							: "bg-gray-800 border-gray-700"
 				)}
 			>
 				{messages.map((msg, idx) => (
@@ -62,9 +62,9 @@ const ConfirmStep = ({
 			</motion.div>
 
 			<motion.div
-				initial={{opacity: 0, y: 20}}
-				animate={{opacity: 1, y: 0}}
-				transition={{delay: 0.3, duration: 0.6}}
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.3, duration: 0.6 }}
 				className="mt-6 space-y-6"
 			>
 				<ThemeDiv isChildren className="rounded-lg p-4 md:p-6">

@@ -16,7 +16,7 @@ const AdminClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const { data: dashboardStats, isLoading, error } = useDashboardStats();
 
-  // 테마별 연한 글씨 색상 클래스
+  // 테마별 연한 글씨
   const getLightTextColor = () => {
     switch (theme) {
       case 'dark':
@@ -28,7 +28,7 @@ const AdminClient = () => {
     }
   };
 
-  // 테마별 더 연한 글씨 색상 클래스
+  // 테마별 더 연한 글씨
   const getLighterTextColor = () => {
     switch (theme) {
       case 'dark':
@@ -40,7 +40,7 @@ const AdminClient = () => {
     }
   };
 
-  // 테마별 중간 글씨 색상 클래스
+  // 테마별 중간 글씨
   const getMediumTextColor = () => {
     switch (theme) {
       case 'dark':
@@ -52,7 +52,7 @@ const AdminClient = () => {
     }
   };
 
-  // 테마별 내부 블럭 배경색 클래스
+  // 테마별 내부 블럭 배경색
   const getInnerBlockBgColor = () => {
     switch (theme) {
       case 'dark':
@@ -64,7 +64,7 @@ const AdminClient = () => {
     }
   };
 
-  // 테마별 스켈레톤 배경색 클래스
+  // 테마별 스켈레톤 배경색
   const getSkeletonBgColor = () => {
     switch (theme) {
       case 'dark': return 'bg-gray-700';
@@ -73,7 +73,7 @@ const AdminClient = () => {
     }
   };
 
-  // 테마별 스켈레톤 텍스트 색상 클래스
+  // 테마별 스켈레톤 텍스트
   const getSkeletonTextColor = () => {
     switch (theme) {
       case 'dark': return 'text-gray-400';
@@ -85,14 +85,13 @@ const AdminClient = () => {
   if (isLoading) {
     return (
       <ThemeDiv className="space-y-6 p-6">
-        {/* 전체 요약 통계 스켈레톤 - 1x5 레이아웃 */}
         <OverallSummarySectionSkeleton 
           getSkeletonBgColor={getSkeletonBgColor}
           getSkeletonTextColor={getSkeletonTextColor}
           getMediumTextColor={getMediumTextColor}
         />
         
-        {/* 하단 섹션들 스켈레톤 - 3열 균등 배치 */}
+        {/* 3열 균등 배치 */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* 사용자 현황 스켈레톤 */}
           <UserStatsSectionSkeleton
@@ -158,14 +157,13 @@ const AdminClient = () => {
 
   return (
     <ThemeDiv className="space-y-6 p-6">
-      {/* 전체 요약 통계 - 1x5 레이아웃 (전체 너비) */}
+      {/* 전체 요약 통계 */}
       <OverallSummarySection 
         dashboardStats={dashboardStats}
         theme={theme}
         getLightTextColor={getLightTextColor}
       />
 
-      {/* 하단 섹션들 - 3열 균등 배치 */}
       <div className="grid md:grid-cols-3 gap-6">
         {/* 사용자 현황 */}
         <UserStatsSection 

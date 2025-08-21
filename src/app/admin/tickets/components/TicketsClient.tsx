@@ -352,7 +352,6 @@ const TicketsClient = () => {
         />
       </div>
 
-      {/* 테이블 상단 정보 영역 */}
       <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-2">
         {/* 총 개수 */}
         <div className="flex-1 md:flex-2/3 flex justify-start mb-2 md:mb-0">
@@ -363,8 +362,6 @@ const TicketsClient = () => {
         
         {/* 정렬 및 페이지 크기 선택 */}
         <div className="flex items-center gap-4 flex-1 justify-end shrink-0">
-          
-          {/* 페이지 크기 선택 */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-400 md:w-[80%] whitespace-nowrap">페이지당 표시:</span>
             <Select
@@ -384,7 +381,6 @@ const TicketsClient = () => {
 
       {/* 테이블 영역 */}
       <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-        {/* 티켓 목록 테이블 */}
         <div className="flex-1 min-h-fit md:min-h-0">
           <DataTable
             data={paginatedGroups}

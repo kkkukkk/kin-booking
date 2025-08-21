@@ -10,7 +10,7 @@ export const useToastState = () => {
 export const useToastActions = () => {
 	const dispatch = useAppDispatch();
 
-	const showToast  = useCallback(
+	const showToast = useCallback(
 		(payload: {
 			message: string;
 			autoCloseTime?: number;

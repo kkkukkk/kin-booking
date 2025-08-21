@@ -61,7 +61,7 @@ export const useTransferHistoryWithDetails = (historyId: string) => {
 // 양도 이력 생성
 export const useCreateTransferHistory = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (historyData: CreateTransferHistoryRequest) => createTransferHistory(historyData),
     onSuccess: (data) => {

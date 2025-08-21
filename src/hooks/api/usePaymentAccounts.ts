@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { 
-	fetchActivePaymentAccounts, 
+import {
+	fetchActivePaymentAccounts,
 	fetchAllPaymentAccounts,
 	createPaymentAccount,
 	updatePaymentAccount,
 	deletePaymentAccount
 } from "@/api/paymentAccount";
 import { PaymentAccount } from "@/types/model/paymentAccount";
-import { 
-	CreatePaymentAccountDto, 
-	UpdatePaymentAccountDto 
+import {
+	CreatePaymentAccountDto,
+	UpdatePaymentAccountDto
 } from "@/types/dto/paymentAccount";
 
 // 활성 입금 계좌 정보 조회 (공개)

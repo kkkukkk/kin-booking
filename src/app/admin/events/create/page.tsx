@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
@@ -11,7 +12,7 @@ import Textarea from '@/components/base/Textarea';
 import Select from '@/components/base/Select';
 import { EventStatus, EventStatusKo } from '@/types/model/events';
 import { ArrowLeftIcon } from '@/components/icon/ArrowIcons';
-import { generateRandomGradient } from '@/util/gradientGenerator';
+import { generateRandomGradient, generateNeonGradient } from '@/util/gradientGenerator';
 import { useUploadEventPoster } from '@/hooks/api/useEventMedia';
 import { useCreateEvent } from '@/hooks/api/useEvents';
 import useToast from '@/hooks/useToast';
@@ -19,7 +20,7 @@ import useToast from '@/hooks/useToast';
 const CreateEventPage = () => {
   const router = useRouter();
   const theme = useAppSelector((state: RootState) => state.theme.current);
-  
+
   const [formData, setFormData] = useState({
     eventName: '',
     description: '',
@@ -69,7 +70,7 @@ const CreateEventPage = () => {
       }
 
       setSelectedPosterFile(file);
-      
+
       // 이미지 미리보기 생성
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -92,7 +93,7 @@ const CreateEventPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isFormValid) {
       showToast({
         message: '필수 항목을 모두 입력해주세요.',
@@ -103,7 +104,7 @@ const CreateEventPage = () => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // 1. 공연 등록
       const newEvent = await createEventMutation.mutateAsync({
@@ -116,7 +117,7 @@ const CreateEventPage = () => {
         seatCapacity: Number(formData.maxTickets),
         ticketColor: formData.ticketGradient,
       });
-      
+
       // 2. 포스터가 선택된 경우 업로드 (실패해도 공연 등록은 성공)
       if (selectedPosterFile) {
         try {
@@ -133,7 +134,7 @@ const CreateEventPage = () => {
           });
         }
       }
-      
+
       // 성공 시 목록 페이지로 이동
       showToast({
         message: '공연이 성공적으로 등록되었습니다!',
@@ -156,8 +157,8 @@ const CreateEventPage = () => {
     router.push('/admin/events');
   };
 
-  const isFormValid = formData.eventName && formData.eventDateTime && 
-                     formData.location && formData.ticketPrice && formData.maxTickets;
+  const isFormValid = formData.eventName && formData.eventDateTime &&
+    formData.location && formData.ticketPrice && formData.maxTickets;
 
   return (
     <ThemeDiv className="min-h-full">
@@ -183,19 +184,21 @@ const CreateEventPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* 포스터 이미지 섹션 */}
             <div className="md:col-span-1">
-              <ThemeDiv className="rounded-lg p-4 h-[550px]">
+              <ThemeDiv className="rounded-lg p-4 md:h-[550px]">
                 <h2 className="text-lg font-semibold mb-3">포스터 이미지</h2>
-                <div className="flex flex-col items-center justify-center h-[450px]">
+                <div className="flex flex-col items-center justify-center md:h-[450px]">
                   <div className="text-center w-full max-w-sm">
                     {selectedPosterFile ? (
                       /* 파일 선택 완료 + 이미지 미리보기 */
                       <div className="text-center">
-                        <div className="w-48 h-64 mx-auto mb-4 rounded-lg overflow-hidden">
+                        <div className="w-48 h-64 mx-auto mb-4 rounded-lg overflow-hidden relative">
                           {previewUrl ? (
-                            <img 
-                              src={previewUrl} 
-                              alt="포스터 미리보기" 
-                              className="w-full h-full object-cover"
+                            <Image
+                              src={previewUrl}
+                              alt="포스터 미리보기"
+                              fill
+                              className="object-cover"
+                              sizes="192px"
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -233,15 +236,14 @@ const CreateEventPage = () => {
                           type="file"
                           accept="image/*"
                           onChange={handleFileSelect}
-                          className={`w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold hover:file:opacity-80 ${
-                            theme === 'normal' 
-                              ? 'file:bg-gray-200 file:text-gray-700' 
+                          className={`w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold hover:file:opacity-80 ${theme === 'normal'
+                              ? 'file:bg-gray-200 file:text-gray-700'
                               : 'file:bg-gray-500 file:text-gray-100'
-                          }`}
+                            }`}
                         />
                       </ThemeDiv>
                     )}
-                    
+
                     <p className="text-xs mt-4">PNG, JPG, GIF 최대 10MB</p>
                   </div>
                 </div>
@@ -250,7 +252,7 @@ const CreateEventPage = () => {
 
             {/* 기본 정보 섹션 */}
             <div className="md:col-span-1">
-              <ThemeDiv className="rounded-lg p-4 h-[550px]">
+              <ThemeDiv className="rounded-lg p-4 md:h-[550px]">
                 <h2 className="text-lg font-semibold mb-3">기본 정보</h2>
                 <div className="space-y-4">
                   {/* 공연명 */}
@@ -318,7 +320,7 @@ const CreateEventPage = () => {
 
             {/* 티켓 정보 섹션 */}
             <div className="md:col-span-1">
-              <ThemeDiv className="rounded-lg p-4 h-[550px]">
+              <ThemeDiv className="rounded-lg p-4 md:h-[550px]">
                 <h2 className="text-lg font-semibold mb-3">티켓 정보</h2>
                 <div className="space-y-4">
                   {/* 티켓 가격 */}
@@ -358,19 +360,31 @@ const CreateEventPage = () => {
                     <label className="block text-sm font-medium mb-2">
                       티켓 색상 <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-20 h-10 rounded"
+                    <div className="space-y-3">
+                      <div
+                        className="w-full h-12 rounded-lg shadow-sm"
                         style={{ background: formData.ticketGradient }}
                       />
-                      <Button
-                        theme={theme}
-                        type="button"
-                        onClick={() => handleInputChange('ticketGradient', generateRandomGradient())}
-                        className="px-3 py-1 text-xs"
-                      >
-                        새로고침
-                      </Button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          theme={theme}
+                          type="button"
+                          onClick={() => handleInputChange('ticketGradient', generateRandomGradient())}
+                          className="px-3 py-1.5 text-xs font-semibold"
+                          reverse={theme === 'normal'}
+                          light={true}
+                        >
+                          일반 그라데이션
+                        </Button>
+                        <Button
+                          theme={theme}
+                          type="button"
+                          onClick={() => handleInputChange('ticketGradient', generateNeonGradient())}
+                          className="px-3 py-1.5 text-xs font-semibold"
+                        >
+                          네온 그라데이션
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>

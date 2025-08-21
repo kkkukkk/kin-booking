@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fadeSlideDownSm } from '@/types/ui/motionVariants';
 
 export interface Column<T> {
   key: string;
@@ -85,7 +84,7 @@ function DataTable<T>({
     } else if (theme === 'neon') {
       return {
         container: 'bg-black/50 border border-green-500/20 shadow-[0_0_16px_0_rgba(34,197,94,0.25)]',
-        header: headerClassName ||'bg-green-500/10',
+        header: headerClassName || 'bg-green-500/10',
         row: rowClassName || 'hover:bg-green-500/5',
         headerText: 'text-green-400',
         bodyText: 'text-gray-300',
@@ -147,9 +146,8 @@ function DataTable<T>({
                   {columns.map((column) => (
                     <th
                       key={column.key}
-                      className={`px-4 py-3 text-left text-sm font-medium ${themeStyles.headerText} ${column.className || ''} ${
-                        column.sortable ? 'cursor-pointer hover:opacity-80' : ''
-                      }`}
+                      className={`px-4 py-3 text-left text-sm font-medium ${themeStyles.headerText} ${column.className || ''} ${column.sortable ? 'cursor-pointer hover:opacity-80' : ''
+                        }`}
                       style={{ width: column.width }}
                       onClick={() => handleHeaderClick(column)}
                     >
@@ -211,38 +209,38 @@ function DataTable<T>({
       <div className="lg:hidden space-y-4 p-4 overflow-y-auto max-h-full">
         {mobileCardSections
           ? data.map((item, index) => {
-              const { firstRow, secondRow, actionButton } = mobileCardSections(item, index);
-              return (
-                <div
-                  key={index}
-                  className={`${themeStyles.card} rounded p-3 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3 ${onRowClick ? 'cursor-pointer' : ''}`}
-                  onClick={() => handleRowClick(item, index)}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-2">{firstRow}</div>
-                  <div className="flex items-center justify-between gap-2 text-xs mb-2">{secondRow}</div>
-                  {actionButton && <div className="flex gap-2 justify-end">{actionButton}</div>}
-                </div>
-              );
-            })
-          : data.map((item, index) => (
-              <motion.div
+            const { firstRow, secondRow, actionButton } = mobileCardSections(item, index);
+            return (
+              <div
                 key={index}
-                className={`${themeStyles.card} rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`${themeStyles.card} rounded p-3 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3 ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => handleRowClick(item, index)}
-                transition={{ duration: 0.15 }}
               >
-                {columns.map((column, colIndex) => (
-                  <div key={column.key} className={`flex flex-col ${colIndex < columns.length - 1 ? 'mb-4' : ''}`}>
-                    <div className={`text-xs font-semibold uppercase tracking-wide ${themeStyles.cardBody} mb-2 opacity-70`}>
-                      {column.header}
-                    </div>
-                    <div className={`text-sm ${themeStyles.cardBody} ${column.className || ''}`}>
-                      {column.render(item, index)}
-                    </div>
+                <div className="flex items-center justify-between gap-2 mb-2">{firstRow}</div>
+                <div className="flex items-center justify-between gap-2 text-xs mb-2">{secondRow}</div>
+                {actionButton && <div className="flex gap-2 justify-end">{actionButton}</div>}
+              </div>
+            );
+          })
+          : data.map((item, index) => (
+            <motion.div
+              key={index}
+              className={`${themeStyles.card} rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 ${onRowClick ? 'cursor-pointer' : ''}`}
+              onClick={() => handleRowClick(item, index)}
+              transition={{ duration: 0.15 }}
+            >
+              {columns.map((column, colIndex) => (
+                <div key={column.key} className={`flex flex-col ${colIndex < columns.length - 1 ? 'mb-4' : ''}`}>
+                  <div className={`text-xs font-semibold uppercase tracking-wide ${themeStyles.cardBody} mb-2 opacity-70`}>
+                    {column.header}
                   </div>
-                ))}
-              </motion.div>
-            ))}
+                  <div className={`text-sm ${themeStyles.cardBody} ${column.className || ''}`}>
+                    {column.render(item, index)}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          ))}
       </div>
     </div>
   );

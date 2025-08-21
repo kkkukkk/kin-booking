@@ -24,9 +24,9 @@ const Logo = ({ width, className, priority = false, variant = 'theme' }: LogoPro
 	const computedHeight = (computedWidth / defaultWidth) * defaultHeight;
 
 	// 반응형 sizes 설정
-	const sizes = computedWidth <= 200 ? "200px" : 
-				  computedWidth <= 400 ? "400px" : 
-				  `${computedWidth}px`;
+	const sizes = computedWidth <= 200 ? "200px" :
+		computedWidth <= 400 ? "400px" :
+			`${computedWidth}px`;
 
 	return (
 		<div

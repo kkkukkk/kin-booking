@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import Button from '@/components/base/Button';
@@ -11,7 +12,7 @@ import Select from '@/components/base/Select';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { ArrowLeftIcon } from '@/components/icon/ArrowIcons';
-import { generateRandomGradient } from '@/util/gradientGenerator';
+import { generateRandomGradient, generateNeonGradient } from '@/util/gradientGenerator';
 import dayjs from 'dayjs';
 import { EventStatus, EventStatusKo } from '@/types/model/events';
 import { useEventFromEventsTable } from '@/hooks/api/useEvents';
@@ -21,14 +22,13 @@ import useToast from '@/hooks/useToast';
 import { useAlert } from '@/providers/AlertProvider';
 import EventPoster from '@/app/events/[eventId]/components/EventPoster';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { useSession } from '@/hooks/useSession';
+import Spinner from '@/components/spinner/Spinner';
 
 const EditEventPage = () => {
     const router = useRouter();
     const params = useParams();
     const eventId = params.eventId as string;
     const theme = useAppSelector((state: RootState) => state.theme.current);
-    const { session } = useSession();
 
     const [isEditing, setIsEditing] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +50,7 @@ const EditEventPage = () => {
 
     // 포스터 이미지 조회
     const { data: posterImages } = useEventMediaByType(eventId, 'image');
-    
+
     // 공연 정보 업데이트
     const updateEventMutation = useUpdateEvent();
 
@@ -63,10 +63,7 @@ const EditEventPage = () => {
     // 공연 완료
     const completeEventMutation = useCompleteEvent();
 
-    // Toast 알림
     const { showToast } = useToast();
-
-    // Alert 확인
     const { showAlert } = useAlert();
 
     // 관리자 권한 체크
@@ -76,13 +73,13 @@ const EditEventPage = () => {
     const handleCompleteEvent = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         const confirmed = await showAlert({
             title: '공연 종료 확인',
             message: `"${event?.eventName}" 공연을 종료하시겠습니까?\n\n• 대기중인 예매가 모두 취소됩니다\n• 이 작업은 되돌릴 수 없습니다`,
             type: 'confirm'
         });
-        
+
         if (confirmed) {
             completeEventMutation.mutate(eventId, {
                 onSuccess: () => {
@@ -255,10 +252,16 @@ const EditEventPage = () => {
     // 로딩 상태
     if (isLoading) {
         return (
-            <ThemeDiv className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-6"></div>
-                    <p className="text-lg text-gray-600">공연 정보를 불러오는 중...</p>
+            <ThemeDiv className="min-h-full">
+                <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
+                    <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
+                        <h1 className="text-lg md:text-xl font-bold">공연 상세 정보</h1>
+                    </div>
+                </div>
+                <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
+                    <div className="flex items-center justify-center h-64">
+                        <Spinner />
+                    </div>
                 </div>
             </ThemeDiv>
         );
@@ -327,13 +330,12 @@ const EditEventPage = () => {
                                             <button
                                                 type="button"
                                                 onClick={(e) => handleCompleteEvent(e)}
-                                                className={`px-3 py-1 rounded font-semibold transition-colors ${
-                                                    theme === 'normal' 
-                                                        ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white' 
-                                                        : theme === 'dark' 
-                                                            ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white' 
-                                                            : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
-                                                }`}
+                                                className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                                    ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
+                                                    : theme === 'dark'
+                                                        ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                                                        : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
+                                                    }`}
                                             >
                                                 공연 종료
                                             </button>
@@ -341,26 +343,24 @@ const EditEventPage = () => {
                                         <button
                                             type="button"
                                             onClick={handleDelete}
-                                            className={`px-3 py-1 rounded font-semibold transition-colors ${
-                                                theme === 'normal' 
-                                                    ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white' 
-                                                    : theme === 'dark' 
-                                                        ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white' 
-                                                        : 'bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white'
-                                            }`}
+                                            className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                                ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white'
+                                                : theme === 'dark'
+                                                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                                                    : 'bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white'
+                                                }`}
                                         >
                                             삭제
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setIsEditing(true)}
-                                            className={`px-3 py-1 rounded font-semibold transition-colors ${
-                                                theme === 'normal' 
-                                                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white' 
-                                                    : theme === 'dark' 
-                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white' 
-                                                        : 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white'
-                                            }`}
+                                            className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
+                                                : theme === 'dark'
+                                                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                                                    : 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white'
+                                                }`}
                                         >
                                             편집
                                         </button>
@@ -373,26 +373,24 @@ const EditEventPage = () => {
                                     type="button"
                                     onClick={handleSave}
                                     disabled={isSubmitting}
-                                    className={`px-3 py-1 rounded font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                                        theme === 'normal' 
-                                            ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white' 
-                                            : theme === 'dark' 
-                                                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white' 
-                                                : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
-                                    }`}
+                                    className={`px-3 py-1 rounded font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'normal'
+                                        ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
+                                        : theme === 'dark'
+                                            ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                                            : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
+                                        }`}
                                 >
                                     {isSubmitting ? '저장 중...' : '저장'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className={`px-3 py-1 rounded font-semibold transition-colors ${
-                                        theme === 'normal' 
-                                            ? 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white' 
-                                            : theme === 'dark' 
-                                                ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white' 
-                                                : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white'
-                                    }`}
+                                    className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                        ? 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white'
+                                        : theme === 'dark'
+                                            ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white'
+                                            : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white'
+                                        }`}
                                 >
                                     취소
                                 </button>
@@ -438,22 +436,24 @@ const EditEventPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* 포스터 이미지 */}
                         <div className="md:col-span-1">
-                            <ThemeDiv className="rounded-lg p-4 h-[550px]">
+                            <ThemeDiv className="rounded-lg p-4 md:h-[550px]">
                                 <h2 className="text-lg font-semibold mb-3">포스터 이미지</h2>
 
                                 {isEditing ? (
                                     /* 수정 모드: 업로드 전용 UI */
-                                    <div className="flex flex-col items-center justify-center h-[450px]">
+                                    <div className="flex flex-col items-center justify-center md:h-[450px]">
                                         <div className="text-center w-full max-w-sm">
                                             {selectedPosterFile ? (
                                                 /* 파일 선택 완료 + 이미지 미리보기 */
                                                 <div className="text-center">
-                                                    <div className="w-48 h-64 mx-auto mb-4 rounded-lg overflow-hidden">
+                                                    <div className="w-48 h-64 mx-auto mb-4 rounded-lg overflow-hidden relative">
                                                         {previewUrl ? (
-                                                            <img
+                                                            <Image
                                                                 src={previewUrl}
                                                                 alt="포스터 미리보기"
-                                                                className="w-full h-full object-cover"
+                                                                fill
+                                                                className="object-cover"
+                                                                sizes="192px"
                                                             />
                                                         ) : (
                                                             <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -492,8 +492,8 @@ const EditEventPage = () => {
                                                         accept="image/*"
                                                         onChange={handleFileSelect}
                                                         className={`w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold hover:file:opacity-80 ${theme === 'normal'
-                                                                ? 'file:bg-gray-200 file:text-gray-700'
-                                                                : 'file:bg-gray-500 file:text-gray-100'
+                                                            ? 'file:bg-gray-200 file:text-gray-700'
+                                                            : 'file:bg-gray-500 file:text-gray-100'
                                                             }`}
                                                     />
                                                 </ThemeDiv>
@@ -530,7 +530,7 @@ const EditEventPage = () => {
 
                         {/* 기본 정보 섹션 */}
                         <div className="md:col-span-1">
-                            <ThemeDiv className="rounded-lg p-4 h-[550px]">
+                            <ThemeDiv className="rounded-lg p-4 md:h-[550px]">
                                 <h2 className="text-lg font-semibold mb-3">기본 정보</h2>
                                 <div className="space-y-4">
                                     {/* 공연명 */}
@@ -643,15 +643,29 @@ const EditEventPage = () => {
                                         {isEditing ? (
                                             <div className="flex items-center gap-3">
                                                 <div
-                                                    className="w-20 h-10 rounded"
+                                                    className="w-36 h-10 rounded-lg shadow-sm"
                                                     style={{ background: formData.ticketGradient }}
                                                 />
-                                                <Button
-                                                    onClick={() => handleInputChange('ticketGradient', generateRandomGradient())}
-                                                    className="px-2 py-1 text-xs"
-                                                >
-                                                    새로고침
-                                                </Button>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        theme={theme}
+                                                        type="button"
+                                                        onClick={() => handleInputChange('ticketGradient', generateRandomGradient())}
+                                                        className="px-3 py-1.5 text-xs font-semibold"
+                                                        reverse={theme === 'normal'}
+                                                        light={true}
+                                                    >
+                                                        일반
+                                                    </Button>
+                                                    <Button
+                                                        theme={theme}
+                                                        type="button"
+                                                        onClick={() => handleInputChange('ticketGradient', generateNeonGradient())}
+                                                        className="px-3 py-1.5 text-xs font-semibold"
+                                                    >
+                                                        네온
+                                                    </Button>
+                                                </div>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-3">
@@ -672,7 +686,7 @@ const EditEventPage = () => {
                         </div>
                         {/* 설명 섹션 - 1/3 */}
                         <div className="md:col-span-1">
-                            <ThemeDiv className="rounded-lg p-4 h-[550px]">
+                            <ThemeDiv className="rounded-lg p-4 md:h-[550px]">
                                 <h2 className="text-lg font-semibold mb-3">공연 설명</h2>
                                 {isEditing ? (
                                     <Textarea
@@ -681,10 +695,10 @@ const EditEventPage = () => {
                                         onChange={(e) => handleInputChange('description', e.target.value)}
                                         placeholder="공연 설명을 입력하세요 (선택사항)"
                                         rows={10}
-                                        className="min-h-[475px]"
+                                        className="md:min-h-[475px]"
                                     />
                                 ) : (
-                                    <ThemeDiv className="px-4 py-3 rounded min-h-[475px] max-h-[475px] overflow-y-auto whitespace-pre-wrap" isChildren={true}>
+                                    <ThemeDiv className="px-4 py-3 rounded md:min-h-[475px] md:max-h-[475px] overflow-y-auto whitespace-pre-wrap" isChildren={true}>
                                         {event?.description || '설명 없음'}
                                     </ThemeDiv>
                                 )}

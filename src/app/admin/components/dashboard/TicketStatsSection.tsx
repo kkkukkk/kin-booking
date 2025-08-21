@@ -70,7 +70,6 @@ const TicketStatsSection = ({
   );
 };
 
-// 스켈레톤 UI - 정적 요소는 그대로 표시
 export const TicketStatsSectionSkeleton = ({
   getSkeletonBgColor, 
   getSkeletonTextColor, 

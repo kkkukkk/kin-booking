@@ -36,7 +36,7 @@ const EventBasicInfo = ({ eventDate, location, ticketPrice, theme }: EventBasicI
 								: "bg-blue-900/30 text-blue-300 hover:bg-blue-900/50 border-blue-600 hover:border-blue-400"
 						)}
 					>
-						<LocationIcon className="w-4 h-4"/>
+						<LocationIcon className="w-4 h-4" />
 						<span className="whitespace-nowrap">카카오맵</span>
 					</a>
 				</div>

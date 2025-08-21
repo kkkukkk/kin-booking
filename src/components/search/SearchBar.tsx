@@ -185,7 +185,7 @@ const SearchBar = ({
                   >
                     {tempFrom && tempTo ? `${tempFrom} ~ ${tempTo}` : '기간'}
                   </button>
-                  
+
                   {/* DatePicker - 부모 요소 내에서 직접 렌더링 */}
                   {showDatePicker && (
                     <motion.div

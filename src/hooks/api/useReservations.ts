@@ -10,7 +10,7 @@ export const useCreateReservation = () => {
 	return useMutation<Reservation, Error, CreateReservationDto>({
 		mutationFn: createReservation,
 		onSuccess: () => {
-			queryClient.invalidateQueries({queryKey: ['reservations']});
+			queryClient.invalidateQueries({ queryKey: ['reservations'] });
 		},
 		onError: (error: Error) => {
 			console.error('reservations 생성 실패:', error.message);
@@ -21,13 +21,13 @@ export const useCreateReservation = () => {
 // 예매 승인
 export const useApproveReservation = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: approveReservation,
 		onSuccess: () => {
 			// 예매 관련 쿼리들 무효화
-			queryClient.invalidateQueries({queryKey: ['reservations']});
-			queryClient.invalidateQueries({queryKey: ['tickets']});
+			queryClient.invalidateQueries({ queryKey: ['reservations'] });
+			queryClient.invalidateQueries({ queryKey: ['tickets'] });
 		},
 	});
 };
@@ -35,13 +35,13 @@ export const useApproveReservation = () => {
 // 예매 거절
 export const useRejectReservation = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: cancelPendingReservation,
 		onSuccess: () => {
 			// 예매 관련 쿼리들 무효화
-			queryClient.invalidateQueries({queryKey: ['reservations']});
-			queryClient.invalidateQueries({queryKey: ['tickets']});
+			queryClient.invalidateQueries({ queryKey: ['reservations'] });
+			queryClient.invalidateQueries({ queryKey: ['tickets'] });
 		},
 	});
 };

@@ -45,7 +45,7 @@ const fetchYouTubeVideos = async (): Promise<YouTubeVideo[]> => {
   }
 
   const data: YouTubeResponse = await response.json();
-  
+
   return data.items.map(item => ({
     id: item.id.videoId,
     title: item.snippet.title,

@@ -7,14 +7,14 @@ import {
   checkFriendStatus, getFriends
 } from '@/api/friends';
 import { Friends, FriendStatus } from '@/types/model/friends';
-import {CreateFriendRequest, FriendResponse, FriendWithUser} from "@/types/dto/friends";
+import { CreateFriendRequest, FriendResponse, FriendWithUser } from "@/types/dto/friends";
 import useToast from '@/hooks/useToast';
 import { useSession } from '@/hooks/useSession';
 
 // 친구 목록 조회
 export const useFriends = () => {
   const { session } = useSession();
-  
+
   return useQuery<FriendWithUser[]>({
     queryKey: ['friends', session?.user?.id],
     queryFn: () => getFriends(),
@@ -129,7 +129,7 @@ export const useDeleteFriendRelation = () => {
 // 친구 관계 확인
 export const useCheckFriendStatus = (friendId: string) => {
   const { session } = useSession();
-  
+
   return useQuery({
     queryKey: ['friendStatus', friendId],
     queryFn: () => checkFriendStatus(friendId, session?.user?.id || ''),

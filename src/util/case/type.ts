@@ -9,12 +9,12 @@ export type CamelCase<T> = {
 // 키 문자열 변환
 type SnakeCaseKey<S extends string> =
 	S extends `${infer T}${infer U}`
-		? U extends Uncapitalize<U>
-			? `${Lowercase<T>}${SnakeCaseKey<U>}`
-			: `${Lowercase<T>}_${SnakeCaseKey<U>}`
-		: S;
+	? U extends Uncapitalize<U>
+	? `${Lowercase<T>}${SnakeCaseKey<U>}`
+	: `${Lowercase<T>}_${SnakeCaseKey<U>}`
+	: S;
 
 type CamelCaseKey<S extends string> =
 	S extends `${infer T}_${infer U}`
-		? `${T}${Capitalize<CamelCaseKey<U>>}`
-		: S;
+	? `${T}${Capitalize<CamelCaseKey<U>>}`
+	: S;

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
@@ -74,7 +74,7 @@ const Email = ({
 				target: { value: finalEmail }
 			} as React.ChangeEvent<HTMLInputElement>);
 		}
-	}, [localPart, domain]);
+	}, [finalEmail, onChange, value, localPart, domain]);
 
 	// 유효성 검사만 수행 (중복확인 상태 변경 없음)
 	useEffect(() => {
@@ -85,18 +85,18 @@ const Email = ({
 	// 에러 메시지 생성
 	const getErrorMessage = () => {
 		if (!touched) return null;
-		
+
 		// 이메일 아이디가 비어있는지 체크
 		if (!localPart || localPart.trim() === '') {
 			return "이메일 아이디를 입력해주세요.";
 		}
-		
+
 		// 이메일 아이디 형식 체크 (한글, 특수문자 제한)
 		const emailIdRegex = /^[a-zA-Z0-9._-]+$/;
 		if (!emailIdRegex.test(localPart)) {
 			return "영문, 숫자, 점(.), 언더바(_), 하이픈(-)만 사용 가능합니다.";
 		}
-		
+
 		return null;
 	};
 
@@ -154,7 +154,7 @@ const Email = ({
 
 		// 도메인 형식 체크 (직접입력일 때만)
 		const isDirectInput = !commonDomains.some(d => d.value !== '직접입력' && d.value === domain);
-		
+
 		if (isDirectInput && !domain.includes('.')) {
 			showToast({
 				message: "도메인 형식에 맞춰 입력해주세요. 예) gmail.com",

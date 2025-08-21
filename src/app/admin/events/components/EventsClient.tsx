@@ -1,20 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEvents, useCompleteEvent } from '@/hooks/api/useEvents';
-import { useEventMediaByType } from '@/hooks/api/useEventMedia';
 import { EventStatus, EventStatusKo, Events } from '@/types/model/events';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import SearchBar from '@/components/search/SearchBar';
-import EventCard from '@/app/events/components/EventCard';
 import Spinner from '@/components/spinner/Spinner';
 import DataTable from '@/components/base/DataTable';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
+import { StatusBadge } from '@/components/status/StatusBadge';
 import dayjs from 'dayjs';
 import { useAlert } from '@/providers/AlertProvider';
 import useToast from '@/hooks/useToast';
@@ -53,7 +52,7 @@ const EventsClient = () => {
     size: pageSize,
   });
 
-  const events = eventsResponse?.data || [];
+  const events = React.useMemo(() => eventsResponse?.data || [], [eventsResponse?.data]);
   const totalCount = eventsResponse?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -232,11 +231,13 @@ const EventsClient = () => {
       key: 'status',
       header: '상태',
       render: (event: Events) => (
-        <div className="text-sm">
-          <div className="font-medium">
-            {EventStatusKo[event.status]}
-          </div>
-        </div>
+        <StatusBadge
+          status={event.status}
+          theme={theme}
+          variant="badge"
+          size="sm"
+          statusType="event"
+        />
       ),
       width: '8%',
       sortable: true,
@@ -271,11 +272,13 @@ const EventsClient = () => {
           <div className="font-semibold text-sm truncate">
             {event.eventName}
           </div>
-          <div>
-            <div className="font-medium">
-              {EventStatusKo[event.status]}
-            </div>
-          </div>
+                  <StatusBadge
+          status={event.status}
+          theme={theme}
+          variant="badge"
+          size="sm"
+          statusType="event"
+        />
         </div>
       </>
     ),

@@ -197,10 +197,6 @@ const EntryCheckPage = () => {
 
   return (
     <ThemeDiv className="h-full p-6">
-      {/* 페이지 제목 - 좌상단 */}
-      {/* <div>
-        <h1 className="text-lg md:text-xl font-bold">입장 확인</h1>
-      </div> */}
 
       {/* 콘텐츠 영역 */}
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -220,7 +216,7 @@ const EntryCheckPage = () => {
                     <p className="font-semibold mb-2">사용 방법:</p>
                     <ul className="space-y-1">
                       <li>• <strong>앱 스캔:</strong> 카메라 앱 등으로 스캔 후 링크 접속</li>
-                      <li>• <strong>QR 스캔:</strong> 사이드바의 "QR 스캔" 메뉴 사용</li>
+                      <li>• <strong>QR 스캔:</strong> 사이드바의 &quot;QR 스캔&quot; 메뉴 사용</li>
                     </ul>
                   </div>
                 </ThemeDiv>
@@ -286,7 +282,7 @@ const EntryCheckPage = () => {
                       {isUpdatingTickets || isUpdatingSession ? '처리 중...' : '입장확정'}
                     </Button>
                     <p className={`text-xs ${getTextColor('secondary')} text-center mt-2`}>
-                      해당 예매의 모든 티켓이 '사용됨' 상태로 변경됩니다.
+                      해당 예매의 모든 티켓이 &apos;사용됨&apos; 상태로 변경됩니다.
                     </p>
                   </div>
                 )}

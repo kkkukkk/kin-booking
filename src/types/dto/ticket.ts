@@ -40,18 +40,18 @@ export interface TicketGroupApiResponse {
 }
 
 export interface TicketWithEventDto {
-	id: string;
-	reservationId: string;
-	eventId: string;
-	ownerId: string;
-	status: TicketStatus;
-	transferredAt: string | null;
-	createdAt: string;
-	updatedAt: string;
-	color: string;
-	isRare: boolean;
-	ticketNumber: number;
-	event: Events;
+  id: string;
+  reservationId: string;
+  eventId: string;
+  ownerId: string;
+  status: TicketStatus;
+  transferredAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  color: string;
+  isRare: boolean;
+  ticketNumber: number;
+  event: Events;
 }
 
 export interface TransferTicketsRequestDto {

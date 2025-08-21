@@ -1,5 +1,5 @@
 import React from "react";
-import {Theme} from "@/types/ui/theme";
+import { Theme } from "@/types/ui/theme";
 import { NeonVariant } from "./neonVariant";
 
 export type ButtonType = "default" | "hamburger";

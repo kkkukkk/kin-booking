@@ -14,7 +14,7 @@ export interface CreatePaymentTransactionDto {
 	operatorId: string;
 }
 
-// 거래 이력 수정 DTO (필요시)
+// 거래 이력 수정 DTO
 export interface UpdatePaymentTransactionDto {
 	note?: string;
 }

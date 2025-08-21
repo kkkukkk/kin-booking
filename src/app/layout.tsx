@@ -18,17 +18,17 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             <CustomHead />
             <body>
                 <AppProviders>
-                    <DynamicVhSetter/>
+                    <DynamicVhSetter />
                     <ClientAuthWrapper>
                         <PathnameWrapper>
                             {children}
-                            <TogglePanel/>
+                            <TogglePanel />
                         </PathnameWrapper>
                     </ClientAuthWrapper>
-                    <Toast/>
+                    <Toast />
                 </AppProviders>
-                <Analytics/>
-                <SpeedInsights/>
+                <Analytics />
+                <SpeedInsights />
             </body>
         </html>
     );

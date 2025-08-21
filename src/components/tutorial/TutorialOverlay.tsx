@@ -21,10 +21,10 @@ interface TutorialOverlayProps {
   onComplete: () => void;
 }
 
-const TutorialOverlay = ({ 
-  steps, 
-  isOpen, 
-  onComplete, 
+const TutorialOverlay = ({
+  steps,
+  isOpen,
+  onComplete,
 }: TutorialOverlayProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
@@ -110,7 +110,7 @@ const TutorialOverlay = ({
 
             {/* 그라데이션 오버레이 */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl" />
-            
+
             {/* 메인 컨텐츠 */}
             <div className="relative px-6 py-4">
               {currentStepData.title && (
@@ -149,8 +149,8 @@ const TutorialOverlay = ({
                       key={index}
                       className={clsx(
                         "w-2 h-2 rounded-full transition-all duration-300",
-                        index === currentStep 
-                          ? "bg-white shadow-lg scale-110" 
+                        index === currentStep
+                          ? "bg-white shadow-lg scale-110"
                           : "bg-white/30"
                       )}
                     />

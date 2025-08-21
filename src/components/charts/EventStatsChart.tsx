@@ -118,7 +118,7 @@ const EventStatsChart: React.FC<EventStatsChartProps> = ({ events, theme }) => {
         borderColor: colors.border,
         borderWidth: 1,
         callbacks: {
-          label: function(context: any) {
+          label: function (context: { dataset: { label?: string }; datasetIndex: number; parsed: { y: number } }) {
             let label = context.dataset.label || '';
             if (label) {
               label += ': ';

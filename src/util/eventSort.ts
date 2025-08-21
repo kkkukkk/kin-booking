@@ -17,31 +17,31 @@ export const sortEvents = (
   config: SortConfig
 ): EventWithCurrentStatus[] => {
   const { field, direction } = config;
-  
+
   return [...events].sort((a, b) => {
     let comparison = 0;
-    
+
     switch (field) {
       case 'date':
         comparison = dayjs(a.eventDate).valueOf() - dayjs(b.eventDate).valueOf();
         break;
-        
+
       case 'price':
         comparison = a.ticketPrice - b.ticketPrice;
         break;
-        
+
       case 'name':
         comparison = a.eventName.localeCompare(b.eventName, 'ko');
         break;
-        
+
       case 'status':
         comparison = statusPriority[a.status] - statusPriority[b.status];
         break;
-        
+
       default:
         comparison = 0;
     }
-    
+
     // 내림차순인 경우 비교 결과를 반전
     return direction === 'desc' ? -comparison : comparison;
   });

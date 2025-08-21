@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { 
-	createRefundAccount, 
-	updateRefundAccount, 
+import {
+	createRefundAccount,
+	updateRefundAccount,
 	deleteRefundAccount,
 	fetchRefundAccountByUserId
 } from '@/api/refund';
-import { 
-	UpdateRefundAccountDto 
+import {
+	UpdateRefundAccountDto
 } from '@/types/dto/refundAccount';
 
 // 사용자별 환불 계좌 조회
@@ -41,7 +41,7 @@ export const useUpdateRefundAccount = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ id, data }: { id: string; data: UpdateRefundAccountDto }) => 
+		mutationFn: ({ id, data }: { id: string; data: UpdateRefundAccountDto }) =>
 			updateRefundAccount(id, data),
 		onSuccess: (data) => {
 			// 해당 사용자의 환불 계좌 쿼리 무효화

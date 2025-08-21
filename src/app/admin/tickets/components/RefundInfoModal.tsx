@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCreatePaymentTransaction, usePaymentTransactionsByReservationId } from '@/hooks/api/usePaymentTransactions';
 import { useReservations } from '@/hooks/api/useReservations';
 import { useEvents } from '@/hooks/api/useEvents';
@@ -80,37 +80,6 @@ const RefundInfoModal = ({
     // 양도된 티켓인지 확인 (refundRequestMapping이 있으면 양도된 티켓)
     const isTransferredTicket = !!refundRequestMapping;
 
-    // 기본값 설정 (양도된 티켓이면 환불계좌 정보, 아니면 입금 정보)
-    const getDefaultValues = () => {
-        if (isTransferredTicket && refundAccount) {
-            // 양도된 티켓: 환불계좌 정보 사용
-            return {
-                refundAmount: defaultRefundAmount,
-                refundBank: refundAccount.bankName,
-                refundAccount: refundAccount.accountNumber,
-                refundHolder: refundAccount.accountHolder,
-                note: '',
-            };
-        } else if (paymentInfo) {
-            // 일반 티켓: 입금 정보 사용
-            return {
-                refundAmount: defaultRefundAmount,
-                refundBank: paymentInfo.bankName,
-                refundAccount: paymentInfo.accountNumber,
-                refundHolder: paymentInfo.accountHolder,
-                note: '',
-            };
-        } else {
-            return {
-                refundAmount: 0,
-                refundBank: '',
-                refundAccount: '',
-                refundHolder: '',
-                note: '',
-            };
-        }
-    };
-
     // 환불 정책에 따른 환불 금액 계산 (취소 신청 시점 기준)
     const calculateRefundAmount = () => {
         if (!paymentInfo) return 0; // 입금 정보가 없으면 환불 불가
@@ -143,6 +112,37 @@ const RefundInfoModal = ({
     // 기본 환불 금액 (정책 적용)
     const defaultRefundAmount = calculateRefundAmount();
 
+    // 기본값 설정 (양도된 티켓이면 환불계좌 정보, 아니면 입금 정보)
+    const getDefaultValues = React.useCallback(() => {
+        if (isTransferredTicket && refundAccount) {
+            // 양도된 티켓: 환불계좌 정보 사용
+            return {
+                refundAmount: defaultRefundAmount,
+                refundBank: refundAccount.bankName,
+                refundAccount: refundAccount.accountNumber,
+                refundHolder: refundAccount.accountHolder,
+                note: '',
+            };
+        } else if (paymentInfo) {
+            // 일반 티켓: 입금 정보 사용
+            return {
+                refundAmount: defaultRefundAmount,
+                refundBank: paymentInfo.bankName,
+                refundAccount: paymentInfo.accountNumber,
+                refundHolder: paymentInfo.accountHolder,
+                note: '',
+            };
+        } else {
+            return {
+                refundAmount: 0,
+                refundBank: '',
+                refundAccount: '',
+                refundHolder: '',
+                note: '',
+            };
+        }
+    }, [isTransferredTicket, refundAccount, paymentInfo, defaultRefundAmount]);
+
     // 환불 가능 여부 확인
     const isRefundable = defaultRefundAmount > 0;
 
@@ -152,7 +152,7 @@ const RefundInfoModal = ({
     // 기본값 업데이트 (양도된 티켓의 환불계좌 정보나 입금 정보가 변경되면)
     useEffect(() => {
         setRefundInfo(getDefaultValues());
-    }, [refundRequestMapping, refundAccount, paymentInfo, defaultRefundAmount]);
+    }, [getDefaultValues]);
 
     // 입력 핸들러
     const handleInputChange = (field: string, value: string | number) => {

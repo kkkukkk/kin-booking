@@ -25,7 +25,7 @@ export const useEventMediaByType = (eventId: string, mediaType: string) => {
 // 이미지 업로드 훅
 export const useUploadEventImage = (eventId: string) => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: (file: File) => uploadEventImage(eventId, file),
 		onSuccess: () => {
@@ -39,7 +39,7 @@ export const useUploadEventImage = (eventId: string) => {
 // 이미지 삭제 훅
 export const useDeleteEventMedia = (eventId: string) => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: (mediaId: number) => deleteEventMedia(mediaId),
 		onSuccess: () => {
@@ -53,7 +53,7 @@ export const useDeleteEventMedia = (eventId: string) => {
 // 공연 등록 후 포스터 업로드 훅
 export const useUploadEventPoster = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: ({ eventId, file }: {
 			eventId: string;

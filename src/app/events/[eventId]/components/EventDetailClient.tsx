@@ -86,7 +86,7 @@ const EventDetailClient = () => {
 			</motion.div>
 
 			<div className="space-y-5 flex flex-col">
-				<EventHeader 
+				<EventHeader
 					eventName={event.eventName}
 					status={event.status}
 					theme={theme}

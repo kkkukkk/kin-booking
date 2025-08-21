@@ -9,7 +9,7 @@
     "sidebar main";
 }
 
-.admin-layout > .sidebar {
+.admin-layout>.sidebar {
   grid-area: sidebar;
   display: block;
   min-width: 0;
@@ -17,23 +17,25 @@
   width: auto;
 }
 
-.admin-layout > .main {
+.admin-layout>.main {
   grid-area: main;
   overflow-y: auto;
   min-width: 0;
   height: 100%;
   width: 100%;
   /* 스크롤바 숨기기 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
 
 /* Webkit 브라우저용 스크롤바 숨기기 */
-.admin-layout > .main::-webkit-scrollbar {
+.admin-layout>.main::-webkit-scrollbar {
   display: none;
 }
 
-.admin-layout > .header {
+.admin-layout>.header {
   grid-area: header;
 }
 
@@ -47,7 +49,8 @@
       "sidebar"
       "main";
   }
+
   .sidebar {
     display: none;
   }
-} 
+}

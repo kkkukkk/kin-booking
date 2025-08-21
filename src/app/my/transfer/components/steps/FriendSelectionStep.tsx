@@ -20,23 +20,23 @@ const FriendSelectionStep = ({ friends, onFriendSelect, theme }: FriendSelection
   return (
     <ThemeDiv className="p-6 rounded-lg" isChildren>
       <h2 className="text-base md:text-lg font-bold mb-4">양도할 친구를 선택해주세요</h2>
-      
+
       {!friends || friends.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8">
           <div className={clsx(
             "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4",
-            theme === 'normal' 
-              ? "bg-gray-100" 
-              : theme === 'dark' 
-                ? "bg-gray-700" 
+            theme === 'normal'
+              ? "bg-gray-100"
+              : theme === 'dark'
+                ? "bg-gray-700"
                 : "bg-gray-800"
           )}>
             <UsersIcon className={clsx(
               "w-8 h-8",
-              theme === 'normal' 
-                ? "text-gray-400" 
-                : theme === 'dark' 
-                  ? "text-gray-300" 
+              theme === 'normal'
+                ? "text-gray-400"
+                : theme === 'dark'
+                  ? "text-gray-300"
                   : "text-gray-400"
             )} />
           </div>

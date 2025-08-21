@@ -3,7 +3,7 @@ import { EventStats, UserStats, DashboardStats, TrendData } from '@/types/dto/ad
 import dayjs from 'dayjs';
 
 // 기간별 데이터 분류 함수
-const classifyByPeriod = (data: any[], dateField: string) => {
+const classifyByPeriod = <T extends Record<string, unknown>>(data: T[], dateField: string) => {
   const now = dayjs();
   const periods = {
     today: { start: now.startOf('day'), end: now.endOf('day') },
@@ -13,14 +13,14 @@ const classifyByPeriod = (data: any[], dateField: string) => {
     currentMonth: { start: now.startOf('month'), end: now.endOf('month') },
     lastMonth: { start: now.subtract(1, 'month').startOf('month'), end: now.subtract(1, 'month').endOf('month') }
   };
-  
+
   return Object.entries(periods).reduce((acc, [key, { start, end }]) => {
     acc[key] = data.filter(item => {
-      const itemDate = dayjs(item[dateField]);
+      const itemDate = dayjs(item[dateField] as string);
       return itemDate.isAfter(start) && itemDate.isBefore(end);
     });
     return acc;
-  }, {} as Record<string, any[]>);
+  }, {} as Record<string, T[]>);
 };
 
 // 통합 대시보드 데이터 조회 (최적화된 버전)
@@ -28,25 +28,25 @@ export const getAllDashboardData = async () => {
   try {
     const now = dayjs();
     const lastMonthStart = now.subtract(1, 'month').startOf('month');
-    
+
     // API 호출로 모든 데이터 조회
     const [usersResult, ticketsResult, transactionsResult, reservationsResult, eventsResult] = await Promise.all([
       // 1. 사용자 데이터
       supabase.from('users').select('id, status'),
-      
+
       // 2. 티켓 데이터
       supabase.from('ticket').select('status'),
-      
+
       // 3. 결제 거래 데이터 (최근 1개월)
       supabase.from('payment_transactions')
         .select('event_id, amount, payment_type, operated_at')
         .gte('operated_at', lastMonthStart.toISOString()),
-      
+
       // 4. 예매 데이터 (최근 1개월)
       supabase.from('reservations')
-        .select('event_id, quantity, status, reserved_at')
+        .select('event_id, quantity, status, reserved_at, user_id')
         .gte('reserved_at', lastMonthStart.toISOString().split('T')[0]),
-      
+
       // 5. 공연 데이터 (통합 뷰)
       supabase.from('event_with_reservation_view')
         .select('*')
@@ -74,14 +74,14 @@ export const getAllDashboardData = async () => {
 };
 
 // 프론트엔드에서 사용할 데이터 처리 함수들
-export const processUserStats = (users: any[]): UserStats => {
+export const processUserStats = (users: Array<{ status: string }>): UserStats => {
   const totalUsers = users.length;
   const activeUsers = users.filter(u => u.status === 'active').length;
   const inactiveUsers = totalUsers - activeUsers;
-  
+
   // 활동 사용자 수는 reservations에서 계산해야 하므로 별도 처리
   const activeUserRate = totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0;
-  
+
   return {
     totalUsers,
     activeUsers,
@@ -92,7 +92,7 @@ export const processUserStats = (users: any[]): UserStats => {
   };
 };
 
-export const processTicketStats = (tickets: any[]) => {
+export const processTicketStats = (tickets: Array<{ status: string }>) => {
   const availableTickets = tickets.filter(t => t.status === 'active').length;
   const usedTickets = tickets.filter(t => t.status === 'used').length;
   const cancelledTickets = tickets.filter(t => t.status === 'cancelled').length;
@@ -108,10 +108,10 @@ export const processTicketStats = (tickets: any[]) => {
   };
 };
 
-export const processRevenueStats = (transactions: any[]) => {
+export const processRevenueStats = (transactions: Array<{ payment_type: string; amount: number }>) => {
   let totalPayment = 0;
   let totalRefund = 0;
-  
+
   transactions.forEach(transaction => {
     if (transaction.payment_type === 'payment') {
       totalPayment += transaction.amount;
@@ -129,13 +129,25 @@ export const processRevenueStats = (transactions: any[]) => {
   };
 };
 
-export const processEventStats = (events: any[], transactions: any[], reservations: any[]): EventStats[] => {
+export const processEventStats = (
+  events: Array<{
+    event_id: string;
+    event_name: string;
+    event_date: string;
+    seat_capacity: number;
+    reserved_quantity: number;
+    status: string;
+    ticket_price?: number;
+  }>,
+  transactions: Array<{ event_id: string; payment_type: string; amount: number }>,
+  reservations: Array<{ event_id: string; status: string; quantity: number }>
+): EventStats[] => {
   return events.map(event => {
     // 해당 공연의 결제 거래 집계
     const eventTransactions = transactions.filter(t => t.event_id === event.event_id);
     let totalPayment = 0;
     let totalRefund = 0;
-    
+
     eventTransactions.forEach(transaction => {
       if (transaction.payment_type === 'payment') {
         totalPayment += transaction.amount;
@@ -145,26 +157,26 @@ export const processEventStats = (events: any[], transactions: any[], reservatio
     });
 
     const netRevenue = totalPayment - totalRefund;
-    
+
     // 해당 공연의 예매 집계
     const eventReservations = reservations.filter(r => r.event_id === event.event_id);
     const confirmedQuantity = eventReservations
       .filter(r => r.status === 'confirmed')
       .reduce((sum, r) => sum + r.quantity, 0);
-    
+
     const pendingQuantity = eventReservations
       .filter(r => r.status === 'pending')
       .reduce((sum, r) => sum + r.quantity, 0);
-    
+
     const cancelledQuantity = eventReservations
       .filter(r => r.status === 'cancelled' || r.status === 'voided')
       .reduce((sum, r) => sum + r.quantity, 0);
 
     const totalReservedQuantity = confirmedQuantity + pendingQuantity + cancelledQuantity;
-    
+
     // 판매율 계산 (실제 판매된 티켓 수 / 총 좌석 수)
     const salesRate = event.seat_capacity > 0 ? (event.reserved_quantity / event.seat_capacity) * 100 : 0;
-    
+
     // 취소율 계산
     const cancellationRate = totalReservedQuantity > 0 ? (cancelledQuantity / totalReservedQuantity) * 100 : 0;
 
@@ -188,13 +200,16 @@ export const processEventStats = (events: any[], transactions: any[], reservatio
   });
 };
 
-export const processTrendStats = (transactions: any[], reservations: any[]): TrendData[] => {
+export const processTrendStats = (
+  transactions: Array<{ payment_type: string; amount: number; operated_at: string }>,
+  reservations: Array<{ status: string; quantity: number; reserved_at: string }>
+): TrendData[] => {
   // 기간별 분류
   const paymentByPeriod = classifyByPeriod(transactions, 'operated_at');
   const reservationsByPeriod = classifyByPeriod(reservations, 'reserved_at');
 
   // 수익 계산 함수
-  const calculatePaymentStats = (transactions: any[]) => {
+  const calculatePaymentStats = (transactions: Array<{ payment_type: string; amount: number }>) => {
     let payment = 0;
     let refund = 0;
     transactions.forEach(t => {
@@ -208,7 +223,7 @@ export const processTrendStats = (transactions: any[], reservations: any[]): Tre
   };
 
   // 예매/취소 통계 함수
-  const calculateReservationStats = (reservations: any[]) => {
+  const calculateReservationStats = (reservations: Array<{ status: string }>) => {
     const total = reservations.length;
     const cancelled = reservations.filter(r => r.status === 'cancelled' || r.status === 'voided').length;
     return { total, cancelled };
@@ -217,19 +232,19 @@ export const processTrendStats = (transactions: any[], reservations: any[]): Tre
   // 각 기간별 통계 계산
   const todayStats = calculatePaymentStats(paymentByPeriod.today || []);
   const todayResStats = calculateReservationStats(reservationsByPeriod.today || []);
-  
+
   const yesterdayStats = calculatePaymentStats(paymentByPeriod.yesterday || []);
   const yesterdayResStats = calculateReservationStats(reservationsByPeriod.yesterday || []);
-  
+
   const currentWeekStats = calculatePaymentStats(paymentByPeriod.currentWeek || []);
   const currentWeekResStats = calculateReservationStats(reservationsByPeriod.currentWeek || []);
-  
+
   const lastWeekStats = calculatePaymentStats(paymentByPeriod.lastWeek || []);
   const lastWeekResStats = calculateReservationStats(reservationsByPeriod.lastWeek || []);
-  
+
   const currentMonthStats = calculatePaymentStats(paymentByPeriod.currentMonth || []);
   const currentMonthResStats = calculateReservationStats(reservationsByPeriod.currentMonth || []);
-  
+
   const lastMonthStats = calculatePaymentStats(paymentByPeriod.lastMonth || []);
   const lastMonthResStats = calculateReservationStats(reservationsByPeriod.lastMonth || []);
 
@@ -277,16 +292,19 @@ export const processTrendStats = (transactions: any[], reservations: any[]): Tre
 };
 
 // 활동 사용자 통계 (reservations 데이터 필요)
-export const processActivityUserStats = (users: any[], reservations: any[]): UserStats => {
+export const processActivityUserStats = (
+  users: Array<{ status: string }>,
+  reservations: Array<{ user_id: string | null; reserved_at: string }>
+): UserStats => {
   const totalUsers = users.length;
   const activeUsers = users.filter(u => u.status === 'active').length;
   const inactiveUsers = totalUsers - activeUsers;
-  
+
   // 최근 30일 내 활동이 있는 사용자 수
   const thirtyDaysAgo = dayjs().subtract(30, 'day').format('YYYY-MM-DD');
   const recentReservations = reservations.filter(r => r.reserved_at >= thirtyDaysAgo);
   const uniqueActivityUsers = new Set(recentReservations.map(r => r.user_id).filter(id => id !== null)).size;
-  
+
   const activeUserRate = totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0;
   const activityUserRate = totalUsers > 0 ? (uniqueActivityUsers / totalUsers) * 100 : 0;
 
@@ -305,7 +323,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
   try {
     // 통합 데이터 조회
     const rawData = await getAllDashboardData();
-    
+
     // 프론트엔드에서 데이터 처리
     const userStats = processActivityUserStats(rawData.users, rawData.reservations);
     const ticketStats = processTicketStats(rawData.tickets);

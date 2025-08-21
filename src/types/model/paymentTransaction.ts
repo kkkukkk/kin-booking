@@ -1,8 +1,8 @@
 export type PaymentType = 'payment' | 'refund';
 
 export const PaymentTypeKo: Record<PaymentType, string> = {
-  payment: '입금',
-  refund: '환불',
+	payment: '입금',
+	refund: '환불',
 };
 
 export interface PaymentTransaction {

@@ -15,54 +15,64 @@ import { UsersIcon, RequestIcon, SearchIcon } from '@/components/icon/FriendIcon
 type FriendsTabType = 'friends' | 'requests' | 'add';
 
 const FriendsTab = () => {
-  const theme = useAppSelector((state: RootState) => state.theme.current);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<FriendsTabType>('friends');
+	const theme = useAppSelector((state: RootState) => state.theme.current);
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const [activeTab, setActiveTab] = useState<FriendsTabType>('friends');
 
-  // URL 파라미터에서 섹션 설정
-  useEffect(() => {
-    const sectionParam = searchParams.get('section') as FriendsTabType;
-    if (sectionParam && ['friends', 'requests', 'add'].includes(sectionParam)) {
-      setActiveTab(sectionParam);
-    }
-  }, [searchParams]);
+	// URL 파라미터에서 섹션 설정
+	useEffect(() => {
+		const sectionParam = searchParams.get('section') as FriendsTabType;
+		if (sectionParam && ['friends', 'requests', 'add'].includes(sectionParam)) {
+			setActiveTab(sectionParam);
+		}
+	}, [searchParams]);
 
-  	const tabs = [
-		{ 
-	      id: 'friends' as FriendsTabType, 
-	      label: '목록', 
-	      icon: UsersIcon,
-	      neonColor: 'cyan' as const
-	    },
-		{ 
-	      id: 'requests' as FriendsTabType, 
-	      label: '요청', 
-	      icon: RequestIcon,
-	      neonColor: 'cyan' as const
-	    },
-		{ 
-	      id: 'add' as FriendsTabType, 
-	      label: '추가', 
-	      icon: SearchIcon,
-	      neonColor: 'cyan' as const
-	    },
+	// 탭 변경 처리
+	const handleTabChange = (tabId: FriendsTabType) => {
+		setActiveTab(tabId);
+		
+		// URL 업데이트 (섹션 변경 시)
+		const newUrl = new URL(window.location.href);
+		newUrl.searchParams.set('section', tabId);
+		router.replace(newUrl.pathname + newUrl.search);
+	};
+
+	const tabs = [
+		{
+			id: 'friends' as FriendsTabType,
+			label: '목록',
+			icon: UsersIcon,
+			neonColor: 'cyan' as const
+		},
+		{
+			id: 'requests' as FriendsTabType,
+			label: '요청',
+			icon: RequestIcon,
+			neonColor: 'cyan' as const
+		},
+		{
+			id: 'add' as FriendsTabType,
+			label: '추가',
+			icon: SearchIcon,
+			neonColor: 'cyan' as const
+		},
 	];
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'friends':
-        return <FriendList />;
-      case 'requests':
-        return <FriendRequests />;
-      case 'add':
-        return <AddFriend />;
-      default:
-        return null;
-    }
-  };
+	const renderTabContent = () => {
+		switch (activeTab) {
+			case 'friends':
+				return <FriendList />;
+			case 'requests':
+				return <FriendRequests />;
+			case 'add':
+				return <AddFriend />;
+			default:
+				return null;
+		}
+	};
 
-  	return (
+	return (
 		<>
 			{/* 탭 */}
 			<motion.div
@@ -78,13 +88,7 @@ const FriendsTab = () => {
 						return (
 							<Button
 								key={tab.id}
-								onClick={() => {
-									setActiveTab(tab.id);
-									// URL 업데이트 (섹션 변경 시)
-									const newUrl = new URL(window.location.href);
-									newUrl.searchParams.set('section', tab.id);
-									router.replace(newUrl.pathname + newUrl.search);
-								}}
+								onClick={() => handleTabChange(tab.id)}
 								theme={theme}
 								padding={'py-1.5 px-3 md:py-2 md:px-4'}
 								className={`gap-1.5 md:gap-2 font-semibold relative text-sm`}
@@ -103,7 +107,7 @@ const FriendsTab = () => {
 					})}
 				</div>
 			</motion.div>
-			
+
 			<ThemeDiv className="p-4 md:p-6 rounded" isChildren>
 				<motion.div
 					key={activeTab}

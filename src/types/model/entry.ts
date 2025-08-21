@@ -1,7 +1,7 @@
 export enum EntrySessionStatus {
-  Pending = 'pending',   // 대기 중 (입장 가능)
-  Used = 'used',         // 사용 완료 (입장 불가)
-  Expired = 'expired'    // 만료됨 (재생성 필요)
+  Pending = 'pending',
+  Used = 'used',
+  Expired = 'expired'
 }
 
 export const EntrySessionStatusKo: Record<EntrySessionStatus, string> = {

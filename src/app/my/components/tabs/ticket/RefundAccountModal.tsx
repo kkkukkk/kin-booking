@@ -17,13 +17,13 @@ export interface RefundAccountModalProps {
 	theme: Theme;
 }
 
-export const RefundAccountModal = ({ 
-	isOpen, 
-	onClose, 
-	onSubmit, 
+export const RefundAccountModal = ({
+	isOpen,
+	onClose,
+	onSubmit,
 	existingAccounts = [],
 	isSubmitting = false,
-	theme 
+	theme
 }: RefundAccountModalProps) => {
 	const [selectedAccountId, setSelectedAccountId] = useState<string>('');
 	const [bankName, setBankName] = useState('');
@@ -61,7 +61,7 @@ export const RefundAccountModal = ({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		
+
 		if (isNewAccount) {
 			// 새 계좌 정보 유효성 검사
 			if (!bankName.trim()) {
@@ -76,7 +76,7 @@ export const RefundAccountModal = ({
 				showToast({ message: '예금주를 입력해주세요.', iconType: 'error' });
 				return;
 			}
-			
+
 			// 유효성 검사 통과 시 제출
 			onSubmit({ bankName: bankName.trim(), accountNumber: accountNumber.trim(), accountHolder: accountHolder.trim() });
 		} else {
@@ -85,7 +85,7 @@ export const RefundAccountModal = ({
 				showToast({ message: '계좌를 선택해주세요.', iconType: 'error' });
 				return;
 			}
-			
+
 			// 유효성 검사 통과 시 제출
 			const selectedAccount = existingAccounts.find(acc => acc.id === selectedAccountId);
 			if (selectedAccount) {
@@ -123,30 +123,28 @@ export const RefundAccountModal = ({
 							<button
 								type="button"
 								onClick={() => setIsNewAccount(false)}
-								className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-									!isNewAccount
-										? theme === 'normal' 
-											? 'bg-green-100 text-green-700 border border-green-200' 
+								className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${!isNewAccount
+										? theme === 'normal'
+											? 'bg-green-100 text-green-700 border border-green-200'
 											: 'bg-green-600 text-white border border-green-500'
 										: theme === 'normal'
 											? 'bg-gray-100 text-gray-600 border border-gray-200'
 											: 'bg-gray-700 text-gray-300 border border-gray-600'
-								}`}
+									}`}
 							>
 								기존 계좌 선택
 							</button>
 							<button
 								type="button"
 								onClick={() => setIsNewAccount(true)}
-								className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-									isNewAccount
-										? theme === 'normal' 
-											? 'bg-green-100 text-green-700 border border-green-200' 
+								className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${isNewAccount
+										? theme === 'normal'
+											? 'bg-green-100 text-green-700 border border-green-200'
 											: 'bg-green-600 text-white border border-green-500'
 										: theme === 'normal'
 											? 'bg-gray-100 text-gray-600 border border-gray-200'
 											: 'bg-gray-700 text-gray-300 border border-gray-600'
-								}`}
+									}`}
 							>
 								새 계좌 입력
 							</button>
@@ -201,15 +199,14 @@ export const RefundAccountModal = ({
 								<div
 									key={account.id}
 									onClick={() => setSelectedAccountId(account.id)}
-									className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-										selectedAccountId === account.id
+									className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${selectedAccountId === account.id
 											? theme === 'normal'
 												? 'border-green-500 bg-green-50'
 												: 'border-green-400 bg-green-900/20'
 											: theme === 'normal'
 												? 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
 												: 'border-gray-600 bg-gray-800 hover:border-gray-500 hover:bg-gray-700'
-									}`}
+										}`}
 								>
 									<div className="flex items-center justify-between">
 										<div className="flex-1">
@@ -220,15 +217,14 @@ export const RefundAccountModal = ({
 												{account.accountHolder}
 											</div>
 										</div>
-										<div className={`w-4 h-4 rounded-full border-2 ${
-											selectedAccountId === account.id
+										<div className={`w-4 h-4 rounded-full border-2 ${selectedAccountId === account.id
 												? theme === 'normal'
 													? 'border-green-500 bg-green-500'
 													: 'border-green-400 bg-green-400'
 												: theme === 'normal'
 													? 'border-gray-300'
 													: 'border-gray-500'
-										}`}>
+											}`}>
 											{selectedAccountId === account.id && (
 												<div className="w-2 h-2 bg-white rounded-full m-0.5" />
 											)}
@@ -241,10 +237,10 @@ export const RefundAccountModal = ({
 
 					<div className="flex space-x-3 pt-4">
 						<Button
-              theme={theme === 'normal' ? 'dark' : theme}
+							theme={theme === 'normal' ? 'dark' : theme}
 							type="button"
 							onClick={handleClose}
-              padding="py-1"
+							padding="py-1"
 							className="flex-1 font-semibold"
 						>
 							취소
@@ -253,7 +249,7 @@ export const RefundAccountModal = ({
 							theme={theme === 'normal' ? 'dark' : theme}
 							type="submit"
 							disabled={isSubmitDisabled()}
-              padding="py-1"
+							padding="py-1"
 							className="flex-1 font-semibold"
 						>
 							{isSubmitting ? '처리 중...' : '확인'}

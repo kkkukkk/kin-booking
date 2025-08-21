@@ -18,7 +18,7 @@ const Textarea = ({
 }: TextareaProps) => {
 	// 기본 스타일
 	const getBaseStyles = () => {
-		return "focus:outline-none pl-2 py-1 w-full resize-none rounded-[5px] shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)]";
+		return "focus:outline-none px-2 py-1 w-full resize-none rounded-[5px] shadow-[1px_1px_0_1px_rgba(0,0,0,0.1)]";
 	};
 
 	// 테마별 스타일

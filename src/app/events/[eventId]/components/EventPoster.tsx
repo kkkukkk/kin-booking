@@ -1,8 +1,6 @@
 'use client'
 
-import { motion } from "framer-motion";
-import { fadeSlideLeft } from "@/types/ui/motionVariants";
-import { getStorageUrl, getEventPosterUrl } from "@/util/storage";
+import { getEventPosterUrl } from "@/util/storage";
 import clsx from "clsx";
 import Skeleton from "@/components/base/Skeleton";
 import Image from "next/image";
@@ -30,13 +28,7 @@ const EventPoster = ({
 	smallText = false,
 }: EventPosterProps) => {
 	return (
-		<motion.div
-			variants={fadeSlideLeft}
-			initial="hidden"
-			animate="visible"
-			transition={{ delay: 0.15 }}
-			className="w-full h-full"
-		>
+		<div className="w-full h-full">
 			{isLoading ? (
 				<Skeleton className="w-full h-full rounded-lg" />
 			) : posterData && posterData.length > 0 ? (
@@ -70,7 +62,7 @@ const EventPoster = ({
 					</div>
 				</div>
 			)}
-		</motion.div>
+		</div>
 	);
 };
 

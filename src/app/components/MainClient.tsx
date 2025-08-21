@@ -90,7 +90,7 @@ const MainClient = () => {
   const handleScrollToKinSection = () => {
     const container = scrollContainerRef.current;
     const endMarker = document.getElementById('kin-animation-end-marker') as HTMLElement;
-    
+
     if (container && endMarker) {
       const markerTop = endMarker.offsetTop;
       // 스크롤 위치를 더 아래로 조정 (예: 100px 추가)
@@ -100,23 +100,23 @@ const MainClient = () => {
       const distance = targetScrollTop - startScrollTop;
       const duration = 8000;
       const startTime = performance.now();
-      
+
       const linear = (t: number) => {
         return t; // 일정한 속도로 움직임
       };
-      
+
       const animateScroll = (currentTime: number) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const easedProgress = linear(progress);
-        
+
         container.scrollTop = startScrollTop + (distance * easedProgress);
-        
+
         if (progress < 1) {
           requestAnimationFrame(animateScroll);
         }
       };
-      
+
       requestAnimationFrame(animateScroll);
     }
   };
@@ -129,7 +129,7 @@ const MainClient = () => {
           <div className="text-lg mb-2">정보를 불러오는 중...</div>
           <div className="text-sm text-gray-500">잠시만 기다려주세요</div>
         </div>
-        
+
         {/* 튜토리얼 오버레이 */}
         <TutorialOverlay
           steps={mainPageTutorialSteps}
@@ -155,7 +155,7 @@ const MainClient = () => {
             다시 시도
           </Button>
         </div>
-        
+
         {/* 튜토리얼 오버레이 */}
         <TutorialOverlay
           steps={mainPageTutorialSteps}
@@ -169,7 +169,7 @@ const MainClient = () => {
   return (
     <>
       {/* 이미지 슬라이더 */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -205,18 +205,18 @@ const MainClient = () => {
       </motion.div>
 
       {/* 스크롤 화살표 */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.6 }}
         className="flex justify-center mb-8"
       >
         <motion.div
-          animate={{ 
+          animate={{
             y: [0, 8, 0],
             opacity: [0.6, 1, 0.6]
           }}
-          transition={{ 
+          transition={{
             duration: 2,
             repeat: Infinity,
             ease: "easeInOut"
@@ -229,19 +229,19 @@ const MainClient = () => {
       </motion.div>
 
       {/* KIN 애니메이션 */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className="text-center py-4 relative"
       >
-        <KinAnimationSection 
-          scrollContainerRef={isContainerReady ? scrollContainerRef : undefined} 
+        <KinAnimationSection
+          scrollContainerRef={isContainerReady ? scrollContainerRef : undefined}
         />
       </motion.div>
 
       {/* 공연 현황 */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
@@ -253,11 +253,11 @@ const MainClient = () => {
           onNavigateToEvents={handleNavigateToEvents}
         />
       </motion.div>
-      
+
       {/* 공연 포스터 */}
       <MainEventSection title="지금 공연 중" events={openEvents} theme={theme} variant="large" />
       <MainEventSection title="곧 만나볼 공연" events={waitingEvents} theme={theme} variant="small" />
-      
+
       {(!openEvents || openEvents.length === 0) && (!waitingEvents || waitingEvents.length === 0) && (
         <div className="flex flex-col items-center justify-center py-8 bg-gradient-to-br from-black/40 to-green-900/30 rounded-xl shadow-lg">
           <div className="text-lg mb-2 text-white font-semibold">현재 준비 중인 공연이 없어요</div>
@@ -265,8 +265,8 @@ const MainClient = () => {
         </div>
       )}
 
-      
-      {/* 유튜브 동영상 섹션 (임시 숨김) */}
+
+      {/* 유튜브 동영상 섹션 ( 숨김) */}
       {/* <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -277,7 +277,7 @@ const MainClient = () => {
       </motion.div> */}
 
       {/* About us 섹션 */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
@@ -301,7 +301,7 @@ const MainClient = () => {
           </div>
         </div>
       </motion.div>
-      
+
       {/* 튜토리얼 오버레이 */}
       <TutorialOverlay
         steps={mainPageTutorialSteps}

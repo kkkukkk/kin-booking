@@ -42,8 +42,8 @@ const TransferClient = () => {
   // 실제 보유 매수에 맞게 transferCount 초기화
   useEffect(() => {
     if (userTickets) {
-      const targetTickets = userTickets.filter(ticket => 
-        ticket.eventId === eventId && 
+      const targetTickets = userTickets.filter(ticket =>
+        ticket.eventId === eventId &&
         ticket.reservationId === reservationId &&
         ticket.status === 'active'
       );
@@ -130,8 +130,8 @@ const TransferClient = () => {
   }
 
   // 해당 예매의 사용자 티켓 필터링
-  const targetTickets = userTickets?.filter(ticket => 
-    ticket.eventId === eventId && 
+  const targetTickets = userTickets?.filter(ticket =>
+    ticket.eventId === eventId &&
     ticket.reservationId === reservationId &&
     ticket.status === 'active'
   ) || [];
@@ -152,9 +152,9 @@ const TransferClient = () => {
 
   const selectedFriend = friends?.find(f => f.counterpartUserId === selectedFriendId);
 
-  	return (
-		<div className="p-4 md:p-6 space-y-6">
-			{/* 헤더 */}
+  return (
+    <div className="p-4 md:p-6 space-y-6">
+      {/* 헤더 */}
       <Button
         onClick={handleBack}
         theme="dark"
@@ -163,13 +163,13 @@ const TransferClient = () => {
         light={theme !== 'normal'}
         className='font-semibold'
       >
-        {currentStep === 'friend' 
-          ? '뒤로가기' 
+        {currentStep === 'friend'
+          ? '뒤로가기'
           : '이전'
         }
       </Button>
 
-			<div className="space-y-6">
+      <div className="space-y-6">
         {/* 단계 표시 */}
         <TransferProgress currentStep={currentStep} theme={theme} />
 

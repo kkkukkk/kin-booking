@@ -1,40 +1,40 @@
 export const isValidEmail = (email: string): boolean => {
 	const trimmed = email.trim();
-	
+
 	// 기본 형식 검사
 	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
 		return false;
 	}
-	
+
 	// @ 기준으로 분리
 	const [localPart, domain] = trimmed.split('@');
-	
+
 	// 로컬 파트 검사 (1-64자, 특수문자 제한)
 	if (!localPart || localPart.length > 64 || localPart.length < 1) {
 		return false;
 	}
-	
+
 	// 도메인 검사 (1-253자, 최소 2개 레벨)
 	if (!domain || domain.length > 253 || domain.length < 3) {
 		return false;
 	}
-	
+
 	// 도메인에 최소 1개의 점이 있어야 함
 	if (!domain.includes('.')) {
 		return false;
 	}
-	
+
 	// 도메인 레벨별 길이 검사 (각 레벨은 1-63자)
 	const domainParts = domain.split('.');
 	if (domainParts.some(part => part.length === 0 || part.length > 63)) {
 		return false;
 	}
-	
+
 	// 도메인 시작과 끝이 점이면 안됨
 	if (domain.startsWith('.') || domain.endsWith('.')) {
 		return false;
 	}
-	
+
 	return true;
 };
 

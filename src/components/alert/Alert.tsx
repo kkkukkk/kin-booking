@@ -1,7 +1,7 @@
 'use client'
 
 import ThemeDiv from "@/components/base/ThemeDiv";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import { useAppSelector } from "@/redux/hooks";
@@ -86,10 +86,10 @@ const Alert = ({
 
 					{/* 액션 영역 */}
 					<div className="flex justify-center gap-3 pt-4 border-t border-gray-200/10">
-						<Button 
-							onClick={onConfirm} 
-							theme={"dark"} 
-							width={"w-1/3"} 
+						<Button
+							onClick={onConfirm}
+							theme={"dark"}
+							width={"w-1/3"}
 							padding={"px-3 py-1.5"}
 							reverse={theme === "normal"}
 							className={clsx(
@@ -99,18 +99,18 @@ const Alert = ({
 							확인
 						</Button>
 						{!noCancel && (
-							<Button 
-								onClick={onCancel} 
-								theme={"normal"} 
-								width={"w-1/3"} 
+							<Button
+								onClick={onCancel}
+								theme={"normal"}
+								width={"w-1/3"}
 								padding={"px-3 py-1.5"}
 								reverse={theme !== "normal"}
 								className={clsx(
 									"transition-all duration-200"
 								)}
-						>
-							취소
-						</Button>
+							>
+								취소
+							</Button>
 						)}
 					</div>
 				</div>

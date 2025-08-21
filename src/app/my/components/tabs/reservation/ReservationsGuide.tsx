@@ -7,10 +7,10 @@ import clsx from 'clsx';
 
 const ReservationsGuide = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
-	
+
 	return (
-		<Accordion 
-			title=" 예매 안내" 
+		<Accordion
+			title=" 예매 안내"
 			className="rounded shadow-inner mb-4"
 		>
 			<div>

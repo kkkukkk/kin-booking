@@ -22,20 +22,20 @@ interface ConfirmationStepProps {
   theme: Theme;
 }
 
-const ConfirmationStep = ({ 
-  selectedFriend, 
-  transferCount, 
+const ConfirmationStep = ({
+  selectedFriend,
+  transferCount,
   transferReason,
-  targetTickets, 
-  onTransfer, 
-  onBack, 
-  isTransferring, 
-  theme 
+  targetTickets,
+  onTransfer,
+  onBack,
+  isTransferring,
+  theme
 }: ConfirmationStepProps) => {
   const router = useRouter();
   const { showAlert } = useAlert();
   const eventInfo = targetTickets[0]?.event;
-  
+
   const formatEventDate = (dateString: string) => {
     const date = dayjs(dateString);
     return {
@@ -57,7 +57,7 @@ const ConfirmationStep = ({
       title: '티켓 양도 확인',
       message: `티켓 양도 시 소유권이 상실됩니다.\n\n양도하시겠습니까?`,
     });
-    
+
     if (confirmed) {
       onTransfer();
     }
@@ -66,16 +66,15 @@ const ConfirmationStep = ({
   return (
     <ThemeDiv className="p-6 rounded-lg" isChildren>
       <h2 className="text-base md:text-lg font-bold mb-4">양도 정보 확인</h2>
-      
+
       <div className="space-y-4 mb-6">
         {/* 양도 대상 */}
-        <div className={`p-3 rounded-lg border ${
-          theme === 'normal' 
-            ? 'border-gray-200' 
-            : theme === 'dark' 
-              ? 'border-gray-600' 
+        <div className={`p-3 rounded-lg border ${theme === 'normal'
+            ? 'border-gray-200'
+            : theme === 'dark'
+              ? 'border-gray-600'
               : 'border-gray-600'
-        }`}>
+          }`}>
           <h3 className="text-sm font-semibold mb-3 opacity-70">양도 대상</h3>
           <UserInfo
             name={selectedFriend?.counterpartName || '이름 없음'}
@@ -87,13 +86,12 @@ const ConfirmationStep = ({
         </div>
 
         {/* 양도 정보 */}
-        <div className={`p-3 rounded-lg border ${
-          theme === 'normal' 
-            ? 'border-gray-200' 
-            : theme === 'dark' 
-              ? 'border-gray-600' 
+        <div className={`p-3 rounded-lg border ${theme === 'normal'
+            ? 'border-gray-200'
+            : theme === 'dark'
+              ? 'border-gray-600'
               : 'border-gray-600'
-        }`}>
+          }`}>
           <h3 className="text-sm font-semibold mb-3 opacity-70">양도 정보</h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between items-center">
@@ -105,8 +103,8 @@ const ConfirmationStep = ({
             <div className="flex justify-between items-center">
               <span className="opacity-70">공연일시:</span>
               <span className="font-medium text-right">
-                {eventInfo?.eventDate ? 
-                  `${formatEventDate(eventInfo.eventDate).detailed} ${formatEventDate(eventInfo.eventDate).time}` : 
+                {eventInfo?.eventDate ?
+                  `${formatEventDate(eventInfo.eventDate).detailed} ${formatEventDate(eventInfo.eventDate).time}` :
                   '미정'
                 }
               </span>
@@ -120,13 +118,12 @@ const ConfirmationStep = ({
 
         {/* 양도 사유 */}
         {transferReason && (
-          <div className={`p-3 rounded-lg border ${
-            theme === 'normal' 
-              ? 'border-gray-200' 
-              : theme === 'dark' 
-                ? 'border-gray-600' 
+          <div className={`p-3 rounded-lg border ${theme === 'normal'
+              ? 'border-gray-200'
+              : theme === 'dark'
+                ? 'border-gray-600'
                 : 'border-gray-600'
-          }`}>
+            }`}>
             <h3 className="text-sm font-semibold mb-3 opacity-70">양도 사유</h3>
             <p className={clsx("text-sm", theme === 'normal' ? 'text-gray-700' : 'text-gray-300')}>
               {transferReason}

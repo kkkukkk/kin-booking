@@ -19,20 +19,20 @@ interface CountSelectionStepProps {
   theme: Theme;
 }
 
-const CountSelectionStep = ({ 
-  selectedFriend, 
-  transferCount, 
-  setTransferCount, 
+const CountSelectionStep = ({
+  selectedFriend,
+  transferCount,
+  setTransferCount,
   transferReason,
   setTransferReason,
-  actualTicketCount, 
-  onConfirm, 
-  theme 
+  actualTicketCount,
+  onConfirm,
+  theme
 }: CountSelectionStepProps) => {
   return (
     <ThemeDiv className="p-6 rounded-lg" isChildren>
       <h2 className="text-base md:text-lg font-bold mb-4">양도할 매수를 선택해주세요</h2>
-      
+
       {/* 선택된 친구 정보 */}
       <div className={
         theme === 'normal'
@@ -52,7 +52,7 @@ const CountSelectionStep = ({
 
       {/* 매수 선택 */}
       <div className="space-y-4">
-      <div>
+        <div>
           <label className="block text-sm font-medium mb-3">양도할 매수</label>
           <div className="flex justify-center">
             <Counter

@@ -4,7 +4,7 @@ export type NeonVariant = 'green' | 'cyan' | 'magenta' | 'pink' | 'blue' | 'yell
 // 네온 색상 상수 (타입 안전성을 위한 const assertion)
 export const NEON_VARIANTS = {
   GREEN: 'green',
-  CYAN: 'cyan', 
+  CYAN: 'cyan',
   MAGENTA: 'magenta',
   PINK: 'pink',
   BLUE: 'blue',

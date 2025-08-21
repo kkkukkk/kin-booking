@@ -1,11 +1,11 @@
 'use client'
 
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import React, {useEffect, useRef, useState} from "react";
-import {supabase} from "@/lib/supabaseClient";
-import {useAppSelector} from "@/redux/hooks";
-import {RootState} from "@/redux/store";
-import {isValidPassword} from "@/util/validators";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { isValidPassword } from "@/util/validators";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
 import Card from "@/components/Card";
@@ -94,15 +94,15 @@ const ResetPassword = () => {
 	useEffect(() => {
 		// 비밀번호 변경이 완료되지 않은 경우에만 보안 로그아웃 수행
 		if (isPasswordChanged) return;
-		
+
 		// 새로고침/브라우저 닫기
 		window.addEventListener('beforeunload', handleLogout);
-		
+
 		// URL 변경 감지
 		if (initialPathRef.current !== pathname) {
 			handleLogout();
 		}
-		
+
 		return () => window.removeEventListener('beforeunload', handleLogout);
 	}, [pathname, isPasswordChanged]);
 
@@ -142,11 +142,11 @@ const ResetPassword = () => {
 				</div>
 
 				<div className={"mb-2"}>
-					<AnimatedText fontSize={"text-base md:text-xl"} text={"변경 할 비밀번호를 입력해주세요!"}/>
+					<AnimatedText fontSize={"text-base md:text-xl"} text={"변경 할 비밀번호를 입력해주세요!"} />
 				</div>
 
 				<div className={"mb-4"}>
-					<AnimatedText fontSize={"text-sm md:text-base"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8}/>
+					<AnimatedText fontSize={"text-sm md:text-base"} text={"비밀번호는 특수문자를 포함해 8자 이상 작성해주세요!"} delay={0.8} />
 				</div>
 
 				<div

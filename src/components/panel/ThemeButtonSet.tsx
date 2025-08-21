@@ -7,6 +7,7 @@ import { setTheme } from "@/redux/slices/themeSlice";
 import clsx from "clsx";
 import Button from "@/components/base/Button";
 import ThemeDiv from "@/components/base/ThemeDiv";
+import {Theme} from "@/types/ui/theme";
 
 type ThemeButtonSetProps = {
 	isOpen: boolean;
@@ -19,7 +20,7 @@ const PANEL_STYLES = {
 	closed: "opacity-0 scale-95 pointer-events-none"
 } as const;
 
-const THEMES = ["normal", "dark", "neon"] as const;
+const THEMES:Theme[] = ["normal", "dark", "neon"];
 
 const ThemeButtonSet = ({ isOpen }: ThemeButtonSetProps) => {
 	const dispatch = useAppDispatch();

@@ -102,9 +102,9 @@ const FriendList = () => {
           </div>
         </div>
         <h3 className="text-base md:text-xl font-bold mb-3">지금은 친구가 없어요</h3>
-              <p className="text-sm opacity-70 mb-2 leading-relaxed">
-                  새로운 친구를 추가해보세요!
-              </p>
+        <p className="text-sm opacity-70 mb-2 leading-relaxed">
+          새로운 친구를 추가해보세요!
+        </p>
       </div>
     );
   }
@@ -115,16 +115,16 @@ const FriendList = () => {
         <h3>친구({currentFriends.length}명)</h3>
       </div>
       {currentFriends.map((friend) => (
-        <ThemeDiv 
-          key={friend.id} 
+        <ThemeDiv
+          key={friend.id}
           className={clsx(
             "px-4 py-3 rounded-lg border transition-all duration-200",
-          )} 
+          )}
           isChildren
         >
           <div className="flex items-center justify-between gap-3">
             {/* 사용자 정보 (아바타+이름+뱃지) */}
-            <UserInfo 
+            <UserInfo
               name={friend.counterpartName}
               email={friend.counterpartEmail}
               subtitle={`${dayjs(friend.updatedAt || friend.createdAt).format('YYYY.MM.DD')} 친구됨`}
@@ -132,15 +132,15 @@ const FriendList = () => {
               avatarSize="md"
               rightElement={
                 <StatusBadge
-                  status={FriendStatus.Accepted} 
-                  theme={theme} 
-                  variant="badge" 
+                  status={FriendStatus.Accepted}
+                  theme={theme}
+                  variant="badge"
                   size="sm"
                   statusType="friend"
                 />
               }
             />
-            
+
             {/* 액션 버튼 */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <Button

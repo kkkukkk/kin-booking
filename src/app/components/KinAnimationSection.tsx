@@ -16,10 +16,10 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
     const checkScreenSize = () => {
       setIsDesktop(window.innerWidth >= 768); // md breakpoint
     };
-    
+
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-    
+
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
@@ -32,7 +32,7 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
 
   // 애니메이션 완료 상태 감지
   const [isAnimationCompleted, setIsAnimationCompleted] = useState(false);
-  
+
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     setIsAnimationCompleted(latest >= 0.95);
   });
@@ -79,7 +79,7 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
   return (
     <div className="relative h-[600vh]" ref={containerRef} data-scroll-container="true">
       {/* 고정 영역 */}
-      <div 
+      <div
         className="fixed inset-0 flex items-center justify-center pointer-events-none transition-all duration-500"
         style={{
           zIndex: isAnimationCompleted ? 0 : 10,
@@ -133,7 +133,7 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
           </motion.div>
 
           {/* I */}
-          <motion.div 
+          <motion.div
             className="absolute flex flex-col items-center text-center justify-start"
             style={{
               opacity: iOpacity,
@@ -178,7 +178,7 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
           </motion.div>
 
           {/* N */}
-          <motion.div 
+          <motion.div
             className="absolute flex flex-col items-end text-right justify-start"
             style={{
               opacity: nOpacity,
@@ -223,12 +223,12 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
           </motion.div>
         </div>
       </div>
-      
+
       {/* 스크롤 기준점 */}
-      <div 
+      <div
         id="kin-animation-end-marker"
         className="absolute left-1/2 transform -translate-x-1/2 w-1 h-1 opacity-0"
-        style={{ 
+        style={{
           pointerEvents: 'none',
           top: '600vh'
         }}

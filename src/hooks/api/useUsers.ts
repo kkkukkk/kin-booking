@@ -82,7 +82,7 @@ export const useUpdateUser = () => {
 		},
 		onError: (error: Error, variables, context) => {
 			console.error('사용자 수정 실패:', error.message);
-			
+
 			// 실패 시 이전 데이터로 롤백
 			if (context?.previousUser) {
 				queryClient.setQueryData(['user', variables.userId], context.previousUser);
@@ -134,7 +134,7 @@ export const useUserById = (userId: string) => {
 // 사용자 검색 (친구 추가 등)
 export const useSearchUsers = (query: string) => {
 	const { session } = useSession();
-	
+
 	return useQuery({
 		queryKey: ['users', 'search', query],
 		queryFn: () => searchUsers(query, session?.user?.id || ''),

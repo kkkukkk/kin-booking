@@ -24,32 +24,32 @@ const ThemeRefDiv = forwardRef<HTMLDivElement, ThemeRefDivProps>(
 		// 네온 색상 변형 (CSS 변수 사용)
 		const getNeonStyles = (variant: NeonVariant) => {
 			const colors = {
-				green: { 
+				green: {
 					border: 'border-[var(--neon-green)]/50',
 				},
-				cyan: { 
+				cyan: {
 					border: 'border-[var(--neon-cyan)]/50',
 				},
-				magenta: { 
+				magenta: {
 					border: 'border-[var(--neon-magenta)]/50',
 				},
-				pink: { 
-					border: 'border-[var(--neon-pink)]/50', 
+				pink: {
+					border: 'border-[var(--neon-pink)]/50',
 				},
-				blue: { 
+				blue: {
 					border: 'border-[var(--neon-blue)]/50',
 				},
-				yellow: { 
+				yellow: {
 					border: 'border-[var(--neon-yellow)]/50',
 				},
-				purple: { 
+				purple: {
 					border: 'border-[var(--neon-purple)]/50',
 				}
 			};
 			return colors[variant as keyof typeof colors] || colors.green;
 		};
 
-			// 테마별 스타일 (ThemeDiv와 동일)
+		// 테마별 스타일 (ThemeDiv와 동일)
 		const themeStyles = {
 			normal: {
 				base: 'bg-[var(--normal-back)] border border-[rgba(0,0,0,0.2)] text-gray-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_4px_rgba(0,0,0,0.1)]',
@@ -70,7 +70,7 @@ const ThemeRefDiv = forwardRef<HTMLDivElement, ThemeRefDivProps>(
 
 		const currentTheme = themeStyles[theme as keyof typeof themeStyles];
 		const styleVariant = lightweight ? 'lightweight' : (isChildren ? 'children' : 'base');
-		
+
 		return (
 			<div
 				ref={ref}

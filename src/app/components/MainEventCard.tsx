@@ -21,25 +21,25 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
   const isLarge = variant === "large";
   const isHero = variant === "hero";
   const isSmall = variant === "small";
-  
+
   // 포스터 컨테이너 크기
-  const posterContainerSize = isHero 
-    ? "w-full max-w-xs md:max-w-sm aspect-[602/852]" 
-    : isLarge 
-    ? "w-36 h-440 md:w-56 md:h-80"
-    : "w-32 h-40 md:w-36 md:h-44 relative";
-  
-  const titleSize = isHero 
-    ? "text-xl font-bold" 
-    : isLarge 
-    ? "text-lg md:text-2xl font-bold"
-    : "text-sm font-semibold";
-  
-  const dateSize = isHero 
-    ? "text-base" 
-    : isLarge 
-    ? "text-sm md:text-base"
-    : "text-xs";
+  const posterContainerSize = isHero
+    ? "w-full max-w-xs md:max-w-sm aspect-[602/852]"
+    : isLarge
+      ? "w-36 h-440 md:w-56 md:h-80"
+      : "w-32 h-40 md:w-36 md:h-44 relative";
+
+  const titleSize = isHero
+    ? "text-xl font-bold"
+    : isLarge
+      ? "text-lg md:text-2xl font-bold"
+      : "text-sm font-semibold";
+
+  const dateSize = isHero
+    ? "text-base"
+    : isLarge
+      ? "text-sm md:text-base"
+      : "text-xs";
 
   const handleDetailClick = () => {
     router.push(`/events/${event.eventId}`);
@@ -63,11 +63,11 @@ const MainEventCard = ({ event, theme, variant = "large" }: MainEventCardProps) 
           overlay={
             isSmall
               ? {
-                  title: event.eventName,
+                title: event.eventName,
                 subtitle: dayjs(event.eventDate).format('MM/DD HH:mm'),
                 showOverlay: true,
               }
-            : undefined
+              : undefined
           }
         />
       </div>

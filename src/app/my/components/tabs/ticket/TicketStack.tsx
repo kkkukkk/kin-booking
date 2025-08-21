@@ -580,12 +580,9 @@ const TicketStack = ({
 											<TicketCard
 												eventName={eventName}
 												status={stackStatus}
-												latestCreatedAt={ticket.createdAt}
-												eventId={ticket.eventId}
 												ticketColor={ticket.color || undefined}
 												isRare={ticket.isRare}
 												eventDate={eventInfo?.eventDate}
-												ticketId={ticket.id}
 												ticketNumber={ticket.ticketNumber}
 												ticketPrice={eventInfo?.ticketPrice}
 											/>
@@ -623,12 +620,9 @@ const TicketStack = ({
 													<TicketCard
 														eventName={eventName}
 														status={stackStatus}
-														latestCreatedAt={ticket.createdAt}
-														eventId={ticket.eventId}
 														ticketColor={ticket.color || undefined}
 														isRare={ticket.isRare}
 														eventDate={eventInfo?.eventDate}
-														ticketId={ticket.id}
 														ticketNumber={ticket.ticketNumber}
 														ticketPrice={eventInfo?.ticketPrice}
 													/>

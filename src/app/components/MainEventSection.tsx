@@ -10,14 +10,14 @@ interface EventSectionProps {
 
 const MainEventSection = ({ title, events, theme, variant = "large" }: EventSectionProps) => {
   if (!events || events.length === 0) return null;
-  
+
   return (
     <section className="mb-16">
       <div className="max-w-6xl mx-auto px-4">
         {/* 섹션 헤더 */}
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-wide drop-shadow-sm">
-            {title} 
+            {title}
           </h2>
         </div>
 

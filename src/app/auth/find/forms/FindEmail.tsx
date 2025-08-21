@@ -85,7 +85,7 @@ const FindEmail = () => {
 				animate="animate"
 				exit="exit"
 			>
-				<AnimatedText text={"가입에 사용한 휴대폰 번호를 입력해주세요."}/>
+				<AnimatedText text={"가입에 사용한 휴대폰 번호를 입력해주세요."} />
 				<motion.div
 					variants={fadeSlideLeft}
 					initial="hidden"

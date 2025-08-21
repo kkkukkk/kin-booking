@@ -107,7 +107,7 @@ const DatePicker = ({ onChange, initialFrom, initialTo }: DatePickerProps) => {
 	// 스타일 클래스 생성 최적화
 	const getCellStyles = useCallback((day: Dayjs, isStart: boolean, isEnd: boolean, inRange: boolean, isOtherMonth: boolean) => {
 		const baseStyles = "w-8 h-8 flex items-center justify-center cursor-pointer transition-colors duration-150 text-xs";
-		
+
 		// 오늘 날짜
 		if (isToday(day)) {
 			if (theme === 'neon') {
@@ -165,19 +165,19 @@ const DatePicker = ({ onChange, initialFrom, initialTo }: DatePickerProps) => {
 	// 요일 헤더 스타일
 	const getWeekdayStyles = useCallback((idx: number) => {
 		const baseStyles = "w-8 h-8 flex items-center justify-center font-bold text-xs";
-		
+
 		if (theme === 'neon') {
 			if (idx === 0) return clsx(baseStyles, "text-red-300"); // 일요일
 			if (idx === 6) return clsx(baseStyles, "text-blue-300"); // 토요일
 			return clsx(baseStyles, "text-gray-200");
 		}
-		
+
 		if (theme === 'dark') {
 			if (idx === 0) return clsx(baseStyles, "text-red-400"); // 일요일
 			if (idx === 6) return clsx(baseStyles, "text-blue-400"); // 토요일
 			return clsx(baseStyles, "text-gray-300");
 		}
-		
+
 		if (idx === 0) return clsx(baseStyles, "text-red-500"); // 일요일
 		if (idx === 6) return clsx(baseStyles, "text-blue-500"); // 토요일
 		return clsx(baseStyles, "text-gray-700");
@@ -197,7 +197,7 @@ const DatePicker = ({ onChange, initialFrom, initialTo }: DatePickerProps) => {
 		<ThemeDiv className="p-4 rounded w-fit mx-auto shadow-md" isChildren>
 			{/* 헤더 */}
 			<div className="flex justify-between items-center mb-2">
-				<button 
+				<button
 					onClick={() => handleMonthChange('prev')}
 					className="p-2 hover:bg-gray-100 rounded transition-colors"
 				>
@@ -205,12 +205,12 @@ const DatePicker = ({ onChange, initialFrom, initialTo }: DatePickerProps) => {
 				</button>
 				<span className={clsx(
 					"text-base font-semibold",
-					theme === 'neon' ? "text-gray-100" : 
-					theme === 'dark' ? "text-gray-200" : "text-gray-800"
+					theme === 'neon' ? "text-gray-100" :
+						theme === 'dark' ? "text-gray-200" : "text-gray-800"
 				)}>
 					{currentDate.format('YYYY년 MM월')}
 				</span>
-				<button 
+				<button
 					onClick={() => handleMonthChange('next')}
 					className="p-2 hover:bg-gray-100 rounded transition-colors"
 				>

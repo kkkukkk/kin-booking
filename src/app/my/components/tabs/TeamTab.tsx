@@ -20,7 +20,7 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { mutate: updateTeamMember, isPending } = useUpdateTeamMember();
 	const { showToast } = useToast();
-	
+
 	const [editMode, setEditMode] = useState(false);
 	const [editedData, setEditedData] = useState({
 		displayName: teamMember.displayName || '',
@@ -48,9 +48,9 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 
 	const handleSave = () => {
 		updateTeamMember(
-			{ 
-				id: teamMember.id, 
-				data: { ...editedData, userId: teamMember.userId } 
+			{
+				id: teamMember.id,
+				data: { ...editedData, userId: teamMember.userId }
 			},
 			{
 				onSuccess: (updatedTeamMember) => {

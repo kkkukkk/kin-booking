@@ -117,7 +117,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 				// 관리자 권한이 있는 경우 Admin 버튼 추가
 				...(userRole !== UserRoleStatus.User ? [{
 					key: 'Admin',
-					order: 0,
+					order: 1.5,
 					onClick: () => router.push("/admin"),
 					name: 'Admin',
 				}] : []),

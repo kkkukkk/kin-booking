@@ -79,7 +79,6 @@ const OverallSummarySection: React.FC<OverallSummarySectionProps> = ({
   );
 };
 
-// 스켈레톤 UI - 정적 요소는 그대로 표시
 export const OverallSummarySectionSkeleton = ({ 
   getSkeletonBgColor, 
   getSkeletonTextColor, 

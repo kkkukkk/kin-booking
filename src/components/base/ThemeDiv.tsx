@@ -24,25 +24,25 @@ const ThemeDiv = ({ children, className, isChildren, lightweight = false, neonVa
 	// 네온 색상 변형 (CSS 변수 사용)
 	const getNeonStyles = (variant: NeonVariant) => {
 		const colors = {
-			green: { 
+			green: {
 				border: 'border-[var(--neon-green)]/50',
 			},
-			cyan: { 
+			cyan: {
 				border: 'border-[var(--neon-cyan)]/50',
 			},
-			magenta: { 
+			magenta: {
 				border: 'border-[var(--neon-magenta)]/50',
 			},
-			pink: { 
-				border: 'border-[var(--neon-pink)]/50', 
+			pink: {
+				border: 'border-[var(--neon-pink)]/50',
 			},
-			blue: { 
+			blue: {
 				border: 'border-[var(--neon-blue)]/50',
 			},
-			yellow: { 
+			yellow: {
 				border: 'border-[var(--neon-yellow)]/50',
 			},
-			purple: { 
+			purple: {
 				border: 'border-[var(--neon-purple)]/50',
 			}
 		};
@@ -70,7 +70,7 @@ const ThemeDiv = ({ children, className, isChildren, lightweight = false, neonVa
 
 	const currentTheme = themeStyles[theme as keyof typeof themeStyles];
 	const styleVariant = lightweight ? 'lightweight' : (isChildren ? 'children' : 'base');
-	
+
 	return (
 		<div
 			className={clsx(

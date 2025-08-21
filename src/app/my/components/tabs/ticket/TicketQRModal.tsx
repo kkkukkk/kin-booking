@@ -1,10 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Modal from '@/components/Modal';
 import Button from '@/components/base/Button';
 import { useProcessEntrySession } from '@/hooks/api/useEntry';
+import { EntrySessionDto } from '@/types/model/entry';
 import QRCode from 'qrcode';
+import Spinner from '@/components/spinner/Spinner';
 
 interface TicketQRModalProps {
   isOpen: boolean;
@@ -27,7 +30,11 @@ const TicketQRModal = ({
 }: TicketQRModalProps) => {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{
+    action: string;
+    message: string;
+    session: EntrySessionDto;
+  } | null>(null);
   const [error, setError] = useState<string>('');
   const [sessionKey, setSessionKey] = useState<string>('');
 
@@ -49,23 +56,20 @@ const TicketQRModal = ({
     setIsProcessing(true);
     setError('');
     setResult(null);
-    
+
     try {
-      console.log('🚀 QR 코드 생성 시작');
-      
+
       processSession(
         { eventId, userId, reservationId },
         {
           onSuccess: (data) => {
-            console.log('✅ 세션 처리 성공:', data);
             setResult(data);
             setSessionKey(data.session.id);
-            
+
             // QR 코드 생성
             generateQRCode(data.session.id);
           },
           onError: (err) => {
-            console.error('❌ 세션 처리 실패:', err);
             setError('세션 처리에 실패했습니다.');
             setResult(null);
           },
@@ -75,7 +79,6 @@ const TicketQRModal = ({
         }
       );
     } catch (err) {
-      console.error('❌ QR 코드 생성 오류:', err);
       setError('QR 코드 생성 중 오류가 발생했습니다');
       setIsProcessing(false);
     }
@@ -107,7 +110,7 @@ const TicketQRModal = ({
     <Modal onClose={onClose}>
       <div className="text-center space-y-4 flex flex-col items-center">
         <h3 className="text-lg font-bold">입장 QR코드</h3>
-        
+
         {/* 초기 상태: QR 생성 버튼 */}
         {!qrCodeDataUrl && !isProcessing && !error && !result && (
           <div className="space-y-4">
@@ -129,11 +132,13 @@ const TicketQRModal = ({
             </Button>
           </div>
         )}
-        
+
         {/* 로딩 상태 */}
         {isProcessing && (
           <div className="space-y-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="mx-auto">
+              <Spinner size={32} />
+            </div>
             <p className="text-sm text-gray-600">입장 세션을 처리하고 있습니다...</p>
           </div>
         )}
@@ -171,16 +176,18 @@ const TicketQRModal = ({
               <p><strong>처리 결과:</strong> {result.message}</p>
               <p><strong>세션 ID:</strong> {sessionKey}</p>
             </div>
-            
+
             {/* QR 코드 */}
             <div className="border-2 border-gray-200 rounded-lg p-4 bg-white">
-              <img 
-                src={qrCodeDataUrl} 
-                alt="입장 QR 코드" 
+              <Image
+                src={qrCodeDataUrl}
+                alt="입장 QR 코드"
+                width={200}
+                height={200}
                 className="mx-auto"
               />
             </div>
-            
+
             <Button
               theme="dark"
               onClick={onClose}

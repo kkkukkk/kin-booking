@@ -60,8 +60,8 @@ const ReservationSeatInfo = ({
                   theme === "normal"
                     ? "bg-green-500"
                     : theme === "dark"
-                    ? "bg-green-400"
-                    : "bg-gradient-to-r from-[#10b9ab] via-[#22c581] via-[#3dafec] via-[#70ffb8] to-[#50ea7c] animate-pulse"
+                      ? "bg-green-400"
+                      : "bg-gradient-to-r from-[#10b9ab] via-[#22c581] via-[#3dafec] via-[#70ffb8] to-[#50ea7c] animate-pulse"
                 )}
                 style={{
                   width: `${(reservedQuantity / seatCapacity) * 100}%`

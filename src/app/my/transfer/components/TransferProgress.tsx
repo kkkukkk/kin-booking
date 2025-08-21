@@ -10,7 +10,7 @@ interface TransferProgressProps {
 
 const TransferProgress = ({ currentStep, theme }: TransferProgressProps) => {
   const steps = ['친구 선택', '매수 선택', '확인'];
-  
+
   const getCurrentStepIndex = () => {
     switch (currentStep) {
       case 'friend': return 0;
@@ -24,11 +24,11 @@ const TransferProgress = ({ currentStep, theme }: TransferProgressProps) => {
 
   return (
     <>
-        <ProgressBar
-          steps={steps}
-          currentStep={currentStepIndex}
-          theme={theme}
-        />
+      <ProgressBar
+        steps={steps}
+        currentStep={currentStepIndex}
+        theme={theme}
+      />
     </>
   );
 };

@@ -61,8 +61,7 @@ const UserRoleChangeModal = ({ user, theme, onRoleChange, onClose }: UserRoleCha
             ))}
           </div>
         </div>
-
-        {/* 닫기 버튼 */}
+        
         <div className="flex justify-end">
           <Button
             theme='dark'

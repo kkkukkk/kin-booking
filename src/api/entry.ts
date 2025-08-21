@@ -20,12 +20,12 @@ export const processEntrySession = async (params: {
     }
 
     const sessionData = toCamelCaseKeys<EntrySessionDto>(data.session_data);
-    
+
     return {
       action: data.action,
       message: data.message,
       session: sessionData
-    };  
+    };
 
   } catch (error) {
     console.error('입장 세션 처리 실패:', error);
@@ -55,9 +55,9 @@ export const getEntrySession = async (sessionId: string): Promise<EntrySessionWi
     .single();
 
   if (error) throw error;
-  
+
   const camelCaseData = toCamelCaseKeys<EntrySessionWithDetailsDto>(data);
-  
+
   return camelCaseData;
 };
 

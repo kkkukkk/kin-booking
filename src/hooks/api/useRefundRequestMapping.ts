@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { 
-  createRefundRequestMapping, 
+import {
+  createRefundRequestMapping,
   getRefundRequestMappingByReservation,
-  getRefundRequestMappingsByUserId 
+  getRefundRequestMappingsByUserId
 } from '@/api/refundRequestMapping';
 
 // 환불 요청 매핑 생성

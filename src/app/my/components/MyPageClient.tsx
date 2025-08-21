@@ -50,17 +50,17 @@ const MyPageClient = () => {
 			setActiveTab(tabParam);
 		}
 	}, [searchParams]);
-	
+
 	// 사용자 정보 조회
 	const { data: user, isLoading: userLoading } = useUserById(session?.user?.id || '');
 	// 멤버 정보 조회
 	const { data: teamMember, isLoading: teamMemberLoading } = useTeamMemberById(session?.user?.id || '');
-	
+
 	// 사용자 권한 정보
 	const userRole = getUserHighestRole(user || null);
-	
+
 	const isLoading = userLoading || teamMemberLoading;
-	
+
 	// 로그아웃 처리
 	const handleLogout = async () => {
 		const confirmed = await showAlert({
@@ -68,7 +68,7 @@ const MyPageClient = () => {
 			title: '로그아웃',
 			message: '정말 로그아웃하시겠습니까?',
 		});
-		
+
 		if (confirmed) {
 			logout(undefined, {
 				onSuccess: () => {
@@ -80,6 +80,31 @@ const MyPageClient = () => {
 				}
 			});
 		}
+	};
+
+	// 관리자 페이지로 이동
+	const handleAdminClick = () => {
+		router.push('/admin');
+	};
+
+	// 홈으로 이동
+	const handleHomeClick = () => {
+		router.push('/');
+	};
+
+	// 탭 변경 처리
+	const handleTabChange = (tabId: MyPageTab) => {
+		setActiveTab(tabId);
+
+		// URL 업데이트 (탭 변경 시)
+		const newUrl = new URL(window.location.href);
+		newUrl.searchParams.set('tab', tabId);
+
+		// 다른 탭의 파라미터들 정리
+		newUrl.searchParams.delete('filter');  // reservations 탭
+		newUrl.searchParams.delete('section'); // friends 탭
+
+		router.replace(newUrl.pathname + newUrl.search);
 	};
 
 	const tabs = [
@@ -110,7 +135,7 @@ const MyPageClient = () => {
 	return (
 		<div className="p-4 md:p-6">
 			{isLoading && <SpinnerOverlay />}
-			
+
 			{/* 헤더 */}
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}
@@ -118,24 +143,31 @@ const MyPageClient = () => {
 				className="mb-6"
 			>
 				<div className="flex items-center justify-between mb-4">
-					<h1 className="text-2xl md:text-3xl font-bold">마이페이지</h1>
+					<h1 className="text-xl md:text-3xl font-bold">마이페이지</h1>
 					<div className="flex gap-2">
 						{userRole !== UserRoleStatus.User && (
 							<Button
-								onClick={() => router.push('/admin')}
+								onClick={handleAdminClick}
 								theme="dark"
 								padding="px-2 py-1"
-								fontSize='text-sm'
-								className="font-semibold bg-purple-600 hover:bg-purple-700"
+								fontSize='text-xs md:text-sm'
+								className={clsx(
+									"font-semibold shadow-lg",
+									theme === 'normal'
+										? "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+										: theme === 'dark'
+											? "bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
+											: "bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500"
+								)}
 							>
 								관리자
 							</Button>
 						)}
 						<Button
-							onClick={() => router.push('/')}
+							onClick={handleHomeClick}
 							theme="dark"
 							padding="px-2 py-1"
-							fontSize='text-sm'
+							fontSize='text-xs md:text-sm'
 							className="font-semibold"
 						>
 							<HomeIcon className="w-4 h-4 mr-1" />
@@ -145,7 +177,7 @@ const MyPageClient = () => {
 							onClick={handleLogout}
 							theme="dark"
 							padding="px-2 py-1"
-							fontSize='text-sm'
+							fontSize='text-xs md:text-sm'
 							className="font-semibold"
 						>
 							<LogoutIcon className="w-4 h-4 mr-1" />
@@ -169,11 +201,11 @@ const MyPageClient = () => {
 								<h2 className="text-lg sm:text-xl font-bold">
 									{user?.name || '사용자'}
 								</h2>
-								<StatusBadge 
+								<StatusBadge
 									status={userRole}
-									theme={theme} 
-									variant="badge" 
-									size="sm" 
+									theme={theme}
+									variant="badge"
+									size="sm"
 									statusType="userRole"
 								/>
 							</div>
@@ -208,18 +240,7 @@ const MyPageClient = () => {
 						return (
 							<Button
 								key={tab.id}
-								onClick={() => {
-									setActiveTab(tab.id as MyPageTab);
-									// URL 업데이트 (탭 변경 시)
-									const newUrl = new URL(window.location.href);
-									newUrl.searchParams.set('tab', tab.id);
-									
-									// 다른 탭의 파라미터들 정리
-									newUrl.searchParams.delete('filter');  // reservations 탭
-									newUrl.searchParams.delete('section'); // friends 탭
-									
-									router.replace(newUrl.pathname + newUrl.search);
-								}}
+								onClick={() => handleTabChange(tab.id)}
 								theme={theme}
 								padding={'py-2 md:py-1.5'}
 								fontSize='text-sm md:text-base'
@@ -236,7 +257,7 @@ const MyPageClient = () => {
 					})}
 				</div>
 			</motion.div>
-			
+
 			{/* 탭 콘텐츠 */}
 			<motion.div
 				key={activeTab}

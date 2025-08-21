@@ -22,7 +22,6 @@ const ReservationInfo = ({
         <div className={`${theme === 'neon' ? 'bg-gray-800' : theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} rounded-lg p-4 space-y-2`}>
             <h3 className={`font-semibold text-sm ${theme === 'neon' ? 'text-gray-300' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>예매 정보</h3>
             
-            {/* 모바일: 세로 배치, 데스크톱: 2열 배치 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div className="flex flex-col">
                     <span className={`${theme === 'neon' ? 'text-gray-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-xs mb-1`}>사용자</span>

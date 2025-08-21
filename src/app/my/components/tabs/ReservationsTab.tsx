@@ -50,7 +50,7 @@ const ReservationsTab = () => {
 			setActiveFilter(filterParam);
 		}
 	}, [searchParams]);
-	
+
 	// 실제 데이터가 없으면 빈 배열 사용
 	const displayReservations = reservations?.data || [];
 
@@ -65,6 +65,21 @@ const ReservationsTab = () => {
 		if (confirmed) {
 			cancelReservation(reservationId);
 		}
+	};
+
+	// 공연 보러 가기
+	const handleGoToEvents = () => {
+		router.push('/events');
+	};
+
+	// 필터 변경 처리
+	const handleFilterChange = (filterKey: string) => {
+		setActiveFilter(filterKey);
+		
+		// URL 업데이트 (필터 변경 시)
+		const newUrl = new URL(window.location.href);
+		newUrl.searchParams.set('filter', filterKey);
+		router.replace(newUrl.pathname + newUrl.search);
 	};
 
 	if (displayReservations.length === 0) {
@@ -97,7 +112,7 @@ const ReservationsTab = () => {
 						멋진 공연을 찾아보세요!
 					</p>
 					<Button
-						onClick={() => router.push('/events')}
+						onClick={handleGoToEvents}
 						theme="dark"
 						padding="px-6 py-2"
 						className="w-full md:w-auto"
@@ -124,13 +139,7 @@ const ReservationsTab = () => {
 						key={key}
 						theme={theme}
 						padding={"px-3 py-2 md:px-4"}
-						onClick={() => {
-							setActiveFilter(key);
-							// URL 업데이트 (필터 변경 시)
-							const newUrl = new URL(window.location.href);
-							newUrl.searchParams.set('filter', key);
-							router.replace(newUrl.pathname + newUrl.search);
-						}}
+						onClick={() => handleFilterChange(key)}
 						className={clsx(
 							'flex flex-col items-center justify-center md:flex-row md:gap-2 transition-all duration-200 font-medium flex-1 md:flex-none',
 						)}

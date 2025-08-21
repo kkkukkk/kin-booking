@@ -77,7 +77,7 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 		if (!isLoggedIn) {
 			return null; // 로그인 페이지로 리다이렉트 중
 		}
-		
+
 		if (userLoading || !user) {
 			return null; // 사용자 정보 로딩 중이거나 없음
 		}

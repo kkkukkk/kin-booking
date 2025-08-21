@@ -1,23 +1,22 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { 
-	createPaymentTransaction, 
-	updatePaymentTransaction, 
-	fetchPaymentTransactions, 
+import {
+	createPaymentTransaction,
+	updatePaymentTransaction,
+	fetchPaymentTransactions,
 	fetchPaymentTransactionsWithReservation,
 	fetchPaymentTransactionsByReservationId,
 	fetchPaymentTransactionsByUserId
 } from '@/api/paymentTransaction';
-import { 
-	CreatePaymentTransactionDto, 
-	UpdatePaymentTransactionDto, 
-	FetchPaymentTransactionDto 
+import {
+	UpdatePaymentTransactionDto,
+	FetchPaymentTransactionDto
 } from '@/types/dto/paymentTransaction';
 import { PaginationParams } from '@/util/pagination/type';
 
 // 거래 이력 생성
 export const useCreatePaymentTransaction = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: createPaymentTransaction,
 		onSuccess: () => {
@@ -34,9 +33,9 @@ export const useCreatePaymentTransaction = () => {
 // 거래 이력 수정
 export const useUpdatePaymentTransaction = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
-		mutationFn: ({ id, data }: { id: string; data: UpdatePaymentTransactionDto }) => 
+		mutationFn: ({ id, data }: { id: string; data: UpdatePaymentTransactionDto }) =>
 			updatePaymentTransaction(id, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['paymentTransactions'] });

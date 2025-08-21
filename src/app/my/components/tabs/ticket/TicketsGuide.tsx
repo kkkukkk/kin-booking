@@ -7,10 +7,10 @@ import clsx from 'clsx';
 
 const TicketsGuide = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
-	
+
 	return (
-		<Accordion 
-			title=" 티켓 안내" 
+		<Accordion
+			title=" 티켓 안내"
 			className="rounded shadow-inner mb-4"
 		>
 			<div>
@@ -28,7 +28,7 @@ const TicketsGuide = () => {
 							theme === "normal" ? "bg-black/60" : "bg-white/60"
 						)}></div>
 						<span>양도받은 티켓은 같은 공연이라도 별도 그룹으로 관리됩니다.</span>
-					</li>
+					</li>S
 					<li className="flex items-center gap-2">
 						<div className={clsx(
 							"w-1.5 h-1.5 rounded-full flex-shrink-0",
