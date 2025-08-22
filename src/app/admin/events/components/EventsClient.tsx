@@ -159,11 +159,9 @@ const EventsClient = () => {
       if (searchParams.startDate && dayjs(event.eventDate).isBefore(searchParams.startDate)) {
         return false;
       }
-      if (searchParams.endDate && dayjs(event.eventDate).isAfter(searchParams.endDate)) {
-        return false;
-      }
+      return !(searchParams.endDate && dayjs(event.eventDate).isAfter(searchParams.endDate));
 
-      return true;
+
     });
   }, [events, searchParams]);
 
@@ -347,13 +345,15 @@ const EventsClient = () => {
           <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
             <h1 className="text-lg md:text-xl font-bold mb-2">공연 관리</h1>
           </div>
-          <Button
-            theme={theme}
-            onClick={handleCreateEvent}
-            className="px-3 py-1"
-          >
-            공연 추가
-          </Button>
+          {canManageEvents && (
+            <Button
+              theme={theme}
+              onClick={handleCreateEvent}
+              className="px-3 py-1"
+            >
+              공연 추가
+            </Button>
+          )}
         </div>
 
         {/* 검색 및 필터 */}

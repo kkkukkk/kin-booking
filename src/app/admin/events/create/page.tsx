@@ -16,10 +16,12 @@ import { generateRandomGradient, generateNeonGradient } from '@/util/gradientGen
 import { useUploadEventPoster } from '@/hooks/api/useEventMedia';
 import { useCreateEvent } from '@/hooks/api/useEvents';
 import useToast from '@/hooks/useToast';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const CreateEventPage = () => {
   const router = useRouter();
   const theme = useAppSelector((state: RootState) => state.theme.current);
+  const { canManageEvents, isLoading: authLoading } = useAdminAuth();
 
   const [formData, setFormData] = useState({
     eventName: '',
@@ -35,14 +37,47 @@ const CreateEventPage = () => {
   const [selectedPosterFile, setSelectedPosterFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // API 훅들
   const uploadPosterMutation = useUploadEventPoster();
   const createEventMutation = useCreateEvent();
   const { showToast } = useToast();
 
+  // 권한 체크
+  if (authLoading) {
+    return (
+      <ThemeDiv className="min-h-full flex items-center justify-center">
+        <div className="text-center">
+          <p>권한을 확인하는 중...</p>
+        </div>
+      </ThemeDiv>
+    );
+  }
+
+  if (!canManageEvents) {
+    return (
+      <ThemeDiv className="min-h-full flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">공연을 관리할 권한이 없습니다.</p>
+          <Button
+            theme={theme}
+            onClick={() => router.push('/admin/events')}
+            className="px-4 py-2"
+          >
+            목록으로 돌아가기
+          </Button>
+        </div>
+      </ThemeDiv>
+    );
+  }
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // 입력 시 해당 필드의 유효성 검사 에러 제거
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   // 포스터 파일 선택 처리
@@ -91,12 +126,73 @@ const CreateEventPage = () => {
     }
   };
 
+  // 상세한 유효성 검사 함수
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    // 공연명 검사
+    if (!formData.eventName.trim()) {
+      errors.eventName = '공연명을 입력해주세요.';
+    } else if (formData.eventName.trim().length < 2) {
+      errors.eventName = '공연명은 2자 이상 입력해주세요.';
+    } else if (formData.eventName.trim().length > 100) {
+      errors.eventName = '공연명은 100자 이하로 입력해주세요.';
+    }
+
+    // 공연일시 검사
+    if (!formData.eventDateTime) {
+      errors.eventDateTime = '공연일시를 선택해주세요.';
+    } else {
+      const selectedDate = new Date(formData.eventDateTime);
+      const now = new Date();
+      if (selectedDate <= now) {
+        errors.eventDateTime = '공연일시는 현재 시간보다 이후로 설정해주세요.';
+      }
+    }
+
+    // 장소 검사
+    if (!formData.location.trim()) {
+      errors.location = '장소를 입력해주세요.';
+    } else if (formData.location.trim().length < 2) {
+      errors.location = '장소는 2자 이상 입력해주세요.';
+    } else if (formData.location.trim().length > 200) {
+      errors.location = '장소는 200자 이하로 입력해주세요.';
+    }
+
+    // 티켓 가격 검사
+    if (!formData.ticketPrice) {
+      errors.ticketPrice = '티켓 가격을 입력해주세요.';
+    } else if (Number(formData.ticketPrice) < 0) {
+      errors.ticketPrice = '티켓 가격은 0원 이상이어야 합니다.';
+    } else if (Number(formData.ticketPrice) > 1000000) {
+      errors.ticketPrice = '티켓 가격은 1,000,000원 이하여야 합니다.';
+    }
+
+    // 최대 티켓 수 검사
+    if (!formData.maxTickets) {
+      errors.maxTickets = '최대 티켓 수를 입력해주세요.';
+    } else if (Number(formData.maxTickets) < 1) {
+      errors.maxTickets = '최대 티켓 수는 1장 이상이어야 합니다.';
+    } else if (Number(formData.maxTickets) > 10000) {
+      errors.maxTickets = '최대 티켓 수는 10,000장 이하여야 합니다.';
+    }
+
+    // 설명 검사 (선택사항이지만 길이 제한)
+    if (formData.description && formData.description.length > 2000) {
+      errors.description = '공연 설명은 2,000자 이하로 입력해주세요.';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(formData);
 
-    if (!isFormValid) {
+    if (!validateForm()) {
       showToast({
-        message: '필수 항목을 모두 입력해주세요.',
+        message: '입력 정보를 확인하고 수정해주세요.',
         iconType: 'error',
         autoCloseTime: 3000,
       });
@@ -157,8 +253,9 @@ const CreateEventPage = () => {
     router.push('/admin/events');
   };
 
-  const isFormValid = formData.eventName && formData.eventDateTime &&
-    formData.location && formData.ticketPrice && formData.maxTickets;
+  // 폼 유효성 검사 (기본적인 필수 필드 체크) - 현재는 사용하지 않음
+  // const isFormValid = formData.eventName && formData.eventDateTime &&
+  //   formData.location && formData.ticketPrice && formData.maxTickets;
 
   return (
     <ThemeDiv className="min-h-full">
@@ -267,12 +364,15 @@ const CreateEventPage = () => {
                       placeholder="공연명을 입력하세요"
                       required
                     />
+                    {validationErrors.eventName && (
+                      <p className="text-red-500 text-xs mt-1">{validationErrors.eventName}</p>
+                    )}
                   </div>
 
                   {/* 공연일시 */}
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      공연일시 <span className="text-red-500">*</span>
+                      공연 일시 <span className="text-red-500">*</span>
                     </label>
                     <Input
                       theme={theme}
@@ -281,12 +381,15 @@ const CreateEventPage = () => {
                       onChange={(e) => handleInputChange('eventDateTime', e.target.value)}
                       required
                     />
+                    {validationErrors.eventDateTime && (
+                      <p className="text-red-500 text-xs mt-1">{validationErrors.eventDateTime}</p>
+                    )}
                   </div>
 
                   {/* 장소 */}
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      장소 <span className="text-red-500">*</span>
+                      공연 장소 <span className="text-red-500">*</span>
                     </label>
                     <Input
                       theme={theme}
@@ -295,6 +398,9 @@ const CreateEventPage = () => {
                       placeholder="공연 장소를 입력하세요"
                       required
                     />
+                    {validationErrors.location && (
+                      <p className="text-red-500 text-xs mt-1">{validationErrors.location}</p>
+                    )}
                   </div>
 
                   {/* 상태 */}
@@ -337,22 +443,30 @@ const CreateEventPage = () => {
                       min="0"
                       required
                     />
+                    {validationErrors.ticketPrice && (
+                      <p className="text-red-500 text-xs mt-1">{validationErrors.ticketPrice}</p>
+                    )}
                   </div>
 
                   {/* 최대 티켓 수 */}
                   <div>
-                    <label className="block text-sm font-medium mb-2">
-                      최대 티켓 수 <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      theme={theme}
-                      type="number"
-                      value={formData.maxTickets}
-                      onChange={(e) => handleInputChange('maxTickets', e.target.value)}
-                      placeholder="최대 티켓 수를 입력하세요"
-                      min="1"
-                      required
-                    />
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        최대 티켓 수 <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        theme={theme}
+                        type="number"
+                        value={formData.maxTickets}
+                        onChange={(e) => handleInputChange('maxTickets', e.target.value)}
+                        placeholder="최대 티켓 수를 입력하세요"
+                        min="1"
+                        required
+                      />
+                      {validationErrors.maxTickets && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.maxTickets}</p>
+                      )}
+                    </div>
                   </div>
 
                   {/* 티켓 그라데이션 */}
@@ -404,11 +518,14 @@ const CreateEventPage = () => {
                 rows={8}
                 className="min-h-[200px]"
               />
+              {validationErrors.description && (
+                <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>
+              )}
             </ThemeDiv>
           </div>
 
           {/* 버튼 영역 */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-center gap-3 pt-6 border-t border-gray-200">
             <Button
               theme={theme}
               reverse={theme === "normal"}
@@ -421,7 +538,7 @@ const CreateEventPage = () => {
             <Button
               theme={theme}
               onClick={handleSubmit}
-              disabled={!isFormValid || isSubmitting || createEventMutation.isPending}
+              disabled={isSubmitting || createEventMutation.isPending}
               className="px-6 py-2"
             >
               {isSubmitting || createEventMutation.isPending ? '등록 중...' : '등록'}

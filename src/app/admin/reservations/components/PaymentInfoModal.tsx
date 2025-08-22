@@ -65,19 +65,19 @@ const PaymentInfoModal = ({
   const handleSubmit = async () => {
     // 유효성 검사
     if (!paymentInfo.depositorName.trim()) {
-      showToast({ message: '입금자명을 입력해주세요.', iconType: 'error' });
+      showToast({ message: '입금자명을 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
       return;
     }
     if (!paymentInfo.bankName.trim()) {
-      showToast({ message: '은행명을 입력해주세요.', iconType: 'error' });
+      showToast({ message: '은행명을 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
       return;
     }
     if (!paymentInfo.accountNumber.trim()) {
-      showToast({ message: '계좌번호를 입력해주세요.', iconType: 'error' });
+      showToast({ message: '계좌번호를 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
       return;
     }
     if (paymentInfo.amount <= 0) {
-      showToast({ message: '입금 금액을 입력해주세요.', iconType: 'error' });
+      showToast({ message: '입금 금액을 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
       return;
     }
 
@@ -85,7 +85,12 @@ const PaymentInfoModal = ({
     
     try {
       if (!session?.user?.id) {
-        throw new Error('로그인 정보를 찾을 수 없습니다.');
+        showToast({ 
+          message: '로그인 정보를 찾을 수 없습니다. 다시 로그인해주세요.', 
+          iconType: 'error',
+          autoCloseTime: 3000
+        });
+        return;
       }
 
       await createTransactionMutation.mutateAsync({

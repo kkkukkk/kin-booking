@@ -75,25 +75,36 @@ const AdminHeader = () => {
             관리자 패널
           </div>
         </div>
-        <div className="relative">
+        <div className='flex items-center gap-2'>
           <Button
-            onClick={toggleUserDropdown}
+            onClick={() => router.push('/')}
             theme={theme}
             padding="p-2"
-            className="flex items-center justify-center"
-            aria-label="사용자 메뉴"
+            className="flex items-center justify-center font-semibold"
+            fontSize='text-sm'
           >
-            <UsersIcon className="w-5 h-5" />
+            페이지로 가기
           </Button>
-          {/* 관리자 정보 */}
-          <AdminUserInfo
-            user={user}
-            session={session}
-            theme={theme as Theme}
-            handleLogout={handleLogout}
-            isOpen={isUserDropdownOpen}
-            onClose={() => setIsUserDropdownOpen(false)}
-          />
+          <div className="relative">
+            <Button
+              onClick={toggleUserDropdown}
+              theme={theme}
+              padding="p-2"
+              className="flex items-center justify-center"
+              aria-label="사용자 메뉴"
+            >
+              <UsersIcon className="w-5 h-5" />
+            </Button>
+            {/* 관리자 정보 */}
+            <AdminUserInfo
+              user={user}
+              session={session}
+              theme={theme as Theme}
+              handleLogout={handleLogout}
+              isOpen={isUserDropdownOpen}
+              onClose={() => setIsUserDropdownOpen(false)}
+            />
+          </div>
         </div>
       </ThemeDiv>
       <AdminDropDownMenu open={open} onClose={() => setOpen(false)} />
