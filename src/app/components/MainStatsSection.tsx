@@ -10,13 +10,13 @@ interface MainStatsSectionProps {
   onNavigateToEvents: (status: EventStatus) => void;
 }
 
-const MainStatsSection = ({ 
-  openEventsCount, 
-  waitingEventsCount, 
-  onNavigateToEvents 
+const MainStatsSection = ({
+  openEventsCount,
+  waitingEventsCount,
+  onNavigateToEvents
 }: MainStatsSectionProps) => {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
@@ -36,7 +36,7 @@ const MainStatsSection = ({
             count={openEventsCount}
             title="예매 진행 중인 공연"
             description="오래 기다렸어요! 이제 함께할 차례예요!"
-            className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 before:absolute before:inset-0 before:bg-gradient-to-br before:from-green-500/10 before:to-emerald-500/10"
+            className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 before:absolute before:inset-0 before:bg-gradient-to-br before:from-green-500/10 before:to-emerald-500/10 font-semibold"
             delay={0.6}
             onClick={() => onNavigateToEvents(EventStatus.Ongoing)}
           />
@@ -45,7 +45,7 @@ const MainStatsSection = ({
             count={waitingEventsCount}
             title="준비 중인 공연"
             description="곧 만나게 될 특별한 순간을 기다리는 중..."
-            className="bg-gradient-to-br from-teal-600/20 to-cyan-600/20 before:absolute before:inset-0 before:bg-gradient-to-br before:from-teal-500/10 before:to-cyan-500/10"
+            className="bg-gradient-to-br from-teal-600/20 to-cyan-600/20 before:absolute before:inset-0 before:bg-gradient-to-br before:from-teal-500/10 before:to-cyan-500/10 font-semibold"
             delay={0.7}
             onClick={() => onNavigateToEvents(EventStatus.Pending)}
           />

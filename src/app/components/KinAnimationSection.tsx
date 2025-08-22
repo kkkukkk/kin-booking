@@ -110,10 +110,10 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
                 y: kEnglishY,
               }}
             >
-              <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed max-w-xs">
+              <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed max-w-xs font-semibold">
                 Keep on looking!
               </p>
-              <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xs font-semibold">
                 something amazing awaits you
               </p>
             </motion.div>
@@ -123,10 +123,10 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
                 y: kKoreanY,
               }}
             >
-              <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xs font-semibold">
                 눈을 떼지 말아요!
               </p>
-              <p className="text-sm md:text-base text-white/90 leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/90 leading-relaxed max-w-xs font-semibold">
                 놀라운 순간이 기다리고 있어요.
               </p>
             </motion.div>
@@ -155,10 +155,10 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
                 y: iEnglishY,
               }}
             >
-              <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed max-w-xs">
+              <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed max-w-xs font-semibold">
                 Inviting you
               </p>
-              <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xs font-semibold">
                 to experience a day like no other
               </p>
             </motion.div>
@@ -168,10 +168,10 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
                 y: iKoreanY,
               }}
             >
-              <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xs font-semibold">
                 잊지 못할 특별한 하루에
               </p>
-              <p className="text-sm md:text-base text-white/90 leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/90 leading-relaxed max-w-xs font-semibold">
                 당신을 초대할게요!
               </p>
             </motion.div>
@@ -200,10 +200,10 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
                 y: nEnglishY,
               }}
             >
-              <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed max-w-xs">
+              <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed max-w-xs font-semibold">
                 Now,
               </p>
-              <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xs font-semibold">
                 please be a part of our musical journey
               </p>
             </motion.div>
@@ -213,10 +213,10 @@ const KinAnimationSection = ({ scrollContainerRef }: KinAnimationSectionProps = 
                 y: nKoreanY,
               }}
             >
-              <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xs font-semibold">
                 이제,
               </p>
-              <p className="text-sm md:text-base text-white/90 leading-relaxed max-w-xs">
+              <p className="text-sm md:text-base text-white/90 leading-relaxed max-w-xs font-semibold">
                 저희의 음악 여정에 함께해주세요!
               </p>
             </motion.div>

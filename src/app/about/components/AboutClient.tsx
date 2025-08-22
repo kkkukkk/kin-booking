@@ -46,7 +46,7 @@ const AboutClient = () => {
           <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
             About Us
           </h1>
-          <p className="text-base md:text-lg text-gray-300">
+          <p className="text-base md:text-lg text-gray-300 font-semibold">
             공연을 사랑하는 우리 팀을 소개합니다
           </p>
         </motion.div>
@@ -60,15 +60,16 @@ const AboutClient = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-green-400 text-center">KIN</h2>
           <div className="bg-gray-800/50 rounded-lg p-6 md:p-8 border border-gray-700">
-            <p className="text-sm md:text-base text-gray-300 leading-relaxed text-left">
-              KIN은 대학교 동아리에서 함께 활동했던 친구들이 모여 만든 공연팀입니다. 
+            <div className="text-sm md:text-base text-gray-300 leading-relaxed text-left font-semibold whitespace-pre-line">
+              {`KIN은 대학교 동아리에서 함께 활동했던 친구들이 모여 만든 공연팀입니다.
               공연을 사랑하는 마음으로 시작했던 우리는, 
               수많은 공연을 함께하며 공연 문화의 매력을 깊이 경험했습니다.
-              <br /><br />
+
               대학 시절 함께 공연을 해오면서 느꼈던 설렘과 감동을 바탕으로, 
               더 많은 사람들과 공연을 나누고 싶다는 열정을 가지고 
               우리만의 특별한 팀워크로 공연 문화를 이어가고 있습니다.
-            </p>
+              `}
+            </div>
           </div>
         </motion.div>
 
