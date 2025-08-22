@@ -159,11 +159,9 @@ const EventsClient = () => {
       if (searchParams.startDate && dayjs(event.eventDate).isBefore(searchParams.startDate)) {
         return false;
       }
-      if (searchParams.endDate && dayjs(event.eventDate).isAfter(searchParams.endDate)) {
-        return false;
-      }
+      return !(searchParams.endDate && dayjs(event.eventDate).isAfter(searchParams.endDate));
 
-      return true;
+
     });
   }, [events, searchParams]);
 
