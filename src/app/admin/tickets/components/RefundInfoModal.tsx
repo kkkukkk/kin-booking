@@ -200,7 +200,12 @@ const RefundInfoModal = ({
 
         try {
             if (!session?.user?.id) {
-                throw new Error('로그인 정보를 찾을 수 없습니다.');
+                showToast({ 
+                    message: '로그인 정보를 찾을 수 없습니다. 다시 로그인해주세요.', 
+                    iconType: 'error',
+                    autoCloseTime: 3000
+                });
+                return;
             }
 
             await createTransactionMutation.mutateAsync({
