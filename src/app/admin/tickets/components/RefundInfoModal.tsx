@@ -263,7 +263,7 @@ const RefundInfoModal = ({
 
                 {/* 환불 정책 정보 표시 */}
                 <div className={`${theme === 'neon' ? 'bg-amber-950/20' : theme === 'dark' ? 'bg-amber-950/20' : 'bg-amber-50'} border ${theme === 'neon' ? 'border-amber-400/50' : theme === 'dark' ? 'border-amber-400/50' : 'border-amber-200'} rounded-lg p-4 space-y-2`}>
-                    <h3 className={`font-semibold text-sm ${theme === 'neon' ? 'text-amber-200' : theme === 'dark' ? 'text-amber-200' : 'text-amber-800'} mb-2`}>환불 정책 안내</h3>
+                    <h3 className={`font-semibold text-sm ${theme === 'neon' ? 'text-amber-200' : theme === 'dark' ? 'text-amber-200' : 'text-amber-800'} mb-2`}>환불 정책 기준</h3>
                     <div className="text-sm space-y-1">
                         <div className="flex justify-between">
                             <span className={`${theme === 'neon' ? 'text-amber-300' : theme === 'dark' ? 'text-amber-300' : 'text-amber-600'}`}>취소 신청 시점 기준</span>
