@@ -196,7 +196,7 @@ const MainClient = () => {
               onClick={handleExploreEvents}
               theme="dark"
               padding="px-8 py-3"
-              className="text-lg font-medium tracking-wide"
+              className="text-lg font-medium tracking-wide font-semibold"
             >
               공연 둘러보기
             </Button>

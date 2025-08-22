@@ -89,7 +89,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
         {member.bio && (
           <div className={styles.gridAreaBio}>
             <div className="h-24 md:h-28 bg-gray-700/30 rounded-lg p-3">
-              <p className="text-sm text-gray-300 leading-relaxed line-clamp-4 h-full">
+              <p className="text-sm text-gray-300 leading-relaxed line-clamp-4 h-full font-semibold">
                 {member.bio}
               </p>
             </div>
