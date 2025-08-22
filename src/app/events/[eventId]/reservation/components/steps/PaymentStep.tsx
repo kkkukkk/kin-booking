@@ -76,14 +76,14 @@ const PaymentStep = ({
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative space-y-4">
 			{/* 성공 메시지 */}
 			<motion.div
 				variants={textContainer}
 				initial="hidden"
 				animate="visible"
 				className={clsx(
-					"flex flex-col items-center text-center p-6 rounded-xl border-2 mb-6 mt-4",
+					"flex flex-col items-center text-center p-6 rounded-xl border-2 mt-4",
 					theme === "normal"
 						? "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-sm"
 						: theme === "dark"
@@ -94,7 +94,7 @@ const PaymentStep = ({
 				<motion.div
 					variants={textContainerItem}
 					className={clsx(
-						"w-12 h-12 rounded-full flex items-center justify-center mb-4",
+						"w-12 h-12 rounded-full flex items-center justify-center",
 						theme === "normal"
 							? "bg-gradient-to-br from-blue-500 to-indigo-500"
 							: "bg-gradient-to-br from-blue-500 to-indigo-500"
@@ -125,7 +125,7 @@ const PaymentStep = ({
 			</motion.div>
 
 			{/* 입금 전 공연 상태 확인 */}
-			<ThemeDiv isChildren className="rounded-lg p-4 mb-6">
+			<ThemeDiv isChildren className="rounded-lg p-4">
 				<div className="flex items-center justify-between mb-3">
 					<h3 className="text-base font-semibold">
 						입금 전 공연 상태 확인
@@ -181,7 +181,32 @@ const PaymentStep = ({
 				)}
 			</ThemeDiv>
 
-			<div className="space-y-5">
+			{/* 주의사항 */}
+			<ThemeDiv isChildren className="rounded-lg p-4">
+				<h3 className="text-base font-semibold mb-3">
+					입금 시 주의사항
+				</h3>
+				<div className="space-y-2 text-sm">
+					<div className="flex items-start space-x-2">
+						<span className="text-red-500 font-bold text-xs">•</span>
+						<span>입금자명을 <strong>{ticketHolder}</strong>으로 해주세요</span>
+					</div>
+					<div className="flex items-start space-x-2">
+						<span className="text-red-500 font-bold text-xs">•</span>
+						<span>입금 확인 후 관리자 승인이 완료됩니다</span>
+					</div>
+					<div className="flex items-start space-x-2">
+						<span className="text-red-500 font-bold text-xs">•</span>
+						<span>입금 확인 전까지는 예매가 확정되지 않습니다</span>
+					</div>
+					<div className="flex items-start space-x-2">
+						<span className="text-blue-500 font-bold text-xs">•</span>
+						<span>입금 계좌 정보는 마이페이지에서 다시 확인할 수 있어요</span>
+					</div>
+				</div>
+			</ThemeDiv>
+
+			<div className="space-y-4">
 				{/* 예매 정보 요약 */}
 				<ThemeDiv isChildren className="rounded-lg p-4">
 					<motion.h3
@@ -245,16 +270,16 @@ const PaymentStep = ({
 								</div>
 								{account.description && (
 									<div className={`mt-3 p-3 rounded-lg ${theme === 'normal'
-											? 'bg-amber-50 border border-amber-200'
-											: theme === 'neon'
-												? 'bg-amber-950/20 border border-amber-400/50'
-												: 'bg-amber-950/30 border border-amber-800/50'
+										? 'bg-amber-50 border border-amber-200'
+										: theme === 'neon'
+											? 'bg-amber-950/20 border border-amber-400/50'
+											: 'bg-amber-950/30 border border-amber-800/50'
 										}`}>
 										<p className={`text-xs ${theme === 'normal'
-												? 'text-amber-800'
-												: theme === 'neon'
-													? 'text-amber-200'
-													: 'text-amber-200'
+											? 'text-amber-800'
+											: theme === 'neon'
+												? 'text-amber-200'
+												: 'text-amber-200'
 											}`}>
 											{account.description}
 										</p>
@@ -263,31 +288,6 @@ const PaymentStep = ({
 							</div>
 						</div>
 					))}
-				</ThemeDiv>
-
-				{/* 주의사항 */}
-				<ThemeDiv isChildren className="rounded-lg p-4">
-					<h3 className="text-base font-semibold mb-3">
-						입금 시 주의사항
-					</h3>
-					<div className="space-y-2 text-sm">
-						<div className="flex items-start space-x-2">
-							<span className="text-red-500 font-bold text-xs">•</span>
-							<span>입금자명을 <strong>{ticketHolder}</strong>으로 해주세요</span>
-						</div>
-						<div className="flex items-start space-x-2">
-							<span className="text-red-500 font-bold text-xs">•</span>
-							<span>입금 확인 후 1-2일 내에 관리자 승인이 완료됩니다</span>
-						</div>
-						<div className="flex items-start space-x-2">
-							<span className="text-red-500 font-bold text-xs">•</span>
-							<span>입금 확인 전까지는 예매가 확정되지 않습니다</span>
-						</div>
-						<div className="flex items-start space-x-2">
-							<span className="text-blue-500 font-bold text-xs">•</span>
-							<span>입금 계좌 정보는 마이페이지에서 다시 확인할 수 있어요</span>
-						</div>
-					</div>
 				</ThemeDiv>
 			</div>
 
@@ -302,7 +302,7 @@ const PaymentStep = ({
 					theme="dark"
 					width="w-full"
 					fontSize="text-base"
-					padding="px-2 py-1.5"
+					padding="px-2 py-1.5 md:py-2"
 					onClick={handleGoToMyPage}
 					reverse={theme === "normal"}
 					className="font-semibold"
