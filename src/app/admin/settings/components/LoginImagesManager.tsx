@@ -11,7 +11,7 @@ import {
   updateImageOrder 
 } from '@/api/appImages';
 import { AppImage } from '@/types/model/appImages';
-import { CreateAppImageDto, UpdateAppImageDto } from '@/types/dto/appImages';
+import { CreateAppImageDto } from '@/types/dto/appImages';
 import Button from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import useToast from '@/hooks/useToast';

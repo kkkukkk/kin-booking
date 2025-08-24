@@ -142,13 +142,13 @@ html,
 
 @layer base {
   input:-webkit-autofill {
-    box-shadow: 0 0 0px 1000px var(--normal-back) inset !important;
+    box-shadow: 0 0 0 1000px var(--normal-back) inset !important;
     -webkit-text-fill-color: var(--black) !important;
     transition: background-color 5000s ease-in-out 0s;
   }
 
   input:-webkit-autofill:focus {
-    box-shadow: 0 0 0px 1000px var(--normal-back) inset !important;
+    box-shadow: 0 0 0 1000px var(--normal-back) inset !important;
     -webkit-text-fill-color: var(--black) !important;
   }
 }
