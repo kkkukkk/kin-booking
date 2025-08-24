@@ -3,7 +3,7 @@
 
 :root {
   --vh: 100vh;
-  --background-image-url: url('https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/images/background_1.jpg');
+  --background-image-url: url('https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/images/background.jpg');
   --background: #ffffff;
   --foreground: #171717;
   /* 형광 네온 색상 팔레트 (검정 배경 대비 개선) */
@@ -142,21 +142,21 @@ html,
 
 @layer base {
   input:-webkit-autofill {
-    box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
-    -webkit-text-fill-color: var(--input-text) !important;
+    box-shadow: 0 0 0px 1000px var(--normal-back) inset !important;
+    -webkit-text-fill-color: var(--black) !important;
     transition: background-color 5000s ease-in-out 0s;
   }
 
   input:-webkit-autofill:focus {
-    box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
-    -webkit-text-fill-color: var(--input-text) !important;
+    box-shadow: 0 0 0px 1000px var(--normal-back) inset !important;
+    -webkit-text-fill-color: var(--black) !important;
   }
 }
 
 /*@media (min-width: 768px) {
   .scrollbar-none::-webkit-scrollbar {
     display: none;
-  }
+  }F
   .scrollbar-none {
     scrollbar-width: none;
   }
