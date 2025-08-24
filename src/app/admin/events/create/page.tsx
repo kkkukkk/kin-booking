@@ -188,7 +188,7 @@ const CreateEventPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    // 폼 데이터 확인
 
     if (!validateForm()) {
       showToast({

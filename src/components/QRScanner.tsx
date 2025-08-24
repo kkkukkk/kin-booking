@@ -100,7 +100,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 
 		if (code) {
 			// QR 코드 발견!
-			console.log('QR 코드 발견:', code.data);
+			        // QR 코드 스캔 성공
 			onScan(code.data);
 			stopCamera();
 			return;
