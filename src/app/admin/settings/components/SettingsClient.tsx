@@ -118,8 +118,8 @@ export default function SettingsClient() {
         className="max-w-4xl mx-auto"
       >
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[var(--neon-green)] mb-4">애플리케이션 설정</h1>
-          <p className="text-gray-400">애플리케이션의 전역 설정과 이미지를 관리합니다.</p>
+          <h1 className="text-3xl font-bold text-[var(--neon-green)] mb-4">설정</h1>
+          <p className="text-gray-400">전역 설정과 이미지를 관리합니다.</p>
         </div>
 
         {/* 탭 네비게이션 */}
@@ -128,7 +128,7 @@ export default function SettingsClient() {
             onClick={() => setActiveTab('background')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'background'
               ? 'bg-[var(--neon-green)] text-black'
-              : 'text-gray-400 hover:text-white'
+              : 'text-gray-400 hover:text-gray-200'
               }`}
           >
             배경 이미지
