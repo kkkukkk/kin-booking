@@ -27,7 +27,8 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 
 			// 브라우저 호환성 확인
 			if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-				throw new Error('이 브라우저는 카메라 접근을 지원하지 않습니다.');
+				setError('이 브라우저는 카메라 접근을 지원하지 않습니다.');
+				return;
 			}
 
 			// getUserMedia API 호환성 처리
@@ -38,7 +39,8 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 				(navigator as Navigator & { msGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).msGetUserMedia;
 
 			if (!getUserMedia) {
-				throw new Error('카메라 접근 API를 지원하지 않습니다.');
+				setError('카메라 접근 API를 지원하지 않습니다.');
+				return;
 			}
 
 			const stream = await getUserMedia.call(navigator.mediaDevices, {
@@ -75,8 +77,8 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 	const scanQR = useCallback(() => {
 		if (!videoRef.current || !canvasRef.current || !isScanning) return;
 
-		const video = videoRef.current!;
-		const canvas = canvasRef.current!;
+		const video = videoRef.current;
+		const canvas = canvasRef.current;
 		const ctx = canvas.getContext('2d');
 
 		if (!ctx) return;
@@ -113,7 +115,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 	// 카메라 중지
 	const stopCamera = () => {
 		if (streamRef.current) {
-			streamRef.current.getTracks()?.forEach(track => track.stop());
+			streamRef.current.getTracks().forEach(track => track.stop());
 			streamRef.current = null;
 		}
 		if (animationRef.current) {
