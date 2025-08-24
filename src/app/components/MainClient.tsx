@@ -17,12 +17,14 @@ import ImageSlider from "@/components/slider/ImageSlider";
 import { useLoginImages } from "@/hooks/api/useImages";
 import { ArrowDownIcon } from "@/components/icon/ArrowIcons";
 import KinAnimationSection from "@/app/components/KinAnimationSection";
+import { useBackgroundImage } from "@/hooks/useBackgroundImage";
 
 const MainClient = () => {
   const { showSpinner, hideSpinner } = useSpinner();
   const router = useRouter();
   const theme = useAppSelector(state => state.theme.current);
   const { data: images = [], isPending: imagePending } = useLoginImages();
+  const { backgroundImageUrl, loading: backgroundLoading } = useBackgroundImage();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isContainerReady, setIsContainerReady] = useState(false);
 
