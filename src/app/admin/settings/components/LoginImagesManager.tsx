@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { 
   fetchImagesByType, 
   createImage, 
@@ -10,7 +11,7 @@ import {
   updateImageOrder 
 } from '@/api/appImages';
 import { AppImage } from '@/types/model/appImages';
-import { CreateAppImageDto, UpdateAppImageDto } from '@/types/dto/appImages';
+import { CreateAppImageDto } from '@/types/dto/appImages';
 import Button from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import useToast from '@/hooks/useToast';
@@ -63,11 +64,7 @@ export default function LoginImagesManager() {
     }
   });
 
-  useEffect(() => {
-    loadImages();
-  }, []);
-
-  const loadImages = async () => {
+  const loadImages = useCallback(async () => {
     try {
       setLoading(true);
       const data = await fetchImagesByType('login_slide');
@@ -78,7 +75,11 @@ export default function LoginImagesManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    loadImages();
+  }, [loadImages]);
 
   const handleEdit = (image: AppImage) => {
     setEditingId(image.id);
@@ -278,7 +279,7 @@ export default function LoginImagesManager() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={editForm.isActive}
+                  checked={editForm.isActive ?? true}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
                   className="mr-2"
                 />
@@ -387,7 +388,7 @@ function SortableImageItem({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: image.id });
+  } = useSortable({ id: image.id.toString() });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -478,8 +479,8 @@ function SortableImageItem({
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={editForm.isActive}
-                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
+                checked={editForm.isActive ?? true}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
                 className="mr-2"
               />
               <span className="text-sm text-gray-300">활성화</span>
@@ -527,20 +528,17 @@ function SortableImageItem({
         
         <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
           <div className="md:col-span-2">
-                         <img
-               src={image.url}
-               alt={`slide-${image.order}`}
-               className="w-full h-20 object-cover rounded"
-               onError={(e) => {
-                 // placeholder 이미지가 없으면 기본 스타일 적용
-                 e.currentTarget.style.display = 'none';
-                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
-               }}
-             />
-             {/* 이미지 로드 실패 시 대체 요소 */}
-             <div className="w-full h-20 bg-gray-700 rounded flex items-center justify-center text-gray-400 text-sm hidden">
-               이미지 로드 실패
-             </div>
+            <div className="relative w-full h-20">
+              <Image
+                src={image.url}
+                alt={`slide-${image.order}`}
+                fill
+                className="object-cover rounded"
+                onError={() => {
+                  console.log('이미지 로드 실패:', image.url);
+                }}
+              />
+            </div>
           </div>
           <div className="text-sm text-gray-300">
             <div>순서: {image.order}</div>

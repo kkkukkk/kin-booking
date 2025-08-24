@@ -27,7 +27,8 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 
 			// 브라우저 호환성 확인
 			if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-				throw new Error('이 브라우저는 카메라 접근을 지원하지 않습니다.');
+				setError('이 브라우저는 카메라 접근을 지원하지 않습니다.');
+				return;
 			}
 
 			// getUserMedia API 호환성 처리
@@ -38,7 +39,8 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 				(navigator as Navigator & { msGetUserMedia?: typeof navigator.mediaDevices.getUserMedia }).msGetUserMedia;
 
 			if (!getUserMedia) {
-				throw new Error('카메라 접근 API를 지원하지 않습니다.');
+				setError('카메라 접근 API를 지원하지 않습니다.');
+				return;
 			}
 
 			const stream = await getUserMedia.call(navigator.mediaDevices, {
@@ -100,7 +102,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 
 		if (code) {
 			// QR 코드 발견!
-			console.log('QR 코드 발견:', code.data);
+			        // QR 코드 스캔 성공
 			onScan(code.data);
 			stopCamera();
 			return;

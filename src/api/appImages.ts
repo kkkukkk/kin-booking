@@ -74,8 +74,37 @@ export const updateImage = async (id: string, image: UpdateAppImageDto): Promise
   return toCamelCaseKeys<AppImage>(data);
 };
 
-// 이미지 삭제
+// 이미지 삭제 (DB + Storage)
 export const deleteImage = async (id: string): Promise<void> => {
+  // 1. 먼저 이미지 정보 조회하여 URL 확인
+  const { data: imageData, error: fetchError } = await supabase
+    .from('app_images')
+    .select('url')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) throw fetchError;
+
+  // 2. Storage에서 파일 삭제 (Supabase Storage URL인 경우에만)
+  if (imageData?.url?.includes('supabase.co/storage/v1/object/public/kin/')) {
+    try {
+      // URL에서 파일 경로 추출 (예: images/background.jpg, login-slide/slide_1.jpg)
+      const filePath = imageData.url.replace(/^.*\/kin\//, '');
+      const { error: storageError } = await supabase.storage
+        .from('kin')
+        .remove([filePath]);
+
+      if (storageError) {
+        console.error('Storage 파일 삭제 에러:', storageError.message);
+        // Storage 삭제 실패해도 DB 삭제는 진행
+      }
+    } catch (error) {
+      console.error('Storage 파일 삭제 중 예외 발생:', error);
+      // Storage 삭제 실패해도 DB 삭제는 진행
+    }
+  }
+
+  // 3. DB에서 레코드 삭제
   const { error } = await supabase
     .from('app_images')
     .delete()
@@ -134,30 +163,28 @@ export const fetchActiveLoginSlideImages = async (): Promise<AppImage[]> => {
 
 // ===== 파일 업로드 함수 =====
 export const uploadImageToStorage = async (file: File, type: 'background' | 'login_slide' | 'banner'): Promise<string> => {
-  try {
-    // 파일명 생성 (중복 방지)
-    const timestamp = Date.now();
-    const fileName = `${timestamp}_${file.name}`;
-    const filePath = `${type}/${fileName}`;
-    
-    // Supabase Storage에 업로드
-    const { data, error } = await supabase.storage
-      .from('kin')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
-    
-    if (error) throw error;
-    
-    // 업로드된 파일의 공개 URL 반환
-    const { data: urlData } = supabase.storage
-      .from('kin')
-      .getPublicUrl(filePath);
-    
-    return urlData.publicUrl;
-  } catch (error) {
+  // 파일명 생성 (중복 방지)
+  const timestamp = Date.now();
+  const fileName = `${timestamp}_${file.name}`;
+  const filePath = `${type}/${fileName}`;
+  
+  // Supabase Storage에 업로드
+  const { error } = await supabase.storage
+    .from('kin')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+  
+  if (error) {
     console.error('이미지 업로드 실패:', error);
     throw error;
   }
+  
+  // 업로드된 파일의 공개 URL 반환
+  const { data: urlData } = supabase.storage
+    .from('kin')
+    .getPublicUrl(filePath);
+  
+  return urlData.publicUrl;
 }; 

@@ -178,7 +178,7 @@ const CreateEventPage = () => {
     }
 
     // 설명 검사 (선택사항이지만 길이 제한)
-    if (formData.description && formData.description.length > 2000) {
+    if (formData.description && formData.description.trim().length > 2000) {
       errors.description = '공연 설명은 2,000자 이하로 입력해주세요.';
     }
 
@@ -188,7 +188,7 @@ const CreateEventPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    // 폼 데이터 확인
 
     if (!validateForm()) {
       showToast({
@@ -518,9 +518,9 @@ const CreateEventPage = () => {
                 rows={8}
                 className="min-h-[200px]"
               />
-              {validationErrors.description && (
+              {validationErrors.description ? (
                 <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>
-              )}
+              ) : null}
             </ThemeDiv>
           </div>
 

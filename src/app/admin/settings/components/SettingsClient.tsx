@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { fetchImagesByType, updateImage, createImage } from '@/api/appImages';
 import { AppImage } from '@/types/model/appImages';
 import { CreateAppImageDto } from '@/types/dto/appImages';
@@ -35,11 +36,7 @@ export default function SettingsClient() {
     }
   });
 
-  useEffect(() => {
-    loadBackgroundImage();
-  }, []);
-
-  const loadBackgroundImage = async () => {
+  const loadBackgroundImage = useCallback(async () => {
     try {
       setLoading(true);
       const images = await fetchImagesByType('background');
@@ -53,7 +50,11 @@ export default function SettingsClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    loadBackgroundImage();
+  }, [loadBackgroundImage]);
 
   const handleEdit = () => {
     setEditingBackground(true);
@@ -71,7 +72,7 @@ export default function SettingsClient() {
         await createImage(editForm);
         showToast({ message: '새 배경 이미지가 생성되었습니다.', iconType: 'success', autoCloseTime: 3000 });
       }
-      
+
       setEditingBackground(false);
       await loadBackgroundImage();
     } catch (error) {
@@ -116,37 +117,35 @@ export default function SettingsClient() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto"
       >
-                 <div className="mb-8">
-           <h1 className="text-3xl font-bold text-[var(--neon-green)] mb-4">애플리케이션 설정</h1>
-           <p className="text-gray-400">애플리케이션의 전역 설정과 이미지를 관리합니다.</p>
-         </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-[var(--neon-green)] mb-4">애플리케이션 설정</h1>
+          <p className="text-gray-400">애플리케이션의 전역 설정과 이미지를 관리합니다.</p>
+        </div>
 
         {/* 탭 네비게이션 */}
         <ThemeDiv className="flex space-x-1 rounded-lg p-1 mb-8">
           <button
             onClick={() => setActiveTab('background')}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'background'
-                ? 'bg-[var(--neon-green)] text-black'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'background'
+              ? 'bg-[var(--neon-green)] text-black'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             배경 이미지
           </button>
           <button
             onClick={() => setActiveTab('login-images')}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'login-images'
-                ? 'bg-[var(--neon-green)] text-black'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'login-images'
+              ? 'bg-[var(--neon-green)] text-black'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             로그인 슬라이드
           </button>
         </ThemeDiv>
 
         {/* 배경 이미지 관리 */}
-        {activeTab === 'background' && (
+        {activeTab === 'background' ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -154,33 +153,31 @@ export default function SettingsClient() {
           >
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-[var(--neon-green)]">메인 페이지 배경 이미지</h2>
-                             <Button
-                 onClick={handleEdit}
-                 theme={theme}
-                 className="font-semibold px-4 py-2"
-               >
-                 {backgroundImage ? '수정' : '추가'}
-               </Button>
+              <Button
+                onClick={handleEdit}
+                theme={theme}
+                className="font-semibold px-4 py-2"
+              >
+                {backgroundImage ? '수정' : '추가'}
+              </Button>
             </div>
 
             {/* 현재 배경 이미지 표시 */}
-            {backgroundImage && (
+            {backgroundImage ? (
               <ThemeDiv className="rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-[var(--neon-green)] mb-4">현재 배경 이미지</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <img
-                      src={backgroundImage.url}
-                      alt="현재 배경 이미지"
-                      className="w-full h-48 object-cover rounded"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                    {/* 이미지 로드 실패 시 대체 요소 */}
-                    <div className="w-full h-48 bg-gray-700 rounded flex items-center justify-center text-gray-400 text-sm hidden">
-                      이미지 로드 실패
+                    <div className="relative w-full h-48">
+                      <Image
+                        src={backgroundImage.url}
+                        alt="현재 배경 이미지"
+                        fill
+                        className="object-cover rounded"
+                        onError={() => {
+                          console.log('이미지 로드 실패:', backgroundImage?.url);
+                        }}
+                      />
                     </div>
                   </div>
                   <div className="space-y-4">
@@ -211,10 +208,10 @@ export default function SettingsClient() {
                   </div>
                 </div>
               </ThemeDiv>
-            )}
+            ) : null}
 
             {/* 배경 이미지 편집 폼 */}
-            {editingBackground && (
+            {editingBackground ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -223,115 +220,114 @@ export default function SettingsClient() {
                   <h3 className="text-lg font-semibold text-[var(--neon-green)] mb-4">
                     {backgroundImage ? '배경 이미지 수정' : '새 배경 이미지 추가'}
                   </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      이미지 업로드
-                    </label>
-                    <div className="space-y-2">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileSelect}
-                        className="hidden"
-                        id="background-image-upload"
-                        disabled={uploading}
-                      />
-                      <label
-                        htmlFor="background-image-upload"
-                        className={`block w-full p-4 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
-                          uploading 
-                            ? 'border-gray-600 text-gray-500 cursor-not-allowed' 
-                            : 'border-gray-500 text-gray-400 hover:border-[var(--neon-green)] hover:text-[var(--neon-green)]'
-                        }`}
-                      >
-                        {uploading ? (
-                          <div className="space-y-3">
-                            <Spinner size={32} color="var(--neon-green)" />
-                            <div className="text-base">업로드 중...</div>
-                                                         {uploadProgress > 0 && (
-                               <div className="w-full bg-gray-700 rounded-full h-3">
-                                 <div 
-                                   className="bg-[var(--neon-green)] h-3 rounded-full transition-all duration-300"
-                                   style={{ width: `${uploadProgress}%` }}
-                                 />
-                               </div>
-                             )}
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            <div className="text-2xl">🖼️</div>
-                            <div className="text-base">클릭하여 배경 이미지 선택</div>
-                            <div className="text-sm text-gray-500">또는 이미지 파일을 여기에 드래그</div>
-                            <div className="text-xs text-gray-600">권장: 1920x1080 이상, 5MB 이하</div>
-                          </div>
-                        )}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        이미지 업로드
                       </label>
+                      <div className="space-y-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          id="background-image-upload"
+                          disabled={uploading}
+                        />
+                        <label
+                          htmlFor="background-image-upload"
+                          className={`block w-full p-4 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${uploading
+                            ? 'border-gray-600 text-gray-500 cursor-not-allowed'
+                            : 'border-gray-500 text-gray-400 hover:border-[var(--neon-green)] hover:text-[var(--neon-green)]'
+                            }`}
+                        >
+                          {uploading ? (
+                            <div className="space-y-3">
+                              <Spinner size={32} color="var(--neon-green)" />
+                              <div className="text-base">업로드 중...</div>
+                              {uploadProgress > 0 && (
+                                <div className="w-full bg-gray-700 rounded-full h-3">
+                                  <div
+                                    className="bg-[var(--neon-green)] h-3 rounded-full transition-all duration-300"
+                                    style={{ width: `${uploadProgress}%` }}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="text-2xl">🖼️</div>
+                              <div className="text-base">클릭하여 배경 이미지 선택</div>
+                              <div className="text-sm text-gray-500">또는 이미지 파일을 여기에 드래그</div>
+                              <div className="text-xs text-gray-600">권장: 1920x1080 이상, 5MB 이하</div>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        이미지 URL
+                      </label>
+                      <Input
+                        value={editForm.url}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setEditForm(prev => ({ ...prev, url: e.target.value }))
+                        }
+                        theme={theme}
+                        className="w-full"
+                        placeholder="이미지 URL을 입력하거나 파일을 업로드하세요"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        설명
+                      </label>
+                      <Textarea
+                        value={editForm.description || ''}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                          setEditForm(prev => ({ ...prev, description: e.target.value }))
+                        }
+                        theme={theme}
+                        className="w-full"
+                        placeholder="배경 이미지에 대한 설명을 입력하세요"
+                        rows={3}
+                      />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      이미지 URL
-                    </label>
-                                         <Input
-                       value={editForm.url}
-                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-                         setEditForm(prev => ({ ...prev, url: e.target.value }))
-                       }
-                       theme={theme}
-                       className="w-full"
-                       placeholder="이미지 URL을 입력하거나 파일을 업로드하세요"
-                     />
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <Button
+                      onClick={handleCancel}
+                      theme={theme}
+                      reverse={theme === "normal"}
+                      className="px-4 py-2"
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      theme={theme}
+                      className="font-semibold px-4 py-2"
+                    >
+                      저장
+                    </Button>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      설명
-                    </label>
-                                         <Textarea
-                       value={editForm.description || ''}
-                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => 
-                         setEditForm(prev => ({ ...prev, description: e.target.value }))
-                       }
-                       theme={theme}
-                       className="w-full"
-                       placeholder="배경 이미지에 대한 설명을 입력하세요"
-                       rows={3}
-                     />
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-3 mt-6">
-                                     <Button
-                     onClick={handleCancel}
-                     theme={theme}
-                     reverse={theme === "normal"}
-                     className="px-4 py-2"
-                   >
-                     취소
-                   </Button>
-                   <Button
-                     onClick={handleSave}
-                     theme={theme}
-                     className="font-semibold px-4 py-2"
-                   >
-                     저장
-                   </Button>
-                </div>
                 </ThemeDiv>
               </motion.div>
-            )}
+            ) : null}
           </motion.div>
-        )}
+        ) : null}
 
         {/* 로그인 슬라이드 이미지 관리 */}
-        {activeTab === 'login-images' && (
+        {activeTab === 'login-images' ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <LoginImagesManager />
           </motion.div>
-                 )}
-       </motion.div>
-     </ThemeDiv>
-   );
+        ) : null}
+      </motion.div>
+    </ThemeDiv>
+  );
 } 

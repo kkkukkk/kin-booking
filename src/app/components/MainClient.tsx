@@ -17,16 +17,17 @@ import ImageSlider from "@/components/slider/ImageSlider";
 import { useLoginImages } from "@/hooks/api/useImages";
 import { ArrowDownIcon } from "@/components/icon/ArrowIcons";
 import KinAnimationSection from "@/app/components/KinAnimationSection";
-import { useBackgroundImage } from "@/hooks/useBackgroundImage";
+
 
 const MainClient = () => {
   const { showSpinner, hideSpinner } = useSpinner();
   const router = useRouter();
   const theme = useAppSelector(state => state.theme.current);
-  const { data: images = [], isPending: imagePending } = useLoginImages();
-  const { backgroundImageUrl, loading: backgroundLoading } = useBackgroundImage();
+  const { data: images = [] } = useLoginImages();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isContainerReady, setIsContainerReady] = useState(false);
+  
+
 
   // 스크롤 컨테이너 찾기
   useEffect(() => {
@@ -55,10 +56,10 @@ const MainClient = () => {
     page: undefined,
     size: undefined
   };
-  const { data, isLoading, isFetching, error } = useEventsWithCurrentStatus(params);
+  const { data: eventsData, isLoading, isFetching, error } = useEventsWithCurrentStatus(params);
 
-  const openEvents = data?.data.filter((event) => event.status === EventStatus.Ongoing);
-  const waitingEvents = data?.data.filter((event) => event.status === EventStatus.Pending);
+  const openEvents = eventsData?.data.filter((event) => event.status === EventStatus.Ongoing);
+  const waitingEvents = eventsData?.data.filter((event) => event.status === EventStatus.Pending);
 
   const prevIsFetching = useRef(false);
 
@@ -230,17 +231,17 @@ const MainClient = () => {
         </motion.div>
       </motion.div>
 
-      {/* KIN 애니메이션 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="text-center py-4 relative"
-      >
-        <KinAnimationSection
-          scrollContainerRef={isContainerReady ? scrollContainerRef : undefined}
-        />
-      </motion.div>
+             {/* KIN 애니메이션 */}
+       <motion.div
+         initial={{ opacity: 0, y: 20 }}
+         animate={{ opacity: 1, y: 0 }}
+         transition={{ delay: 0.3 }}
+         className="text-center py-4 relative"
+       >
+         <KinAnimationSection
+           scrollContainerRef={scrollContainerRef}
+         />
+       </motion.div>
 
       {/* 공연 현황 */}
       <motion.div
