@@ -75,8 +75,8 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 	const scanQR = useCallback(() => {
 		if (!videoRef.current || !canvasRef.current || !isScanning) return;
 
-		const video = videoRef.current;
-		const canvas = canvasRef.current;
+		const video = videoRef.current!;
+		const canvas = canvasRef.current!;
 		const ctx = canvas.getContext('2d');
 
 		if (!ctx) return;
@@ -113,7 +113,7 @@ const QRScanner = ({ isOpen, onClose, onScan }: QRScannerProps) => {
 	// 카메라 중지
 	const stopCamera = () => {
 		if (streamRef.current) {
-			streamRef.current.getTracks().forEach(track => track.stop());
+			streamRef.current.getTracks()?.forEach(track => track.stop());
 			streamRef.current = null;
 		}
 		if (animationRef.current) {

@@ -23,12 +23,15 @@ export const fetchLoginImages = async (): Promise<string[]> => {
 			return [];
 		}
 
-		const urls = data
+		if (!data) {
+			return [];
+		}
+
+		return data
 			.filter((file: { name?: string }) => file.name)
 			.map(
 				(file: { name: string }) =>
 					`https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/login-slide/${file.name}`
 			);
-		return urls;
 	}
 };

@@ -163,30 +163,28 @@ export const fetchActiveLoginSlideImages = async (): Promise<AppImage[]> => {
 
 // ===== 파일 업로드 함수 =====
 export const uploadImageToStorage = async (file: File, type: 'background' | 'login_slide' | 'banner'): Promise<string> => {
-  try {
-    // 파일명 생성 (중복 방지)
-    const timestamp = Date.now();
-    const fileName = `${timestamp}_${file.name}`;
-    const filePath = `${type}/${fileName}`;
-    
-    // Supabase Storage에 업로드
-    const { data, error } = await supabase.storage
-      .from('kin')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
-    
-    if (error) throw error;
-    
-    // 업로드된 파일의 공개 URL 반환
-    const { data: urlData } = supabase.storage
-      .from('kin')
-      .getPublicUrl(filePath);
-    
-    return urlData.publicUrl;
-  } catch (error) {
+  // 파일명 생성 (중복 방지)
+  const timestamp = Date.now();
+  const fileName = `${timestamp}_${file.name}`;
+  const filePath = `${type}/${fileName}`;
+  
+  // Supabase Storage에 업로드
+  const { error } = await supabase.storage
+    .from('kin')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+  
+  if (error) {
     console.error('이미지 업로드 실패:', error);
     throw error;
   }
+  
+  // 업로드된 파일의 공개 URL 반환
+  const { data: urlData } = supabase.storage
+    .from('kin')
+    .getPublicUrl(filePath);
+  
+  return urlData.publicUrl;
 }; 

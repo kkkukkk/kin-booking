@@ -279,7 +279,7 @@ export default function LoginImagesManager() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={editForm.isActive}
+                  checked={editForm.isActive ?? true}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
                   className="mr-2"
                 />
@@ -388,7 +388,7 @@ function SortableImageItem({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: image.id });
+  } = useSortable({ id: image.id.toString() });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -479,8 +479,8 @@ function SortableImageItem({
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={editForm.isActive}
-                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
+                checked={editForm.isActive ?? true}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
                 className="mr-2"
               />
               <span className="text-sm text-gray-300">활성화</span>

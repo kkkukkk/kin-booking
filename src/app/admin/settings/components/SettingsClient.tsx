@@ -145,7 +145,7 @@ export default function SettingsClient() {
         </ThemeDiv>
 
         {/* 배경 이미지 관리 */}
-        {activeTab === 'background' && (
+        {activeTab === 'background' ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -163,7 +163,7 @@ export default function SettingsClient() {
             </div>
 
             {/* 현재 배경 이미지 표시 */}
-            {backgroundImage && (
+            {backgroundImage ? (
               <ThemeDiv className="rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-[var(--neon-green)] mb-4">현재 배경 이미지</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -175,7 +175,7 @@ export default function SettingsClient() {
                         fill
                         className="object-cover rounded"
                         onError={() => {
-                          console.log('이미지 로드 실패:', backgroundImage.url);
+                          console.log('이미지 로드 실패:', backgroundImage?.url);
                         }}
                       />
                     </div>
@@ -208,10 +208,10 @@ export default function SettingsClient() {
                   </div>
                 </div>
               </ThemeDiv>
-            )}
+            ) : null}
 
             {/* 배경 이미지 편집 폼 */}
-            {editingBackground && (
+            {editingBackground ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -314,19 +314,19 @@ export default function SettingsClient() {
                   </div>
                 </ThemeDiv>
               </motion.div>
-            )}
+            ) : null}
           </motion.div>
-        )}
+        ) : null}
 
         {/* 로그인 슬라이드 이미지 관리 */}
-        {activeTab === 'login-images' && (
+        {activeTab === 'login-images' ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <LoginImagesManager />
           </motion.div>
-        )}
+        ) : null}
       </motion.div>
     </ThemeDiv>
   );

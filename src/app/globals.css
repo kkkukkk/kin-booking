@@ -3,7 +3,7 @@
 
 :root {
   --vh: 100vh;
-  --background-image-url: url('https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/images/background.jpg');
+  --background-image-url: none; /* 기본값 설정 */
   --background: #ffffff;
   --foreground: #171717;
   /* 형광 네온 색상 팔레트 (검정 배경 대비 개선) */
