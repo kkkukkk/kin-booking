@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { 
-  fetchImagesByType, 
-  createImage, 
-  updateImage, 
+import {
+  fetchImagesByType,
+  createImage,
+  updateImage,
   deleteImage,
-  updateImageOrder 
+  updateImageOrder
 } from '@/api/appImages';
 import { AppImage } from '@/types/model/appImages';
 import { CreateAppImageDto } from '@/types/dto/appImages';
@@ -51,7 +51,7 @@ export default function LoginImagesManager() {
     order: 0,
     isActive: true
   });
-  
+
   // 타입 안전성을 위한 setter 함수
   const updateEditForm = (updates: Partial<CreateAppImageDto>) => {
     setEditForm(prev => ({ ...prev, ...updates }));
@@ -104,7 +104,7 @@ export default function LoginImagesManager() {
         await createImage(editForm);
         showToast({ message: '새 이미지가 추가되었습니다.', iconType: 'success', autoCloseTime: 3000 });
       }
-      
+
       setEditingId(null);
       setEditForm({ type: 'login_slide', url: '', order: 0, isActive: true });
       await loadImages();
@@ -148,20 +148,20 @@ export default function LoginImagesManager() {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (active.id !== over?.id) {
       const oldIndex = images.findIndex(img => img.id === active.id);
       const newIndex = images.findIndex(img => img.id === over?.id);
-      
+
       const newImages = arrayMove(images, oldIndex, newIndex);
       setImages(newImages);
-      
+
       // 순서 업데이트
       const updates = newImages.map((img, index) => ({
         id: img.id,
         order: index
       }));
-      
+
       updateImageOrder(updates).catch(error => {
         console.error('순서 업데이트 실패:', error);
         showToast({ message: '순서 업데이트에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
@@ -186,124 +186,123 @@ export default function LoginImagesManager() {
 
   return (
     <div className="space-y-6">
-             <div className="flex items-center justify-between">
-         <h2 className="text-2xl font-bold text-[var(--neon-green)]">로그인 슬라이드 이미지 관리</h2>
-                   <Button
-            onClick={() => setEditingId('new')}
-            theme={theme}
-            className="font-semibold px-4 py-2"
-          >
-            새 이미지 추가
-          </Button>
-       </div>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-[var(--neon-green)]">슬라이드 이미지 관리</h2>
+        <Button
+          onClick={() => setEditingId('new')}
+          theme={theme}
+          className="font-semibold px-4 py-2"
+        >
+          추가
+        </Button>
+      </div>
 
-             {/* 새 이미지 추가 폼 */}
-       {editingId === 'new' && (
-         <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-         >
-           <ThemeDiv className="rounded-lg p-6">
-             <h3 className="text-lg font-semibold text-[var(--neon-green)] mb-4">새 이미지 추가</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                이미지 업로드
-              </label>
-              <div className="space-y-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="image-upload"
-                  disabled={uploading}
+      {/* 새 이미지 추가 폼 */}
+      {editingId === 'new' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <ThemeDiv className="rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-[var(--neon-green)] mb-4">새 이미지 추가</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  이미지 업로드
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="image-upload"
+                    disabled={uploading}
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className={`block w-full p-3 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${uploading
+                        ? 'border-gray-600 text-gray-500 cursor-not-allowed'
+                        : 'border-gray-500 text-gray-400 hover:border-[var(--neon-green)] hover:text-[var(--neon-green)]'
+                      }`}
+                  >
+                    {uploading ? (
+                      <div className="space-y-2">
+                        <Spinner size={24} color="var(--neon-green)" />
+                        <div className="text-sm">업로드 중...</div>
+                        {uploadProgress > 0 && (
+                          <div className="w-full bg-gray-700 rounded-full h-2">
+                            <div
+                              className="bg-[var(--neon-green)] h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${uploadProgress}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="text-lg">📁</div>
+                        <div className="text-sm">클릭하여 이미지 선택</div>
+                        <div className="text-xs text-gray-500">또는 이미지 파일을 여기에 드래그</div>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  이미지 URL
+                </label>
+                <Input
+                  value={editForm.url}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ url: e.target.value })}
+                  theme={theme}
+                  className="w-full"
+                  placeholder="이미지 URL을 입력하거나 파일을 업로드하세요"
                 />
-                <label
-                  htmlFor="image-upload"
-                  className={`block w-full p-3 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
-                    uploading 
-                      ? 'border-gray-600 text-gray-500 cursor-not-allowed' 
-                      : 'border-gray-500 text-gray-400 hover:border-[var(--neon-green)] hover:text-[var(--neon-green)]'
-                  }`}
-                >
-                  {uploading ? (
-                    <div className="space-y-2">
-                      <Spinner size={24} color="var(--neon-green)" />
-                      <div className="text-sm">업로드 중...</div>
-                      {uploadProgress > 0 && (
-                        <div className="w-full bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-[var(--neon-green)] h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${uploadProgress}%` }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="text-lg">📁</div>
-                      <div className="text-sm">클릭하여 이미지 선택</div>
-                      <div className="text-xs text-gray-500">또는 이미지 파일을 여기에 드래그</div>
-                    </div>
-                  )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  순서
+                </label>
+                <Input
+                  type="number"
+                  value={editForm.order}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ order: parseInt(e.target.value) || 0 })}
+                  theme={theme}
+                  className="w-full"
+                  placeholder="0"
+                />
+              </div>
+              <div className="flex items-center space-x-3">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={editForm.isActive ?? true}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-300">활성화</span>
                 </label>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                이미지 URL
-              </label>
-              <Input
-                value={editForm.url}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ url: e.target.value })}
+            <div className="flex justify-end space-x-3 mt-4">
+              <Button
+                onClick={handleCancel}
                 theme={theme}
-                className="w-full"
-                placeholder="이미지 URL을 입력하거나 파일을 업로드하세요"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                순서
-              </label>
-              <Input
-                type="number"
-                value={editForm.order}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ order: parseInt(e.target.value) || 0 })}
+                reverse={theme === "normal"}
+                className="px-4 py-2"
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleSave}
                 theme={theme}
-                className="w-full"
-                placeholder="0"
-              />
+                className="font-semibold px-4 py-2"
+              >
+                저장
+              </Button>
             </div>
-            <div className="flex items-center space-x-3">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={editForm.isActive ?? true}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-300">활성화</span>
-              </label>
-            </div>
-          </div>
-          <div className="flex justify-end space-x-3 mt-4">
-            <Button
-              onClick={handleCancel}
-              theme={theme}
-              reverse={theme === "normal"}
-              className="px-4 py-2"
-            >
-              취소
-            </Button>
-            <Button
-              onClick={handleSave}
-              theme={theme}
-              className="font-semibold px-4 py-2"
-            >
-              저장
-            </Button>
-          </div>
           </ThemeDiv>
         </motion.div>
       )}
@@ -405,105 +404,104 @@ function SortableImageItem({
       >
         <ThemeDiv className="rounded-lg p-6">
           <h3 className="text-lg font-semibold text-[var(--neon-green)] mb-4">이미지 수정</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              이미지 업로드
-            </label>
-            <div className="space-y-2">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-                id={`image-upload-${image.id}`}
-                disabled={uploading}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                이미지 업로드
+              </label>
+              <div className="space-y-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id={`image-upload-${image.id}`}
+                  disabled={uploading}
+                />
+                <label
+                  htmlFor={`image-upload-${image.id}`}
+                  className={`block w-full p-3 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${uploading
+                      ? 'border-gray-600 text-gray-500 cursor-not-allowed'
+                      : 'border-gray-500 text-gray-400 hover:border-[var(--neon-green)] hover:text-[var(--neon-green)]'
+                    }`}
+                >
+                  {uploading ? (
+                    <div className="space-y-2">
+                      <Spinner size={24} color="var(--neon-green)" />
+                      <div className="text-sm">업로드 중...</div>
+                      {uploadProgress > 0 && (
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className="bg-[var(--neon-green)] h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="text-lg">📁</div>
+                      <div className="text-sm">클릭하여 이미지 선택</div>
+                      <div className="text-xs text-gray-500">또는 이미지 파일을 여기에 드래그</div>
+                    </div>
+                  )}
+                </label>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                이미지 URL
+              </label>
+              <Input
+                value={editForm.url}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ url: e.target.value })}
+                theme={theme}
+                className="w-full"
+                placeholder="이미지 URL을 입력하거나 파일을 업로드하세요"
               />
-              <label
-                htmlFor={`image-upload-${image.id}`}
-                className={`block w-full p-3 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
-                  uploading 
-                    ? 'border-gray-600 text-gray-500 cursor-not-allowed' 
-                    : 'border-gray-500 text-gray-400 hover:border-[var(--neon-green)] hover:text-[var(--neon-green)]'
-                }`}
-              >
-                {uploading ? (
-                  <div className="space-y-2">
-                    <Spinner size={24} color="var(--neon-green)" />
-                    <div className="text-sm">업로드 중...</div>
-                    {uploadProgress > 0 && (
-                      <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div 
-                          className="bg-[var(--neon-green)] h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${uploadProgress}%` }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="text-lg">📁</div>
-                    <div className="text-sm">클릭하여 이미지 선택</div>
-                    <div className="text-xs text-gray-500">또는 이미지 파일을 여기에 드래그</div>
-                  </div>
-                )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                순서
+              </label>
+              <Input
+                type="number"
+                value={editForm.order}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ order: parseInt(e.target.value) || 0 })}
+                theme={theme}
+                className="w-full"
+                placeholder="0"
+              />
+            </div>
+            <div className="flex items-center space-x-3">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={editForm.isActive ?? true}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
+                  className="mr-2"
+                />
+                <span className="text-sm text-gray-300">활성화</span>
               </label>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              이미지 URL
-            </label>
-            <Input
-              value={editForm.url}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ url: e.target.value })}
+          <div className="flex justify-end space-x-3 mt-4">
+            <Button
+              onClick={() => setEditingId(null)}
               theme={theme}
-              className="w-full"
-              placeholder="이미지 URL을 입력하거나 파일을 업로드하세요"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              순서
-            </label>
-            <Input
-              type="number"
-              value={editForm.order}
-                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ order: parseInt(e.target.value) || 0 })}
+              reverse={theme === "normal"}
+              className="px-4 py-2"
+            >
+              취소
+            </Button>
+            <Button
+              onClick={onSave}
               theme={theme}
-              className="w-full"
-              placeholder="0"
-            />
+              className="font-semibold px-4 py-2"
+            >
+              저장
+            </Button>
           </div>
-          <div className="flex items-center space-x-3">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={editForm.isActive ?? true}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEditForm({ isActive: e.target.checked })}
-                className="mr-2"
-              />
-              <span className="text-sm text-gray-300">활성화</span>
-            </label>
-          </div>
-        </div>
-        <div className="flex justify-end space-x-3 mt-4">
-          <Button
-            onClick={() => setEditingId(null)}
-            theme={theme}
-            reverse={theme === "normal"}
-            className="px-4 py-2"
-          >
-            취소
-          </Button>
-          <Button
-            onClick={onSave}
-            theme={theme}
-            className="font-semibold px-4 py-2"
-          >
-            저장
-          </Button>
-        </div>
         </ThemeDiv>
       </motion.div>
     );
@@ -514,59 +512,58 @@ function SortableImageItem({
       ref={setNodeRef}
       style={style}
     >
-      <ThemeDiv className={`rounded-lg p-4 ${
-        isDragging ? 'opacity-50' : ''
-      }`}>
-      <div className="flex items-center space-x-4">
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-move text-gray-400 hover:text-white p-2"
-        >
-          ⋮⋮
-        </div>
-        
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-          <div className="md:col-span-2">
-            <div className="relative w-full h-20">
-              <Image
-                src={image.url}
-                alt={`slide-${image.order}`}
-                fill
-                className="object-cover rounded"
-                onError={() => {
-                  console.log('이미지 로드 실패:', image.url);
-                }}
-              />
+      <ThemeDiv className={`rounded-lg p-4 ${isDragging ? 'opacity-50' : ''
+        }`}>
+        <div className="flex items-center space-x-4">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-move text-gray-400 hover:text-white p-2"
+          >
+            ⋮⋮
+          </div>
+
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+            <div className="md:col-span-2">
+              <div className="relative w-full h-20">
+                <Image
+                  src={image.url}
+                  alt={`slide-${image.order}`}
+                  fill
+                  className="object-cover rounded"
+                  onError={() => {
+                    console.log('이미지 로드 실패:', image.url);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="text-sm text-gray-300">
+              <div>순서: {image.order}</div>
+              <div>상태: {image.isActive ? '활성' : '비활성'}</div>
+            </div>
+            <div className="text-sm text-gray-400 truncate">
+              {image.url}
             </div>
           </div>
-          <div className="text-sm text-gray-300">
-            <div>순서: {image.order}</div>
-            <div>상태: {image.isActive ? '활성' : '비활성'}</div>
-          </div>
-          <div className="text-sm text-gray-400 truncate">
-            {image.url}
+
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => onEdit(image)}
+              theme={theme}
+              className="px-3 py-1 text-sm"
+            >
+              수정
+            </Button>
+            <Button
+              onClick={() => onDelete(image.id)}
+              theme={theme}
+              reverse={theme === "normal"}
+              className="px-3 py-1 text-sm"
+            >
+              삭제
+            </Button>
           </div>
         </div>
-        
-        <div className="flex space-x-2">
-          <Button
-            onClick={() => onEdit(image)}
-            theme={theme}
-            className="px-3 py-1 text-sm"
-          >
-            수정
-          </Button>
-          <Button
-            onClick={() => onDelete(image.id)}
-            theme={theme}
-            reverse={theme === "normal"}
-            className="px-3 py-1 text-sm"
-          >
-            삭제
-          </Button>
-        </div>
-      </div>
       </ThemeDiv>
     </motion.div>
   );

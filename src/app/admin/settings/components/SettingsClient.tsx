@@ -118,8 +118,8 @@ export default function SettingsClient() {
         className="max-w-4xl mx-auto"
       >
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[var(--neon-green)] mb-4">애플리케이션 설정</h1>
-          <p className="text-gray-400">애플리케이션의 전역 설정과 이미지를 관리합니다.</p>
+          <h1 className="text-3xl font-bold text-[var(--neon-green)] mb-4">배경 설정</h1>
+          <p className="text-gray-400">전역 배경 이미지를 관리합니다.</p>
         </div>
 
         {/* 탭 네비게이션 */}
