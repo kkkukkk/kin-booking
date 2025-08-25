@@ -41,6 +41,13 @@ const ReservationsGuide = () => {
 							"w-1.5 h-1.5 rounded-full flex-shrink-0",
 							theme === "normal" ? "bg-black/60" : "bg-white/60"
 						)}></div>
+						<span>안내 계좌 외 어떤 계좌로도 입금 요청을 드리지 않습니다.</span>
+					</li>
+					<li className="flex items-center gap-2">
+						<div className={clsx(
+							"w-1.5 h-1.5 rounded-full flex-shrink-0",
+							theme === "normal" ? "bg-black/60" : "bg-white/60"
+						)}></div>
 						<span>사용자 예매 대기 중 공연이 매진될 수 있습니다. 입금 전 꼭 공연 상태를 확인해주세요.</span>
 					</li>
 				</ul>

@@ -200,8 +200,12 @@ const PaymentStep = ({
 						<span>입금 확인 전까지는 예매가 확정되지 않습니다</span>
 					</div>
 					<div className="flex items-start space-x-2">
+						<span className="text-red-500 font-bold text-xs">•</span>
+						<span>안내 계좌 외 어떤 계좌로도 입금 요청을 드리지 않습니다</span>
+					</div>
+					<div className="flex items-start space-x-2">
 						<span className="text-blue-500 font-bold text-xs">•</span>
-						<span>입금 계좌 정보는 마이페이지에서 다시 확인할 수 있어요</span>
+						<span>입금 계좌 정보는 마이페이지에서 다시 확인할 수 있습니다</span>
 					</div>
 				</div>
 			</ThemeDiv>
