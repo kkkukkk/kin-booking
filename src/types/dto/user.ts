@@ -1,4 +1,5 @@
 import { User, UserStatus } from "@/types/model/user";
+import { UserRoleStatus } from "@/types/model/userRole";
 
 export interface CreateUserDto {
 	name: string;
@@ -33,7 +34,7 @@ export interface UserWithRoles extends User {
 	userRoles: {
 		roleId: string;
 		roles: {
-			roleCode: string;
+			roleCode: UserRoleStatus;
 			roleName: string;
 		};
 	};

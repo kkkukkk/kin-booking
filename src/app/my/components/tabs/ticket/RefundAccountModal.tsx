@@ -65,15 +65,15 @@ export const RefundAccountModal = ({
 		if (isNewAccount) {
 			// 새 계좌 정보 유효성 검사
 			if (!bankName.trim()) {
-				showToast({ message: '은행명을 입력해주세요.', iconType: 'error' });
+				showToast({ message: '은행명을 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
 				return;
 			}
 			if (!accountNumber.trim()) {
-				showToast({ message: '계좌번호를 입력해주세요.', iconType: 'error' });
+				showToast({ message: '계좌번호를 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
 				return;
 			}
 			if (!accountHolder.trim()) {
-				showToast({ message: '예금주를 입력해주세요.', iconType: 'error' });
+				showToast({ message: '예금주를 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
 				return;
 			}
 

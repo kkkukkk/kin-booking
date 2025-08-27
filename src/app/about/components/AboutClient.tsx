@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useTeamMembers } from '@/hooks/api/useTeamMembers';
+import { useActiveTeamMembers } from '@/hooks/api/useTeamMembers';
 import { TeamMemberViewDto } from '@/types/dto/teamMember';
 import TeamMemberCard from '@/components/user/TeamMemberCard';
 import { ArrowLeftIcon } from '@/components/icon/ArrowIcons';
@@ -10,7 +10,7 @@ import Button from '@/components/base/Button';
 
 const AboutClient = () => {
   const router = useRouter();
-  const { data: teamMembers, isLoading } = useTeamMembers();
+  const { data: teamMembers, isLoading } = useActiveTeamMembers();
 
   const handleGoBack = () => {
     router.back();

@@ -180,7 +180,7 @@ const EventsClient = () => {
           </div>
         </div>
       ),
-      width: '20%',
+      width: '18%',
       sortable: true,
     },
     {
@@ -192,7 +192,7 @@ const EventsClient = () => {
           <div className="text-xs text-gray-500">{dayjs(event.eventDate).format('HH:mm')}</div>
         </div>
       ),
-      width: '10%',
+      width: '12%',
       sortable: true,
     },
     {
@@ -203,7 +203,7 @@ const EventsClient = () => {
           {event.ticketPrice?.toLocaleString() || 0}원
         </div>
       ),
-      width: '11%',
+      width: '12%',
       sortable: true,
     },
     {
@@ -258,7 +258,7 @@ const EventsClient = () => {
           )}
         </div>
       ),
-      width: '11%',
+      width: '10%',
     },
   ];
 

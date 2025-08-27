@@ -2,7 +2,7 @@ import { TeamMember, TeamRoleEnum } from '@/types/model/teamMember';
 
 export type CreateTeamMemberDto = Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>;
 
-export type UpdateTeamMemberDto = Partial<Omit<TeamMember, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'displayOrder'>>;
+export type UpdateTeamMemberDto = Partial<Omit<TeamMember, 'id' | 'name' | 'createdAt' | 'updatedAt'>>;
 
 // 뷰에서 반환되는 조회용 타입
 export interface TeamMemberViewDto {
@@ -14,4 +14,6 @@ export interface TeamMemberViewDto {
   youtubeLink?: string;
   displayOrder: number;
   displayName: string;
+  teamMemberId: string;
+  isActive: boolean;
 } 

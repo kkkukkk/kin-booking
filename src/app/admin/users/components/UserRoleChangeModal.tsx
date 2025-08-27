@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Modal from '@/components/Modal';
 import Button from '@/components/base/Button';
 import { UserWithRoles } from '@/types/dto/user';
@@ -50,11 +49,11 @@ const UserRoleChangeModal = ({ user, theme, onRoleChange, onClose }: UserRoleCha
             ].map((role) => (
               <Button
                 key={role.value}
-                theme={user.userRoles?.roles?.roleCode === role.value.toUpperCase() ? 'neon' : (theme === 'normal' ? 'normal' : 'dark')}
-                onClick={() => onRoleChange(user.id, role.value as UserRoleStatus)}
+                theme={user.userRoles?.roles?.roleCode === role.value ? 'neon' : (theme === 'normal' ? 'normal' : 'dark')}
+                onClick={() => onRoleChange(user.id, role.value)}
                 fontSize="text-sm"
                 padding="px-3 py-2"
-                className="w-full"
+                className="w-full font-semibold"
               >
                 {role.label}
               </Button>
@@ -69,6 +68,7 @@ const UserRoleChangeModal = ({ user, theme, onRoleChange, onClose }: UserRoleCha
             onClick={onClose}
             fontSize='text-sm'
             padding='px-3 py-1.5 md:py-1'
+            className='font-semibold'
           >
             닫기
           </Button>

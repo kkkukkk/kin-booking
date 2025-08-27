@@ -23,6 +23,7 @@ const AdminSidebar = ({ variant = 'sidebar', onClose }: AdminSidebarProps) => {
   const navItems = [
     { href: '/admin', label: '대시보드' },
     { href: '/admin/users', label: '사용자 관리' },
+    { href: '/admin/team-members', label: '멤버 관리' },
     { href: '/admin/events', label: '공연 관리' },
     { href: '/admin/reservations', label: '예매 관리' },
     { href: '/admin/tickets', label: '티켓 관리' },

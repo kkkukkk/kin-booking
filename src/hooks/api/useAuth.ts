@@ -25,7 +25,7 @@ export const useLogin = () => {
 				showToast({
 					message: "비활성화(탈퇴 등)된 계정입니다. 관리자에게 문의해주세요.",
 					iconType: "error",
-					autoCloseTime: 4000,
+					autoCloseTime: 3000,
 				});
 			} else {
 				showToast({

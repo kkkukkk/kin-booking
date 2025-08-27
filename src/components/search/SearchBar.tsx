@@ -133,7 +133,7 @@ const SearchBar = ({
                 },
               }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="flex flex-col md:flex-row gap-3 items-center w-full mt-2"
+              className="flex flex-col md:flex-row gap-3 items-center w-full mt-2 md:justify-end"
             >
               {filters.keyword && (
                 <Input
@@ -171,7 +171,7 @@ const SearchBar = ({
               )}
 
               {filters.dateRange && (
-                <div className="relative w-full md:min-w-[300px] md:w-1/4">
+                <div className="relative w-full md:min-w-[280px] md:w-1/5">
                   <button
                     ref={datePickerRef}
                     type="button"

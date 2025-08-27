@@ -149,11 +149,13 @@ export const useSearchUsers = (query: string) => {
 export const useUpdateUserRole = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<void, Error, { userId: string; newRoleId: number }>({
-		mutationFn: ({ userId, newRoleId }) => updateUserRole(userId, newRoleId),
+	return useMutation<void, Error, { userId: string; newRoleId: string; roleCode: string }>({
+		mutationFn: ({ userId, newRoleId, roleCode }) => updateUserRole(userId, newRoleId, roleCode),
 		onSuccess: () => {
 			// 사용자 목록 쿼리 무효화하여 변경사항 반영
 			queryClient.invalidateQueries({ queryKey: ['user'] });
+			// 팀 멤버 목록도 무효화 (역할 변경으로 인한 팀 멤버 변경사항 반영)
+			queryClient.invalidateQueries({ queryKey: ['team-members'] });
 		},
 		onError: (error: Error) => {
 			console.error('사용자 역할 변경 실패:', error.message);

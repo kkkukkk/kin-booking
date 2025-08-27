@@ -10,6 +10,7 @@ import {
 import { PaginationParams } from "@/util/pagination/type";
 import { getPaginationRange } from "@/util/pagination/pagination";
 import { toCamelCaseKeys, toSnakeCaseKeys } from "@/util/case/case";
+import { syncTeamMemberWithUserRole } from './teamMember';
 
 // 유저 검색 api
 export const fetchUser = async (params?: PaginationParams & FetchUserDto): Promise<FetchUserWithRolesResponseDto> => {
@@ -136,13 +137,17 @@ export const softDeleteUser = async (userId: string): Promise<User> => {
 }
 
 // 사용자 역할 변경 api
-export const updateUserRole = async (userId: string, newRoleId: number): Promise<void> => {
+export const updateUserRole = async (userId: string, newRoleId: string, roleCode: string): Promise<void> => {
+	// 사용자 역할 업데이트
 	const { error } = await supabase
 		.from('user_roles')
 		.update({ role_id: newRoleId })
 		.eq('user_id', userId);
 	
 	if (error) throw error;
+
+	// 팀 멤버 동기화
+	await syncTeamMemberWithUserRole(userId, roleCode);
 };
 
 // 특정 유저 조회 api

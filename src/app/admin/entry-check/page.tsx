@@ -101,7 +101,7 @@ const EntryCheckPage = () => {
               showToast({
                 message: '티켓은 업데이트되었지만 세션 상태 업데이트에 실패했습니다.',
                 iconType: 'warning',
-                autoCloseTime: 5000,
+                autoCloseTime: 3000,
               });
             }
           });

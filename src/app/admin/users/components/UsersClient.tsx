@@ -14,7 +14,7 @@ import useToast from '@/hooks/useToast';
 import SearchBar from '@/components/search/SearchBar';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { UserStatusKo } from '@/types/model/user';
-import { RoleCode, RoleCodeKo } from '@/types/model/role';
+
 import { UserRoleStatus, UserRoleStatusKo } from '@/types/model/userRole';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
@@ -144,14 +144,14 @@ const UsersClient = () => {
   // 사용자 클릭 핸들러
   const handleUserClick = (user: UserWithRoles) => {
     if (!isMaster) {
-      showToast({ 
-        message: '권한이 없습니다.', 
+      showToast({
+        message: '권한이 없습니다.',
         iconType: 'error',
         autoCloseTime: 3000
       });
       return;
     }
-    
+
     setSelectedUser(user);
     setIsModalOpen(true);
   };
@@ -167,18 +167,8 @@ const UsersClient = () => {
   // 역할 변경 핸들러
   const handleRoleChange = async (userId: string, newRoleStatus: UserRoleStatus) => {
     try {
-      // UserRoleStatus를 RoleCode로 변환
-      const roleCodeMap = {
-        [UserRoleStatus.Master]: 'MASTER',
-        [UserRoleStatus.Manager]: 'MANAGER',
-        [UserRoleStatus.Member]: 'MEMBER',
-        [UserRoleStatus.User]: 'USER'
-      };
-
-      const newRoleCode = roleCodeMap[newRoleStatus];
-
       // roles에서 해당 roleCode에 맞는 role_id 찾기
-      const targetRole = roles?.find(role => role.roleCode === newRoleCode);
+      const targetRole = roles?.find(role => role.roleCode === newRoleStatus);
       if (!targetRole) {
         showToast({ message: '해당 역할을 찾을 수 없습니다.', iconType: 'error' });
         return;
@@ -187,7 +177,8 @@ const UsersClient = () => {
       // 실제 역할 변경 API 호출
       await updateUserRoleMutation.mutateAsync({
         userId,
-        newRoleId: targetRole.id
+        newRoleId: targetRole.id,
+        roleCode: newRoleStatus
       });
 
       showToast({ message: `역할이 ${UserRoleStatusKo[newRoleStatus]}로 변경되었습니다.`, iconType: 'success', autoCloseTime: 3000 });
@@ -199,7 +190,7 @@ const UsersClient = () => {
           ...prev.userRoles,
           roles: {
             ...prev.userRoles?.roles,
-            roleCode: newRoleCode
+            roleCode: newRoleStatus
           }
         }
       } : null);
@@ -252,15 +243,12 @@ const UsersClient = () => {
       render: (user: UserWithRoles) => (
         <div className="flex items-center space-x-2">
           <StatusBadge
-            status={user.userRoles?.roles?.roleCode === 'MASTER' ? UserRoleStatus.Master :
-              user.userRoles?.roles?.roleCode === 'MANAGER' ? UserRoleStatus.Manager :
-                user.userRoles?.roles?.roleCode === 'MEMBER' ? UserRoleStatus.Member : UserRoleStatus.User}
+            status={user.userRoles?.roles?.roleCode || UserRoleStatus.User}
             theme={theme}
             className="text-xs"
             statusType="userRole"
             size="sm"
           />
-
         </div>
       ),
       width: '12%',
@@ -307,7 +295,7 @@ const UsersClient = () => {
   ];
 
   // 모바일 카드 섹션 렌더 함수
-  const mobileCardSections = (user: UserWithRoles, index: number) => ({
+  const mobileCardSections = (user: UserWithRoles) => ({
     firstRow: (
       <>
         <div className="w-full flex flex-col gap-2">
@@ -315,9 +303,7 @@ const UsersClient = () => {
             <span className="font-semibold text-sm truncate">{user.name}</span>
             <div className="flex items-center gap-2">
               <StatusBadge
-                status={user.userRoles?.roles?.roleCode === 'MASTER' ? UserRoleStatus.Master :
-                  user.userRoles?.roles?.roleCode === 'MANAGER' ? UserRoleStatus.Manager :
-                    user.userRoles?.roles?.roleCode === 'MEMBER' ? UserRoleStatus.Member : UserRoleStatus.User}
+                status={user.userRoles?.roles?.roleCode || UserRoleStatus.User}
                 theme={theme}
                 statusType="userRole"
                 size="sm"
@@ -330,10 +316,6 @@ const UsersClient = () => {
                 size="sm"
               />
             </div>
-          </div>
-          <div className="flex justify-between">
-            
-            
           </div>
         </div>
       </>
@@ -431,7 +413,7 @@ const UsersClient = () => {
                 { value: '', label: '권한' },
                 ...(roles?.map(role => ({
                   value: role.roleCode,
-                  label: RoleCodeKo[role.roleCode as RoleCode]
+                  label: UserRoleStatusKo[role.roleCode]
                 })) || [])
               ]
             }
