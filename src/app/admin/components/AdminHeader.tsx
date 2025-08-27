@@ -17,6 +17,7 @@ import AdminDropDownMenu from './AdminDropDownMenu';
 import AdminUserInfo from './AdminUserInfo';
 import { useAdminSidebar } from '@/providers/AdminSidebarProvider';
 import {Theme} from "@/types/ui/theme";
+import { HomeIcon } from '@/components/icon/HomeIcon';
 
 const AdminHeader = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -83,7 +84,7 @@ const AdminHeader = () => {
             className="flex items-center justify-center font-semibold"
             fontSize='text-sm'
           >
-            페이지로 가기
+            <HomeIcon className="w-5 h-5" />
           </Button>
           <div className="relative">
             <Button

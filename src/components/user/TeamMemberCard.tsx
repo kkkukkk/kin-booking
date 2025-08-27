@@ -36,7 +36,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
         {/* 아바타 */}
         <div className={styles.gridAreaAvatar}>
           <UserAvatar
-            name={member.name || 'Unknown'}
+            name={member.displayName || 'Unknown'}
             size="sm md:md"
           />
         </div>
@@ -86,15 +86,19 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
         </div>
 
         {/* 소개 */}
-        {member.bio && (
-          <div className={styles.gridAreaBio}>
-            <div className="h-24 md:h-28 bg-gray-700/30 rounded-lg p-3">
+        <div className={styles.gridAreaBio}>
+          <div className="h-24 md:h-28 bg-gray-700/30 rounded-lg p-3">
+            {member.bio ? (
               <p className="text-sm text-gray-300 leading-relaxed line-clamp-4 h-full font-semibold">
                 {member.bio}
               </p>
-            </div>
+            ) : (
+              <p className="text-sm text-gray-500 leading-relaxed h-full font-semibold flex items-center justify-center">
+                소개 없음
+              </p>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </motion.div>
   );

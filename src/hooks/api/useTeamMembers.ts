@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchTeamMembers,
+  fetchActiveTeamMembers,
   fetchTeamMemberById,
   createTeamMember,
   updateTeamMember,
@@ -13,12 +14,22 @@ import {
 } from '@/types/dto/teamMember';
 import { TeamMember } from '@/types/model/teamMember';
 
-// 팀 멤버 목록 조회
+// 팀 멤버 목록 조회 (모든 멤버 - 관리자용)
 export const useTeamMembers = () => {
   return useQuery<TeamMemberViewDto[]>({
     queryKey: ['team-members'],
     queryFn: fetchTeamMembers,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0, // 캐시 없음 - 항상 최신 데이터
+    retry: 1,
+  });
+};
+
+// 활성 팀 멤버 목록 조회 (About 페이지용)
+export const useActiveTeamMembers = () => {
+  return useQuery<TeamMemberViewDto[]>({
+    queryKey: ['active-team-members'],
+    queryFn: fetchActiveTeamMembers,
+    staleTime: 0, // 캐시 없음 - 항상 최신 데이터
     retry: 1,
   });
 };

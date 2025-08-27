@@ -1,20 +1,8 @@
-export enum RoleCode {
-	MASTER = 'MASTER',
-	MANAGER = 'MANAGER',
-	MEMBER = 'MEMBER',
-	USER = 'USER',
-}
-
-export const RoleCodeKo: Record<RoleCode, string> = {
-	[RoleCode.MASTER]: '마스터',
-	[RoleCode.MANAGER]: '매니저',
-	[RoleCode.MEMBER]: '멤버',
-	[RoleCode.USER]: '사용자',
-};
+import { UserRoleStatus } from './userRole';
 
 export interface Role {
-	id: number;
-	roleCode: RoleCode;
+	id: string; // UUID로 변경
+	roleCode: UserRoleStatus;
 	roleName: string;
 	description?: string | null;
 }

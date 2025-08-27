@@ -7,10 +7,10 @@ export interface UserRole {
 
 // 사용자 역할 상태 enum
 export enum UserRoleStatus {
-	Master = 'master',
-	Manager = 'manager',
-	Member = 'member',
-	User = 'user',
+	Master = 'MASTER',
+	Manager = 'MANAGER',
+	Member = 'MEMBER',
+	User = 'USER',
 }
 
 export const UserRoleStatusKo: Record<UserRoleStatus, string> = {
