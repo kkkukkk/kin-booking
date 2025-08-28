@@ -1,1 +1,1 @@
-export type StatusBadgeType = 'event' | 'ticket' | 'friend' | 'reservation' | 'userRole' | 'user' | 'paymentType'; 
+export type StatusBadgeType = 'event' | 'ticket' | 'friend' | 'reservation' | 'userRole' | 'user' | 'paymentType' | 'teamRole'; 

@@ -11,6 +11,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { useUpdateTeamMember } from '@/hooks/api/useTeamMembers';
 import useToast from '@/hooks/useToast';
+import { StatusBadge } from '@/components/status/StatusBadge';
 
 interface TeamTabProps {
 	teamMember: TeamMember;
@@ -160,9 +161,12 @@ const TeamTab = ({ teamMember }: TeamTabProps) => {
 				</div>
 				<div className="flex justify-between items-center py-2 border-b border-gray-200">
 					<span className="font-medium opacity-70">역할</span>
-					<span className="px-2 py-1 rounded-full text-xs font-medium bg-green-700/60 text-white">
-						{TeamRoleKo[teamMember.teamRole]}
-					</span>
+					<StatusBadge
+						status={teamMember.teamRole}
+						theme={theme}
+						statusType="teamRole"
+						size="sm"
+					/>
 				</div>
 				{teamMember.bio && (
 					<div className="flex flex-col pt-2 pb-4 border-b border-gray-200">

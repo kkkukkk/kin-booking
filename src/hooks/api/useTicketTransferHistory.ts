@@ -6,6 +6,8 @@ import {
   getSentTransferHistory,
   getTransferredTicketsByReservation,
   getTransferHistoryWithDetails,
+  getAllTransferHistoryWithDetails,
+  getAllTransferHistoryGroups,
 } from '@/api/ticketTransferHistory';
 import { CreateTransferHistoryRequest } from '@/types/model/ticketTransferHistory';
 
@@ -58,6 +60,30 @@ export const useTransferHistoryWithDetails = (historyId: string) => {
   });
 };
 
+// 관리자용 전체 양도 이력 조회
+export const useAllTransferHistoryWithDetails = () => {
+  return useQuery({
+    queryKey: ['transferHistory', 'all'],
+    queryFn: () => getAllTransferHistoryWithDetails(),
+    retry: 1,
+  });
+};
+
+// 관리자용 양도 이력 그룹 조회 (뷰 테이블 사용)
+export const useAllTransferHistoryGroups = (params: {
+  page?: number;
+  size?: number;
+  startDate?: string;
+  endDate?: string;
+  keyword?: string;
+} = {}) => {
+  return useQuery({
+    queryKey: ['transferHistory', 'groups', params],
+    queryFn: () => getAllTransferHistoryGroups(params),
+    retry: 1,
+  });
+};
+
 // 양도 이력 생성
 export const useCreateTransferHistory = () => {
   const queryClient = useQueryClient();
@@ -69,6 +95,7 @@ export const useCreateTransferHistory = () => {
       queryClient.invalidateQueries({ queryKey: ['transferHistory', 'ticket', data.ticketId] });
       queryClient.invalidateQueries({ queryKey: ['transferHistory', 'received', data.toUserId] });
       queryClient.invalidateQueries({ queryKey: ['transferHistory', 'sent', data.fromUserId] });
+      queryClient.invalidateQueries({ queryKey: ['transferHistory', 'all'] });
     },
   });
 }; 

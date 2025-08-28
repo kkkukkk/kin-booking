@@ -34,8 +34,12 @@ export const fetchUser = async (params?: PaginationParams & FetchUserDto): Promi
 		if (params.id) query = query.eq('id', params.id);
 		if (params.name) query = query.ilike('name', `%${params.name}%`);
 		if (params.email) query = query.ilike('email', `%${params.email}%`);
-		if (params.phoneNumber) query = query.eq('phone_number', params.phoneNumber);
 		if (params.status) query = query.eq('status', params.status);
+		
+		// 키워드 검색 (이름, 이메일)
+		if (params.keyword) {
+			query = query.or(`name.ilike.%${params.keyword}%,email.ilike.%${params.keyword}%`);
+		}
 		
 		// 정렬 적용
 		if (params.sortBy) {
@@ -51,10 +55,7 @@ export const fetchUser = async (params?: PaginationParams & FetchUserDto): Promi
 					sortField = 'email';
 					ascending = params.sortDirection === 'asc';
 					break;
-				case 'phoneNumber':
-					sortField = 'phone_number';
-					ascending = params.sortDirection === 'asc';
-					break;
+
 				case 'status':
 					sortField = 'status';
 					ascending = params.sortDirection === 'asc';

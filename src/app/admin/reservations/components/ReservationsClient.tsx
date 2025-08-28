@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { useReservations, useApproveReservation, useRejectReservation } from '@/hooks/api/useReservations';
-import { useUsers } from '@/hooks/api/useUsers';
-import { useEvents } from '@/hooks/api/useEvents';
 import SearchBar from '@/components/search/SearchBar';
 import Button from '@/components/base/Button';
 import DataTable, { Column } from '@/components/base/DataTable';
@@ -17,10 +15,10 @@ import dayjs from 'dayjs';
 import { ReservationStatus } from '@/types/model/reservation';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { Reservation } from '@/types/model/reservation';
+import { ReservationWithEventDto } from '@/types/dto/reservation';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
 import PaymentInfoModal from './PaymentInfoModal';
-import Spinner from '@/components/spinner/Spinner';
 
 const ReservationsClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -28,9 +26,8 @@ const ReservationsClient = () => {
   const { showAlert } = useAlert();
   const { showSpinner, hideSpinner } = useSpinner();
 
-  // 검색/필터 상태
+  // 필터 상태 (검색 제거)
   const [searchParams, setSearchParams] = useState({
-    keyword: '',
     status: '' as ReservationStatus | '',
     dateFrom: '',
     dateTo: '',
@@ -63,9 +60,6 @@ const ReservationsClient = () => {
     sortDirection: sortConfig.direction,
   });
 
-  const { data: usersResponse } = useUsers();
-  const { data: eventsResponse } = useEvents();
-
   // 예매 승인/취소 뮤테이션
   const approveMutation = useApproveReservation();
   const rejectMutation = useRejectReservation();
@@ -73,68 +67,21 @@ const ReservationsClient = () => {
   // 입금 정보 모달 상태
   const [paymentModalState, setPaymentModalState] = useState<{
     isOpen: boolean;
-    reservation: Reservation | null;
+    reservation: ReservationWithEventDto | null;
   }>({
     isOpen: false,
     reservation: null,
   });
 
-  // 사용자 이름 조회
-  const getUserName = (userId: string) => {
-    const user = usersResponse?.data?.find(u => u.id === userId);
-    return user?.name || '알 수 없음';
-  };
 
-  // 이벤트 이름 조회
-  const getEventName = (eventId: string) => {
-    const event = eventsResponse?.data?.find(e => e.id === eventId);
-    return event?.eventName || '알 수 없음';
-  };
 
-  // 클라이언트 키워드 필터링만 적용 (정렬은 서버에서 처리)
-  const filteredReservations = (reservationsResponse?.data || []).filter((reservation: Reservation) => {
-    // 키워드 검색만 클라이언트에서 처리
-    if (searchParams.keyword) {
-      const keyword = searchParams.keyword.toLowerCase();
-      const userName = getUserName(reservation.userId).toLowerCase();
-      const eventName = getEventName(reservation.eventId).toLowerCase();
-      
-      if (!userName.includes(keyword) && !eventName.includes(keyword)) {
-        return false;
-      }
-    }
-    
-    return true;
-  });
-
-  // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
-  const finalReservations = filteredReservations;
+  // API에서 모든 필터링과 정렬을 처리하므로 클라이언트 필터링 제거
+  const finalReservations = reservationsResponse?.data || [];
   const finalTotalCount = reservationsResponse?.totalCount || 0;
 
-  // 로딩 상태
-  if (isLoading) {
-    return (
-      <ThemeDiv className="flex flex-col min-h-full">
-        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-            <h1 className="text-lg md:text-xl font-bold mb-2">예매 관리</h1>
-          </div>
-        </div>
-        <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="flex items-center justify-center h-64">
-            <Spinner />
-          </div>
-        </div>
-      </ThemeDiv>
-    );
-  }
+  // 로딩 상태는 DataTable의 오버레이로 처리 (전체 화면 스피너 제거)
 
-  // 검색/필터 핸들러
-  const handleSearch = (keyword: string) => {
-    setSearchParams(prev => ({ ...prev, keyword }));
-    setCurrentPage(1);
-  };
-
+  // 필터 핸들러 (검색 제거)
   const handleStatusFilter = (status: string) => {
     setSearchParams(prev => ({ ...prev, status: status as ReservationStatus | '' }));
     setCurrentPage(1);
@@ -184,11 +131,11 @@ const ReservationsClient = () => {
   };
 
   // 예매 확정
-  const handleConfirm = async (reservation: Reservation) => {
+  const handleConfirm = async (reservation: ReservationWithEventDto) => {
     const confirmed = await showAlert({
       type: 'confirm',
       title: '예매 확정',
-      message: `다음 예매를 확정하시겠습니까?\n\n사용자: ${getUserName(reservation.userId)}\n수량: ${reservation.quantity}매\n티켓 소유자: ${reservation.ticketHolder}`,
+      message: `다음 예매를 확정하시겠습니까?\n\n사용자: ${reservation.users?.name || '알 수 없음'}\n수량: ${reservation.quantity}매\n티켓 소유자: ${reservation.ticketHolder}`,
     });
 
     if (confirmed) {
@@ -201,11 +148,11 @@ const ReservationsClient = () => {
   };
 
   // 예매 취소
-  const handleCancel = async (reservation: Reservation) => {
+  const handleCancel = async (reservation: ReservationWithEventDto) => {
     const confirmed = await showAlert({
       type: 'confirm',
       title: '예매 취소',
-      message: `다음 예매를 취소하시겠습니까?\n\n사용자: ${getUserName(reservation.userId)}\n공연: ${getEventName(reservation.eventId)}\n수량: ${reservation.quantity}매\n티켓 소유자: ${reservation.ticketHolder}`,
+      message: `다음 예매를 취소하시겠습니까?\n\n사용자: ${reservation.users?.name || '알 수 없음'}\n공연: ${reservation.events?.eventName || '알 수 없음'}\n수량: ${reservation.quantity}매\n티켓 소유자: ${reservation.ticketHolder}`,
     });
 
     if (confirmed) {
@@ -224,19 +171,19 @@ const ReservationsClient = () => {
     }
   };
 
-  // 테이블 컬럼 정의
-  const columns: Column<Reservation>[] = [
+  // 테이블 컬럼 정의 (JOIN된 데이터 직접 사용)
+  const columns: Column<ReservationWithEventDto>[] = [
     {
       key: 'user',
       header: '사용자',
-      render: (reservation: Reservation) => getUserName(reservation.userId),
+      render: (reservation: ReservationWithEventDto) => reservation.users?.name || '알 수 없음',
       sortable: true,
       width: '12%',
     },
     {
       key: 'event',
       header: '공연명',
-      render: (reservation: Reservation) => getEventName(reservation.eventId),
+      render: (reservation: ReservationWithEventDto) => reservation.events?.eventName || '알 수 없음',
       sortable: true,
       width: '23%',
     },
@@ -310,11 +257,11 @@ const ReservationsClient = () => {
     },
   ];
 
-  // 모바일 알림식 카드 섹션 렌더 함수
-  const mobileCardSections = (reservation: Reservation, index: number) => ({
+  // 모바일 알림식 카드 섹션 렌더 함수 (JOIN된 데이터 직접 사용)
+  const mobileCardSections = (reservation: ReservationWithEventDto, index: number) => ({
     firstRow: (
       <>
-        <span className="font-semibold text-xs truncate">예매: {getUserName(reservation.userId)}</span>
+        <span className="font-semibold text-xs truncate">예매: {reservation.users?.name || '알 수 없음'}</span>
         <span className="text-xs truncate">티켓 소유: {reservation.ticketHolder}</span>
         <span className="text-xs truncate">{reservation.quantity}매</span>
         <StatusBadge status={reservation.status} theme={theme} variant="badge" size="sm" statusType="reservation" />
@@ -322,7 +269,7 @@ const ReservationsClient = () => {
     ),
     secondRow: (
       <>
-        <span className="truncate">{getEventName(reservation.eventId)}</span>
+        <span className="truncate">{reservation.events?.eventName || '알 수 없음'}</span>
         <span>{dayjs(reservation.reservedAt).format('YYYY-MM-DD HH:mm')}</span>
       </>
     ),
@@ -377,14 +324,9 @@ const ReservationsClient = () => {
 
         {/* 검색 및 필터 */}
         <SearchBar
-          label="예매 검색 및 필터"
+          label="예매 필터"
           initialOpen={false}
           filters={{
-            keyword: {
-              value: searchParams.keyword,
-              onChange: handleSearch,
-              placeholder: '사용자명, 공연명 검색',
-            },
             status: {
               value: searchParams.status,
               onChange: handleStatusFilter,
@@ -473,9 +415,15 @@ const ReservationsClient = () => {
           onClose={handlePaymentModalClose}
           reservation={paymentModalState.reservation}
           onSuccess={handlePaymentSuccess}
-          getUserName={getUserName}
-          getEventName={getEventName}
-          ticketPrice={eventsResponse?.data?.find(e => e.id === paymentModalState.reservation?.eventId)?.ticketPrice || 0}
+          getUserName={(userId: string) => {
+            const reservation = finalReservations.find(r => r.userId === userId);
+            return reservation?.users?.name || '알 수 없음';
+          }}
+          getEventName={(eventId: string) => {
+            const reservation = finalReservations.find(r => r.eventId === eventId);
+            return reservation?.events?.eventName || '알 수 없음';
+          }}
+          ticketPrice={finalReservations.find(r => r.id === paymentModalState.reservation?.id)?.events?.ticketPrice || 0}
         />
       )}
     </ThemeDiv>

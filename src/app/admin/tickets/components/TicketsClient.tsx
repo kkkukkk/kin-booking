@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTicketGroups, useApproveCancelRequest } from '@/hooks/api/useTickets';
 import DataTable from '@/components/base/DataTable';
-import Spinner from '@/components/spinner/Spinner';
+
 import { TicketGroupDto } from '@/types/dto/ticket';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
@@ -22,9 +22,8 @@ const TicketsClient = () => {
   const theme = useAppSelector((state: RootState) => state.theme.current);
   const { showToast } = useToast();
   
-  // 검색/필터 상태
+  // 필터 상태 (검색 제거)
   const [searchParams, setSearchParams] = useState({
-    keyword: '',
     status: '',
     dateFrom: '',
     dateTo: '',
@@ -47,10 +46,6 @@ const TicketsClient = () => {
   });
 
   const { data: ticketGroups, isLoading, error, refetch } = useTicketGroups({
-    keyword: searchParams.keyword,
-    status: searchParams.status,
-    dateFrom: searchParams.dateFrom,
-    dateTo: searchParams.dateTo,
     sortBy: sortConfig.field,
     sortDirection: sortConfig.direction,
   });
@@ -65,17 +60,8 @@ const TicketsClient = () => {
     ticketGroup: null,
   });
   
-  // 검색 필터링
+  // 필터링 (키워드 검색 제거)
   const filteredGroups = ticketGroups?.filter((group: TicketGroupDto) => {
-    // 키워드 검색
-    if (searchParams.keyword) {
-      const searchLower = searchParams.keyword.toLowerCase();
-      if (!group.eventName?.toLowerCase().includes(searchLower) && 
-          !group.userName?.toLowerCase().includes(searchLower)) {
-        return false;
-      }
-    }
-    
     // 상태 필터링
     if (searchParams.status && group.status !== searchParams.status) {
       return false;
@@ -104,11 +90,7 @@ const TicketsClient = () => {
   const endIndex = startIndex + pageSize;
   const paginatedGroups = filteredGroups.slice(startIndex, endIndex);
 
-  // 검색 핸들러
-  const handleSearch = (keyword: string) => {
-    setSearchParams(prev => ({ ...prev, keyword }));
-    setCurrentPage(1); // 검색 시 첫 페이지로 이동
-  };
+
 
   // 상태 필터 핸들러
   const handleStatusFilter = (status: string) => {
@@ -281,37 +263,9 @@ const TicketsClient = () => {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <ThemeDiv className="flex flex-col min-h-full">
-        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-            <h1 className="text-lg md:text-xl font-bold mb-2">티켓 관리</h1>
-          </div>
-        </div>
-        <div className="flex justify-center items-center h-64">
-          <Spinner />
-        </div>
-      </ThemeDiv>
-    );
-  }
+  // 로딩 상태는 DataTable의 오버레이로 처리 (전체 화면 스피너 제거)
 
-  if (error) {
-    return (
-      <ThemeDiv className="flex flex-col min-h-full">
-        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-            <h1 className="text-lg md:text-xl font-bold mb-2">티켓 관리</h1>
-          </div>
-        </div>
-        <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <p className="text-red-600">티켓 데이터를 불러오는 중 오류가 발생했습니다.</p>
-          </div>
-        </div>
-      </ThemeDiv>
-    );
-  }
+  // 에러 상태도 DataTable 영역에서 처리 (전체 화면 에러 제거)
 
   return (
     <ThemeDiv className="flex flex-col min-h-full">
@@ -321,26 +275,20 @@ const TicketsClient = () => {
           <h1 className="text-lg md:text-xl font-bold mb-2">티켓 관리</h1>
         </div>
 
-        {/* 검색 및 필터 */}
+        {/* 필터 (검색 제거) */}
         <SearchBar
-          label="티켓 검색 및 필터"
+          label="티켓 필터"
           initialOpen={false}
           filters={{
-            keyword: {
-              value: searchParams.keyword,
-              onChange: handleSearch,
-              placeholder: '공연명, 사용자명 검색',
-            },
             status: {
               value: searchParams.status,
               onChange: handleStatusFilter,
               options: [
                 { value: '', label: '전체' },
-                { value: 'active', label: '활성' },
+                { value: 'active', label: '사용 가능' },
                 { value: 'cancel_requested', label: '취소 신청' },
-                { value: 'cancelled', label: '취소됨' },
-                { value: 'used', label: '사용됨' },
-                { value: 'transferred', label: '양도됨' },
+                { value: 'cancelled', label: '취소 완료' },
+                { value: 'used', label: '사용 완료' },
               ],
             },
             dateRange: {
@@ -382,18 +330,30 @@ const TicketsClient = () => {
       {/* 테이블 영역 */}
       <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
         <div className="flex-1 min-h-fit md:min-h-0">
-          <DataTable
-            data={paginatedGroups}
-            columns={columns}
-            theme={theme}
-            isLoading={isLoading}
-            emptyMessage="티켓 데이터가 없습니다."
-            loadingMessage="로딩 중..."
-            className="h-full"
-            mobileCardSections={mobileCardSections}
-            sortConfig={sortConfig}
-            onSortChange={handleSortChange}
-          />
+          {error ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center">
+              <p className="text-red-500 mb-4">티켓 데이터를 불러오는 중 오류가 발생했습니다.</p>
+              <button 
+                onClick={() => refetch()} 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : (
+            <DataTable
+              data={paginatedGroups}
+              columns={columns}
+              theme={theme}
+              isLoading={isLoading}
+              emptyMessage="티켓 데이터가 없습니다."
+              loadingMessage="로딩 중..."
+              className="h-full"
+              mobileCardSections={mobileCardSections}
+              sortConfig={sortConfig}
+              onSortChange={handleSortChange}
+            />
+          )}
         </div>
 
         {/* 페이지네이션 하단 중앙 */}

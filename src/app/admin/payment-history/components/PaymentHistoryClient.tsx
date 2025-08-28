@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { usePaymentTransactionsWithReservation } from '@/hooks/api/usePaymentTransactions';
+import useDebounce from '@/hooks/useDebounce';
 import DataTable from '@/components/base/DataTable';
-import Spinner from '@/components/spinner/Spinner';
 import { PaymentTransactionWithReservationDto } from '@/types/dto/paymentTransaction';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
@@ -19,7 +19,6 @@ const PaymentHistoryClient = () => {
 
     // 검색/필터 상태
     const [searchParams, setSearchParams] = useState({
-        keyword: '',
         paymentType: '',
         startDate: '',
         endDate: '',
@@ -41,54 +40,34 @@ const PaymentHistoryClient = () => {
     // 페이지 크기 옵션
     const pageSizeOptions = [20, 50, 100, 200];
 
+    // 디바운스 적용 (300ms)
+    const debouncedStartDate = useDebounce(searchParams.startDate, 300);
+    const debouncedEndDate = useDebounce(searchParams.endDate, 300);
+
+    // paymentType을 PaymentType으로 변환하는 함수
+    const getPaymentType = (type: string): 'payment' | 'refund' | undefined => {
+        if (type === 'payment' || type === 'refund') {
+            return type;
+        }
+        return undefined;
+    };
+
     // payment 이력 데이터 (관계 데이터 포함)
     const { data: transactionsResponse, isLoading, error, refetch } = usePaymentTransactionsWithReservation({
+        paymentType: getPaymentType(searchParams.paymentType),
+        startDate: debouncedStartDate,
+        endDate: debouncedEndDate,
+        page: currentPage,
+        size: pageSize,
         sortBy: sortConfig.field,
         sortDirection: sortConfig.direction,
     });
 
     const transactions = transactionsResponse?.data || [];
-
-    // 검색 필터링만 적용 (정렬은 서버에서 처리)
-    const filteredTransactions = transactions.filter((transaction: PaymentTransactionWithReservationDto) => {
-        // 키워드 검색 (사용자명, 공연명, 계좌 정보 포함)
-        if (searchParams.keyword) {
-            const searchLower = searchParams.keyword.toLowerCase();
-            if (!transaction.users?.name?.toLowerCase().includes(searchLower) &&
-                !transaction.events?.eventName?.toLowerCase().includes(searchLower) &&
-                !transaction.accountHolder?.toLowerCase().includes(searchLower) &&
-                !transaction.bankName?.toLowerCase().includes(searchLower)) {
-                return false;
-            }
-        }
-
-        // 거래 유형 필터링
-        if (searchParams.paymentType && transaction.paymentType !== searchParams.paymentType) {
-            return false;
-        }
-
-        // 날짜 범위 필터링
-        if (searchParams.startDate) {
-            const startDate = dayjs(searchParams.startDate);
-            const transactionDate = dayjs(transaction.operatedAt);
-            if (transactionDate.isBefore(startDate, 'day')) {
-                return false;
-            }
-        }
-
-        if (searchParams.endDate) {
-            const endDate = dayjs(searchParams.endDate);
-            const transactionDate = dayjs(transaction.operatedAt);
-            if (transactionDate.isAfter(endDate, 'day')) {
-                return false;
-            }
-        }
-
-        return true;
-    });
+    const totalCount = transactionsResponse?.totalCount || 0;
 
     // 검색/필터 적용된 데이터 기준으로 통계 계산
-    const paymentStats = filteredTransactions.reduce((acc, transaction: PaymentTransactionWithReservationDto) => {
+    const paymentStats = transactions.reduce((acc, transaction: PaymentTransactionWithReservationDto) => {
         if (transaction.paymentType === 'payment') {
             acc.totalPayment += transaction.amount;
         } else if (transaction.paymentType === 'refund') {
@@ -99,21 +78,8 @@ const PaymentHistoryClient = () => {
 
     const netAmount = paymentStats.totalPayment - paymentStats.totalRefund;
 
-    // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
-    const finalTransactions = filteredTransactions;
-
-    // 페이지네이션 적용
-    const totalCount = finalTransactions.length;
+    // 페이징 적용
     const totalPages = Math.ceil(totalCount / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedTransactions = finalTransactions.slice(startIndex, endIndex);
-
-    // 검색 핸들러
-    const handleSearch = (keyword: string) => {
-        setSearchParams(prev => ({ ...prev, keyword }));
-        setCurrentPage(1);
-    };
 
     // 거래 유형 필터 핸들러
     const handlePaymentTypeFilter = (paymentType: string) => {
@@ -298,42 +264,7 @@ const PaymentHistoryClient = () => {
         ),
     });
 
-    if (isLoading) {
-        return (
-            <ThemeDiv className="flex flex-col min-h-full">
-                <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-                    <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-                        <h1 className="text-lg md:text-xl font-bold mb-2">입/출금 이력 관리</h1>
-                    </div>
-                </div>
-                <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-                    <div className="flex items-center justify-center h-64">
-                        <Spinner />
-                    </div>
-                </div>
-            </ThemeDiv>
-        );
-    }
 
-    if (error) {
-        return (
-            <ThemeDiv className="flex flex-col min-h-full">
-                <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-                    <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-                        <h1 className="text-lg md:text-xl font-bold mb-2">입/출금 이력 관리</h1>
-                    </div>
-                </div>
-                <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-                    <div className="text-center">
-                        <p className="text-red-500 mb-4">입/출금 이력을 불러오는데 실패했습니다.</p>
-                        <button onClick={() => refetch()} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                            다시 시도
-                        </button>
-                    </div>
-                </div>
-            </ThemeDiv>
-        );
-    }
 
     return (
         <ThemeDiv className="flex flex-col min-h-full">
@@ -378,14 +309,9 @@ const PaymentHistoryClient = () => {
 
                 {/* 검색 및 필터 */}
                 <SearchBar
-                    label="입/출금 이력 검색 및 필터"
+                    label="입/출금 이력 필터"
                     initialOpen={false}
                     filters={{
-                        keyword: {
-                            value: searchParams.keyword,
-                            onChange: handleSearch,
-                            placeholder: "사용자명, 공연명, 은행명, 예금주 검색..."
-                        },
                         status: {
                             value: searchParams.paymentType,
                             onChange: handlePaymentTypeFilter,
@@ -439,18 +365,30 @@ const PaymentHistoryClient = () => {
             <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
                 {/* Payment 이력 테이블 */}
                 <div className="flex-1 min-h-fit md:min-h-0">
-                    <DataTable
-                        data={paginatedTransactions}
-                        columns={columns}
-                        theme={theme}
-                        isLoading={isLoading}
-                        emptyMessage="입/출금 이력이 없습니다."
-                        loadingMessage="로딩 중..."
-                        className="h-full"
-                        mobileCardSections={mobileCardSections}
-                        sortConfig={sortConfig}
-                        onSortChange={handleSortChange}
-                    />
+                    {error ? (
+                        <div className="flex flex-col items-center justify-center h-64 text-center">
+                            <p className="text-red-500 mb-4">입/출금 이력을 불러오는 중 오류가 발생했습니다.</p>
+                            <button 
+                                onClick={() => refetch()} 
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            >
+                                다시 시도
+                            </button>
+                        </div>
+                    ) : (
+                        <DataTable
+                            data={transactions}
+                            columns={columns}
+                            theme={theme}
+                            isLoading={isLoading}
+                            emptyMessage="입/출금 이력이 없습니다."
+                            loadingMessage="로딩 중..."
+                            className="h-full"
+                            mobileCardSections={mobileCardSections}
+                            sortConfig={sortConfig}
+                            onSortChange={handleSortChange}
+                        />
+                    )}
                 </div>
 
                 {/* 페이지네이션 */}

@@ -4,6 +4,7 @@ import {
   CreateTransferHistoryRequest, 
   TransferHistoryWithDetails 
 } from '@/types/model/ticketTransferHistory';
+import { TransferHistoryGroupDto } from '@/types/dto/ticketTransferHistory';
 import { toCamelCaseKeys } from '@/util/case/case';
 
 // 양도 이력 생성
@@ -89,4 +90,68 @@ export const getTransferHistoryWithDetails = async (historyId: string): Promise<
 
   if (error) throw error;
   return toCamelCaseKeys<TransferHistoryWithDetails>(data);
+};
+
+// 관리자용 전체 양도 이력 조회 (상세 정보 포함)
+export const getAllTransferHistoryWithDetails = async (): Promise<TransferHistoryWithDetails[]> => {
+  const { data, error } = await supabase
+    .from('ticket_transfer_history')
+    .select(`
+      *,
+      ticket:ticket_id(id, event_id, reservation_id, status),
+      fromUser:from_user_id(id, name, email),
+      toUser:to_user_id(id, name, email)
+    `)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return toCamelCaseKeys<TransferHistoryWithDetails[]>(data ?? []);
+};
+
+// 관리자용 양도 이력 그룹 조회 (뷰 테이블 사용)
+export const getAllTransferHistoryGroups = async (
+  params: {
+    page?: number;
+    size?: number;
+    startDate?: string;
+    endDate?: string;
+    keyword?: string;
+  } = {}
+): Promise<{ data: TransferHistoryGroupDto[]; totalCount: number }> => {
+  const { page = 1, size = 10, startDate, endDate, keyword } = params;
+  
+  let query = supabase
+    .from('ticket_transfer_history_group_view')
+    .select('*', { count: 'exact' });
+
+  // 키워드 검색 적용 (양도자명, 수령자명, 공연명)
+  if (keyword) {
+    query = query.or(`from_user_name.ilike.%${keyword}%,to_user_name.ilike.%${keyword}%,event_name.ilike.%${keyword}%`);
+  }
+
+  // 날짜 필터 적용
+  if (startDate) {
+    query = query.gte('group_time', startDate);
+  }
+  if (endDate) {
+    query = query.lte('group_time', endDate + 'T23:59:59');
+  }
+
+  // 페이징 적용
+  const from = (page - 1) * size;
+  const to = from + size - 1;
+  
+  const { data, error, count } = await query
+    .order('group_time', { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    throw error;
+  }
+  
+  const result = toCamelCaseKeys<TransferHistoryGroupDto[]>(data ?? []);
+  return {
+    data: result,
+    totalCount: count || 0
+  };
 }; 
