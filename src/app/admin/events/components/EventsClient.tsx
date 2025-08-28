@@ -3,13 +3,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEvents, useCompleteEvent } from '@/hooks/api/useEvents';
+import useDebounce from '@/hooks/useDebounce';
 import { EventStatus, EventStatusKo, Events } from '@/types/model/events';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Button from '@/components/base/Button';
 import SearchBar from '@/components/search/SearchBar';
-import Spinner from '@/components/spinner/Spinner';
+
 import DataTable from '@/components/base/DataTable';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
@@ -27,8 +28,16 @@ const EventsClient = () => {
   const { mutate: completeEventMutate } = useCompleteEvent();
   const { canManageEvents } = useAdminAuth();
   
+  // 검색/필터 상태 타입 정의
+  interface SearchParams {
+    keyword: string;
+    status: EventStatus | '';
+    startDate: string;
+    endDate: string;
+  }
+  
   // 검색/필터 상태
-  const [searchParams, setSearchParams] = useState({
+  const [searchParams, setSearchParams] = useState<SearchParams>({
     keyword: '',
     status: '',
     startDate: '',
@@ -40,43 +49,61 @@ const EventsClient = () => {
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [10, 20, 50];
 
+  // 정렬 상태 타입 정의
+  interface SortConfig {
+    field: string;
+    direction: 'asc' | 'desc';
+  }
+  
   // 정렬 상태
-  const [sortConfig, setSortConfig] = useState({
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
     field: 'eventDate',
-    direction: 'desc' as 'asc' | 'desc',
+    direction: 'desc',
   });
+
+  // 디바운스
+  const debouncedKeyword = useDebounce(searchParams.keyword, 300);
+  const debouncedStartDate = useDebounce(searchParams.startDate, 300);
+  const debouncedEndDate = useDebounce(searchParams.endDate, 300);
 
   // 공연 데이터 조회
   const { data: eventsResponse, isLoading, error, refetch } = useEvents({
     page: currentPage,
     size: pageSize,
+    eventName: debouncedKeyword || undefined,
+    status: searchParams.status || undefined,
+    eventDateFrom: debouncedStartDate || undefined,
+    eventDateTo: debouncedEndDate || undefined,
   });
 
   const events = React.useMemo(() => eventsResponse?.data || [], [eventsResponse?.data]);
   const totalCount = eventsResponse?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  // 검색 처리
+  // 검색 처리 (페이지 초기화)
   const handleSearch = (keyword: string) => {
     setSearchParams(prev => ({ ...prev, keyword }));
-    setCurrentPage(1);
+    setCurrentPage(1); // 검색 시 1페이지로 이동
   };
 
-  // 상태 필터 처리
+  // 상태 필터 처리 (페이지 초기화)
   const handleStatusFilter = (status: string) => {
-    setSearchParams(prev => ({ ...prev, status }));
-    setCurrentPage(1);
+    // EventStatus 타입인지 확인
+    if (status === '' || Object.values(EventStatus).includes(status as EventStatus)) {
+      setSearchParams(prev => ({ ...prev, status: status as EventStatus | '' }));
+      setCurrentPage(1); // 필터 변경 시 1페이지로 이동
+    }
   };
 
-  // 날짜 필터 처리
+  // 날짜 필터 처리 (페이지 초기화)
   const handleStartDateFilter = (date: string) => {
     setSearchParams(prev => ({ ...prev, startDate: date }));
-    setCurrentPage(1);
+    setCurrentPage(1); // 날짜 변경 시 1페이지로 이동
   };
 
   const handleEndDateFilter = (date: string) => {
     setSearchParams(prev => ({ ...prev, endDate: date }));
-    setCurrentPage(1);
+    setCurrentPage(1); // 날짜 변경 시 1페이지로 이동
   };
 
   // 페이지 크기 변경
@@ -96,12 +123,12 @@ const EventsClient = () => {
     setCurrentPage(page);
   };
 
-  // 공연 상세 페이지로 이동
+  // 공연 상세
   const handleEventClick = (event: Events) => {
     router.push(`/admin/events/${event.id}`);
   };
 
-  // 공연 생성 페이지로 이동
+  // 공연 생성
   const handleCreateEvent = () => {
     router.push('/admin/events/create');
   };
@@ -138,32 +165,7 @@ const EventsClient = () => {
     }
   };
 
-  // 필터링된 공연 목록
-  const filteredEvents = React.useMemo(() => {
-    return events.filter((event) => {
-      // 키워드 검색
-      if (searchParams.keyword) {
-        const searchLower = searchParams.keyword.toLowerCase();
-        if (!event.eventName.toLowerCase().includes(searchLower) &&
-            !event.description?.toLowerCase().includes(searchLower)) {
-          return false;
-        }
-      }
-
-      // 상태 필터
-      if (searchParams.status && event.status !== searchParams.status) {
-        return false;
-      }
-
-      // 날짜 범위 필터
-      if (searchParams.startDate && dayjs(event.eventDate).isBefore(searchParams.startDate)) {
-        return false;
-      }
-      return !(searchParams.endDate && dayjs(event.eventDate).isAfter(searchParams.endDate));
-
-
-    });
-  }, [events, searchParams]);
+  // API에서 이미 필터링된 결과를 사용하므로 클라이언트 필터링 제거
 
   // 테이블 컬럼 정의
   const columns = [
@@ -300,42 +302,9 @@ const EventsClient = () => {
     ),
   });
 
-  if (isLoading) {
-    return (
-      <ThemeDiv className="flex flex-col min-h-full">
-        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-            <h1 className="text-lg md:text-xl font-bold mb-2">공연 관리</h1>
-          </div>
-        </div>
-        <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="flex items-center justify-center h-64">
-            <Spinner />
-          </div>
-        </div>
-      </ThemeDiv>
-    );
-  }
+  // 로딩 상태는 DataTable의 오버레이로 처리 (전체 화면 스피너 제거)
 
-  if (error) {
-    return (
-      <ThemeDiv className="flex flex-col min-h-full">
-        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-            <h1 className="text-lg md:text-xl font-bold mb-2">공연 관리</h1>
-          </div>
-        </div>
-        <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="text-center">
-            <p className="text-red-500 mb-4">공연 목록을 불러오는데 실패했습니다.</p>
-            <button onClick={() => refetch()} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-              다시 시도
-            </button>
-          </div>
-        </div>
-      </ThemeDiv>
-    );
-  }
+  // 에러 상태도 DataTable 영역에서 처리 (전체 화면 에러 제거)
 
   return (
     <ThemeDiv className="flex flex-col min-h-full">
@@ -364,7 +333,7 @@ const EventsClient = () => {
             keyword: {
               value: searchParams.keyword,
               onChange: handleSearch,
-              placeholder: "공연명, 설명 검색..."
+              placeholder: "공연명으로 검색..."
             },
             status: {
               value: searchParams.status,
@@ -421,19 +390,31 @@ const EventsClient = () => {
       <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
         {/* 공연 목록 테이블 */}
         <div className="flex-1 min-h-fit md:min-h-0">
-          <DataTable
-            data={filteredEvents}
-            columns={columns}
-            theme={theme}
-            isLoading={isLoading}
-            emptyMessage="공연이 없습니다."
-            loadingMessage="로딩 중..."
-            className="h-full"
-            mobileCardSections={mobileCardSections}
-            sortConfig={sortConfig}
-            onSortChange={handleSortChange}
-            onRowClick={(event) => router.push(`/admin/events/${event.id}`)}
-          />
+          {error ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center">
+              <p className="text-red-500 mb-4">공연 목록을 불러오는데 실패했습니다.</p>
+              <button 
+                onClick={() => refetch()} 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : (
+            <DataTable
+              data={events}
+              columns={columns}
+              theme={theme}
+              isLoading={isLoading}
+              emptyMessage="공연이 없습니다."
+              loadingMessage="로딩 중..."
+              className="h-full"
+              mobileCardSections={mobileCardSections}
+              sortConfig={sortConfig}
+              onSortChange={handleSortChange}
+              onRowClick={(event) => router.push(`/admin/events/${event.id}`)}
+            />
+          )}
         </div>
 
         {/* 페이지네이션 */}

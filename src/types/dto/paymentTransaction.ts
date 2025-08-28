@@ -27,6 +27,9 @@ export interface FetchPaymentTransactionDto {
 	eventId?: string;
 	paymentType?: PaymentType;
 	operatorId?: string;
+	keyword?: string;
+	startDate?: string;
+	endDate?: string;
 	page?: number;
 	size?: number;
 	sortBy?: string;

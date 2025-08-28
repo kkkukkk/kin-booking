@@ -16,8 +16,6 @@ export interface FetchReservationDto {
 	reservedFrom?: string;
 	reservedTo?: string;
 	status?: ReservationStatus;
-	ticketHolder?: string;
-	keyword?: string;
 	sortBy?: string;
 	sortDirection?: 'asc' | 'desc';
 }
@@ -27,8 +25,11 @@ export interface FetchReservationResponseDto {
 	totalCount: number;
 }
 
-// 예매 정보와 이벤트 정보를 함께 포함하는 DTO
+// 예매 정보와 이벤트 정보, 사용자 정보를 함께 포함하는 DTO
 export interface ReservationWithEventDto extends Reservation {
+	users?: {
+		name: string;
+	} | null;
 	events?: {
 		eventId: string;
 		eventName: string;

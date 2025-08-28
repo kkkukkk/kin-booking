@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Spinner from '@/components/spinner/Spinner';
 
 export interface Column<T> {
   key: string;
@@ -116,8 +117,39 @@ function DataTable<T>({
   if (isLoading) {
     return (
       <div className={`rounded ${themeStyles.container} ${className}`}>
-        <div className="px-4 py-8 text-center text-gray-400">
-          {loadingMessage}
+        {/* 테이블 헤더는 유지 */}
+        <div className="hidden lg:block">
+          <table className="w-full table-fixed">
+            <thead className={themeStyles.header}>
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.key}
+                    className={`px-4 py-3 text-left text-sm font-medium ${themeStyles.headerText} ${column.className || ''} ${column.sortable ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    style={{ width: column.width }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>{column.header}</span>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          </table>
+        </div>
+        
+        {/* 로딩 오버레이 - 테이블 본문 영역만 덮기 */}
+        <div className="relative flex-1 flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner 
+              size={48}
+            />
+            <span className={`text-sm ${
+              theme === 'normal' ? 'text-gray-600' :
+              theme === 'neon' ? 'text-green-400' :
+              'text-neutral-400'
+            }`}>{loadingMessage}</span>
+          </div>
         </div>
       </div>
     );
@@ -217,7 +249,7 @@ function DataTable<T>({
                 onClick={() => handleRowClick(item, index)}
               >
                 <div className="flex items-center justify-between gap-2 mb-2">{firstRow}</div>
-                <div className="flex items-center justify-between gap-2 text-xs mb-2">{secondRow}</div>
+                <div className="flex items-center justify-between gap-2 text-xs">{secondRow}</div>
                 {actionButton && <div className="flex gap-2 justify-end">{actionButton}</div>}
               </div>
             );

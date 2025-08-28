@@ -67,11 +67,11 @@ export const useCancelPendingReservation = () => {
 	});
 };
 
-// 관리자용 전체 예매 조회
+// 관리자용 전체 예매 조회 (이벤트 정보와 사용자 정보 포함)
 export const useReservations = (params?: PaginationParams & FetchReservationDto) => {
 	return useQuery({
 		queryKey: ['reservations', 'admin', params],
-		queryFn: () => fetchReservation(params),
+		queryFn: () => fetchReservationWithEvent(params),
 		retry: 1,
 		staleTime: 0,
 	});

@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCreatePaymentTransaction, usePaymentTransactionsByReservationId } from '@/hooks/api/usePaymentTransactions';
 import { useReservations } from '@/hooks/api/useReservations';
-import { useEvents } from '@/hooks/api/useEvents';
 import { useRefundRequestMappingByReservation } from '@/hooks/api/useRefundRequestMapping';
 import { useRefundAccountByUserId } from '@/hooks/api/useRefundAccounts';
 import { TicketGroupDto } from '@/types/dto/ticket';
@@ -49,12 +48,7 @@ const RefundInfoModal = ({
     // 입금 이력 조회
     const { data: paymentTransactions } = usePaymentTransactionsByReservationId(ticketGroup.reservationId);
 
-    // 공연 정보 조회 (티켓 가격용)
-    const { data: eventsResponse } = useEvents({});
-    const eventInfo = eventsResponse?.data?.find(e => e.id === ticketGroup.eventId);
-    const ticketPrice = eventInfo?.ticketPrice || 0;
-
-    // 예매 정보 조회
+    // 예매 정보 조회 (이벤트 정보와 사용자 정보 포함)
     const { data: reservationData } = useReservations({
         id: ticketGroup.reservationId,
         page: 1,
@@ -62,6 +56,10 @@ const RefundInfoModal = ({
     });
 
     const reservationInfo = reservationData?.data?.[0];
+    
+    // 이벤트 정보 reservationData에서 가져옴 (JOIN된 데이터)
+    const eventInfo = reservationInfo?.events;
+    const ticketPrice = eventInfo?.ticketPrice || 0;
 
     // 양도된 티켓의 환불계좌 정보 조회
     const { data: refundRequestMapping } = useRefundRequestMappingByReservation(

@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useUsers, useUpdateUserRole } from '@/hooks/api/useUsers';
+import useDebounce from '@/hooks/useDebounce';
 import { useRoles } from '@/hooks/api/useRoles';
 import DataTable from '@/components/base/DataTable';
-import Spinner from '@/components/spinner/Spinner';
+
 import { UserWithRoles } from '@/types/dto/user';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { StatusBadge } from '@/components/status/StatusBadge';
-import Button from '@/components/base/Button';
 import useToast from '@/hooks/useToast';
 import SearchBar from '@/components/search/SearchBar';
 import ThemeDiv from '@/components/base/ThemeDiv';
@@ -41,6 +41,9 @@ const UsersClient = () => {
     role: '',
   });
 
+  // 디바운싱된 검색어 (500ms 후 API 호출)
+  const debouncedKeyword = useDebounce(searchParams.keyword, 300);
+
   // 정렬 상태
   const [sortConfig, setSortConfig] = useState<{
     field: string;
@@ -63,45 +66,40 @@ const UsersClient = () => {
 
   // 사용자 및 역할 데이터
   const { data: usersResponse, isLoading, error, refetch } = useUsers({
+    keyword: debouncedKeyword,
+    status: searchParams.status,
+    role: searchParams.role,  // 역할 필터 추가
+    page: currentPage,
+    size: pageSize,
     sortBy: sortConfig.field,
     sortDirection: sortConfig.direction,
   });
   const { data: roles } = useRoles();
   const updateUserRoleMutation = useUpdateUserRole();
 
-  const users = usersResponse?.data || [];
-
-  // 검색 필터링만 적용 (정렬은 서버에서 처리)
-  const filteredUsers = users.filter((user: UserWithRoles) => {
-    // 키워드 검색
-    if (searchParams.keyword) {
-      const searchLower = searchParams.keyword.toLowerCase();
-      if (!user.name?.toLowerCase().includes(searchLower) &&
-        !user.email?.toLowerCase().includes(searchLower) &&
-        !user.phoneNumber?.toLowerCase().includes(searchLower)) {
-        return false;
-      }
+  const users = React.useMemo(() => usersResponse?.data || [], [usersResponse?.data]);
+  
+  // 클라이언트 사이드 필터링 (역할 필터)
+  const filteredUsers = React.useMemo(() => {
+    const usersData = users || [];
+    let filtered = usersData;
+    
+    // 역할 필터링 (클라이언트 사이드)
+    if (searchParams.role) {
+      filtered = filtered.filter(user => 
+        user.userRoles?.roles?.roleCode === searchParams.role
+      );
     }
-
-    // 상태 필터링
-    if (searchParams.status && user.status !== searchParams.status) {
-      return false;
-    }
-
-    // 역할 필터링
-    if (searchParams.role && user.userRoles?.roles?.roleCode !== searchParams.role) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // 서버에서 정렬된 데이터를 사용하므로 클라이언트 정렬 불필요
+    
+    return filtered;
+  }, [users, searchParams.role]);
+  
+  // 필터링된 결과로 페이지네이션 계산
   const finalUsers = filteredUsers;
-
-  // 페이지네이션 적용
   const totalCount = finalUsers.length;
   const totalPages = Math.ceil(totalCount / pageSize);
+  
+  // 페이지네이션 적용 (클라이언트 사이드)
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedUsers = finalUsers.slice(startIndex, endIndex);
@@ -340,43 +338,6 @@ const UsersClient = () => {
     ),
   });
 
-  if (isLoading) {
-    return (
-      <ThemeDiv className="flex flex-col min-h-full">
-        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-            <h1 className="text-lg md:text-xl font-bold mb-2">사용자 관리</h1>
-          </div>
-        </div>
-        <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="flex items-center justify-center h-64">
-            <Spinner />
-          </div>
-        </div>
-      </ThemeDiv>
-    );
-  }
-
-  if (error) {
-    return (
-      <ThemeDiv className="flex flex-col min-h-full">
-        <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-          <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-            <h1 className="text-lg md:text-xl font-bold mb-2">사용자 관리</h1>
-          </div>
-        </div>
-        <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
-          <div className="text-center">
-            <p className="text-red-500 mb-4">사용자 목록을 불러오는데 실패했습니다.</p>
-            <Button onClick={() => refetch()} theme="dark">
-              다시 시도
-            </Button>
-          </div>
-        </div>
-      </ThemeDiv>
-    );
-  }
-
   return (
     <ThemeDiv className="flex flex-col min-h-full">
       {/* 상단 고정 영역 */}
@@ -393,7 +354,7 @@ const UsersClient = () => {
             keyword: {
               value: searchParams.keyword,
               onChange: handleSearch,
-              placeholder: "이름, 이메일, 전화번호 검색..."
+              placeholder: "이름, 이메일 검색..."
             },
             status: {
               value: searchParams.status,
@@ -425,9 +386,9 @@ const UsersClient = () => {
       <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-2">
         {/* 총 개수 */}
         <div className="flex-1 md:flex-2/3 flex justify-start mb-2 md:mb-0">
-          <span className="text-sm text-gray-400">
-            총 {totalCount}명 중 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)}명 표시
-          </span>
+                              <span className="text-sm text-gray-400">
+                        총 {totalCount}명 중 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)}명 표시
+                    </span>
         </div>
 
         {/* 페이지 크기 선택 */}
@@ -453,19 +414,31 @@ const UsersClient = () => {
       <div className="px-6 pb-6 flex-1 flex flex-col min-h-fit md:min-h-0">
         {/* 사용자 목록 테이블 */}
         <div className="flex-1 min-h-fit md:min-h-0">
-          <DataTable
-            data={paginatedUsers}
-            columns={columns}
-            theme={theme}
-            isLoading={isLoading}
-            emptyMessage="사용자가 없습니다."
-            loadingMessage="로딩 중..."
-            className="h-full"
-            mobileCardSections={mobileCardSections}
-            sortConfig={sortConfig}
-            onSortChange={handleSortChange}
-            onRowClick={isMaster ? handleUserClick : undefined}
-          />
+          {error ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center">
+              <p className="text-red-500 mb-4">사용자 목록을 불러오는데 실패했습니다.</p>
+              <button 
+                onClick={() => refetch()} 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : (
+            <DataTable
+              data={paginatedUsers}
+              columns={columns}
+              theme={theme}
+              isLoading={isLoading}
+              emptyMessage="사용자가 없습니다."
+              loadingMessage="로딩 중..."
+              className="h-full"
+              mobileCardSections={mobileCardSections}
+              sortConfig={sortConfig}
+              onSortChange={handleSortChange}
+              onRowClick={isMaster ? handleUserClick : undefined}
+            />
+          )}
         </div>
 
         {/* 페이지네이션 */}

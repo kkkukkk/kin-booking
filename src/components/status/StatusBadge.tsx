@@ -6,10 +6,11 @@ import { ReservationStatus, ReservationStatusKo } from "@/types/model/reservatio
 import { UserRoleStatus, UserRoleStatusKo } from "@/types/model/userRole";
 import { UserStatus, UserStatusKo } from "@/types/model/user";
 import { PaymentType, PaymentTypeKo } from "@/types/model/paymentTransaction";
+import { TeamRoleEnum, TeamRoleKo } from "@/types/model/teamMember";
 import { StatusBadgeType } from "@/types/ui/statusBadge";
 
 // 지원하는 상태 타입들
-type StatusType = EventStatus | TicketStatus | FriendStatus | ReservationStatus | UserRoleStatus | UserStatus | PaymentType;
+type StatusType = EventStatus | TicketStatus | FriendStatus | ReservationStatus | UserRoleStatus | UserStatus | PaymentType | TeamRoleEnum;
 
 // 상태별 색상 정의
 const getStatusColors = <T extends StatusType>(status: T, theme: string, variant: 'badge' | 'text' | 'info' = 'badge') => {
@@ -282,6 +283,37 @@ const getStatusColors = <T extends StatusType>(status: T, theme: string, variant
     }
   }
 
+  // TeamRoleEnum 색상
+  if (status === TeamRoleEnum.LEADER) {
+    if (variant === 'badge') {
+      return isDarkTheme ? 'bg-red-900/30 text-red-300 border border-red-500 font-semibold' : 'bg-red-500 text-white border border-red-600 font-semibold';
+    } else if (variant === 'text') {
+      return isDarkTheme ? 'text-red-400' : 'text-red-500';
+    } else if (variant === 'info') {
+      return isDarkTheme ? 'bg-red-900/20 text-red-300' : 'bg-red-100 text-red-700';
+    }
+  }
+
+  if (status === TeamRoleEnum.STAFF) {
+    if (variant === 'badge') {
+      return isDarkTheme ? 'bg-indigo-900/30 text-indigo-300 border border-indigo-500 font-semibold' : 'bg-indigo-500 text-white border border-indigo-600 font-semibold';
+    } else if (variant === 'text') {
+      return isDarkTheme ? 'text-indigo-400' : 'text-indigo-500';
+    } else if (variant === 'info') {
+      return isDarkTheme ? 'bg-indigo-900/20 text-indigo-300' : 'bg-indigo-100 text-indigo-700';
+    }
+  }
+
+  if (status === TeamRoleEnum.CREW) {
+    if (variant === 'badge') {
+      return isDarkTheme ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-500 font-semibold' : 'bg-emerald-500 text-white border border-emerald-600 font-semibold';
+    } else if (variant === 'text') {
+      return isDarkTheme ? 'text-emerald-400' : 'text-emerald-500';
+    } else if (variant === 'info') {
+      return isDarkTheme ? 'bg-emerald-900/20 text-emerald-300' : 'bg-emerald-100 text-emerald-700';
+    }
+  }
+
   // 기본값
   if (variant === 'badge') {
     return isDarkTheme ? 'bg-gray-900 text-gray-200' : 'bg-gray-100 text-gray-700';
@@ -311,6 +343,8 @@ const getStatusTextByType = <T extends StatusType>(status: T, type: StatusBadgeT
       return UserStatusKo[status as UserStatus];
     case 'paymentType':
       return PaymentTypeKo[status as PaymentType];
+    case 'teamRole':
+      return TeamRoleKo[status as TeamRoleEnum];
     default:
       return status;
   }

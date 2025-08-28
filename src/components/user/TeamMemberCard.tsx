@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import UserAvatar from './UserAvatar';
 import { TeamMemberViewDto } from '@/types/dto/teamMember';
-import { TeamRoleEnum, TeamRoleKo } from '@/types/model/teamMember';
 import { InstagramIcon, YoutubeIcon } from '@/components/icon/SocialIcons';
+import { StatusBadge } from '@/components/status/StatusBadge';
+import { useAppSelector } from '@/redux/hooks';
+import { RootState } from '@/redux/store';
 import styles from '@/css/module/team-member-card.module.css';
 
 interface TeamMemberCardProps {
@@ -11,18 +13,7 @@ interface TeamMemberCardProps {
 }
 
 const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
-  const getRoleColor = (teamRole: TeamRoleEnum) => {
-    switch (teamRole) {
-      case TeamRoleEnum.LEADER:
-        return 'bg-red-500';
-      case TeamRoleEnum.STAFF:
-        return 'bg-blue-500';
-      case TeamRoleEnum.CREW:
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
+  const theme = useAppSelector((state: RootState) => state.theme.current);
 
   return (
     <motion.div
@@ -50,9 +41,12 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
 
         {/* 역할 */}
         <div className={styles.gridAreaRole}>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getRoleColor(member.teamRole)}`}>
-            {TeamRoleKo[member.teamRole]}
-          </span>
+          <StatusBadge
+            status={member.teamRole}
+            theme={theme}
+            statusType="teamRole"
+            size="sm"
+          />
         </div>
 
         {/* 소셜 링크 */}

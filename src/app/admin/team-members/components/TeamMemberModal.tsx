@@ -53,7 +53,7 @@ const TeamMemberModal = ({ member, isOpen, onClose, onSuccess }: TeamMemberModal
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div className="min-w-[400px] max-w-md">
+            <div className="min-w-[250px] md:min-w-[400px] max-w-md">
                 <div className="mb-6">
                     <h2 className="text-xl font-bold text-gray-900">
                         팀 멤버 역할 변경

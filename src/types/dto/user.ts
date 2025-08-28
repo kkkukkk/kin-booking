@@ -18,9 +18,10 @@ export interface FetchUserDto {
 	id?: string;
 	name?: string;
 	email?: string;
-	phoneNumber?: string;
 	status?: string;
+	role?: string;  // 역할 필터 추가
 	marketingConsent?: boolean;
+	keyword?: string;
 	sortBy?: string;
 	sortDirection?: 'asc' | 'desc';
 }

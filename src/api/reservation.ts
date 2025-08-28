@@ -4,7 +4,7 @@ import { getPaginationRange } from "@/util/pagination/pagination";
 import {toCamelCaseKeys, toSnakeCaseKeys} from "@/util/case/case";
 import { CreateReservationDto, FetchReservationDto, FetchReservationResponseDto, ReservationWithEventDto } from "@/types/dto/reservation";
 import { Reservation } from "@/types/model/reservation";
-import { generateRandomGradient } from "@/util/gradientGenerator";
+import { generateRandomGradient, generateNeonGradient } from "@/util/gradientGenerator";
 import { EventStatus } from "@/types/model/events";
 
 export const fetchReservation = async (params?: PaginationParams & FetchReservationDto): Promise<FetchReservationResponseDto> => {
@@ -51,6 +51,9 @@ export const fetchReservationWithEvent = async (params?: PaginationParams & Fetc
 		.from('reservations')
 		.select(`
 			*,
+			users (
+				name
+			),
 			events (
 				event_name,
 				event_date,
@@ -64,9 +67,25 @@ export const fetchReservationWithEvent = async (params?: PaginationParams & Fetc
 		if (params.id) query = query.eq('id', params.id);
 		if (params.userId) query = query.eq('user_id', params.userId);
 		if (params.eventId) query = query.eq('event_id', params.eventId);
-		if (params.reservedFrom) query = query.gte('event_date', params.reservedTo);
+		if (params.reservedFrom) query = query.gte('event_date', params.reservedFrom);
 		if (params.reservedTo) query = query.lte('event_date', params.reservedTo);
 		if (params.status) query = query.eq('status', params.status);
+		
+		// 정렬 적용
+		if (params.sortBy) {
+			const sortField = params.sortBy === 'reservedAt' ? 'reserved_at' : 
+							 params.sortBy === 'user' ? 'user_id' :
+							 params.sortBy === 'event' ? 'event_id' :
+							 params.sortBy === 'ticketHolder' ? 'ticket_holder' :
+							 params.sortBy === 'quantity' ? 'quantity' :
+							 params.sortBy === 'status' ? 'status' : 'reserved_at';
+			
+			query = query.order(sortField, { ascending: params.sortDirection === 'asc' });
+		} else {
+			// 기본 정렬: 예매일 최신순
+			query = query.order('reserved_at', { ascending: false });
+		}
+		
 		if (params.page && params.size) {
 			const range = getPaginationRange(params);
 			query = query.range(range.start, range.end);
@@ -143,7 +162,13 @@ export const approveReservation = async (reservationId: string): Promise<void> =
 	const ticketData = [];
 	for (let i = 0; i < reservation.quantity; i++) {
 		const isRare = Math.random() < 0.05; // 5% 확률
-		const color = isRare ? generateRandomGradient() : event.ticket_color;
+		let color = event.ticket_color; // 기본 색상
+		
+		if (isRare) {
+			// 희귀 티켓인 경우 1/2 확률로 그라데이션 또는 네온 선택
+			const useNeon = Math.random() < 0.5; // 50% 확률
+			color = useNeon ? generateNeonGradient() : generateRandomGradient();
+		}
 		
 		ticketData.push({
 			color,

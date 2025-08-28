@@ -52,6 +52,11 @@ export const fetchPaymentTransactions = async (params?: FetchPaymentTransactionD
 		if (params.paymentType) query = query.eq('payment_type', params.paymentType);
 		if (params.operatorId) query = query.eq('operator_id', params.operatorId);
 		
+		// 키워드 검색 (공연명)
+		if (params.keyword) {
+			query = query.ilike('events.event_name', `%${params.keyword}%`);
+		}
+		
 		// 정렬 적용
 		if (params.sortBy) {
 			const sortField = params.sortBy === 'operatedAt' ? 'operated_at' : 
@@ -101,6 +106,19 @@ export const fetchPaymentTransactionsWithReservation = async (params?: FetchPaym
 		if (params.eventId) query = query.eq('event_id', params.eventId);
 		if (params.paymentType) query = query.eq('payment_type', params.paymentType);
 		if (params.operatorId) query = query.eq('operator_id', params.operatorId);
+		
+		// 키워드 검색 (공연명)
+		if (params.keyword) {
+			query = query.ilike('events.event_name', `%${params.keyword}%`);
+		}
+		
+		// 날짜 필터링
+		if (params.startDate) {
+			query = query.gte('operated_at', params.startDate);
+		}
+		if (params.endDate) {
+			query = query.lte('operated_at', params.endDate + 'T23:59:59');
+		}
 		
 		// 정렬 적용
 		if (params.sortBy) {
