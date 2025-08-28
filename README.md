@@ -1,7 +1,5 @@
 # 🎫 KIN Booking - 공연 예약 플랫폼
 
-KIN Booking은 공연 예약 및 티켓 관리 시스템입니다. Next.js 15와 TypeScript를 기반으로 구축되었으며, 사용자 친화적인 인터페이스와 강력한 관리자 기능을 제공합니다.
-
 ## ✨ 주요 기능
 
 ### 🎭 공연 관리
@@ -46,13 +44,6 @@ KIN Booking은 공연 예약 및 티켓 관리 시스템입니다. Next.js 15와
 ### Backend & Database
 - **Supabase** - 백엔드 서비스 및 데이터베이스
 - **PostgreSQL** - 관계형 데이터베이스
-- **Row Level Security (RLS)** - 데이터 보안
-
-### 기타 도구
-- **Day.js** - 날짜 처리
-- **QR Code** - 티켓 생성
-- **Chart.js** - 데이터 시각화
-- **ESLint** - 코드 품질 관리
 
 ## 📱 주요 페이지
 
