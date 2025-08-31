@@ -1,37 +1,27 @@
 import { supabase } from "@/lib/supabaseClient";
-import { fetchActiveLoginSlideImages } from './appImages';
 
 export const fetchLoginImages = async (): Promise<string[]> => {
 	try {
-		// 데이터베이스에서 로그인 이미지 조회 시도
-		const images = await fetchActiveLoginSlideImages();
-		return images.map(image => image.url);
+		// 데이터베이스에서 로그인 이미지 조회
+		const { data, error } = await supabase
+			.from('app_images')
+			.select('*')
+			.eq('type', 'login_slide')
+			.eq('is_active', true)
+			.order('order', { ascending: true });
+
+		if (error) {
+			console.error('로그인 이미지 조회 실패:', error);
+			return [];
+		}
+
+		if (data && data.length > 0) {
+			return data.map(image => image.url);
+		}
+
+		return [];
 	} catch (error) {
-		console.error('데이터베이스에서 로그인 이미지 조회 실패:', error);
-		
-		// 폴백: 기존 Supabase Storage 방식
-		const { data, error: storageError } = await supabase.storage
-			.from("kin")
-			.list("login-slide", {
-				limit: 100,
-				offset: 0,
-				sortBy: { column: "name", order: "asc" },
-			});
-
-		if (storageError) {
-			console.error('Storage 조회 오류:', storageError);
-			return [];
-		}
-
-		if (!data) {
-			return [];
-		}
-
-		return data
-			.filter((file: { name?: string }) => file.name)
-			.map(
-				(file: { name: string }) =>
-					`https://smoemdfpvkatezrsrttu.supabase.co/storage/v1/object/public/kin/login-slide/${file.name}`
-			);
+		console.error('로그인 이미지 조회 중 예외:', error);
+		return [];
 	}
 };
