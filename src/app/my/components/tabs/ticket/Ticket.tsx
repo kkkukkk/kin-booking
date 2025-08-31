@@ -39,52 +39,6 @@ const TicketCard = ({
         return "drop-shadow(0 4px 8px rgba(0,0,0,0.25))"
     }
   }
-  const contentRef = useRef<HTMLDivElement>(null)
-  const [maskSize, setMaskSize] = useState({ width: 320, height: 140 })
-  const [maskId] = useState(() => `ticketMask-${Math.random().toString(36).slice(2)}`)
-  const [isReady, setIsReady] = useState(false)
-  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
-
-  // 디바운스된 리사이즈 핸들러
-  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
-    if (resizeTimeoutRef.current) {
-      clearTimeout(resizeTimeoutRef.current)
-    }
-
-    resizeTimeoutRef.current = setTimeout(() => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect
-        setMaskSize({ width: Math.round(width), height: Math.round(height) })
-        setIsReady(true)
-      }
-    }, 16) // 약 60fps에 맞춘 디바운스
-  }, [])
-
-  useEffect(() => {
-    if (!contentRef.current) return
-
-    // 초기 크기 설정
-    const rect = contentRef.current.getBoundingClientRect()
-    if (rect.width > 0 && rect.height > 0) {
-      setMaskSize({ width: Math.round(rect.width), height: Math.round(rect.height) })
-      setIsReady(true)
-    }
-
-    const ro = new ResizeObserver(handleResize)
-    ro.observe(contentRef.current)
-    return () => {
-      ro.disconnect()
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current)
-      }
-    }
-  }, [handleResize])
-
-  const notchRadius = 12
-  const notchCx = maskSize.width - notchRadius - 80
-  const notchCyTop = 0
-  const notchCyBottom = maskSize.height
-  const rightWidth = maskSize.width - notchCx - 1
 
   // 공연 날짜 포맷팅
   const formatDate = (date: string) => {
@@ -95,75 +49,16 @@ const TicketCard = ({
     return dayjs(date).format('HH:mm');
   };
 
-  // 마스크 요소 메모이제이션
-  const maskElements = useMemo(() => {
-    const elements = []
-    const notchCount = Math.floor(maskSize.height / 10)
-
-    for (let i = 0; i < notchCount; i++) {
-      const cy = 7 + i * 14
-      elements.push(
-        <React.Fragment key={i}>
-          <circle cx={0} cy={cy} r={4} fill="black" />
-          <circle cx={maskSize.width} cy={cy} r={4} fill="black" />
-          <circle cx={notchCx} cy={cy} r={4} fill="black" />
-        </React.Fragment>
-      )
-    }
-
-    return elements
-  }, [maskSize.height, maskSize.width, notchCx])
-
-  // 크기 측정이 완료되지 않았으면 로딩 표시
-  if (!isReady) {
-    return (
-      <div
-        ref={contentRef}
-        className="relative max-w-md mx-auto my-6"
-        style={{ filter: getShadowStyle() }}
-      >
-        <div className="relative flex">
-          <div className="p-4 bg-gray-100 rounded-lg animate-pulse">
-            <div className="h-6 bg-gray-200 rounded mb-3"></div>
-            <div className="space-y-3">
-              <div className="h-16 bg-gray-200 rounded"></div>
-              <div className="h-12 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div
       className="relative max-w-md mx-auto my-6"
       style={{ filter: getShadowStyle() }}
     >
-      <svg width="0" height="0" aria-hidden="true" focusable="false">
-        <defs>
-          <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width={maskSize.width} height={maskSize.height}>
-            <rect x="0" y="0" width={maskSize.width} height={maskSize.height} fill="white" />
-            <circle cx={notchCx} cy={notchCyTop} r={notchRadius} fill="black" />
-            <circle cx={notchCx} cy={notchCyBottom} r={notchRadius} fill="black" />
-            {maskElements}
-          </mask>
-        </defs>
-      </svg>
-
-      <div
-        ref={contentRef}
-        className="relative flex"
-        style={{
-          mask: `url(#${maskId})`,
-          WebkitMask: `url(#${maskId})`,
-          background: 'transparent',
-        }}
-      >
+      <div className="relative flex gap-0">
         <div
-          className="p-4"
+          className="p-4 rounded"
           style={{
-            width: notchCx,
+            flex: 1,
             boxSizing: 'border-box',
             background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 25%, #e2e8f0 100%)',
           }}
@@ -208,9 +103,8 @@ const TicketCard = ({
 
         {/* 우측 영역 */}
         <div
-          className="flex flex-col justify-center items-center select-none relative overflow-hidden"
+          className="flex flex-col justify-center items-center select-none relative overflow-hidden rounded w-20"
           style={{
-            width: rightWidth,
             background: status === TicketStatus.Used ? 'transparent' : (ticketColor || '#3b82f6'),
             color: status === TicketStatus.Used ? 'transparent' : 'white',
             transition: 'all 0.3s ease',
@@ -247,6 +141,17 @@ const TicketCard = ({
             </div>
           )}
         </div>
+      </div>
+
+      {/* 절취선 점선 요소 */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute w-0.5 bg-gray-300" style={{ 
+          left: 'calc(100% - 80px - 0.5px)', // 우측 영역 시작 부분
+          top: '50%',
+          height: '95%',
+          transform: 'translateY(-50%)',
+          backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 8px, #9ca3af 8px, #9ca3af 12px)'
+        }}></div>
       </div>
     </div>
   )
