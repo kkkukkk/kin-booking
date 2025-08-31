@@ -40,6 +40,101 @@ const TicketCard = ({
     }
   }
 
+  // 기존 mask 관련 코드들 (주석 처리)
+  /*
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [maskSize, setMaskSize] = useState({ width: 320, height: 140 })
+  const [isReady, setIsReady] = useState(false)
+  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
+
+  // 디바운스된 리사이즈 핸들러
+  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
+    if (resizeTimeoutRef.current) {
+      clearTimeout(resizeTimeoutRef.current)
+    }
+
+    resizeTimeoutRef.current = setTimeout(() => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect
+        setMaskSize({ width: Math.round(width), height: Math.round(height) })
+        setIsReady(true)
+      }
+    }, 16) // 약 60fps에 맞춘 디바운스
+  }, [])
+
+  useEffect(() => {
+    if (!contentRef.current) return
+
+    // 초기 크기 설정
+    const rect = contentRef.current.getBoundingClientRect()
+    if (rect.width > 0 && rect.height > 0) {
+      setMaskSize({ width: Math.round(rect.width), height: Math.round(rect.height) })
+      setIsReady(true)
+    }
+
+    const ro = new ResizeObserver(handleResize)
+    ro.observe(contentRef.current)
+    return () => {
+      ro.disconnect()
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+    }
+  }, [handleResize])
+
+  const notchRadius = 12
+  const notchCx = maskSize.width - notchRadius - 80
+  const notchCyTop = 0
+  const notchCyBottom = maskSize.height
+  const rightWidth = maskSize.width - notchCx - 1
+
+  // 절취선 구멍 위치 계산 (가변 높이에 맞춤)
+  const perforationHoles = useMemo(() => {
+    const holes = []
+    const smallHoleRadius = 4 // 작은 구멍 반지름
+    
+    // 중간 원들만 사용 (반원 제거)
+    const availableHeight = maskSize.height
+    const totalSmallHoles = 15 // 원 개수
+    
+    // 모든 간격을 동일하게 계산
+    const uniformSpacing = availableHeight / (totalSmallHoles + 1)
+    
+    for (let i = 0; i < totalSmallHoles; i++) {
+      const y = uniformSpacing + i * uniformSpacing
+      holes.push({ y, radius: smallHoleRadius })
+    }
+    
+    return holes
+  }, [maskSize.height])
+
+  // 절취선 mask SVG 생성
+  const perforationMask = useMemo(() => {
+    // 절취선 위치를 두 영역 경계 중앙으로 정확히 계산
+    const perforationX = notchCx + 0.5 // 두 영역 경계 중앙
+    
+    const svg = `
+      <svg width="${maskSize.width}" height="${maskSize.height}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <mask id="perforation-mask">
+            <rect width="100%" height="100%" fill="white"/>
+            ${perforationHoles.map(hole => `
+              <circle 
+                cx="${perforationX}" 
+                cy="${hole.y}" 
+                r="${hole.radius}" 
+                fill="black"
+              />
+            `).join('')}
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill="white" mask="url(#perforation-mask)"/>
+      </svg>
+    `
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+  }, [maskSize.width, maskSize.height, notchCx, perforationHoles])
+  */
+
   // 공연 날짜 포맷팅
   const formatDate = (date: string) => {
     return dayjs(date).format('YYYY년 MM월 DD일');
@@ -49,11 +144,46 @@ const TicketCard = ({
     return dayjs(date).format('HH:mm');
   };
 
+  // 기존 로딩 표시 (주석 처리)
+  /*
+  // 크기 측정이 완료되지 않았으면 로딩 표시
+  if (!isReady) {
+    return (
+      <div
+        ref={contentRef}
+        className="relative max-w-md mx-auto my-6"
+        style={{ filter: getShadowStyle() }}
+      >
+        <div className="relative flex">
+          <div className="p-4 bg-gray-100 rounded-lg animate-pulse">
+            <div className="h-6 bg-gray-200 rounded mb-3"></div>
+            <div className="space-y-3">
+              <div className="h-16 bg-gray-200 rounded"></div>
+              <div className="h-12 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  */
+
   return (
     <div
       className="relative max-w-md mx-auto my-6"
       style={{ filter: getShadowStyle() }}
     >
+      {/* 기존 mask 적용 div (주석 처리) */}
+      {/* 
+      <div
+        ref={contentRef}
+        className="relative flex"
+        style={{
+          maskImage: `url("${perforationMask}")`,
+          WebkitMaskImage: `url("${perforationMask}")`,
+        }}
+      >
+      */}
       <div className="relative flex gap-0">
         <div
           className="p-4 rounded"
@@ -142,6 +272,8 @@ const TicketCard = ({
           )}
         </div>
       </div>
+      {/* 기존 mask 적용 div 닫기 (주석 처리) */}
+      {/* </div> */}
 
       {/* 절취선 점선 요소 */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
