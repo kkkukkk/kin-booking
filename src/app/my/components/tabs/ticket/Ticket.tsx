@@ -171,7 +171,12 @@ const TicketCard = ({
   return (
     <div
       className="relative max-w-md mx-auto my-6"
-      style={{ filter: getShadowStyle() }}
+      style={{ 
+        filter: getShadowStyle(),
+        // iOS Safari 최적화를 위한 추가 속성
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+      }}
     >
       {/* 기존 mask 적용 div (주석 처리) */}
       {/* 
@@ -184,7 +189,7 @@ const TicketCard = ({
         }}
       >
       */}
-      <div className="relative flex gap-0">
+      <div className="relative flex gap-0 overflow-visible">
         <div
           className="p-4 rounded"
           style={{
@@ -239,6 +244,10 @@ const TicketCard = ({
             color: status === TicketStatus.Used ? 'transparent' : 'white',
             transition: 'all 0.3s ease',
             userSelect: 'none',
+            // iOS Safari 최적화를 위한 추가 속성
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+            willChange: 'background, color',
           }}
         >
           {/* 배경 패턴 */}
@@ -282,7 +291,10 @@ const TicketCard = ({
           top: '50%',
           height: '95%',
           transform: 'translateY(-50%)',
-          backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 8px, #9ca3af 8px, #9ca3af 12px)'
+          backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 8px, #9ca3af 8px, #9ca3af 12px)',
+          // iOS Safari 최적화를 위한 추가 속성
+          zIndex: 1,
+          willChange: 'transform',
         }}></div>
       </div>
     </div>

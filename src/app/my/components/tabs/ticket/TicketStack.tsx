@@ -346,7 +346,7 @@ const TicketStack = ({
 	return (
 		<ThemeDiv
 			className={clsx(
-				"rounded-lg shadow-lg border overflow-hidden",
+				"rounded-lg shadow-lg border overflow-visible",
 				getStatusStyle()
 			)}
 			isChildren
@@ -553,8 +553,8 @@ const TicketStack = ({
 
 			{/* 티켓 스택/리스트 */}
 			<div className={clsx(
-				"pr-6 py-6",
-				isExpanded ? "pl-6" : "pl-4 md:pl-6"
+				"py-6",
+				isExpanded ? "px-6" : "pl-4 md:pl-6 pr-8 md:pr-8"
 			)}>
 				{visibleTickets.length > 0 ? (
 					<>
@@ -598,7 +598,7 @@ const TicketStack = ({
 									transition={{ duration: 0.3, ease: 'easeInOut' }}
 									className="space-y-4"
 								>
-									<div className="relative" style={{ minHeight: '220px' }}>
+									<div className="relative overflow-visible" style={{ minHeight: '220px' }}>
 										{visibleTickets.map((ticket, ticketIdx) => {
 											const isTopTicket = ticketIdx === 0;
 											const zIndex = visibleTickets.length - ticketIdx;
@@ -615,6 +615,9 @@ const TicketStack = ({
 														transform: `translate(${translateX}px, ${translateY}px)`,
 														opacity,
 														pointerEvents: isTopTicket ? 'auto' : 'none',
+														// iOS Safari 최적화를 위한 추가 속성
+														willChange: 'transform, opacity',
+														backfaceVisibility: 'hidden',
 													}}
 												>
 													<TicketCard
