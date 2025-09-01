@@ -253,7 +253,7 @@ const EventsClient = () => {
               onClick={(e) => handleEventCompletion(e, event)}
               className="bg-green-600 hover:bg-green-700 font-semibold"
               padding="px-2 py-1"
-              fontSize='text-sm'
+              fontSize='text-xs'
             >
               공연종료
             </Button>
