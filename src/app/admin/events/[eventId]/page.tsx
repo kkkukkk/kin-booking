@@ -317,7 +317,7 @@ const EditEventPage = () => {
                             <ArrowLeftIcon className="w-5 h-5" />
                         </Button>
                         <div>
-                            <h1 className="text-xl font-bold">공연 상세 정보</h1>
+                            <h1 className="text-lg font-bold">공연 상세</h1>
                         </div>
                     </div>
 
@@ -330,20 +330,20 @@ const EditEventPage = () => {
                                             <button
                                                 type="button"
                                                 onClick={(e) => handleCompleteEvent(e)}
-                                                className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                                className={`text-sm px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
                                                     ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
                                                     : theme === 'dark'
                                                         ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
                                                         : 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white'
                                                     }`}
                                             >
-                                                공연 종료
+                                                종료
                                             </button>
                                         )}
                                         <button
                                             type="button"
                                             onClick={handleDelete}
-                                            className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                            className={`text-sm px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
                                                 ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white'
                                                 : theme === 'dark'
                                                     ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
@@ -355,7 +355,7 @@ const EditEventPage = () => {
                                         <button
                                             type="button"
                                             onClick={() => setIsEditing(true)}
-                                            className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                            className={`text-sm px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
                                                 ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
                                                 : theme === 'dark'
                                                     ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
@@ -373,7 +373,7 @@ const EditEventPage = () => {
                                     type="button"
                                     onClick={handleSave}
                                     disabled={isSubmitting}
-                                    className={`px-3 py-1 rounded font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'normal'
+                                    className={`text-sm px-3 py-1 rounded font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'normal'
                                         ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
                                         : theme === 'dark'
                                             ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
@@ -385,7 +385,7 @@ const EditEventPage = () => {
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className={`px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
+                                    className={`text-sm px-3 py-1 rounded font-semibold transition-colors ${theme === 'normal'
                                         ? 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white'
                                         : theme === 'dark'
                                             ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white'
