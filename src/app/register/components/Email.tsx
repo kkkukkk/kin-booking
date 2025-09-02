@@ -55,9 +55,9 @@ const Email = ({
 	// 최종 이메일 값 구성
 	const finalEmail = localPart && domain ? `${localPart}@${domain}` : '';
 
-	// 초기값 설정 (한 번만 실행)
+	// 초기값 설정 (value가 변경될 때마다 실행)
 	useEffect(() => {
-		if (!isInitialized && value) {
+		if (value) {
 			if (value.includes('@')) {
 				const [local, domainPart] = value.split('@');
 				setLocalPart(local || '');
@@ -66,9 +66,13 @@ const Email = ({
 				setLocalPart(value);
 				setDomain('');
 			}
-			setIsInitialized(true);
+		} else {
+			// value가 비어있으면 상태도 초기화
+			setLocalPart('');
+			setDomain('');
 		}
-	}, [value, isInitialized]);
+		setIsInitialized(true);
+	}, [value]);
 
 	// 부모 컴포넌트에 값 변경 알림 (안정화된 로직)
 	const notifyParent = useCallback((newEmail: string) => {
@@ -79,14 +83,14 @@ const Email = ({
 		}
 	}, [onChange, value]);
 
-	// 유효성 검사
+		// 유효성 검사
 	useEffect(() => {
 		if (isInitialized) {
 			const emailToValidate = localPart && domain ? `${localPart}@${domain}` : '';
 			const valid = emailToValidate ? isValidEmail(emailToValidate) : false;
 			onValidChange?.(valid);
 		}
-	}, [finalEmail, onValidChange, isInitialized, localPart, domain]);
+	}, [localPart, domain, onValidChange, isInitialized]);
 
 	// 에러 메시지 생성
 	const getErrorMessage = () => {
@@ -225,6 +229,12 @@ const Email = ({
 
 		const isUsed = data;
 		onDuplicateCheck?.(isUsed);
+		
+		// 중복검사 성공 후 유효성 검사도 업데이트
+		if (!isUsed) {
+			const valid = isValidEmail(emailToCheck);
+			onValidChange?.(valid);
+		}
 
 		showToast({
 			message: isUsed

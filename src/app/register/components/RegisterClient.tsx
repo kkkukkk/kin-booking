@@ -169,12 +169,12 @@ const RegisterClient = () => {
 			case 'name': return 'name';
 			case 'email':
 				if (!isValidEmail) return 'emailInvalid';
-				if (isDuplicateEmail || isDuplicateEmail === null) return 'emailDuplicate';
+				if (isDuplicateEmail === null || isDuplicateEmail === true) return 'emailDuplicate';
 				break;
 			case 'password': return passwordValidationReason === 'invalidFormat' ? 'passwordInvalidFormat' : 'passwordNotMatch';
 			case 'phoneNumber':
 				if (!isValidPhone) return 'phone';
-				if (isDuplicatePhone || isDuplicatePhone === null) return 'phoneDuplicate';
+				if (isDuplicatePhone === null || isDuplicatePhone === true) return 'phoneDuplicate';
 				break;
 		}
 	}
