@@ -289,14 +289,14 @@ const MainClient = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
             <h3
-              className="text-2xl md:text-2xl font-bold text-white/80 mb-8 md:mb-10 tracking-wide drop-shadow-sm text-center"
-            >저희가 궁금하시다면...</h3>
+              className="text-2xl md:text-2xl font-bold text-white/90 mb-8 md:mb-10 tracking-wide drop-shadow-sm text-center"
+            >저희 팀을 소개합니다</h3>
             <Button
               theme="dark"
               padding="px-6 py-3"
               fontSize="text-lg"
               width="w-full md:w-1/3"
-              className="font-medium tracking-wide"
+              className="font-semibold tracking-wide"
               onClick={() => router.push('/about')}
             >
               {'About us'}

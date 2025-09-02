@@ -47,7 +47,7 @@ const PanelContent = ({ isOpen, activeButtons, setActiveButtons, setOpen }: Pane
 	const userRole = getUserHighestRole(user || null);
 
 	const toggleButton = useCallback((key: string) => {
-		const skipKeys = ["Home", "Login", "Logout", "My", "Events"];
+		const skipKeys = ["Home", "Login", "Logout", "My", "Events", "Admin"];
 		if (skipKeys.includes(key)) {
 			setOpen(false);
 			setActiveButtons({});
