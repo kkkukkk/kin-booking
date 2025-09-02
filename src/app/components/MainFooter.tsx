@@ -39,12 +39,18 @@ const MainFooter = () => {
         </div>
 
         {/* Contact & Copyright */}
-        <div className="flex flex-col items-center md:items-end space-y-1">
+        <div className="flex flex-col items-center md:items-start space-y-1">
           <a
             href="mailto:gfjg12@naver.com"
             className="text-white/60 hover:opacity-70 transition-opacity"
           >
             Contact: gfjg12@naver.com
+          </a>
+          <a
+              href="mailto:mjkim951225@gmail.com"
+              className="text-white/60 hover:opacity-70 transition-opacity"
+          >
+            Contact: mjkim951225@gmail.com
           </a>
           <p className="text-white/60">© 2025 KIN. All rights reserved.</p>
         </div>

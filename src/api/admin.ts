@@ -250,10 +250,22 @@ export const processTrendStats = (
 
   // 증감률 계산 함수
   const calculateChangeRate = (current: number, previous: number) => {
+    // 두 값 모두 0인 경우
+    if (current === 0 && previous === 0) {
+      return 0;
+    }
+    
+    // 이전 기간이 0인 경우
     if (previous === 0) {
-      if (current === 0) return 0;
       return current > 0 ? 100 : -100;
     }
+    
+    // 현재 기간이 0이고 이전 기간이 0이 아닌 경우 (100% 감소)
+    if (current === 0 && previous !== 0) {
+      return -100;
+    }
+    
+    // 일반적인 경우
     return Math.round(((current - previous) / previous) * 100);
   };
 

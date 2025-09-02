@@ -88,12 +88,18 @@ const Footer = ({ theme = 'normal' }: FooterProps) => {
         </div>
 
         {/* Contact & Copyright */}
-        <div className="flex flex-col items-center md:items-end space-y-1">
+        <div className="flex flex-col items-center md:items-start space-y-1 text-start">
           <a
             href="mailto:gfjg12@naver.com"
             className={`hover:opacity-70 transition-opacity ${getTextColor()}`}
           >
             Contact: gfjg12@naver.com
+          </a>
+          <a
+              href="mailto:mjkim951225@gmail.com"
+              className={`hover:opacity-70 transition-opacity ${getTextColor()}`}
+          >
+            Contact: mjkim951225@gmail.com
           </a>
           <p className={`${getTextColor()}`}>© 2025 KIN. All rights reserved.</p>
         </div>
