@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { fadeSlideLeft } from "@/types/ui/motionVariants";
@@ -40,6 +40,7 @@ const Email = ({
 	const [localPart, setLocalPart] = useState('');
 	const [domain, setDomain] = useState('');
 	const [checking, setChecking] = useState(false);
+	const [isInitialized, setIsInitialized] = useState(false);
 
 	// 자주 사용하는 도메인 목록
 	const commonDomains = [
@@ -52,35 +53,44 @@ const Email = ({
 	];
 
 	// 최종 이메일 값 구성
-	const finalEmail = localPart && domain ? `${localPart}@${domain}` : localPart;
+	const finalEmail = localPart && domain ? `${localPart}@${domain}` : '';
 
-	// 초기값 설정 및 부모와 동기화
+	// 초기값 설정 (value가 변경될 때마다 실행)
 	useEffect(() => {
-		if (value && value.includes('@')) {
-			const [local, domainPart] = value.split('@');
-			setLocalPart(local);
-			setDomain(domainPart);
-		} else if (value) {
-			setLocalPart(value);
+		if (value) {
+			if (value.includes('@')) {
+				const [local, domainPart] = value.split('@');
+				setLocalPart(local || '');
+				setDomain(domainPart || '');
+			} else {
+				setLocalPart(value);
+				setDomain('');
+			}
+		} else {
+			// value가 비어있으면 상태도 초기화
+			setLocalPart('');
 			setDomain('');
 		}
+		setIsInitialized(true);
 	}, [value]);
 
-	// 부모 컴포넌트에 값 변경 알림 (무한루프 방지)
-	useEffect(() => {
-		// 초기 로딩 시에는 호출하지 않음
-		if (finalEmail !== value && finalEmail !== '' && (localPart || domain) && value !== '') {
+	// 부모 컴포넌트에 값 변경 알림 (안정화된 로직)
+	const notifyParent = useCallback((newEmail: string) => {
+		if (newEmail !== value && newEmail !== '') {
 			onChange({
-				target: { value: finalEmail }
+				target: { value: newEmail }
 			} as React.ChangeEvent<HTMLInputElement>);
 		}
-	}, [finalEmail, onChange, value, localPart, domain]);
+	}, [onChange, value]);
 
-	// 유효성 검사만 수행 (중복확인 상태 변경 없음)
+		// 유효성 검사
 	useEffect(() => {
-		const valid = isValidEmail(finalEmail);
-		onValidChange?.(valid);
-	}, [finalEmail, onValidChange]);
+		if (isInitialized) {
+			const emailToValidate = localPart && domain ? `${localPart}@${domain}` : '';
+			const valid = emailToValidate ? isValidEmail(emailToValidate) : false;
+			onValidChange?.(valid);
+		}
+	}, [localPart, domain, onValidChange, isInitialized]);
 
 	// 에러 메시지 생성
 	const getErrorMessage = () => {
@@ -121,7 +131,6 @@ const Email = ({
 	const handleLocalPartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newLocalPart = e.target.value;
 		setLocalPart(newLocalPart);
-		handleChange(e);
 		// 입력값 변경 시 중복확인 상태 초기화
 		onDuplicateCheck?.(null);
 	};
@@ -130,18 +139,37 @@ const Email = ({
 	const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newDomain = e.target.value;
 		setDomain(newDomain);
-		handleChange(e);
 		// 입력값 변경 시 중복확인 상태 초기화
 		onDuplicateCheck?.(null);
 	};
 
+	// 부모에게 변경 알림 (debounced)
+	useEffect(() => {
+		if (isInitialized && finalEmail !== value) {
+			const timeoutId = setTimeout(() => {
+				notifyParent(finalEmail);
+			}, 100);
+			
+			return () => clearTimeout(timeoutId);
+		}
+	}, [finalEmail, notifyParent, value, isInitialized]);
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!touched) setTouched(true);
-		onChange(e);
 	};
 
 	// 중복검사
 	const checkDuplicateEmail = async () => {
+		// 로컬 파트 체크
+		if (!localPart || localPart.trim() === '') {
+			showToast({
+				message: "이메일 아이디를 입력해주세요.",
+				autoCloseTime: 3000,
+				iconType: "warning",
+			});
+			return;
+		}
+
 		// 도메인 체크
 		if (!domain || domain.trim() === '') {
 			showToast({
@@ -164,7 +192,11 @@ const Email = ({
 			return;
 		}
 
-		if (!isValid) {
+		// 최종 이메일 구성
+		const emailToCheck = `${localPart}@${domain}`;
+		
+		// 유효성 검사
+		if (!isValidEmail(emailToCheck)) {
 			showToast({
 				message: "올바른 이메일을 입력해주세요.",
 				autoCloseTime: 3000,
@@ -178,7 +210,7 @@ const Email = ({
 		// Supabase 이메일 중복 여부 체크
 		// Authentication 저장 시 users 테이블에도 저장되므로 users 테이블에서 조회하는 함수 (rls 권한 때문)
 		const { data, error } = await supabase.rpc("check_email_duplicate", {
-			input_email: finalEmail,
+			input_email: emailToCheck,
 		});
 
 		setChecking(false);
@@ -197,6 +229,12 @@ const Email = ({
 
 		const isUsed = data;
 		onDuplicateCheck?.(isUsed);
+		
+		// 중복검사 성공 후 유효성 검사도 업데이트
+		if (!isUsed) {
+			const valid = isValidEmail(emailToCheck);
+			onValidChange?.(valid);
+		}
 
 		showToast({
 			message: isUsed
@@ -242,6 +280,7 @@ const Email = ({
 						className="font text-sm md:text-base w-32"
 						value={localPart}
 						onChange={handleLocalPartChange}
+						onBlur={handleChange}
 					/>
 
 					{/* @ 기호 */}
@@ -256,6 +295,7 @@ const Email = ({
 						className="font text-sm md:text-base w-40"
 						value={domain}
 						onChange={handleDomainChange}
+						onBlur={handleChange}
 					/>
 
 				</div>
