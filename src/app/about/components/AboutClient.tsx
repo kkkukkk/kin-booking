@@ -120,12 +120,20 @@ const AboutClient = () => {
                 <p className="text-sm md:text-base text-gray-300 mb-3 md:mb-4">
                 문의사항이 있으시면 언제든 연락주세요.
                 </p>
-                <a 
-                href="mailto:gfjg12@naver.com" 
-                className="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-lg transition-colors text-sm md:text-base"
-                >
-                gfjg12@naver.com
-                </a>
+                <div className="flex flex-col md:flex-row justify-center items-center gap-3">
+                    <a
+                        href="mailto:gfjg12@naver.com"
+                        className="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-lg transition-colors text-sm md:text-base"
+                    >
+                        gfjg12@naver.com
+                    </a>
+                    <a
+                        href="mailto:mjkim951225@gmail.com"
+                        className="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-lg transition-colors text-sm md:text-base"
+                    >
+                        mjkim951225@gmail.com
+                    </a>
+                </div>
             </div>
         </motion.div>
       </div>
