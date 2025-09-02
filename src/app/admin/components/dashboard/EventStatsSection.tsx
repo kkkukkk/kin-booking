@@ -45,7 +45,7 @@ const EventStatsSection = ({
   return (
     <div className="md:col-span-2 space-y-4">
       <motion.h2 
-        className={`text-lg font-semibold ${theme === 'neon' ? 'text-green-400' : ''}`}
+        className={`text-lg font-semibold`}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
@@ -104,7 +104,7 @@ const EventStatsSection = ({
       {/* 공연별 상세 통계 */}
       <div className="space-y-4">
         <motion.h3 
-          className={`text-lg font-semibold mb-3 ${getMediumTextColor()}`}
+          className={`text-lg font-semibold mb-3`}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}

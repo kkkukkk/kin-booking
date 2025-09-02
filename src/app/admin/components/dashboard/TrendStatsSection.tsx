@@ -19,7 +19,7 @@ const TrendStatsSection = ({
 }: TrendStatsSectionProps) => {
   return (
     <div className="md:col-span-2 space-y-4">
-      <h2 className={`text-lg font-semibold ${theme === 'neon' ? 'text-green-400' : ''}`}>
+      <h2 className={`text-lg font-semibold`}>
         시간별 증감 현황
       </h2>
       

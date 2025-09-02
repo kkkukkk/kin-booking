@@ -54,7 +54,7 @@ const OverallSummarySection: React.FC<OverallSummarySectionProps> = ({
   return (
     <div className="space-y-4">
       <motion.h2 
-        className={`text-lg font-semibold ${theme === 'neon' ? 'text-green-400' : ''}`}
+        className={`text-lg font-semibold`}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
