@@ -161,7 +161,7 @@ export const approveReservation = async (reservationId: string): Promise<void> =
 	// 4. Rare 티켓 정보 미리 계산
 	const ticketData = [];
 	for (let i = 0; i < reservation.quantity; i++) {
-		const isRare = Math.random() < 0.05; // 5% 확률
+		const isRare = Math.random() < 0.02; // 2% 확률
 		let color = event.ticket_color; // 기본 색상
 		
 		if (isRare) {
