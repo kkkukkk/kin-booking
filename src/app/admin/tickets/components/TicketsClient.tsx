@@ -368,7 +368,7 @@ const TicketsClient = () => {
                 size: pageSize,
               }}
               onPageChange={handlePageChange}
-              showFirstLast
+              showFirstLast={false}
             />
           </div>
         )}

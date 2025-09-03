@@ -429,6 +429,7 @@ const EventsClient = () => {
                 hasNext: currentPage < totalPages
               }}
               onPageChange={handlePageChange}
+              showFirstLast={false}
             />
           </div>
         )}
