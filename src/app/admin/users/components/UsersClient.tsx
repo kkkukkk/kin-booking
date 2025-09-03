@@ -68,34 +68,58 @@ const UsersClient = () => {
   const { data: usersResponse, isLoading, error, refetch } = useUsers({
     keyword: debouncedKeyword,
     status: searchParams.status,
-    role: searchParams.role,  // 역할 필터 추가
-    page: currentPage,
-    size: pageSize,
-    sortBy: sortConfig.field,
-    sortDirection: sortConfig.direction,
+    page: 1, // 클라이언트 사이드 필터링을 위해 항상 전체 데이터를 가져옴
+    size: 1000, // 충분히 큰 값으로 설정
+    sortBy: sortConfig.field === 'role' ? 'registerDate' : sortConfig.field, // 역할 정렬은 클라이언트에서 처리
+    sortDirection: sortConfig.field === 'role' ? 'desc' : sortConfig.direction,
   });
   const { data: roles } = useRoles();
   const updateUserRoleMutation = useUpdateUserRole();
 
   const users = React.useMemo(() => usersResponse?.data || [], [usersResponse?.data]);
   
-  // 클라이언트 사이드 필터링 (역할 필터)
-  const filteredUsers = React.useMemo(() => {
+  // 클라이언트 사이드 필터링 및 정렬
+  const processedUsers = React.useMemo(() => {
     const usersData = users || [];
-    let filtered = usersData;
+    let processed = usersData;
     
     // 역할 필터링 (클라이언트 사이드)
     if (searchParams.role) {
-      filtered = filtered.filter(user => 
+      processed = processed.filter(user => 
         user.userRoles?.roles?.roleCode === searchParams.role
       );
     }
     
-    return filtered;
-  }, [users, searchParams.role]);
+    // 역할 정렬 (클라이언트 사이드)
+    if (sortConfig.field === 'role') {
+      processed = processed.sort((a, b) => {
+        const roleA = a.userRoles?.roles?.roleCode || '';
+        const roleB = b.userRoles?.roles?.roleCode || '';
+        
+        // 역할 우선순위 정의 (마스터 > 매니저 > 멤버 > 유저)
+        const rolePriority = {
+          [UserRoleStatus.Master]: 4,
+          [UserRoleStatus.Manager]: 3,
+          [UserRoleStatus.Member]: 2,
+          [UserRoleStatus.User]: 1
+        };
+        
+        const priorityA = rolePriority[roleA as UserRoleStatus] || 0;
+        const priorityB = rolePriority[roleB as UserRoleStatus] || 0;
+        
+        if (sortConfig.direction === 'asc') {
+          return priorityA - priorityB;
+        } else {
+          return priorityB - priorityA;
+        }
+      });
+    }
+    
+    return processed;
+  }, [users, searchParams.role, sortConfig.field, sortConfig.direction]);
   
   // 필터링된 결과로 페이지네이션 계산
-  const finalUsers = filteredUsers;
+  const finalUsers = processedUsers;
   const totalCount = finalUsers.length;
   const totalPages = Math.ceil(totalCount / pageSize);
   
@@ -452,6 +476,7 @@ const UsersClient = () => {
               hasNext: currentPage < totalPages
             }}
             onPageChange={handlePageChange}
+            showFirstLast={false}
           />
         </div>
       </div>
