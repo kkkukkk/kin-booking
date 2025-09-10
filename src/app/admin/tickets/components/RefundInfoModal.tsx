@@ -80,8 +80,6 @@ const RefundInfoModal = ({
 
     // 환불 정책에 따른 환불 금액 계산 (취소 신청 시점 기준)
     const calculateRefundAmount = () => {
-        if (!paymentInfo) return 0; // 입금 정보가 없으면 환불 불가
-        
         const eventDate = dayjs(ticketGroup.eventDate);
         // 취소 신청 시점을 기준으로 계산 (ticket.updated_at)
         const cancelRequestDate = dayjs(ticketGroup.updatedAt);
@@ -100,46 +98,48 @@ const RefundInfoModal = ({
         
         if (!refundRate) return 0;
         
+        // 티켓 가격 계산
+        let ticketPrice = 0;
+        if (isTransferredTicket) {
+            // 양도받은 티켓: 공연 데이터에서 티켓 가격 가져오기
+            ticketPrice = eventInfo?.ticketPrice || 0;
+        } else {
+            // 일반 티켓: 입금 정보에서 티켓 가격 계산
+            if (!paymentInfo) return 0; // 입금 정보가 없으면 환불 불가
+            ticketPrice = paymentInfo.amount / (reservationInfo?.quantity || 1);
+        }
+        
         // 환불 금액 계산 (현재 보유 티켓 수 * 티켓 가격 * 환불 비율)
-        // 티켓 가격은 paymentInfo.amount / 예매 수량으로 계산
-        const originalTicketPrice = paymentInfo.amount / (reservationInfo?.quantity || 1);
-        const currentTicketValue = originalTicketPrice * ticketGroup.ticketCount;
+        const currentTicketValue = ticketPrice * ticketGroup.ticketCount;
         return Math.floor(currentTicketValue * (refundRate.rate / 100));
     };
 
     // 기본 환불 금액 (정책 적용)
     const defaultRefundAmount = calculateRefundAmount();
 
-    // 기본값 설정 (양도된 티켓이면 환불계좌 정보, 아니면 입금 정보)
+    // 기본값 설정
     const getDefaultValues = React.useCallback(() => {
         if (isTransferredTicket && refundAccount) {
-            // 양도된 티켓: 환불계좌 정보 사용
+            // 양도된 티켓: 환불계좌 정보 사용 (금액은 환불 정책에 따라 계산)
             return {
-                refundAmount: defaultRefundAmount,
+                refundAmount: defaultRefundAmount, // 환불 정책에 따라 계산된 금액
                 refundBank: refundAccount.bankName,
                 refundAccount: refundAccount.accountNumber,
                 refundHolder: refundAccount.accountHolder,
                 note: '',
             };
-        } else if (paymentInfo) {
-            // 일반 티켓: 입금 정보 사용
-            return {
-                refundAmount: defaultRefundAmount,
-                refundBank: paymentInfo.bankName,
-                refundAccount: paymentInfo.accountNumber,
-                refundHolder: paymentInfo.accountHolder,
-                note: '',
-            };
         } else {
+            // 일반 티켓: 금액은 입금정보 바탕, 계좌정보는 환불계좌 바탕
+            const userRefundAccount = refundAccounts?.[0]; // 사용자의 첫 번째 환불계좌
             return {
-                refundAmount: 0,
-                refundBank: '',
-                refundAccount: '',
-                refundHolder: '',
+                refundAmount: defaultRefundAmount, // 입금정보 바탕으로 계산된 금액
+                refundBank: userRefundAccount?.bankName || '',
+                refundAccount: userRefundAccount?.accountNumber || '',
+                refundHolder: userRefundAccount?.accountHolder || '',
                 note: '',
             };
         }
-    }, [isTransferredTicket, refundAccount, paymentInfo, defaultRefundAmount]);
+    }, [isTransferredTicket, refundAccount, refundAccounts, defaultRefundAmount]);
 
     // 환불 가능 여부 확인
     const isRefundable = defaultRefundAmount > 0;
@@ -297,8 +297,8 @@ const RefundInfoModal = ({
                     </div>
                 </div>
 
-                {/* 입금 정보 이력 표시 */}
-                {paymentInfo && (
+                {/* 입금 정보 이력 표시 (입금 정보가 있을 때만) */}
+                {paymentInfo && paymentInfo.bankName && paymentInfo.accountNumber && (
                     <div className={`${theme === 'neon' ? 'bg-blue-950/20' : theme === 'dark' ? 'bg-blue-950/20' : 'bg-blue-50'} border ${theme === 'neon' ? 'border-blue-400/50' : theme === 'dark' ? 'border-blue-400/50' : 'border-blue-200'} rounded-lg p-4 space-y-2`}>
                         <h3 className={`font-semibold text-sm ${theme === 'neon' ? 'text-blue-200' : theme === 'dark' ? 'text-blue-200' : 'text-blue-800'} mb-2`}>입금 정보 (참고용)</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
@@ -326,6 +326,54 @@ const RefundInfoModal = ({
                                 <span className={`${theme === 'neon' ? 'text-blue-400' : theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} text-xs`}>메모: {paymentInfo.note}</span>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* 일반 티켓 환불계좌 정보 표시 */}
+                {!isTransferredTicket && refundAccounts && refundAccounts.length > 0 && (
+                    <div className={`${theme === 'neon' ? 'bg-yellow-950/20' : theme === 'dark' ? 'bg-yellow-950/20' : 'bg-yellow-50'} border ${theme === 'neon' ? 'border-yellow-400/50' : theme === 'dark' ? 'border-yellow-400/50' : 'border-yellow-200'} rounded-lg p-4 space-y-2`}>
+                        <h3 className={`font-semibold text-sm ${theme === 'neon' ? 'text-yellow-200' : theme === 'dark' ? 'text-yellow-200' : 'text-yellow-800'} mb-2`}>
+                            일반 티켓 환불 계좌
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-yellow-400' : theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'} text-xs mb-1`}>환불 받는 사람</span>
+                                <span className={`font-medium break-words`}>{refundAccounts[0].accountHolder}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-yellow-400' : theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'} text-xs mb-1`}>환불 은행</span>
+                                <span className={`font-medium break-words`}>{refundAccounts[0].bankName}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-yellow-400' : theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'} text-xs mb-1`}>환불 계좌</span>
+                                <span className={`font-medium break-words`}>{refundAccounts[0].accountNumber}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className={`${theme === 'neon' ? 'text-yellow-400' : theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'} text-xs mb-1`}>입력 일시</span>
+                                <span className={`font-medium`}>
+                                    {dayjs(refundAccounts[0].createdAt).format('YYYY년 M월 D일 HH:mm')}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-yellow-200">
+                            <span className={`${theme === 'neon' ? 'text-yellow-400' : theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'} text-xs`}>
+                                * 일반 티켓의 환불계좌 정보가 자동으로 입력되었습니다.
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+                {/* 환불계좌가 없는 일반 티켓 안내 메시지 */}
+                {!isTransferredTicket && (!refundAccounts || refundAccounts.length === 0) && (
+                    <div className={`${theme === 'neon' ? 'bg-red-950/20' : theme === 'dark' ? 'bg-red-950/20' : 'bg-red-50'} border ${theme === 'neon' ? 'border-red-400/50' : theme === 'dark' ? 'border-red-400/50' : 'border-red-200'} rounded-lg p-4 space-y-2`}>
+                        <h3 className={`font-semibold text-sm ${theme === 'neon' ? 'text-red-200' : theme === 'dark' ? 'text-red-200' : 'text-red-800'} mb-2`}>
+                            환불계좌 정보 없음
+                        </h3>
+                        <div className="text-sm">
+                            <span className={`${theme === 'neon' ? 'text-red-300' : theme === 'dark' ? 'text-red-300' : 'text-red-600'}`}>
+                                * 사용자가 환불계좌 정보를 입력하지 않았습니다. 관리자가 직접 입력해주세요.
+                            </span>
+                        </div>
                     </div>
                 )}
 
