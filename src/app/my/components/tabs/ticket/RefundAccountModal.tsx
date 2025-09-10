@@ -113,7 +113,7 @@ export const RefundAccountModal = ({
 			<div className="max-w-md mx-auto">
 				<div className="mb-6">
 					<h2 className="text-xl font-semibold mb-2">환불계좌 정보</h2>
-					<p className="text-sm opacity-70">양도받은 티켓 취소 시 환불받을 계좌 정보를 입력해주세요.</p>
+					<p className="text-sm opacity-70">티켓 취소 시 환불받을 계좌 정보를 입력해주세요.</p>
 				</div>
 
 				{/* 계좌 입력 방식 선택 */}

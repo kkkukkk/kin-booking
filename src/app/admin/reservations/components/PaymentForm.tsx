@@ -6,8 +6,6 @@ import { ChangeEvent } from 'react';
 interface PaymentFormProps {
     paymentInfo: {
         depositorName: string;
-        bankName: string;
-        accountNumber: string;
         amount: number;
         note: string;
     };
@@ -35,34 +33,6 @@ const PaymentForm = ({
                         value={paymentInfo.depositorName}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => onPaymentInfoChange('depositorName', e.target.value)}
                         placeholder="입금자를 입력하세요"
-                        className="w-full"
-                    />
-                </div>
-                
-                <div>
-                    <label className={`block text-sm font-medium ${theme === 'neon' ? 'text-gray-300' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
-                        은행 *
-                    </label>
-                    <Input
-                        theme={theme}
-                        value={paymentInfo.bankName}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => onPaymentInfoChange('bankName', e.target.value)}
-                        placeholder="은행을 입력하세요"
-                        className="w-full"
-                    />
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <div>
-                    <label className={`block text-sm font-medium ${theme === 'neon' ? 'text-gray-300' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
-                        계좌번호 *
-                    </label>
-                    <Input
-                        theme={theme}
-                        value={paymentInfo.accountNumber}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => onPaymentInfoChange('accountNumber', e.target.value)}
-                        placeholder="계좌번호를 입력하세요"
                         className="w-full"
                     />
                 </div>

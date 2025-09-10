@@ -47,8 +47,6 @@ const PaymentInfoModal = ({
   // 입금 받은 정보 상태
   const [paymentInfo, setPaymentInfo] = useState({
     depositorName: '',
-    bankName: '',
-    accountNumber: '',
     amount: 0, // 기본값: 0원
     note: '',
   });
@@ -66,14 +64,6 @@ const PaymentInfoModal = ({
     // 유효성 검사
     if (!paymentInfo.depositorName.trim()) {
       showToast({ message: '입금자명을 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
-      return;
-    }
-    if (!paymentInfo.bankName.trim()) {
-      showToast({ message: '은행명을 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
-      return;
-    }
-    if (!paymentInfo.accountNumber.trim()) {
-      showToast({ message: '계좌번호를 입력해주세요.', iconType: 'error', autoCloseTime: 3000 });
       return;
     }
     if (paymentInfo.amount <= 0) {
@@ -99,8 +89,8 @@ const PaymentInfoModal = ({
         eventId: reservation.eventId,
         paymentType: 'payment',
         amount: paymentInfo.amount,
-        bankName: paymentInfo.bankName,
-        accountNumber: paymentInfo.accountNumber,
+        bankName: '', // 빈값으로 저장
+        accountNumber: '', // 빈값으로 저장
         accountHolder: paymentInfo.depositorName,
         note: paymentInfo.note,
         operatorId: session.user.id,

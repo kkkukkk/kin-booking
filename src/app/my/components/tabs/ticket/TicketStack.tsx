@@ -184,28 +184,8 @@ const TicketStack = ({
 		const activeTickets = tickets.filter(ticket => ticket.status === TicketStatus.Active);
 		if (activeTickets.length === 0) return;
 
-		// 양도받은 티켓인지 확인
-		if (isReceivedTicket) {
-			// 양도받은 티켓은 환불계좌 입력 모달 표시
-			setShowRefundAccountModal(true);
-			return;
-		}
-
-		// 일반 티켓은 바로 취소 신청
-		const confirmed = await showAlert({
-			type: 'confirm',
-			title: '티켓 취소 신청',
-			message: `정말 ${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n관리자 확인 후 환불이 진행됩니다.`,
-		});
-
-		if (confirmed) {
-			requestCancelAllTickets({
-				eventId,
-				userId: session.user.id,
-				reservationId: activeTickets[0].reservationId,
-				tickets: activeTickets,
-			});
-		}
+		// 모든 티켓에 대해 환불계좌 입력 모달 표시
+		setShowRefundAccountModal(true);
 	};
 
 	// 환불계좌 입력 후 취소 신청 처리
@@ -238,7 +218,7 @@ const TicketStack = ({
 						showAlert({
 							type: 'confirm',
 							title: '티켓 취소 신청',
-							message: `양도받은 티켓 ${activeTickets.length}장을 취소 신청하시겠습니까?\n\n입력하신 계좌로 환불이 진행됩니다.`,
+							message: `${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n입력하신 계좌로 환불이 진행됩니다.`,
 						}).then((confirmed) => {
 							if (confirmed) {
 								// 환불 요청 매핑 생성
@@ -285,7 +265,7 @@ const TicketStack = ({
 			showAlert({
 				type: 'confirm',
 				title: '티켓 취소 신청',
-				message: `양도받은 티켓 ${activeTickets.length}장을 취소 신청하시겠습니까?\n\n입력하신 계좌로 환불이 진행됩니다.`,
+				message: `${activeTickets.length}장의 티켓을 취소 신청하시겠습니까?\n\n입력하신 계좌로 환불이 진행됩니다.`,
 			}).then((confirmed) => {
 				if (confirmed) {
 					// 환불 요청 매핑 생성
