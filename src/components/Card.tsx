@@ -65,7 +65,7 @@ const Card = ({
 				exit="exit"
 				transition={{ duration: 0.3 }}
 				className={clsx(
-					"rounded-none md:rounded-[10px] max-w-7xl mx-auto",
+					"rounded md:rounded-[10px] max-w-7xl mx-auto",
 					theme === "dark"
 						? "shadow-[0_0_6px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.5),0_0_24px_rgba(255,255,255,0.3),0_0_36px_rgba(255,255,255,0.1)]"
 						: theme === "neon"
