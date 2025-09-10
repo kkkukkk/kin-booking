@@ -41,7 +41,7 @@ const TicketsGuide = () => {
 							"w-1.5 h-1.5 rounded-full flex-shrink-0",
 							theme === "normal" ? "bg-black/60" : "bg-white/60"
 						)}></div>
-						<span>양도받은 티켓 취소 시 별도 환불계좌를 입력해야 합니다.</span>
+						<span>티켓 취소 시 별도 환불계좌를 입력해야 합니다.</span>
 					</li>
 					<li className="flex items-center gap-2">
 						<div className={clsx(
