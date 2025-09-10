@@ -5,7 +5,8 @@ const RegisterPage = () => {
 	return (
 		<Card
 			innerScroll
-			className="md:max-w-[80%] mx-auto"
+			className="mx-auto"
+			width="w-[80%]"
 		>
 			<RegisterClient />
 		</Card>
