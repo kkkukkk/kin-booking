@@ -31,6 +31,25 @@ export const login = async (email: string, password: string) => {
 	return data;
 }
 
+// 인증 메일 재전송
+export const resendConfirmationEmail = async (email: string) => {
+	const { error } = await supabase.auth.resend({
+		type: 'signup',
+		email: email,
+		options: {
+			// 회원가입과 동일한 redirect URL 사용
+			emailRedirectTo: 'https://kin-booking.vercel.app/auth/callback?source=email',
+			//emailRedirectTo: 'http://localhost:3000/auth/callback?source=email',
+		}
+	});
+
+	if (error) {
+		throw error;
+	}
+	
+	return true;
+};
+
 export const register = async ({
 	email,
 	name,
