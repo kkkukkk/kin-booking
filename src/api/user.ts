@@ -12,6 +12,16 @@ import { getPaginationRange } from "@/util/pagination/pagination";
 import { toCamelCaseKeys, toSnakeCaseKeys } from "@/util/case/case";
 import { syncTeamMemberWithUserRole } from './teamMember';
 
+// 이메일 인증 상태 업데이트 (RPC 함수 사용)
+export const updateEmailVerificationStatus = async (userId: string) => {
+	const { error } = await supabase.rpc('update_user_email_verification', {
+		user_id: userId
+	});
+
+	if (error) throw error;
+	return true;
+};
+
 // 유저 검색 api
 export const fetchUser = async (params?: PaginationParams & FetchUserDto): Promise<FetchUserWithRolesResponseDto> => {
 	let query = supabase

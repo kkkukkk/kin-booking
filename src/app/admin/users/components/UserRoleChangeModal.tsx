@@ -10,10 +10,11 @@ interface UserRoleChangeModalProps {
   user: UserWithRoles;
   theme: string;
   onRoleChange: (userId: string, newRole: UserRoleStatus) => void;
+  onResendEmail: (email: string) => void;
   onClose: () => void;
 }
 
-const UserRoleChangeModal = ({ user, theme, onRoleChange, onClose }: UserRoleChangeModalProps) => {
+const UserRoleChangeModal = ({ user, theme, onRoleChange, onResendEmail, onClose }: UserRoleChangeModalProps) => {
   return (
     <Modal onClose={onClose}>
       <div className='min-w-xs max-w-sm'>
@@ -34,6 +35,12 @@ const UserRoleChangeModal = ({ user, theme, onRoleChange, onClose }: UserRoleCha
           <div className="flex items-center justify-between">
             <span className={`text-sm ${theme === 'normal' ? 'text-gray-600' : theme === 'dark' ? 'text-gray-300' : 'text-gray-300'}`}>핸드폰 번호:</span>
             <span className="text-sm">{formatPhoneNumber(user.phoneNumber)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={`text-sm ${theme === 'normal' ? 'text-gray-600' : theme === 'dark' ? 'text-gray-300' : 'text-gray-300'}`}>이메일 인증:</span>
+            <span className={`text-sm ${user.emailVerified ? 'text-green-500' : 'text-red-500'}`}>
+              {user.emailVerified ? '완료' : '미완'}
+            </span>
           </div>
         </div>
 
@@ -60,6 +67,21 @@ const UserRoleChangeModal = ({ user, theme, onRoleChange, onClose }: UserRoleCha
             ))}
           </div>
         </div>
+
+        {/* 인증 메일 재전송 버튼 (미인증 사용자만) */}
+        {!user.emailVerified && (
+          <div className="mb-4">
+            <Button
+              theme={theme === 'normal' ? 'normal' : 'dark'}
+              onClick={() => onResendEmail(user.email)}
+              fontSize="text-sm"
+              padding="px-3 py-2"
+              className="w-full font-semibold"
+            >
+              인증 메일 재전송
+            </Button>
+          </div>
+        )}
         
         <div className="flex justify-end">
           <Button

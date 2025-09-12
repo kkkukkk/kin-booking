@@ -18,4 +18,5 @@ export interface User {
 	registerDate: string;
 	marketingConsent: boolean;
 	status: UserStatus;
+	emailVerified: boolean;
 }

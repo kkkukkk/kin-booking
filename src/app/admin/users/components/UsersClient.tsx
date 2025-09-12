@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useUsers, useUpdateUserRole } from '@/hooks/api/useUsers';
+import { resendConfirmationEmail } from '@/api/auth';
 import useDebounce from '@/hooks/useDebounce';
 import { useRoles } from '@/hooks/api/useRoles';
 import DataTable from '@/components/base/DataTable';
@@ -228,6 +229,24 @@ const UsersClient = () => {
     }
   };
 
+  // 인증 메일 재전송 핸들러
+  const handleResendEmail = async (email: string) => {
+    try {
+      await resendConfirmationEmail(email);
+      showToast({ 
+        message: `${email}로 인증 메일을 재전송했습니다.`, 
+        iconType: 'success', 
+        autoCloseTime: 3000 
+      });
+    } catch (error) {
+      showToast({ 
+        message: `인증 메일 재전송 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`, 
+        iconType: 'error', 
+        autoCloseTime: 3000 
+      });
+    }
+  };
+
 
 
   // 테이블 컬럼 정의
@@ -247,7 +266,7 @@ const UsersClient = () => {
       render: (user: UserWithRoles) => (
         <div className="text-sm">{user.email}</div>
       ),
-      width: '25%',
+      width: '22%',
       sortable: true,
     },
     {
@@ -305,6 +324,16 @@ const UsersClient = () => {
       sortable: true,
     },
     {
+      key: 'emailVerified',
+      header: '메일 인증',
+      render: (user: UserWithRoles) => (
+        <div className={`text-sm ${user.emailVerified ? 'text-green-500' : 'text-red-500'}`}>
+          {user.emailVerified ? '완료' : '미완'}
+        </div>
+      ),
+      width: '12%',
+    },
+    {
       key: 'marketingConsent',
       header: '마케팅 동의',
       render: (user: UserWithRoles) => (
@@ -356,6 +385,12 @@ const UsersClient = () => {
           <div className="truncate text-sm flex items-center justify-between">
             <div>이메일</div>
             <span>{user.email}</span>
+          </div>
+          <div className="truncate text-sm flex items-center justify-between">
+            <div>이메일 인증</div>
+            <span className={user.emailVerified ? 'text-green-500' : 'text-red-500'}>
+              {user.emailVerified ? '완료' : '미완'}
+            </span>
           </div>
         </div>
       </>
@@ -487,6 +522,7 @@ const UsersClient = () => {
           user={selectedUser}
           theme={theme}
           onRoleChange={handleRoleChange}
+          onResendEmail={handleResendEmail}
           onClose={handleCloseModal}
         />
       )}
