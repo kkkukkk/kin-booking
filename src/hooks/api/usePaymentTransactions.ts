@@ -5,7 +5,8 @@ import {
 	fetchPaymentTransactions,
 	fetchPaymentTransactionsWithReservation,
 	fetchPaymentTransactionsByReservationId,
-	fetchPaymentTransactionsByUserId
+	fetchPaymentTransactionsByUserId,
+	fetchPaymentTransactionStats
 } from '@/api/paymentTransaction';
 import {
 	UpdatePaymentTransactionDto,
@@ -83,5 +84,15 @@ export const usePaymentTransactionsByUserId = (userId: string) => {
 		queryFn: () => fetchPaymentTransactionsByUserId(userId),
 		enabled: !!userId,
 		retry: 1,
+	});
+};
+
+// 전체 거래 통계 조회
+export const usePaymentTransactionStats = () => {
+	return useQuery({
+		queryKey: ['paymentTransactions', 'stats'],
+		queryFn: fetchPaymentTransactionStats,
+		retry: 1,
+		staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
 	});
 };

@@ -171,3 +171,30 @@ export const fetchPaymentTransactionsByUserId = async (userId: string): Promise<
 	if (error) throw error;
 	return toCamelCaseKeys<PaymentTransaction[]>(data ?? []);
 };
+
+// 전체 거래 통계 조회
+export const fetchPaymentTransactionStats = async (): Promise<{
+	totalPayment: number;
+	totalRefund: number;
+	netAmount: number;
+}> => {
+	const { data, error } = await supabase
+		.from('payment_transactions')
+		.select('payment_type, amount');
+	
+	if (error) throw error;
+	
+	const stats = data?.reduce((acc, transaction) => {
+		if (transaction.payment_type === 'payment') {
+			acc.totalPayment += transaction.amount;
+		} else if (transaction.payment_type === 'refund') {
+			acc.totalRefund += transaction.amount;
+		}
+		return acc;
+	}, { totalPayment: 0, totalRefund: 0 }) || { totalPayment: 0, totalRefund: 0 };
+	
+	return {
+		...stats,
+		netAmount: stats.totalPayment - stats.totalRefund
+	};
+};

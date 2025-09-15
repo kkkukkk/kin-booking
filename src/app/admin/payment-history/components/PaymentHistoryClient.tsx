@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { usePaymentTransactionsWithReservation } from '@/hooks/api/usePaymentTransactions';
+import { usePaymentTransactionsWithReservation, usePaymentTransactionStats } from '@/hooks/api/usePaymentTransactions';
 import useDebounce from '@/hooks/useDebounce';
 import DataTable from '@/components/base/DataTable';
 import { PaymentTransactionWithReservationDto } from '@/types/dto/paymentTransaction';
@@ -63,11 +63,17 @@ const PaymentHistoryClient = () => {
         sortDirection: sortConfig.direction,
     });
 
+    // 전체 통계 데이터
+    const { data: statsData, isLoading: statsLoading } = usePaymentTransactionStats();
+
     const transactions = transactionsResponse?.data || [];
     const totalCount = transactionsResponse?.totalCount || 0;
 
-    // 검색/필터 적용된 데이터 기준으로 통계 계산
-    const paymentStats = transactions.reduce((acc, transaction: PaymentTransactionWithReservationDto) => {
+    // 전체 통계 사용 (필터와 무관하게 전체 데이터 기준)
+    const totalStats = statsData || { totalPayment: 0, totalRefund: 0, netAmount: 0 };
+
+    // 필터링된 데이터 기준으로 통계 계산
+    const filteredStats = transactions.reduce((acc, transaction: PaymentTransactionWithReservationDto) => {
         if (transaction.paymentType === 'payment') {
             acc.totalPayment += transaction.amount;
         } else if (transaction.paymentType === 'refund') {
@@ -76,7 +82,34 @@ const PaymentHistoryClient = () => {
         return acc;
     }, { totalPayment: 0, totalRefund: 0 });
 
-    const netAmount = paymentStats.totalPayment - paymentStats.totalRefund;
+    const filteredNetAmount = filteredStats.totalPayment - filteredStats.totalRefund;
+
+    // 현재 적용된 필터 정보 생성
+    const getFilterInfo = () => {
+        const filters = [];
+        
+        // 거래 유형 필터
+        if (searchParams.paymentType) {
+            const typeLabel = searchParams.paymentType === 'payment' ? '입금' : '환불';
+            filters.push(typeLabel);
+        }
+        
+        // 날짜 필터
+        if (searchParams.startDate && searchParams.endDate) {
+            filters.push(`${searchParams.startDate} ~ ${searchParams.endDate}`);
+        } else if (searchParams.startDate) {
+            filters.push(`${searchParams.startDate} 이후`);
+        } else if (searchParams.endDate) {
+            filters.push(`${searchParams.endDate} 이전`);
+        }
+        
+        // 필터가 없으면 "전체 기간" 표시
+        if (filters.length === 0) {
+            filters.push('전체 기간');
+        }
+        
+        return filters.join(' • ');
+    };
 
     // 페이징 적용
     const totalPages = Math.ceil(totalCount / pageSize);
@@ -274,36 +307,84 @@ const PaymentHistoryClient = () => {
                     <h1 className="text-lg md:text-xl font-bold mb-2">입/출금 이력 관리</h1>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className={`p-4 rounded-lg border ${
-                        theme === 'normal' 
-                            ? 'bg-green-50 border-green-200 text-green-800'
-                            : 'bg-green-900/20 border-green-500/30 text-green-400' 
-                    }`}>
-                        <h3 className="text-sm font-medium mb-1">총 입금</h3>
-                        <p className="text-xl font-bold">
-                            {paymentStats.totalPayment.toLocaleString()}원
-                        </p>
+                {/* 전체 통계 */}
+                <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-600">전체 통계</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className={`p-4 rounded-lg border ${
+                            theme === 'normal' 
+                                ? 'bg-green-50 border-green-200 text-green-800'
+                                : 'bg-green-900/20 border-green-500/30 text-green-400' 
+                        }`}>
+                            <h4 className="text-sm font-medium mb-1">총 입금</h4>
+                            <p className="text-xl font-bold">
+                                {statsLoading ? '로딩 중...' : `${totalStats.totalPayment.toLocaleString()}원`}
+                            </p>
+                        </div>
+                        <div className={`p-4 rounded-lg border ${
+                            theme === 'normal' 
+                                ? 'bg-red-50 border-red-200 text-red-800'
+                                : 'bg-red-900/20 border-red-500/30 text-red-400' 
+                        }`}>
+                            <h4 className="text-sm font-medium mb-1">총 환불</h4>
+                            <p className="text-xl font-bold">
+                                {statsLoading ? '로딩 중...' : `${totalStats.totalRefund.toLocaleString()}원`}
+                            </p>
+                        </div>
+                        <div className={`p-4 rounded-lg border ${
+                            theme === 'normal' 
+                                ? 'bg-blue-50 border-blue-200 text-blue-800'
+                                : 'bg-blue-900/20 border-blue-500/30 text-blue-400' 
+                        }`}>
+                            <h4 className="text-sm font-medium mb-1">순액</h4>
+                            <p className="text-xl font-bold">
+                                {statsLoading ? '로딩 중...' : `${totalStats.netAmount.toLocaleString()}원`}
+                            </p>
+                        </div>
                     </div>
-                    <div className={`p-4 rounded-lg border ${
-                        theme === 'normal' 
-                            ? 'bg-red-50 border-red-200 text-red-800'
-                            : 'bg-red-900/20 border-red-500/30 text-red-400' 
-                    }`}>
-                        <h3 className="text-sm font-medium mb-1">총 환불</h3>
-                        <p className="text-xl font-bold">
-                            {paymentStats.totalRefund.toLocaleString()}원
-                        </p>
+                </div>
+
+                {/* 필터링된 통계 */}
+                <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <h3 className="text-sm font-medium text-gray-600">
+                            현재 구간 통계
+                        </h3>
+                        <div className="text-xs text-gray-500">
+                            {getFilterInfo()} • {totalCount}건 중 현재 페이지 {transactions.length}건
+                        </div>
                     </div>
-                    <div className={`p-4 rounded-lg border ${
-                        theme === 'normal' 
-                            ? 'bg-blue-50 border-blue-200 text-blue-800'
-                            : 'bg-blue-900/20 border-blue-500/30 text-blue-400' 
-                    }`}>
-                        <h3 className="text-sm font-medium mb-1">순액</h3>
-                        <p className="text-xl font-bold">
-                            {netAmount.toLocaleString()}원
-                        </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className={`p-4 rounded-lg border ${
+                            theme === 'normal' 
+                                ? 'bg-green-50/50 border-green-300 text-green-700'
+                                : 'bg-green-900/10 border-green-600/30 text-green-300' 
+                        }`}>
+                            <h4 className="text-sm font-medium mb-1">입금</h4>
+                            <p className="text-lg font-bold">
+                                {filteredStats.totalPayment.toLocaleString()}원
+                            </p>
+                        </div>
+                        <div className={`p-4 rounded-lg border ${
+                            theme === 'normal' 
+                                ? 'bg-red-50/50 border-red-300 text-red-700'
+                                : 'bg-red-900/10 border-red-600/30 text-red-300' 
+                        }`}>
+                            <h4 className="text-sm font-medium mb-1">환불</h4>
+                            <p className="text-lg font-bold">
+                                {filteredStats.totalRefund.toLocaleString()}원
+                            </p>
+                        </div>
+                        <div className={`p-4 rounded-lg border ${
+                            theme === 'normal' 
+                                ? 'bg-blue-50/50 border-blue-300 text-blue-700'
+                                : 'bg-blue-900/10 border-blue-600/30 text-blue-300' 
+                        }`}>
+                            <h4 className="text-sm font-medium mb-1">순액</h4>
+                            <p className="text-lg font-bold">
+                                {filteredNetAmount.toLocaleString()}원
+                            </p>
+                        </div>
                     </div>
                 </div>
 
