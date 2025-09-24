@@ -56,18 +56,51 @@ const ResetPassword = () => {
 
 		setIsLoading(true);
 		try {
+			console.log("비밀번호 변경 시도 중...");
+			
+			// 먼저 현재 세션 확인
+			const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+			console.log("현재 세션:", session);
+			
+			if (sessionError) {
+				console.error("세션 확인 오류:", sessionError);
+				showToast({
+					message: `세션 확인 실패: ${sessionError.message}`,
+					iconType: 'error',
+					autoCloseTime: 3000,
+				});
+				return;
+			}
+			
+			if (!session) {
+				console.error("세션이 없습니다. 이메일 링크를 다시 확인해주세요.");
+				showToast({
+					message: '세션이 만료되었습니다. 비밀번호 재설정 링크를 다시 요청해주세요.',
+					iconType: 'error',
+					autoCloseTime: 3000,
+				});
+				return;
+			}
+			
 			const { error } = await supabase.auth.updateUser({ password });
 
 			if (!error) {
+				console.log("비밀번호 변경 성공, 즉시 로그아웃 처리 중...");
 				showToast({
 					message: '비밀번호가 성공적으로 변경됐어요!\n\n새 비밀번호로 다시 로그인해주세요.',
 					iconType: 'success',
 					autoCloseTime: 5000,
 				});
 				setIsPasswordChanged(true);
+				
+				// 즉시 로그아웃 (보안상)
 				await supabase.auth.signOut();
+				console.log("비밀번호 변경 후 로그아웃 완료");
+				
+				// 로그인 페이지로 이동
 				router.push('/login');
 			} else {
+				console.error("비밀번호 변경 오류:", error);
 				if (error.message?.includes('different from the old password')) {
 					showToast({
 						message: '기존 비밀번호와 다른 비밀번호를 사용해주세요!',
@@ -76,7 +109,7 @@ const ResetPassword = () => {
 					});
 				} else {
 					showToast({
-						message: '비밀번호 변경에 실패했어요. 잠시 후 다시 시도해주세요.',
+						message: `비밀번호 변경에 실패했어요: ${error.message}`,
 						iconType: 'warning',
 						autoCloseTime: 3000,
 					});
@@ -88,22 +121,38 @@ const ResetPassword = () => {
 	}
 
 	const handleLogout = async () => {
+		console.log("보안 로그아웃 실행 중...");
 		await supabase.auth.signOut();
+		console.log("보안 로그아웃 완료");
 	};
 
 	useEffect(() => {
 		// 비밀번호 변경이 완료되지 않은 경우에만 보안 로그아웃 수행
-		if (isPasswordChanged) return;
+		if (isPasswordChanged) {
+			console.log("비밀번호 변경 완료됨, 보안 로그아웃 스킵");
+			return;
+		}
+
+		console.log("보안 로그아웃 이벤트 리스너 등록");
 
 		// 새로고침/브라우저 닫기
-		window.addEventListener('beforeunload', handleLogout);
+		const handleBeforeUnload = () => {
+			console.log("페이지 새로고침/닫기 감지, 로그아웃 실행");
+			handleLogout();
+		};
+		
+		window.addEventListener('beforeunload', handleBeforeUnload);
 
-		// URL 변경 감지
+		// URL 변경 감지 (페이지 이동)
 		if (initialPathRef.current !== pathname) {
+			console.log("페이지 이동 감지, 로그아웃 실행");
 			handleLogout();
 		}
 
-		return () => window.removeEventListener('beforeunload', handleLogout);
+		return () => {
+			console.log("보안 로그아웃 이벤트 리스너 제거");
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
 	}, [pathname, isPasswordChanged]);
 
 	useEffect(() => {
@@ -116,6 +165,57 @@ const ResetPassword = () => {
 			setIsValid(false);
 		}
 	}, [password, confirmPassword]);
+
+	// 페이지 로드 시 세션 확인 및 URL 파라미터 처리
+	useEffect(() => {
+		const checkSessionAndHandleAuth = async () => {
+			console.log("페이지 로드 시 세션 확인 중...");
+			
+			// URL에서 access_token과 refresh_token 확인
+			const urlParams = new URLSearchParams(window.location.hash.substring(1));
+			const accessToken = urlParams.get('access_token');
+			const refreshToken = urlParams.get('refresh_token');
+			
+			console.log("URL 파라미터:", { accessToken: !!accessToken, refreshToken: !!refreshToken });
+			
+			if (accessToken && refreshToken) {
+				console.log("URL에서 토큰 발견, 임시 세션 설정 중...");
+				const { data, error } = await supabase.auth.setSession({
+					access_token: accessToken,
+					refresh_token: refreshToken
+				});
+				
+				if (error) {
+					console.error("세션 설정 오류:", error);
+					showToast({
+						message: '세션 설정에 실패했습니다. 링크를 다시 확인해주세요.',
+						iconType: 'error',
+						autoCloseTime: 3000,
+					});
+					return;
+				}
+				
+				console.log("임시 세션 설정 성공:", data.session);
+				
+				// URL에서 토큰 제거 (보안상)
+				window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+			}
+			
+			// 최종 세션 확인
+			const { data: { session }, error } = await supabase.auth.getSession();
+			console.log("최종 세션:", session);
+			
+			if (error) {
+				console.error("세션 확인 오류:", error);
+			}
+			
+			if (!session) {
+				console.log("세션이 없습니다. 이메일 링크를 통해 접근했는지 확인해주세요.");
+			}
+		};
+		
+		checkSessionAndHandleAuth();
+	}, [showToast]);
 
 	const getValidationError = () => {
 		if (!isValidPassword(password)) {
