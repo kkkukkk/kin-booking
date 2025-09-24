@@ -14,7 +14,6 @@ import InputWithPasswordToggle from "@/components/base/InputWithPasswordToggle";
 import AnimatedText from "@/components/base/AnimatedText";
 import useToast from "@/hooks/useToast";
 import useSourceValidation from "@/hooks/useSourceValidation";
-import useSourceLogout from '@/hooks/useSourceLogout';
 
 const ResetPassword = () => {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -28,11 +27,9 @@ const ResetPassword = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const initialPathRef = useRef(pathname);
-	const searchParams = useSearchParams();
 
 	// url source 포함 여부 체크
 	useSourceValidation('password');
-	useSourceLogout('password');
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!touched) setTouched(true);
@@ -56,6 +53,9 @@ const ResetPassword = () => {
 
 		setIsLoading(true);
 		try {
+			// 세션 확인 (디버깅용)
+			const { data: { session } } = await supabase.auth.getSession();
+			
 			const { error } = await supabase.auth.updateUser({ password });
 
 			if (!error) {
