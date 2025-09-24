@@ -53,14 +53,11 @@ const ResetPassword = () => {
 
 		setIsLoading(true);
 		try {
-			// 세션 확인 (디버깅용)
-			const { data: { session } } = await supabase.auth.getSession();
-			
 			const { error } = await supabase.auth.updateUser({ password });
 
 			if (!error) {
 				showToast({
-					message: '비밀번호가 성공적으로 변경됐어요!\n\n새 비밀번호로 다시 로그인해주세요.',
+					message: '비밀번호가 성공적으로 변경됐어요!\n새 비밀번호로 다시 로그인해주세요.',
 					iconType: 'success',
 					autoCloseTime: 5000,
 				});
