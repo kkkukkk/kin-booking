@@ -56,51 +56,18 @@ const ResetPassword = () => {
 
 		setIsLoading(true);
 		try {
-			console.log("비밀번호 변경 시도 중...");
-			
-			// 먼저 현재 세션 확인
-			const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-			console.log("현재 세션:", session);
-			
-			if (sessionError) {
-				console.error("세션 확인 오류:", sessionError);
-				showToast({
-					message: `세션 확인 실패: ${sessionError.message}`,
-					iconType: 'error',
-					autoCloseTime: 3000,
-				});
-				return;
-			}
-			
-			if (!session) {
-				console.error("세션이 없습니다. 이메일 링크를 다시 확인해주세요.");
-				showToast({
-					message: '세션이 만료되었습니다. 비밀번호 재설정 링크를 다시 요청해주세요.',
-					iconType: 'error',
-					autoCloseTime: 3000,
-				});
-				return;
-			}
-			
 			const { error } = await supabase.auth.updateUser({ password });
 
 			if (!error) {
-				console.log("비밀번호 변경 성공, 즉시 로그아웃 처리 중...");
 				showToast({
 					message: '비밀번호가 성공적으로 변경됐어요!\n\n새 비밀번호로 다시 로그인해주세요.',
 					iconType: 'success',
 					autoCloseTime: 5000,
 				});
 				setIsPasswordChanged(true);
-				
-				// 즉시 로그아웃 (보안상)
 				await supabase.auth.signOut();
-				console.log("비밀번호 변경 후 로그아웃 완료");
-				
-				// 로그인 페이지로 이동
 				router.push('/login');
 			} else {
-				console.error("비밀번호 변경 오류:", error);
 				if (error.message?.includes('different from the old password')) {
 					showToast({
 						message: '기존 비밀번호와 다른 비밀번호를 사용해주세요!',
@@ -121,23 +88,15 @@ const ResetPassword = () => {
 	}
 
 	const handleLogout = async () => {
-		console.log("보안 로그아웃 실행 중...");
 		await supabase.auth.signOut();
-		console.log("보안 로그아웃 완료");
 	};
 
 	useEffect(() => {
 		// 비밀번호 변경이 완료되지 않은 경우에만 보안 로그아웃 수행
-		if (isPasswordChanged) {
-			console.log("비밀번호 변경 완료됨, 보안 로그아웃 스킵");
-			return;
-		}
-
-		console.log("보안 로그아웃 이벤트 리스너 등록");
+		if (isPasswordChanged) return;
 
 		// 새로고침/브라우저 닫기
 		const handleBeforeUnload = () => {
-			console.log("페이지 새로고침/닫기 감지, 로그아웃 실행");
 			handleLogout();
 		};
 		
@@ -145,14 +104,10 @@ const ResetPassword = () => {
 
 		// URL 변경 감지 (페이지 이동)
 		if (initialPathRef.current !== pathname) {
-			console.log("페이지 이동 감지, 로그아웃 실행");
 			handleLogout();
 		}
 
-		return () => {
-			console.log("보안 로그아웃 이벤트 리스너 제거");
-			window.removeEventListener('beforeunload', handleBeforeUnload);
-		};
+		return () => window.removeEventListener('beforeunload', handleLogout);
 	}, [pathname, isPasswordChanged]);
 
 	useEffect(() => {
@@ -165,29 +120,6 @@ const ResetPassword = () => {
 			setIsValid(false);
 		}
 	}, [password, confirmPassword]);
-
-	// 페이지 로드 시 세션 확인 (Supabase가 자동으로 세션 생성)
-	useEffect(() => {
-		const checkSession = async () => {
-			console.log("페이지 로드 시 세션 확인 중...");
-			
-			// Supabase가 자동으로 생성한 세션 확인
-			const { data: { session }, error } = await supabase.auth.getSession();
-			console.log("현재 세션:", session);
-			
-			if (error) {
-				console.error("세션 확인 오류:", error);
-			}
-			
-			if (!session) {
-				console.log("세션이 없습니다. 이메일 링크를 통해 접근했는지 확인해주세요.");
-			} else {
-				console.log("세션이 존재합니다. 비밀번호 변경 가능합니다.");
-			}
-		};
-		
-		checkSession();
-	}, []);
 
 	const getValidationError = () => {
 		if (!isValidPassword(password)) {
