@@ -12,6 +12,12 @@ import SearchBar from '@/components/search/SearchBar';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+// dayjs 플러그인 설정
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const TransferHistoryClient = () => {
     const theme = useAppSelector((state: RootState) => state.theme.current);
@@ -59,10 +65,10 @@ const TransferHistoryClient = () => {
             let aValue: unknown = a[sortConfig.field as keyof TransferHistoryGroupDto];
             let bValue: unknown = b[sortConfig.field as keyof TransferHistoryGroupDto];
             
-            // 날짜 필드인 경우 dayjs로 변환
+            // 날짜 필드인 경우 dayjs로 변환 (한국 시간대 적용)
             if (sortConfig.field === 'groupTime') {
-                aValue = dayjs(aValue as string);
-                bValue = dayjs(bValue as string);
+                aValue = dayjs(aValue as string).tz('Asia/Seoul');
+                bValue = dayjs(bValue as string).tz('Asia/Seoul');
             }
             
             if (sortConfig.direction === 'asc') {
@@ -119,8 +125,8 @@ const TransferHistoryClient = () => {
             header: '양도 일시',
             render: (history: TransferHistoryGroupDto, index: number) => (
                 <div className="text-sm">
-                    <div className="font-medium">{dayjs(history.groupTime).format('YYYY-MM-DD')}</div>
-                    <div className="text-xs opacity-70">{dayjs(history.groupTime).format('HH:mm:ss')}</div>
+                    <div className="font-medium">{dayjs(history.groupTime).tz('Asia/Seoul').format('YYYY-MM-DD')}</div>
+                    <div className="text-xs opacity-70">{dayjs(history.groupTime).tz('Asia/Seoul').format('HH:mm:ss')}</div>
                 </div>
             ),
             width: '15%',
@@ -196,7 +202,7 @@ const TransferHistoryClient = () => {
                 <div className="w-full flex flex-col gap-2">
                     <div className="flex justify-between">
                         <div className="flex flex-col">
-                            <span className="font-semibold text-sm truncate">{dayjs(history.groupTime).format('YYYY-MM-DD HH:mm')}</span>
+                            <span className="font-semibold text-sm truncate">{dayjs(history.groupTime).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="text-xs text-blue-600 font-medium px-2 py-1 bg-blue-50 rounded">

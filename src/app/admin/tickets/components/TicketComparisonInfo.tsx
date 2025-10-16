@@ -35,7 +35,7 @@ const TicketComparisonInfo = ({
                         </div>
                         <div className="flex flex-col">
                             <span className={`${theme === 'neon' ? 'text-gray-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-xs mb-1`}>예매자</span>
-                            <span className={`font-medium break-words`}>{ticketGroup.userName}</span>
+                            <span className={`font-medium break-words`}>{reservationInfo?.users?.name || '정보 없음'}</span>
                         </div>
                         <div className="flex flex-col">
                             <span className={`${theme === 'neon' ? 'text-gray-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-xs mb-1`}>예매 수량</span>
@@ -48,7 +48,7 @@ const TicketComparisonInfo = ({
                         <div className="flex flex-col col-span-2">
                             <span className={`${theme === 'neon' ? 'text-gray-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-xs mb-1`}>예매일</span>
                             <span className={`font-medium`}>
-                                {dayjs(ticketGroup.createdAt).format('YYYY-MM-DD HH:mm')}
+                                {reservationInfo?.reservedAt ? dayjs(reservationInfo.reservedAt).format('YYYY-MM-DD HH:mm') : '정보 없음'}
                             </span>
                         </div>
                     </div>
