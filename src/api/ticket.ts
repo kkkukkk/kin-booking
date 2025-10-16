@@ -277,64 +277,32 @@ export const transferTickets = async (
   return { transferred: ticketsToTransfer.length };
 };
 
-// 티켓 양도 (예매 ID로)
+// 티켓 양도 (예매 ID로) - RPC 함수 사용
 export const transferTicketsByReservation = async (
   request: TransferTicketsRequestDto
 ): Promise<{ transferred: number }> => {
   const { reservationId, eventId, toUserId, fromUserId, transferCount, reason } = request;
   
-  // 1. 해당 예매의 활성 티켓들 조회
-  const { data: ticketsToTransfer, error: checkError } = await supabase
-    .from('ticket')
-    .select('id, event_id, reservation_id, owner_id')
-    .eq('reservation_id', reservationId)
-    .eq('event_id', eventId)
-    .eq('owner_id', fromUserId)
-    .eq('status', 'active')
-    .limit(transferCount);
+  // RPC 함수를 사용하여 티켓 양도 처리 (RLS 정책 우회)
+  const { data, error } = await supabase.rpc('transfer_tickets_by_reservation', {
+    p_reservation_id: reservationId,
+    p_event_id: eventId,
+    p_from_user_id: fromUserId,
+    p_to_user_id: toUserId,
+    p_transfer_count: transferCount,
+    p_reason: reason || null
+  });
 
-  if (checkError) throw checkError;
-  
-  if (!ticketsToTransfer || ticketsToTransfer.length === 0) {
+  if (error) {
+    console.error('티켓 양도 RPC 에러:', error);
+    throw new Error(`티켓 양도 실패: ${error.message}`);
+  }
+
+  if (!data || data.transferred === 0) {
     throw new Error('양도할 수 있는 티켓이 없습니다.');
   }
-
-  if (ticketsToTransfer.length < transferCount) {
-    throw new Error(`양도할 수 있는 티켓이 부족합니다. (요청: ${transferCount}장, 가능: ${ticketsToTransfer.length}장)`);
-  }
-
-  const ticketIds = ticketsToTransfer.map(ticket => ticket.id);
   
-  // 2. 티켓 소유자 변경 (status는 active 유지, transferred_at 설정)
-  const { error: updateError } = await supabase
-    .from('ticket')
-    .update({ 
-      owner_id: toUserId,
-      transferred_at: dayjs().toISOString()
-    })
-    .in('id', ticketIds);
-
-  if (updateError) {
-    throw updateError;
-  }
-
-  // 3. 양도 이력 기록
-  const transferHistoryData = ticketsToTransfer.map(ticket => ({
-    ticket_id: ticket.id,
-    from_user_id: fromUserId,
-    to_user_id: toUserId,
-    reason: reason || null
-  }));
-
-  const { error: historyError } = await supabase
-    .from('ticket_transfer_history')
-    .insert(transferHistoryData);
-
-  if (historyError) {
-    throw historyError;
-  }
-  
-  return { transferred: ticketsToTransfer.length };
+  return { transferred: data.transferred };
 }; 
 
 // 티켓 상태 업데이트 (입장확정용)
