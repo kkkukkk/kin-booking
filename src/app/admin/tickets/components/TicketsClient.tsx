@@ -36,13 +36,13 @@ const TicketsClient = () => {
   // 페이지 크기 옵션
   const pageSizeOptions = [10, 20, 50, 100];
 
-  // 정렬 상태
+  // 정렬 상태 (취소신청 우선 정렬)
   const [sortConfig, setSortConfig] = useState<{
     field: string;
     direction: 'asc' | 'desc';
   }>({
-    field: 'createdAt',
-    direction: 'desc'
+    field: 'status',
+    direction: 'asc'
   });
 
   const { data: ticketGroups, isLoading, error, refetch } = useTicketGroups({
@@ -60,7 +60,7 @@ const TicketsClient = () => {
     ticketGroup: null,
   });
   
-  // 필터링 (키워드 검색 제거)
+  // 필터링 및 정렬 (취소신청 우선 정렬)
   const filteredGroups = ticketGroups?.filter((group: TicketGroupDto) => {
     // 상태 필터링
     if (searchParams.status && group.status !== searchParams.status) {
@@ -81,6 +81,17 @@ const TicketsClient = () => {
     }
     
     return true;
+  }).sort((a: TicketGroupDto, b: TicketGroupDto) => {
+    // 취소신청 상태 우선 정렬
+    if (a.status === 'cancel_requested' && b.status !== 'cancel_requested') {
+      return -1; // a가 먼저
+    }
+    if (a.status !== 'cancel_requested' && b.status === 'cancel_requested') {
+      return 1; // b가 먼저
+    }
+    
+    // 같은 상태 그룹 내에서는 생성일 기준 정렬 (최신순)
+    return dayjs(b.createdAt).diff(dayjs(a.createdAt));
   }) || [];
 
   // 페이지네이션 적용
