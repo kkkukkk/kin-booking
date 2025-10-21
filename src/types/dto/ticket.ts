@@ -62,3 +62,14 @@ export interface TransferTicketsRequestDto {
   transferCount: number;
   reason?: string | null;
 }
+
+export interface TicketListViewDto {
+  name: string;
+  email: string;
+  phone_number: string;
+  ticket_holder: string | null;
+  ticket_count: number;
+  ticket_numbers: number[];
+  event_id: string;
+  ticket_statuses: string[];
+}

@@ -15,6 +15,7 @@ import { TicketStatus } from '@/types/model/ticket';
 import PaginationButtons from '@/components/pagination/PaginationButtons';
 import Select from '@/components/base/Select';
 import RefundInfoModal from './RefundInfoModal';
+import ExcelExportModal from './ExcelExportModal';
 import useToast from '@/hooks/useToast';
 import dayjs from 'dayjs';
 
@@ -59,6 +60,9 @@ const TicketsClient = () => {
     isOpen: false,
     ticketGroup: null,
   });
+
+  // 엑셀 내보내기 모달 상태
+  const [excelModalOpen, setExcelModalOpen] = useState(false);
   
   // 필터링 및 정렬 (취소신청 우선 정렬)
   const filteredGroups = ticketGroups?.filter((group: TicketGroupDto) => {
@@ -282,8 +286,17 @@ const TicketsClient = () => {
     <ThemeDiv className="flex flex-col min-h-full">
       {/* 상단 고정 영역 */}
       <div className="px-6 py-4 space-y-4 md:py-6 md:space-y-6 flex-shrink-0">
-        <div className={`${theme === 'neon' ? 'text-green-400' : ''}`}>
-          <h1 className="text-lg md:text-xl font-bold mb-2">티켓 관리</h1>
+        <div className={`${theme === 'neon' ? 'text-green-400' : ''} flex justify-between items-center`}>
+          <h1 className="text-lg md:text-xl font-bold">티켓 관리</h1>
+          <Button
+            theme={theme === 'neon' ? 'neon' : theme === 'dark' ? 'dark' : 'normal'}
+            onClick={() => setExcelModalOpen(true)}
+            padding="px-3 py-1.5"
+            fontSize="text-sm"
+            className="font-semibold"
+          >
+            엑셀 다운로드
+          </Button>
         </div>
 
         {/* 필터 (검색 제거) */}
@@ -394,6 +407,12 @@ const TicketsClient = () => {
           onSuccess={handleRefundSuccess}
         />
       )}
+
+      {/* 엑셀 내보내기 모달 */}
+      <ExcelExportModal
+        isOpen={excelModalOpen}
+        onClose={() => setExcelModalOpen(false)}
+      />
     </ThemeDiv>
   );
 };
