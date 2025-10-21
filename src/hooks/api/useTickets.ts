@@ -12,6 +12,7 @@ import {
   getTicketGroupsByOwnerId,
   transferTicketsByReservation,
   updateTicketStatusByReservation,
+  getTicketsForExport,
 } from '@/api/ticket';
 import {
   Ticket,
@@ -24,6 +25,58 @@ import {
   TicketGroupDto
 } from '@/types/dto/ticket';
 import { getAllTicketsForStats } from '@/api/ticket';
+import { exportTicketsToExcel } from '@/util/excelExport';
+// 티켓 엑셀 내보내기 훅
+export const useTicketExport = () => {
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: async (params: {
+      eventId?: string;
+      status?: string;
+      separateByEvent?: boolean;
+      events?: Array<{ id: string; eventName: string }>;
+    }) => {
+      const data = await getTicketsForExport(params);
+      
+      // 파일명 생성 (오늘 날짜 + 시간)
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, ''); // HHMMSS
+      const filename = `티켓목록_${dateStr}_${timeStr}.xlsx`;
+      
+      // 엑셀 다운로드
+      exportTicketsToExcel(data, filename, params.separateByEvent, params.events);
+      
+      return data;
+    },
+    onSuccess: (data) => {
+      showToast({ 
+        message: `총 ${data.length}개의 티켓 그룹이 엑셀로 다운로드되었습니다.`, 
+        iconType: 'success', 
+        autoCloseTime: 3000 
+      });
+    },
+    onError: (error: Error) => {
+      showToast({ 
+        message: '티켓 내보내기에 실패했습니다.', 
+        iconType: 'error' 
+      });
+    },
+  });
+};
+
+// 상태를 한국어로 변환하는 헬퍼 함수
+const getStatusKorean = (status: string): string => {
+  const statusMap: { [key: string]: string } = {
+    'active': '사용가능',
+    'cancelled': '취소됨',
+    'used': '사용완료',
+    'transferred': '양도됨',
+    'cancel_requested': '취소신청'
+  };
+  return statusMap[status] || status;
+};
 
 // 예약 ID로 티켓 조회
 export const useTicketsByReservationId = (reservationId: string) => {

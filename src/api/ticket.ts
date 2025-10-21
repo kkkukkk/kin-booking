@@ -4,6 +4,62 @@ import { TicketWithEventDto, TicketGroupApiResponse, FetchTicketGroupDto, Transf
 import { toCamelCaseKeys } from '@/util/case/case';
 import dayjs from 'dayjs';
 
+// 티켓 내보내기용 데이터 조회 (뷰테이블 사용)
+export const getTicketsForExport = async (params?: {
+  eventId?: string;
+  status?: string;
+}): Promise<Array<{
+  userName: string;
+  userEmail: string;
+  userPhoneNumber: string;
+  ticketHolder: string;
+  ticketCount: number;
+  ticketNumbers: number[];
+  eventId: string;
+  ticketStatuses: string[];
+}>> => {
+  let query = supabase
+    .from('ticket_list_view')
+    .select(`
+      name,
+      email,
+      phone_number,
+      ticket_holder,
+      ticket_count,
+      ticket_numbers,
+      event_id,
+      ticket_statuses
+    `);
+
+  // 이벤트 ID 필터링
+  if (params?.eventId) {
+    query = query.eq('event_id', params.eventId);
+  }
+
+  // 상태 필터링 (ticket_statuses 배열에서 확인)
+  if (params?.status) {
+    query = query.contains('ticket_statuses', [params.status]);
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw error;
+
+  // 데이터 변환
+  const result = data?.map((group: any) => ({
+    userName: group.name,
+    userEmail: group.email,
+    userPhoneNumber: group.phone_number,
+    ticketHolder: group.ticket_holder || '',
+    ticketCount: group.ticket_count,
+    ticketNumbers: group.ticket_numbers || [],
+    eventId: group.event_id,
+    ticketStatuses: group.ticket_statuses || []
+  })) || [];
+
+  return result;
+};
+
 // 예약 ID로 티켓 조회
 export const getTicketsByReservationId = async (reservationId: string): Promise<Ticket[]> => {
   const { data, error } = await supabase
