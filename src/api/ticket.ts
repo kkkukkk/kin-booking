@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import { Ticket } from '@/types/model/ticket';
-import { TicketWithEventDto, TicketGroupApiResponse, FetchTicketGroupDto, TransferTicketsRequestDto } from '@/types/dto/ticket';
+import { TicketWithEventDto, TicketGroupApiResponse, FetchTicketGroupDto, TransferTicketsRequestDto, TicketListViewDto } from '@/types/dto/ticket';
 import { toCamelCaseKeys } from '@/util/case/case';
 import dayjs from 'dayjs';
 
@@ -46,7 +46,7 @@ export const getTicketsForExport = async (params?: {
   if (error) throw error;
 
   // 데이터 변환
-  const result = data?.map((group: any) => ({
+  const result = data?.map((group: TicketListViewDto) => ({
     userName: group.name,
     userEmail: group.email,
     userPhoneNumber: group.phone_number,
