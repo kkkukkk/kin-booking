@@ -42,7 +42,7 @@
 - **Framer Motion** - 애니메이션
 
 ### Backend & Database
-- **Supabase** - 백엔드 서비스 및 데이터베이스
+- **Supabase** - 백엔드 서비스 및 데이터베이스, Row Level Security (RLS)
 - **PostgreSQL** - 관계형 데이터베이스
 
 ## 📱 주요 페이지
@@ -53,30 +53,12 @@
 - **마이페이지** (`/my`) - 개인 정보 및 예약 내역
 - **관리자** (`/admin`) - 이벤트 및 사용자 관리, 앱 설정 관리
 
-## 🔒 보안 기능
-
-- Row Level Security (RLS)
-
-### 앱 설정 관리
-- 관리자 페이지 (`/admin/settings`)에서 전역 설정을 관리할 수 있습니다.
-- 배경 이미지 URL을 변경하면 즉시 반영됩니다.
-- 로그인 슬라이드 이미지를 추가/수정/삭제하고 순서를 조정할 수 있습니다.
-- 캐시 문제 없이 동적으로 설정을 관리할 수 있습니다.
-
 ## 📊 성능 최적화
 
 - CSS 최적화 및 번들링
 - 이미지 최적화
 - 코드 스플리팅
-
-## 🤝 기여하기
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
+  
 ## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
