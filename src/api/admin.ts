@@ -30,14 +30,14 @@ export const getAllDashboardData = async () => {
     const lastMonthStart = now.subtract(1, 'month').startOf('month');
 
     // API 호출로 모든 데이터 조회
-    const [usersResult, ticketsResult, transactionsResult, reservationsResult, eventsResult] = await Promise.all([
+    const [usersResult, ticketsResult, transactionsResult, reservationsResult, eventsResult, allTransactionsResult] = await Promise.all([
       // 1. 사용자 데이터
       supabase.from('users').select('id, status'),
 
       // 2. 티켓 데이터
       supabase.from('ticket').select('status'),
 
-      // 3. 결제 거래 데이터 (최근 1개월)
+      // 3. 결제 거래 데이터 (최근 1개월 - 트렌드용)
       supabase.from('payment_transactions')
         .select('event_id, amount, payment_type, operated_at')
         .gte('operated_at', lastMonthStart.toISOString()),
@@ -50,7 +50,11 @@ export const getAllDashboardData = async () => {
       // 5. 공연 데이터 (통합 뷰)
       supabase.from('event_with_reservation_view')
         .select('*')
-        .order('event_date', { ascending: false })
+        .order('event_date', { ascending: false }),
+
+      // 6. 전체 기간 결제 거래 데이터 (총 수익 계산용)
+      supabase.from('payment_transactions')
+        .select('payment_type, amount')
     ]);
 
     // 에러 체크
@@ -59,13 +63,15 @@ export const getAllDashboardData = async () => {
     if (transactionsResult.error) throw transactionsResult.error;
     if (reservationsResult.error) throw reservationsResult.error;
     if (eventsResult.error) throw eventsResult.error;
+    if (allTransactionsResult.error) throw allTransactionsResult.error;
 
     return {
       users: usersResult.data || [],
       tickets: ticketsResult.data || [],
       transactions: transactionsResult.data || [],
       reservations: reservationsResult.data || [],
-      events: eventsResult.data || []
+      events: eventsResult.data || [],
+      allTransactions: allTransactionsResult.data || []
     };
   } catch (error) {
     console.error('통합 대시보드 데이터 조회 실패:', error);
@@ -339,7 +345,8 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     // 프론트엔드에서 데이터 처리
     const userStats = processActivityUserStats(rawData.users, rawData.reservations);
     const ticketStats = processTicketStats(rawData.tickets);
-    const revenueStats = processRevenueStats(rawData.transactions);
+    // 총 수익은 전체 기간 데이터로 계산
+    const revenueStats = processRevenueStats(rawData.allTransactions);
     const eventStats = processEventStats(rawData.events, rawData.transactions, rawData.reservations);
     const trends = processTrendStats(rawData.transactions, rawData.reservations);
 
