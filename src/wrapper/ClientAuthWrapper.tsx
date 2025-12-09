@@ -21,11 +21,12 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
 	const [ready, setReady] = useState(false);
 
-	// 관리자 페이지 권한 체크
+	// 관리자 페이지 경로 확인
 	const isAdminPath = pathname?.startsWith('/admin');
+	// 사용자 정보 조회 (권한 확인용)
 	const { data: user, isLoading: userLoading } = useUserById(session?.user?.id || '');
 
-	// admin 경로 접근 시 권한 체크
+	// 관리자 페이지 접근 시 권한 체크
 	useEffect(() => {
 		if (isAdminPath && isLoggedIn && !userLoading && user) {
 			const userRole = getUserHighestRole(user);
@@ -35,7 +36,7 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 					iconType: 'error',
 					autoCloseTime: 3000,
 				});
-				// Toast가 보이도록 약간 지연 후 이동
+				// toast 알림 용 시간 지연
 				setTimeout(() => {
 					router.replace('/');
 				}, 100);
@@ -43,6 +44,7 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 		}
 	}, [isAdminPath, isLoggedIn, userLoading, user, showToast, router]);
 
+	// 로그인 상태 및 공용 경로 처리
 	useEffect(() => {
 		if (!loading) {
 			// 로그아웃 중이거나 로그아웃된 상태라면 즉시 ready로 설정
@@ -51,13 +53,14 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 				return;
 			}
 
+			// 로그인하지 않은 상태에서 보호된 페이지 접근 시
 			if (!isLoggedIn && !publicPaths.includes(pathname)) {
 				showToast({
 					message: '접근 정보가 없거나 만료되었습니다. 이용을 원하시면 로그인해주세요.',
 					iconType: 'error',
 					autoCloseTime: 3000,
 				});
-				// Toast가 보이도록 약간 지연 후 이동
+				// toast 알림 용 시간 지연
 				setTimeout(() => {
 					router.replace('/login');
 				}, 100);
@@ -67,31 +70,16 @@ const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 		}
 	}, [loading, isLoggedIn, pathname, router, showToast, isLoggedOut, isLoggingOut]);
 
-	// 로그아웃 중이거나 로그아웃된 상태라면 즉시 렌더링
-	if (isLoggingOut || isLoggedOut) {
-		return <>{children}</>;
-	}
+	// 로그아웃 중이거나 공용 경로라면 즉시 렌더링
+	if (isLoggingOut || isLoggedOut) return <>{children}</>;
 
-	// admin 페이지 접근 시 권한 체크 완료 전까지 렌더링 차단
+	// 관리자 페이지 접근 시 권한 체크 완료 전까지 렌더링 차단
 	if (isAdminPath) {
-		if (!isLoggedIn) {
-			return null; // 로그인 페이지로 리다이렉트 중
-		}
-
-		if (userLoading || !user) {
-			return null; // 사용자 정보 로딩 중이거나 없음
-		}
-
-		// 권한 체크
-		const userRole = getUserHighestRole(user);
-		if (userRole === UserRoleStatus.User) {
-			return null; // 권한 부족으로 홈으로 리다이렉트 중
-		}
+		if (!isLoggedIn || userLoading || !user || getUserHighestRole(user) === UserRoleStatus.User) return null;
 	}
 
-	if (!ready && !publicPaths.includes(pathname)) {
-		return null;
-	}
+	// 보호된 페이지 접근 시 준비가 완료되지 않았다면 렌더링 차단
+	if (!ready && !publicPaths.includes(pathname)) return null;
 
 	return <>{children}</>;
 };
