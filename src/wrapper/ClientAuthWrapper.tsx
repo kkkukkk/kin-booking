@@ -8,7 +8,7 @@ import { useUserById } from '@/hooks/api/useUsers';
 import { getUserHighestRole } from '@/util/userRole';
 import { UserRoleStatus } from '@/types/model/userRole';
 
-const publicPaths = ['/login', '/register', '/auth/find', '/auth/callback', '/auth/reset-password'];
+const publicPaths = ['/maintenance', '/login', '/register', '/auth/find', '/auth/callback', '/auth/reset-password'];
 
 const ClientAuthWrapper = ({ children }: { children: React.ReactNode }) => {
 	const pathname = usePathname();
