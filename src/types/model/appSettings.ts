@@ -1,18 +1,24 @@
 export interface AppSettings {
-  id: string;
-  key: string;
-  value: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
+	id: string;
+	key: AppSettingKey;
+	value: string;
+	description?: string | null;
+	createdAt: string;
+	updatedAt: string;
 }
 
-// 로그인 이미지 모델
+export const AppSettingKeys = {
+	SITE_MAINTENANCE: 'site_maintenance',
+	BACKGROUND_IMAGE_URL: 'background_image_url',
+} as const;
+
+export type AppSettingKey = (typeof AppSettingKeys)[keyof typeof AppSettingKeys];
+
 export interface LoginImage {
-  id: string;
-  url: string;
-  order: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-} 
+	id: string;
+	url: string;
+	order: number;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}

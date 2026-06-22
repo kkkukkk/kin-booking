@@ -1,8 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
-import { AppSettings, LoginImage } from '@/types/model/appSettings';
+import { AppSettings, LoginImage, AppSettingKeys } from '@/types/model/appSettings';
 import { CreateAppSettingsDto, UpdateAppSettingsDto, CreateLoginImageDto, UpdateLoginImageDto } from '@/types/dto/appSettings';
 import { toCamelCaseKeys, toSnakeCaseKeys } from '@/util/case/case';
-import { SITE_MAINTENANCE_KEY } from '@/constants/appSettings';
 
 // 모든 설정 조회
 export const fetchAllAppSettings = async (): Promise<AppSettings[]> => {
@@ -66,51 +65,26 @@ export const deleteAppSetting = async (key: string): Promise<void> => {
 
 // 배경 이미지 설정 조회 (편의 함수)
 export const fetchBackgroundImageSetting = async (): Promise<string | null> => {
-  const setting = await fetchAppSettingByKey('background_image_url');
+  const setting = await fetchAppSettingByKey(AppSettingKeys.BACKGROUND_IMAGE_URL);
   return setting?.value || null;
 };
 
 // 배경 이미지 설정 업데이트 (편의 함수)
 export const updateBackgroundImageSetting = async (imageUrl: string): Promise<AppSettings> => {
-  const setting = await fetchAppSettingByKey('background_image_url');
+  const setting = await fetchAppSettingByKey(AppSettingKeys.BACKGROUND_IMAGE_URL);
   
   if (setting) {
-    return await updateAppSetting('background_image_url', { 
+    return await updateAppSetting(AppSettingKeys.BACKGROUND_IMAGE_URL, { 
       value: imageUrl,
       description: '메인 페이지 배경 이미지 URL'
     });
   } else {
     return await createAppSetting({
-      key: 'background_image_url',
+      key: AppSettingKeys.BACKGROUND_IMAGE_URL,
       value: imageUrl,
       description: '메인 페이지 배경 이미지 URL'
     });
   }
-};
-
-// 사이트 점검 모드 조회 (편의 함수)
-export const fetchSiteMaintenanceEnabled = async (): Promise<boolean> => {
-  const setting = await fetchAppSettingByKey(SITE_MAINTENANCE_KEY);
-  return setting?.value === 'true';
-};
-
-// 사이트 점검 모드 설정 (편의 함수)
-export const setSiteMaintenanceEnabled = async (enabled: boolean): Promise<AppSettings> => {
-  const value = enabled ? 'true' : 'false';
-  const existing = await fetchAppSettingByKey(SITE_MAINTENANCE_KEY);
-
-  if (existing) {
-    return updateAppSetting(SITE_MAINTENANCE_KEY, {
-      value,
-      description: '사이트 점검 모드. true면 일반 사용자는 /maintenance로 이동합니다.',
-    });
-  }
-
-  return createAppSetting({
-    key: SITE_MAINTENANCE_KEY,
-    value,
-    description: '사이트 점검 모드. true면 일반 사용자는 /maintenance로 이동합니다.',
-  });
 };
 
 // ===== 로그인 이미지 관리 =====

@@ -1,38 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Button from '@/components/base/Button';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import Spinner from '@/components/spinner/Spinner';
 import useToast from '@/hooks/useToast';
-import { fetchSiteMaintenanceEnabled, setSiteMaintenanceEnabled } from '@/api/appSettings';
+import { useSiteMaintenance, useUpdateSiteMaintenance } from '@/hooks/api/useSiteMaintenance';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 
 export default function MaintenanceModeManager() {
 	const theme = useAppSelector((state: RootState) => state.theme.current);
 	const { showToast } = useToast();
-	const [enabled, setEnabled] = useState(false);
-	const [loading, setLoading] = useState(true);
-	const [saving, setSaving] = useState(false);
-
-	const loadMaintenanceMode = useCallback(async () => {
-		try {
-			setLoading(true);
-			const isEnabled = await fetchSiteMaintenanceEnabled();
-			setEnabled(isEnabled);
-		} catch (error) {
-			console.error('점검 모드 로드 실패:', error);
-			showToast({ message: '점검 모드 설정을 불러오지 못했습니다.', iconType: 'error', autoCloseTime: 3000 });
-		} finally {
-			setLoading(false);
-		}
-	}, [showToast]);
-
-	useEffect(() => {
-		loadMaintenanceMode();
-	}, [loadMaintenanceMode]);
+	const { data: enabled = false, isLoading, isError } = useSiteMaintenance();
+	const { mutateAsync: updateSiteMaintenance, isPending } = useUpdateSiteMaintenance();
 
 	const handleToggle = async () => {
 		const next = !enabled;
@@ -41,9 +22,7 @@ export default function MaintenanceModeManager() {
 		}
 
 		try {
-			setSaving(true);
-			await setSiteMaintenanceEnabled(next);
-			setEnabled(next);
+			await updateSiteMaintenance({ enabled: next });
 			showToast({
 				message: next ? '점검 모드를 켰습니다.' : '점검 모드를 껐습니다.',
 				iconType: 'success',
@@ -52,16 +31,22 @@ export default function MaintenanceModeManager() {
 		} catch (error) {
 			console.error('점검 모드 저장 실패:', error);
 			showToast({ message: '점검 모드 저장에 실패했습니다.', iconType: 'error', autoCloseTime: 3000 });
-		} finally {
-			setSaving(false);
 		}
 	};
 
-	if (loading) {
+	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center py-16">
 				<Spinner size={48} color="var(--neon-green)" />
 			</div>
+		);
+	}
+
+	if (isError) {
+		return (
+			<ThemeDiv className="rounded-lg p-6 text-sm text-red-400">
+				점검 모드 설정을 불러오지 못했습니다. app_settings에 site_maintenance 행이 있는지 확인하세요.
+			</ThemeDiv>
 		);
 	}
 
@@ -78,9 +63,9 @@ export default function MaintenanceModeManager() {
 					theme={theme}
 					reverse={enabled}
 					className="font-semibold px-4 py-2"
-					disabled={saving}
+					disabled={isPending}
 				>
-					{saving ? '저장 중...' : enabled ? '점검 끄기' : '점검 켜기'}
+					{isPending ? '저장 중...' : enabled ? '점검 끄기' : '점검 켜기'}
 				</Button>
 			</div>
 
