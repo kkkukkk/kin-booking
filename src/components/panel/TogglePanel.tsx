@@ -37,8 +37,9 @@ const TogglePanel = () => {
 	}, [handleClickOutside]);
 
 	// 인증 관련 페이지에서 패널 숨기기
-	const isAuthPage = pathname?.startsWith('/auth') || 
-					  pathname?.startsWith('/reset-password');
+	const isAuthPage = pathname?.startsWith('/auth') ||
+					  pathname?.startsWith('/reset-password') ||
+					  pathname === '/maintenance';
 
 	if (isAuthPage) {
 		return null;

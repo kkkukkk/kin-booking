@@ -12,6 +12,7 @@ import Textarea from '@/components/base/Textarea';
 import useToast from '@/hooks/useToast';
 import useImageUpload from '@/hooks/useImageUpload';
 import LoginImagesManager from './LoginImagesManager';
+import MaintenanceModeManager from './MaintenanceModeManager';
 import Spinner from '@/components/spinner/Spinner';
 import ThemeDiv from '@/components/base/ThemeDiv';
 import { useAppSelector } from '@/redux/hooks';
@@ -27,7 +28,7 @@ export default function SettingsClient() {
     url: '',
     description: '메인 페이지 배경 이미지'
   });
-  const [activeTab, setActiveTab] = useState<'background' | 'login-images'>('background');
+  const [activeTab, setActiveTab] = useState<'maintenance' | 'background' | 'login-images'>('maintenance');
   const { showToast } = useToast();
   const { uploading, uploadProgress, uploadImage } = useImageUpload({
     onSuccess: (url) => {
@@ -125,6 +126,15 @@ export default function SettingsClient() {
         {/* 탭 네비게이션 */}
         <ThemeDiv className="flex space-x-1 rounded-lg p-1 mb-8">
           <button
+            onClick={() => setActiveTab('maintenance')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'maintenance'
+              ? 'bg-[var(--neon-green)] text-black'
+              : 'text-gray-400 hover:text-gray-200'
+              }`}
+          >
+            점검 모드
+          </button>
+          <button
             onClick={() => setActiveTab('background')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'background'
               ? 'bg-[var(--neon-green)] text-black'
@@ -143,6 +153,8 @@ export default function SettingsClient() {
             로그인 슬라이드
           </button>
         </ThemeDiv>
+
+        {activeTab === 'maintenance' ? <MaintenanceModeManager /> : null}
 
         {/* 배경 이미지 관리 */}
         {activeTab === 'background' ? (

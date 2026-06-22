@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
-import { AppSettings, LoginImage } from '@/types/model/appSettings';
+import { AppSettings, LoginImage, AppSettingKeys } from '@/types/model/appSettings';
 import { CreateAppSettingsDto, UpdateAppSettingsDto, CreateLoginImageDto, UpdateLoginImageDto } from '@/types/dto/appSettings';
 import { toCamelCaseKeys, toSnakeCaseKeys } from '@/util/case/case';
 
@@ -65,22 +65,22 @@ export const deleteAppSetting = async (key: string): Promise<void> => {
 
 // 배경 이미지 설정 조회 (편의 함수)
 export const fetchBackgroundImageSetting = async (): Promise<string | null> => {
-  const setting = await fetchAppSettingByKey('background_image_url');
+  const setting = await fetchAppSettingByKey(AppSettingKeys.BACKGROUND_IMAGE_URL);
   return setting?.value || null;
 };
 
 // 배경 이미지 설정 업데이트 (편의 함수)
 export const updateBackgroundImageSetting = async (imageUrl: string): Promise<AppSettings> => {
-  const setting = await fetchAppSettingByKey('background_image_url');
+  const setting = await fetchAppSettingByKey(AppSettingKeys.BACKGROUND_IMAGE_URL);
   
   if (setting) {
-    return await updateAppSetting('background_image_url', { 
+    return await updateAppSetting(AppSettingKeys.BACKGROUND_IMAGE_URL, { 
       value: imageUrl,
       description: '메인 페이지 배경 이미지 URL'
     });
   } else {
     return await createAppSetting({
-      key: 'background_image_url',
+      key: AppSettingKeys.BACKGROUND_IMAGE_URL,
       value: imageUrl,
       description: '메인 페이지 배경 이미지 URL'
     });
