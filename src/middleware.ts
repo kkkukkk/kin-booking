@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-/** 사이트 재오픈 시 false로 변경 */
-const MAINTENANCE_ENABLED = true;
+import { isSiteMaintenanceEnabled } from '@/lib/maintenance';
 
 const MAINTENANCE_PATH = '/maintenance';
 
@@ -12,18 +10,22 @@ const isStaticAsset = (pathname: string) =>
 	pathname.startsWith('/images') ||
 	/\.(?:ico|png|jpg|jpeg|svg|gif|webp|json|txt|xml|woff2?)$/i.test(pathname);
 
-export function middleware(request: NextRequest) {
-	if (!MAINTENANCE_ENABLED) {
-		return NextResponse.next();
-	}
+const isMaintenanceBypass = (pathname: string) =>
+	pathname === MAINTENANCE_PATH ||
+	pathname.startsWith('/admin') ||
+	pathname === '/login' ||
+	pathname.startsWith('/auth') ||
+	isStaticAsset(pathname);
 
+export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
-	if (pathname === MAINTENANCE_PATH || isStaticAsset(pathname)) {
-		return NextResponse.next();
+	const maintenanceEnabled = await isSiteMaintenanceEnabled();
+	if (maintenanceEnabled && !isMaintenanceBypass(pathname)) {
+		return NextResponse.redirect(new URL(MAINTENANCE_PATH, request.url));
 	}
 
-	return NextResponse.redirect(new URL(MAINTENANCE_PATH, request.url));
+	return NextResponse.next();
 }
 
 export const config = {
